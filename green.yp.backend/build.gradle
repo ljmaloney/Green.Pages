@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'groovy'
-    id 'org.springframework.boot' version '3.3.4'
+    id 'org.springframework.boot' version '3.4.5'
     id 'io.spring.dependency-management' version '1.1.2'
     id("org.springdoc.openapi-gradle-plugin") version "1.6.0"
 }
@@ -30,7 +30,8 @@ repositories {
 }
 
 ext {
-    springCloudVersion = "2023.0.5"
+    springCloudVersion = "2024.0.1"
+    springDocVersion = "2.8.5"
     lombokVersion = "1.18.30"
     flywayMySql="11.8.0"
 }
@@ -60,7 +61,7 @@ dependencies {
 //    implementation 'org.flywaydb:flyway-core'
 //    implementation "org.flywaydb:flyway-mysql:${flywayMySql}"
 
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocVersion}"
 
     implementation 'org.yaml:snakeyaml'
     implementation 'com.jayway.jsonpath:json-path:2.9.0'
