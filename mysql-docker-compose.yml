@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  green-yp-mysql:
+    container_name: green-yp-mysql
+    environment:
+      MYSQL_DATABASE: greenyp
+      MYSQL_USER: gypadmin
+      MYSQL_PASSWORD: local
+      MYSQL_ROOT_PASSWORD: local
+    image: mysql:8.0.37-debian
+    command:
+      - "--max-connections=1024"
+      - "--innodb-print-all-deadlocks"
+      # For reduced load and speed on the small throw away data pipeline agents:
+      - "--skip-innodb-doublewrite"
+      - "--skip-log-bin"
+      - "--skip-performance-schema"
+    ports:
+      - 3306:3306
+    ulimits:
+      # Ensure file limit is high enough otherwise max connection config will fail
+      nofile:
+        soft: 65535
+        hard: 65535
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:Z
+      - /Users/luthermaloney/green-mysql:/var/lib/mysql
+    restart: unless-stopped
+
+  greenyp-redis:
+    image: redis:latest
+    container_name: greenyp-redis
+    ports:
+      - 6379:6379
+    volumes:
+      - /Users/luthermaloney/greenyp-redis:/data
+    entrypoint: "redis-server --appendonly yes --requirepass local"
+    restart: unless-stopped
