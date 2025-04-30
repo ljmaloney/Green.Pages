@@ -1,0 +1,15 @@
+package com.green.yp.payment.integration;
+
+import com.green.yp.api.apitype.payment.PaymentMethodResponse;
+import jakarta.validation.constraints.NotNull;
+import lombok.NonNull;
+
+import java.math.BigDecimal;
+import java.util.UUID;
+
+public record PaymentIntegrationRequest(
+    @NotNull @NonNull UUID invoiceId,
+    @NotNull @NonNull String invoiceNumber,
+    @NotNull @NonNull String descriptionText,
+    @NotNull @NonNull BigDecimal invoiceAmount,
+    @NotNull @NonNull PaymentMethodResponse paymentMethod) {}

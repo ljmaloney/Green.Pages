@@ -1,0 +1,13 @@
+pluginManagement {
+  repositories {
+      maven { url = 'https://maven.vaadin.com/vaadin-prereleases' }
+      gradlePluginPortal()
+  }
+  plugins {
+      id 'com.vaadin' version "${vaadinVersion}"
+  }
+}
+rootProject.name = 'GreenPages'
+include 'green.yp.api'
+include 'green.yp.backend'
+include 'usps.address.api'

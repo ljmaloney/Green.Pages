@@ -1,0 +1,601 @@
+{
+  "info": {
+    "_postman_id": "f00fa679-a4df-4276-a216-eeb1a0adff5d",
+    "name": "Green YP",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Account - Get Account Info",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "localhost:8080/account/60f27dcf-1c03-417c-9fd9-b8c6e276ca00",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "account",
+            "60f27dcf-1c03-417c-9fd9-b8c6e276ca00"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Account - Create New Account",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"businessName\": \"Covington Lawn Services\",\n  \"lineOfBusinessId\": \"033c7525-ac11-4bbb-9b79-8a389eaf7fd5\",\n  \"subscriptionId\": \"5b4d95a2-967d-433b-b68c-db53b417d25c\",\n  \"subscriptionType\": \"BETA_TESTER\",\n  \"websiteUrl\": \"http://covington-lawn.com\",\n  \"narrative\": \"Business narrative goes here\"\n}\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8081/account",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "account"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Account -Update Account - all",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"producerId\": \"25fda0f5-af8e-48cd-8fa1-947ada3139c7\",\n        \"producerRequest\": {\n        \"producerId\": \"25fda0f5-af8e-48cd-8fa1-947ada3139c7\",\n        \"businessName\": \"Covington Lawn Services\",\n        \"lineOfBusinessId\": \"033c7525-ac11-4bbb-9b79-8a389eaf7fd5\",\n        \"subscriptionId\": \"5b4d95a2-967d-433b-b68c-db53b417d25c\",\n        \"subscriptionType\": \"BETA_TESTER\",\n        \"invoiceCycleType\" : \"MONTHLY\",\n        \"websiteUrl\": \"http://covington-lawn.com\",\n        \"narrative\" : \"Business narrative or description\"\n  },\n  \"primaryLocation\": {\n      \"locationId\": \"4d4675d6-1c06-4677-833a-cb3e735b5c43\",\n      \"locationName\" : \"Covington Lawn & Garden\",\n      \"locationType\" : \"HOME_OFFICE_PRIMARY\",\n      \"locationDisplayType\" : \"CITY_STATE_ZIP\",\n      \"active\" : true,\n      \"addressLine1\": \"123 Floyd Street\",\n      \"addressLine2\" :\"\",\n      \"addressLine3\" : \"\",\n      \"city\" : \"Covington\",\n      \"state\" : \"GA\",\n      \"postalCode\" : \"30014\",\n      \"latitude\" : null, \n      \"longitude\" : null, \n      \"websiteUrl\" : null\n  }, \n  \"primaryContact\" : {\n      \"contactId\" : null,\n      \"locationId\" : null,\n      \"contactType\" : \"PRIMARY\",\n      \"displayContactType\" : \"PHONE_EMAIL_ONLY\",\n      \"genericContactName\" : \"Sales\",\n      \"phoneNumber\" : \"770-786-1343\",\n      \"cellPhoneNumber\" : null, \n      \"emailAddress\" : \"maloney1@mindspring.com\"\n  }\n}\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8081/account",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "account"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Account -Update Account - primary contact",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"producerId\": \"25fda0f5-af8e-48cd-8fa1-947ada3139c7\",\n  \"primaryContact\" : {\n      \"contactId\": \"05a26cc9-d0bf-4136-8224-0100898286ba\",\n      \"producerLocationId\" : \"4d4675d6-1c06-4677-833a-cb3e735b5c43\",\n      \"producerContactType\" : \"PRIMARY\",\n      \"displayContactType\" : \"PHONE_EMAIL_ONLY\",\n      \"genericContactName\" : \"Sales12345\",\n      \"phoneNumber\" : \"770-786-1343\",\n      \"cellPhoneNumber\" : null, \n      \"emailAddress\" : \"maloney1@mindspring.com\"\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8081/account",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "account"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Account - Apply Initial Payment",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"producerId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n  \"paymentMethod\": \"string\",\n  \"payorName\": \"string\",\n  \"payorAddress1\": \"string\",\n  \"payorAddress2\": \"string\",\n  \"payorCity\": \"string\",\n  \"payorState\": \"string\",\n  \"payorPostalCode\": \"string\",\n  \"actionType\": \"APPLY_ONCE\",\n  \"cycleType\": \"MONTHLY\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/account/applyInitialPayment",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "account",
+            "applyInitialPayment"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Account - Apply Payment",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"invoiceId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n  \"producerId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n  \"paymentType\": \"INITIAL_PAYMENT\",\n  \"savedPaymentMethodId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n  \"newPaymentMethod\": {\n    \"producerId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n    \"paymentMethod\": \"string\",\n    \"payorName\": \"string\",\n    \"payorAddress1\": \"string\",\n    \"payorAddress2\": \"string\",\n    \"payorCity\": \"string\",\n    \"payorState\": \"string\",\n    \"payorPostalCode\": \"string\",\n    \"maskedMethod\": \"string\"\n  }\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/account/applyPayment",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "account",
+            "applyPayment"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Account - Delete(Cancel) Account",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/account/{accountId}",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "account",
+            "{accountId}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Subscription - Get Subscriptions",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/reference/subscription",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "reference",
+            "subscription"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Subscription -  Create new Subscription",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"subscriptionType\": \"TOP_LEVEL\",\n  \"displayName\": \"Basic Enhanced\",\n  \"startDate\": \"2023-09-01\",\n  \"endDate\": \"9999-12-31\",\n  \"monthlyAutopayAmount\": 30,\n  \"quarterlyAutopayAmount\": 100,\n  \"annualBillAmount\": 300,\n  \"shortDescription\": \"Adds information request form\",\n  \"htmlDescription\": \"Includes everything from the basic subscription and adds professional looking information request and reply\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/reference/subscription",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "reference",
+            "subscription"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Subscription - Update Subscription",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"subscriptionId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n  \"subscriptionType\": \"TOP_LEVEL\",\n  \"displayName\": \"string\",\n  \"lineOfBusiness\": \"string\",\n  \"startDate\": \"2023-09-02T15:24:28.224Z\",\n  \"endDate\": \"2023-09-02T15:24:28.224Z\",\n  \"monthlyAutopayAmount\": 0,\n  \"quaterlyAutopayAmount\": 0,\n  \"annualBillAmount\": 0,\n  \"shortDescription\": \"string\",\n  \"htmlDescription\": \"string\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/reference/subscription",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "reference",
+            "subscription"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Reference - Line Of Business",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/reference/lob",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "reference",
+            "lob"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Reference - Create Line of Business",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"createByReference\": \"string\",\n  \"createDate\": \"2023-09-02T15:20:42.677Z\",\n  \"createType\": \"SYSTEM_DEFAULT\",\n  \"description\": \"string\",\n  \"lastUpdateDate\": \"2023-09-02T15:20:42.677Z\",\n  \"lineOfBusiness\": \"string\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/reference/lob",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "reference",
+            "lob"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Services for a Line of Business",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/reference/lob/Basic Lawn Care/service",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "reference",
+            "lob",
+            "Basic Lawn Care",
+            "service"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Service for Line of Business",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"lineOfBusiness\": \"Basic Lawn Care\",\n  \"createdByReference\": \"admin\",\n  \"createdByType\": \"ADMIN_USER\",\n  \"serviceName\": \"Lawn mowing\",\n  \"serviceDescription\": \"Lawn mowing\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/reference/lob/service",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "reference",
+            "lob",
+            "service"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Producer - Create a Service",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"producerId\": \"60f27dcf-1c03-417c-9fd9-b8c6e276ca00\",\n  \"producerLocationId\": \"71f62652-ae6e-461b-b006-cad602df7796\",\n  \"minServicePrice\": 35.00,\n  \"maxServicePrice\": 150.00,\n  \"priceUnitsType\": \"LOT_SIZE\",\n  \"shortDescription\": \"Lawn mowing\",\n  \"description\": \"Residential lawn mowing for normal size lots\",\n  \"serviceTerms\": \"\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/producer/location/service",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "producer",
+            "location",
+            "service"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Producer - Get Services Offered",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/producer/60f27dcf-1c03-417c-9fd9-b8c6e276ca00/location/71f62652-ae6e-461b-b006-cad602df7796/services",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "producer",
+            "60f27dcf-1c03-417c-9fd9-b8c6e276ca00",
+            "location",
+            "71f62652-ae6e-461b-b006-cad602df7796",
+            "services"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Producer - Delete Service",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/producer/location/service/43601874-5e08-4e95-98ca-bf6558d84dc7",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "producer",
+            "location",
+            "service",
+            "43601874-5e08-4e95-98ca-bf6558d84dc7"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Producer - patch(update) a service",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"patchParameters\": {\n    \"minServicePrice\": 50.00,\n    \"maxServicePrice\": 200.00\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/producer/location/service/43601874-5e08-4e95-98ca-bf6558d84dc7",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "producer",
+            "location",
+            "service",
+            "43601874-5e08-4e95-98ca-bf6558d84dc7"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Producer - Get All locations",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/producer/60f27dcf-1c03-417c-9fd9-b8c6e276ca00/locations?activeOnly=false&includeHours=true",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "producer",
+            "60f27dcf-1c03-417c-9fd9-b8c6e276ca00",
+            "locations"
+          ],
+          "query": [
+            {
+              "key": "activeOnly",
+              "value": "false"
+            },
+            {
+              "key": "includeHours",
+              "value": "true"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Producer - get one location",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/producer/location/71f62652-ae6e-461b-b006-cad602df7796?includeHours=true",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "producer",
+            "location",
+            "71f62652-ae6e-461b-b006-cad602df7796"
+          ],
+          "query": [
+            {
+              "key": "includeHours",
+              "value": "true"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Producer - Create Location",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"locationName\": \"stringst\",\n  \"locationDisplayType\": \"NO_DISPLAY\",\n  \"locationType\": \"HOME_OFFICE_PRIMARY\",\n  \"addressLine1\": \"string\",\n  \"addressLine2\": \"string\",\n  \"addressLine3\": \"string\",\n  \"city\": \"/xM5hgv3edxxAg'RtAt14ra'5lxZs66lhNKrBQ9WXN6d1Ha0fp\",\n  \"state\": \"/~m]lUOu:[~$}BF[I#xj}\\\\vhtaiW2N?\\\"\\\"r$a<%W8TSz(zv ~=;bz$:'LAQ/gm\",\n  \"postalCode\": \"/46017/\",\n  \"websiteUrl\": \"string\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/producer/location",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "producer",
+            "location"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Producer - Patch location",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"patchParameters\": {\n    \"additionalProp1\": {},\n    \"additionalProp2\": {},\n    \"additionalProp3\": {}\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/producer/locations/71f62652-ae6e-461b-b006-cad602df7796",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "producer",
+            "locations",
+            "71f62652-ae6e-461b-b006-cad602df7796"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Producer - Update Location (PUT)",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"locationId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n  \"locationName\": \"string\",\n  \"locationType\": \"HOME_OFFICE_PRIMARY\",\n  \"locationDisplayType\": \"NO_DISPLAY\",\n  \"active\": true,\n  \"addressLine1\": \"string\",\n  \"addressLine2\": \"string\",\n  \"addressLine3\": \"string\",\n  \"city\": \"string\",\n  \"state\": \"string\",\n  \"postalCode\": \"string\",\n  \"latitude\": \"string\",\n  \"longitude\": \"string\",\n  \"websiteUrl\": \"string\"\n}\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/producer/location",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "producer",
+            "location"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

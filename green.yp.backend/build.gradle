@@ -1,0 +1,134 @@
+plugins {
+    id 'java'
+    id 'groovy'
+    id 'org.springframework.boot' version '3.3.4'
+    id 'io.spring.dependency-management' version '1.1.2'
+    id("org.springdoc.openapi-gradle-plugin") version "1.6.0"
+}
+
+group = 'com.green.yp'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '21'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url = 'https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui'
+    }
+    maven {
+        url = 'https://mvnrepository.com/artifact/org.projectlombok/lombok'
+    }
+}
+
+ext {
+    springCloudVersion = "2023.0.5"
+    lombokVersion = "1.18.30"
+}
+
+dependencies {
+    implementation project(':green.yp.api')
+    implementation project(':usps.address.api')
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+//    implementation 'org.springframework.boot:spring-boot-starter-security'
+//    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+//    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+//    implementation 'redis.clients:jedis'
+    implementation 'commons-io:commons-io:2.14.0'
+    implementation 'io.fusionauth:fusionauth-java-client:1.47.0'
+
+    implementation 'org.cache2k:cache2k-api'
+    implementation 'org.cache2k:cache2k-core'
+    implementation 'org.cache2k:cache2k-spring'
+
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+
+    implementation 'org.yaml:snakeyaml'
+    implementation 'com.jayway.jsonpath:json-path:2.9.0'
+    implementation 'org.apache.logging.log4j:log4j-1.2-api'
+    implementation 'org.apache.commons:commons-collections4:4.4'
+    implementation 'com.googlecode.libphonenumber:libphonenumber:8.12.26'
+    implementation "org.apache.commons:commons-lang3"
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
+    implementation 'commons-discovery:commons-discovery:0.5'
+    implementation 'org.jsoup:jsoup:1.15.4'
+
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    implementation 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+//    implementation 'org.apache.httpcomponents:httpclient'
+    implementation 'io.github.openfeign:feign-httpclient'
+    implementation "io.github.openfeign:feign-jackson"
+    implementation 'io.github.openfeign:feign-micrometer'
+    implementation 'io.hypersistence:hypersistence-utils-hibernate-62:3.5.1'
+    implementation 'org.testng:testng:7.7.0'
+
+    testImplementation 'io.github.openfeign:feign-mock'
+    testImplementation "org.projectlombok:lombok:${lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+//    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    testImplementation 'org.apache.groovy:groovy-all:4.0.26'
+    testImplementation 'org.spockframework:spock-core:2.4-M6-groovy-4.0'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation('com.github.javafaker:javafaker:1.0.2') {
+        exclude(module: 'snakeyaml')
+    }
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude(module: 'android-json')
+    }
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.springframework.batch:spring-batch-test'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.junit.platform:junit-platform-launcher'
+    testImplementation("org.springframework.cloud:spring-cloud-contract-wiremock:3.1.1") {
+        exclude(module: "wiremock-jre8-standalone")
+    }
+    testImplementation 'org.awaitility:awaitility'
+
+    implementation('org.owasp.esapi:esapi:2.6.0.0') {
+        exclude(module: 'slf4j-simple')
+        exclude(module: 'xml-apis')
+    }
+
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+    testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+}
+
+compileJava {
+    options.compilerArgs += [
+            '-Amapstruct.suppressGeneratorTimestamp=true',
+            '-Amapstruct.suppressGeneratorVersionInfoComment=true',
+            '-Amapstruct.verbose=false'
+    ]
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

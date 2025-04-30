@@ -1,0 +1,23 @@
+package com.green.yp.payment.data.repository;
+
+import com.green.yp.payment.data.model.PaymentMethod;
+import jakarta.validation.constraints.NotNull;
+import java.util.Optional;
+import java.util.UUID;
+import lombok.NonNull;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+public interface PaymentMethodRepository extends JpaRepository<PaymentMethod, UUID> {
+
+    @Query(
+            """
+                       SELECT
+                            pm
+                       FROM PaymentMethod pm
+                       WHERE pm.producerId=:producerId and pm.cancelDate IS NULL
+                            and pm.active=TRUE
+                    """)
+    Optional<PaymentMethod> findActiveMethod(@NotNull @NonNull @Param("producerId") UUID producerId);
+}
