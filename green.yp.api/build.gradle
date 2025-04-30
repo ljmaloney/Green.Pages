@@ -7,7 +7,7 @@ java {
 }
 
 ext{
-    lombokVersion = "1.18.30"
+    lombokVersion = "1.18.38"
 }
 
 group = "com.green.yp"
