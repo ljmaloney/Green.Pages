@@ -48,15 +48,15 @@ public interface ProducerMapper {
     @Mapping(source = "producerSubscription.nextInvoiceDate", target = "nextInvoiceDate")
     @Mapping(source = "producerSubscription.startDate", target = "startDate")
     @Mapping(source = "producerSubscription.endDate", target = "endDate")
-    @Mapping(target = "subscriptionAmount", source = "record", qualifiedByName = "toPaymentAmount")
-    ProducerSubscriptionResponse fromRecord(ProducerSubscriptionRecord record);
+    @Mapping(target = "subscriptionAmount", source = "subscriptionRecord", qualifiedByName = "toPaymentAmount")
+    ProducerSubscriptionResponse fromRecord(ProducerSubscriptionRecord subscriptionRecord);
 
     @Named("toPaymentAmount")
-    default BigDecimal toPaymentAmount(ProducerSubscriptionRecord record) {
-        return switch (record.producerSubscription().getInvoiceCycleType()) {
-            case MONTHLY -> record.subscription().getMonthlyAutopayAmount();
-            case QUARTERLY -> record.subscription().getQuarterlyAutopayAmount();
-            case ANNUAL, NONRECURRING_ANNUAL -> record.subscription().getAnnualBillAmount();
+    default BigDecimal toPaymentAmount(ProducerSubscriptionRecord subscriptionRecord) {
+        return switch (subscriptionRecord.producerSubscription().getInvoiceCycleType()) {
+            case MONTHLY -> subscriptionRecord.subscription().getMonthlyAutopayAmount();
+            case QUARTERLY -> subscriptionRecord.subscription().getQuarterlyAutopayAmount();
+            case ANNUAL, NONRECURRING_ANNUAL -> subscriptionRecord.subscription().getAnnualBillAmount();
         };
     }
 

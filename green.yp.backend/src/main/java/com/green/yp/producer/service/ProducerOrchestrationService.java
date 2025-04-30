@@ -118,15 +118,7 @@ public class ProducerOrchestrationService {
                 () ->
                     new BusinessException(
                         ErrorCodeType.PRODUCER_NOT_FOUND, producerUpdate.producerId()));
-
-    if (producer.getCancelDate() != null) {
-      log.info(
-          "Producer {} subscription cancelled as of {}",
-          producerUpdate.producerId(),
-          producer.getCancelDate());
-      throw new PreconditionFailedException(
-          String.format("Subscription cancelled as of %s", producer.getCancelDate()));
-    }
+    validateNotCancelled(producer);
 
     // validate line of business
     LineOfBusinessDto lobDto = lobContract.findLineOfBusiness(producerUpdate.lineOfBusinessId());
@@ -139,7 +131,7 @@ public class ProducerOrchestrationService {
 
     ProducerLineOfBusiness producerLob =
         producer.getLinesOfBusiness().stream()
-            .filter(lob -> lob.getPrimaryLob())
+            .filter(ProducerLineOfBusiness::getPrimaryLob)
             .findFirst()
             .orElseThrow(
                 () ->
@@ -189,14 +181,9 @@ public class ProducerOrchestrationService {
 
   public void updateSubscription(
       Producer producer, UUID subscriptionId, InvoiceCycleType invoiceCycleType) {
-    if (producer.getCancelDate() != null) {
-      log.info(
-          "Producer {} subscription cancelled as of {}",
-          producer.getId(),
-          producer.getCancelDate());
-      throw new PreconditionFailedException(
-          String.format("Subscription cancelled as of %s", producer.getCancelDate()));
-    }
+
+    validateNotCancelled(producer);
+
     // validate subscription
     SubscriptionDto subscriptionDto = subscriptionContract.findSubscription(subscriptionId);
 
@@ -365,7 +352,7 @@ public class ProducerOrchestrationService {
     producer.setCancelDate(null);
     producer.setLastBillDate(lastInvoiceDate);
     producer.setLastBillPaidDate(subscriptionPaidDate);
-    Producer paidProducer = producerRepository.saveAndFlush(producer);
+    producerRepository.saveAndFlush(producer);
 
     return findProducer(producerId);
   }
@@ -392,5 +379,18 @@ public class ProducerOrchestrationService {
     producerLobRepository.deleteProducerLinesOfBusiness(producerIds);
 
     producerRepository.delete(producerIds, ProducerSubscriptionType.LIVE_UNPAID);
+  }
+
+  private void validateNotCancelled(Producer producer){
+    if (producer.getCancelDate() != null) {
+      log.info(
+              "Producer {} subscription cancelled as of {}",
+              producer.getId(),
+              producer.getCancelDate());
+      throw new PreconditionFailedException(
+              String.format("Subscription for %s cancelled as of %s",
+                      producer.getId(),
+                      producer.getCancelDate()));
+    }
   }
 }

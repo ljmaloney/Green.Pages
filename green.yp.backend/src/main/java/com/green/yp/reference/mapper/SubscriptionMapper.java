@@ -19,8 +19,6 @@ public interface SubscriptionMapper {
     @Mapping(source = "subscription.id", target = "subscriptionId")
     SubscriptionDto mapToDto(Subscription subscription);
 
-    //    Subscription mapToEntity(SubscriptionDto subscriptionDto);
-
     Subscription mapToEntity(CreateSubscriptionRequest createRequest);
 
 }

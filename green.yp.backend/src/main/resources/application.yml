@@ -1,0 +1,41 @@
+server:
+  port: 8081
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/greenyp
+    hikari:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      maximum-pool-size: 10
+      minimum-idle: 0
+      max-lifetime: 120000
+      idle-timeout: 120000
+    username: gypadmin
+    password: local
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
+fusionauth:
+  green:
+    yp:
+      apiKey: xwlV_d5Xa7sy2WmF3VnHA0Miegr6NU24Kc7xqHyQA7RhznwuBNoJOLgr
+      baseUrl: http://localhost:9011
+      host: http://localhost:9011
+      client:
+        id: 922748b0-1658-4880-942a-36eaca3aa185
+        secret: Nso5YJaHpIl6_vNezTylWDUoeKhb7eymmn1b_76Gx74
+      app:
+        id: d4381544-ea49-4445-85ba-c380e3948edc
+      tenant: e5c8b6b2-ca40-4d53-c435-01e1b803db88
+      connectTimeout: 2000
+      readTimeout: 2000
