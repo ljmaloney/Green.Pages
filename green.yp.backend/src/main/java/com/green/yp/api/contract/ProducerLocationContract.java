@@ -26,10 +26,11 @@ public class ProducerLocationContract {
     public ProducerLocationResponse updatePrimaryLocation(@NotNull @NonNull UUID producerId,
                                                           @NotNull @NonNull LocationRequest primaryLocation,
                                                           @NotNull @NonNull String ipAddress) {
-        ProducerLocationResponse locationResponse = locationService.findPrimaryLocation(producerId);
+
         if ( primaryLocation.locationId() == null ){
             return locationService.createLocation(primaryLocation, producerId, ipAddress);
         }
+        locationService.findPrimaryLocation(producerId);
         return locationService.updateLocation(primaryLocation, null, ipAddress);
     }
 
