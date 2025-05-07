@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fusionauth-config
+data:
+  POSTGRES_USER: fusion
+  POSTGRES_PASSWORD: fusionpass
+  

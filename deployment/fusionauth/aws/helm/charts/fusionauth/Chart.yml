@@ -1,0 +1,5 @@
+apiVersion: v2
+name: fusionauth
+description: FusionAuth stack on EKS
+version: 0.1.0
+appVersion: "1.48.0"

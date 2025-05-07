@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fusionauth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fusionauth
+  template:
+    metadata:
+      labels:
+        app: fusionauth
+    spec:
+      containers:
+        - name: fusionauth
+          image: {{ .Values.fusionauth.image }}
+          ports:
+            - containerPort: 9011
+          env:
+            - name: DATABASE_URL
+              value: jdbc:postgresql://postgres:5432/fusionauth
+            - name: DATABASE_ROOT_USERNAME
+              value: {{ .Values.postgres.user }}
+            - name: DATABASE_ROOT_PASSWORD
+              value: {{ .Values.postgres.password }}
+            - name: SEARCH_SERVERS
+              value: http://opensearch:9200
+            - name: SEARCH_TYPE
+              value: elasticsearch

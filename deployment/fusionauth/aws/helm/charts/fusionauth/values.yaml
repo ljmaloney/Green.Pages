@@ -1,0 +1,11 @@
+domain: auth.mygreenyp.com
+email: you@example.com
+fusionauth:
+  image: fusionauth/fusionauth-app:latest
+  memory: 512M
+postgres:
+  image: postgres:16.0-bookworm
+  user: fusion
+  password: fusionpass
+opensearch:
+  image: opensearchproject/opensearch:2.11.0

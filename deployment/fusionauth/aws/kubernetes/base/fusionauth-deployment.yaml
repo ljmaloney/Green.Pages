@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fusionauth
+  labels:
+    app: fusionauth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fusionauth
+  template:
+    metadata:
+      name: fusionauth
+      labels:
+        app: fusionauth
+    spec:
+      containers:
+        - name: fusionauth
+          image: fusionauth/fusionauth-app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9011
+              protocol: TCP
+          env:
+            - name: DATABASE_URL
+              value: jdbc:postgresql://postgres:5432/fusionauth
+            - name: DATABASE_ROOT_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_USER
+                  name: fusionauth-config
+            - name: DATABASE_ROOT_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: fusionauth-config
+                  key: POSTGRES_PASSWORD
+            - name: SEARCH_SERVERS
+              value: http://opensearch:9200
+            - name: SEARCH_TYPE
+              value: elasticsearch
+      restartPolicy: Always
+      

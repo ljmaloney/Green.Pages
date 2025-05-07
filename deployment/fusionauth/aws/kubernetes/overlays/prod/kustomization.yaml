@@ -1,0 +1,5 @@
+resources:
+  - ../../base
+
+patchesStrategicMerge:
+  - patch-ingress-tls.yaml
