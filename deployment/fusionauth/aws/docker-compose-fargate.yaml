@@ -1,0 +1,17 @@
+version: '3.7'
+services:
+  fusionauth:
+    image: fusionauth/fusionauth-app:latest
+    environment:
+      - DATABASE_URL=jdbc:postgresql://<RDS-HOSTNAME>:5432/fusionauth
+      - DATABASE_USERNAME=fusionauth
+      - DATABASE_PASSWORD=<RDS-PASSWORD>
+      - FUSIONAUTH_APP_SECRET=<APP-SECRET>
+      - SEARCH_URL=https://<ES-ENDPOINT>:443
+      - FUSIONAUTH_EMAIL_HOST=email-smtp.us-east-1.amazonaws.com
+      - FUSIONAUTH_EMAIL_PORT=587
+      - FUSIONAUTH_EMAIL_USERNAME=<SES-SMTP-USERNAME>
+      - FUSIONAUTH_EMAIL_PASSWORD=<SES-SMTP-PASSWORD>
+      - FUSIONAUTH_EMAIL_FROM_ADDRESS=no-reply@example.com
+    ports:
+      - "9011:9011"
