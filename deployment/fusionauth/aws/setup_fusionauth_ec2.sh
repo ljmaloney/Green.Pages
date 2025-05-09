@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-DOMAIN="auth.mygreenyp.com"
+DOMAIN="auth.greenyp.com"
 EMAIL="luther.maloney@greenyp.com"  # For Let's Encrypt notifications
 
 # Update and install dependencies
@@ -43,7 +43,7 @@ sudo docker compose up -d
 cat <<EOF | sudo tee /etc/nginx/sites-available/fusionauth
 server {
     listen 80;
-    server_name $DOMAIN;
+    server_name auth.greenyp.com;
 
     location / {
         proxy_pass http://localhost:9011;
