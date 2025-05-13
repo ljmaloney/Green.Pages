@@ -9,6 +9,8 @@ import com.green.yp.producer.service.ProducerServicesService;
 import com.green.yp.util.RequestUtil;
 import java.util.List;
 import java.util.UUID;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Validated
 @RequestMapping("producer")
+@Tag(name="Endpoints for managing services offered by a subscriber/producer")
 public class ProducerServicesController extends BaseRestController {
 
     private final ProducerServicesService servicesService;

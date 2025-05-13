@@ -7,6 +7,7 @@ import com.green.yp.common.controller.BaseRestController;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.producer.service.ProducerUserService;
 import com.green.yp.util.RequestUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.security.NoSuchAlgorithmException;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Validated
 @RequestMapping("producer")
+@Tag(name="endpoints for managing the authorized users of the subscription")
 public class ProducerUserController extends BaseRestController {
 
     private final ProducerUserService userService;
