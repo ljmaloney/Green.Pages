@@ -3,10 +3,10 @@ package com.green.yp.producer.controller;
 import com.green.yp.api.apitype.PatchRequest;
 import com.green.yp.api.apitype.ProducerServiceResponse;
 import com.green.yp.api.apitype.producer.ProducerServiceRequest;
-import com.green.yp.common.controller.BaseRestController;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.producer.service.ProducerServicesService;
 import com.green.yp.util.RequestUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,8 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Validated
 @RequestMapping("producer")
-public class ProducerServicesController extends BaseRestController {
+@Tag(name="Endpoints for managing services offered by a subscriber/producer")
+public class ProducerServicesController {
 
     private final ProducerServicesService servicesService;
 

@@ -4,10 +4,9 @@ import com.green.yp.api.apitype.enumeration.ServicePriceUnitsType;
 import com.green.yp.common.data.embedded.Mutable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
-
 import java.math.BigDecimal;
 import java.util.UUID;
+import lombok.*;
 
 @Entity
 @Data

@@ -3,10 +3,10 @@ package com.green.yp.producer.controller;
 import com.green.yp.api.apitype.producer.ProducerCredentialsResponse;
 import com.green.yp.api.apitype.producer.ProducerUserResponse;
 import com.green.yp.api.apitype.producer.UserCredentialsRequest;
-import com.green.yp.common.controller.BaseRestController;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.producer.service.ProducerUserService;
 import com.green.yp.util.RequestUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.security.NoSuchAlgorithmException;
@@ -22,7 +22,8 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Validated
 @RequestMapping("producer")
-public class ProducerUserController extends BaseRestController {
+@Tag(name="endpoints for managing the authorized users of the subscription")
+public class ProducerUserController {
 
     private final ProducerUserService userService;
 

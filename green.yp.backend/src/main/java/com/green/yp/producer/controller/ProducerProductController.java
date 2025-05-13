@@ -5,10 +5,10 @@ import com.green.yp.api.apitype.producer.CreateProductRequest;
 import com.green.yp.api.apitype.producer.DiscontinueProductRequest;
 import com.green.yp.api.apitype.producer.ProducerProductRequest;
 import com.green.yp.api.apitype.producer.ProducerProductResponse;
-import com.green.yp.common.controller.BaseRestController;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.producer.service.ProducerProductService;
 import com.green.yp.util.RequestUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -24,7 +24,8 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Validated
 @RequestMapping("producer/location")
-public class ProducerProductController extends BaseRestController {
+@Tag(name = "endpoints for managing products offered for sale")
+public class ProducerProductController {
 
     private final ProducerProductService productService;
 

@@ -7,8 +7,8 @@ import com.green.yp.api.apitype.account.UpdateAccountRequest;
 import com.green.yp.api.apitype.payment.ApiPaymentResponse;
 import com.green.yp.api.apitype.payment.ApplyPaymentMethodRequest;
 import com.green.yp.api.apitype.payment.ApplyPaymentRequest;
-import com.green.yp.common.controller.BaseRestController;
 import com.green.yp.common.dto.ResponseApi;
+import com.green.yp.exception.SystemException;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @RequestMapping("account")
 @Tag( name="Orchestration Service supporting creation of subscriber / producer account")
-public class AccountController extends BaseRestController {
+public class AccountController {
 
     private final AccountService accountService;
 
@@ -93,7 +93,7 @@ public class AccountController extends BaseRestController {
             return new ResponseApi<>(
                     accountService.updateAccount(account, RequestUtil.getRequestIP()), null);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new SystemException("System error, missing configuration", e);
         }
     }
 

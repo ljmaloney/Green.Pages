@@ -2,7 +2,6 @@ package com.green.yp.producer.controller;
 
 import com.green.yp.api.apitype.producer.ProducerContactRequest;
 import com.green.yp.api.apitype.producer.ProducerContactResponse;
-import com.green.yp.common.controller.BaseRestController;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.producer.service.ProducerContactOrchestrationService;
 import com.green.yp.producer.service.ProducerContactService;
@@ -23,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @Tag(name = "Endpoints for handling the producer / subscriber contacts")
 @RequestMapping("producer")
-public class ProducerContactController extends BaseRestController {
+public class ProducerContactController {
 
     private final ProducerContactService contactService;
 

@@ -6,6 +6,7 @@ import com.green.yp.api.apitype.producer.ProducerLocationResponse;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.producer.service.ProducerLocationService;
 import com.green.yp.util.RequestUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Validated
 @RequestMapping("producer")
+@Tag(name = "Endpoints for managing locations")
 public class ProducerLocationController {
 
     private final ProducerLocationService locationService;

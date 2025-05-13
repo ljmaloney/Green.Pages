@@ -3,7 +3,6 @@ package com.green.yp.reference.controller;
 import com.green.yp.api.apitype.CreateSubscriptionRequest;
 import com.green.yp.api.apitype.PatchRequest;
 import com.green.yp.api.apitype.UpdateSubscriptionRequest;
-import com.green.yp.common.controller.BaseRestController;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.reference.dto.SubscriptionDto;
 import com.green.yp.reference.service.SubscriptionService;
@@ -27,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @RequestMapping("reference")
 @Tag(name = "REST endpoint to manage supported types of subscriptions")
-public class SubscriptionController extends BaseRestController {
+public class SubscriptionController {
 
     private final SubscriptionService subscriptionService;
 

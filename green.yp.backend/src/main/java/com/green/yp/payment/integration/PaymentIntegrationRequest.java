@@ -2,10 +2,9 @@ package com.green.yp.payment.integration;
 
 import com.green.yp.api.apitype.payment.PaymentMethodResponse;
 import jakarta.validation.constraints.NotNull;
-import lombok.NonNull;
-
 import java.math.BigDecimal;
 import java.util.UUID;
+import lombok.NonNull;
 
 public record PaymentIntegrationRequest(
     @NotNull @NonNull UUID invoiceId,

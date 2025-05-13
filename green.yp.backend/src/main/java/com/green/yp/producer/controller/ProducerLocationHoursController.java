@@ -2,10 +2,10 @@ package com.green.yp.producer.controller;
 
 import com.green.yp.api.apitype.producer.LocationHoursRequest;
 import com.green.yp.api.apitype.producer.LocationHoursResponse;
-import com.green.yp.common.controller.BaseRestController;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.producer.service.ProducerLocationHoursService;
 import com.green.yp.util.RequestUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -19,7 +19,8 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Validated
 @RequestMapping("producer/location")
-public class ProducerLocationHoursController extends BaseRestController {
+@Tag(name="endpoints for managing hours of business at a location")
+public class ProducerLocationHoursController {
 
     private final ProducerLocationHoursService locationHoursService;
 
@@ -50,7 +51,7 @@ public class ProducerLocationHoursController extends BaseRestController {
             path = "/hours",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    private ResponseApi<LocationHoursResponse> updateLocationHours(
+    public ResponseApi<LocationHoursResponse> updateLocationHours(
             @Valid @RequestBody LocationHoursRequest hoursRequest) {
         return new ResponseApi<>(
                 locationHoursService.updateLocationHours(hoursRequest, null, RequestUtil.getRequestIP()),

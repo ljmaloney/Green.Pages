@@ -6,11 +6,11 @@ import com.green.yp.api.apitype.enumeration.AuditActionType;
 import com.green.yp.api.apitype.enumeration.AuditObjectType;
 import com.green.yp.audit.data.model.ProducerAudit;
 import com.green.yp.audit.data.repository.ProducerAuditRepository;
+import com.green.yp.exception.SystemException;
 import com.green.yp.util.RequestUtil;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -70,7 +70,7 @@ public class AuditService {
             repository.saveAndFlush(audit);
         } catch (JsonProcessingException e) {
             log.error("Unexpected error serializing payload for audit contract");
-            throw new RuntimeException(e);
+            throw new SystemException("Unexpected error serializing payload for audit contract", e);
         }
     }
 }

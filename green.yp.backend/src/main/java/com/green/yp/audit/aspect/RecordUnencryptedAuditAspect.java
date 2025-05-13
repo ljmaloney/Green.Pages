@@ -4,10 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.green.yp.api.AuditRequest;
 import com.green.yp.api.contract.ProducerAuditContract;
+import com.green.yp.exception.SystemException;
 import com.green.yp.util.RequestUtil;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.aspectj.lang.JoinPoint;
@@ -16,7 +15,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Aspect
@@ -71,7 +69,7 @@ public class RecordUnencryptedAuditAspect {
                     requestPayload != null ? new ObjectMapper().writeValueAsString(requestPayload) : null );
         } catch (JsonProcessingException e) {
             log.error("Unexpected error serializing payload for audit contract");
-            throw new RuntimeException(e);
+            throw new SystemException("Unexpected error serializing payload for audit contract", e);
         }
     }
 

@@ -6,10 +6,9 @@ import com.green.yp.payment.data.converter.PaymentCryptoConverter;
 import com.green.yp.payment.data.enumeration.PaymentMethodType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
-
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import lombok.*;
 
 @Entity
 @Data

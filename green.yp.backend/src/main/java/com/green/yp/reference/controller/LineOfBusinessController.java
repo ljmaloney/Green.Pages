@@ -2,19 +2,17 @@ package com.green.yp.reference.controller;
 
 import com.green.yp.api.apitype.CreateLobServiceRequest;
 import com.green.yp.api.apitype.UpdateLobServiceRequest;
-import com.green.yp.common.controller.BaseRestController;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.reference.dto.LOBServiceDto;
 import com.green.yp.reference.dto.LineOfBusinessDto;
 import com.green.yp.reference.mapper.LineOfBusinessMapper;
 import com.green.yp.reference.service.LineOfBusinessService;
 import com.green.yp.util.RequestUtil;
-import java.util.List;
-import java.util.UUID;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -25,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @RequestMapping("reference")
 @Tag(name = "REST endpoint to manage supported lines of business")
-public class LineOfBusinessController extends BaseRestController {
+public class LineOfBusinessController {
 
   private final LineOfBusinessService lobService;
 
