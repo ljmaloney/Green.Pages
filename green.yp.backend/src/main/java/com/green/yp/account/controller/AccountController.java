@@ -10,8 +10,10 @@ import com.green.yp.api.apitype.payment.ApplyPaymentRequest;
 import com.green.yp.common.controller.BaseRestController;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.util.RequestUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Validated
 @RequestMapping("account")
+@Tag( name="Orchestration Service supporting creation of subscriber / producer account")
 public class AccountController extends BaseRestController {
 
     private final AccountService accountService;
@@ -47,6 +50,7 @@ public class AccountController extends BaseRestController {
     @PostMapping(
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary="Creates the subscriber/producer account")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseApi<AccountResponse> createAccount(
             @RequestBody @Valid CreateAccountRequest account) throws NoSuchAlgorithmException {
@@ -54,6 +58,8 @@ public class AccountController extends BaseRestController {
         accountService.createAccount(account, RequestUtil.getRequestIP()), null);
     }
 
+    @Operation(summary = "Applies the initial subscription payment",
+        description = "Creates an invoice and applies the initial payment for a new subscription")
     @PostMapping(
             path = "/applyInitialPayment",
             consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -64,6 +70,7 @@ public class AccountController extends BaseRestController {
                 accountService.applyInitialPayment(paymentRequest, RequestUtil.getRequestIP()), null);
     }
 
+    @Operation(summary = "Applies a payment on an existing subscription with an invoice")
     @PostMapping(
             path = "/applyPayment",
             consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -74,6 +81,7 @@ public class AccountController extends BaseRestController {
                 accountService.applyPayment(paymentRequest, null, RequestUtil.getRequestIP()), null);
     }
 
+    @Operation(summary = "Update the subscriber / producer account records")
     @PutMapping(
             name = "/account",
             consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -89,6 +97,8 @@ public class AccountController extends BaseRestController {
         }
     }
 
+    @Operation(summary = "Removes / disables unpaid accounts",
+    description = "Removes or disables unpaid accounts where a payment has not been received in over specified number of days")
     @PostMapping(path="/clean/unpaid",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -96,6 +106,7 @@ public class AccountController extends BaseRestController {
         return new ResponseApi<>(accountService.cleanUnpaidAccounts(daysOld, RequestUtil.getRequestIP()), null);
     }
 
+    @Operation(summary = "Cancels or disables an account")
     @DeleteMapping(
             path = "/{accountId}",
             produces = MediaType.APPLICATION_JSON_VALUE)

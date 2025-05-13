@@ -6,6 +6,8 @@ import com.green.yp.api.AuditRequest;
 import com.green.yp.api.contract.ProducerAuditContract;
 import com.green.yp.util.RequestUtil;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.aspectj.lang.JoinPoint;
@@ -22,8 +24,11 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class RecordUnencryptedAuditAspect {
 
-    @Autowired
-    private ProducerAuditContract auditContract;
+    private final ProducerAuditContract auditContract;
+
+    public RecordUnencryptedAuditAspect(ProducerAuditContract auditContract) {
+        this.auditContract = auditContract;
+    }
 
     @Pointcut(value = "@annotation(com.green.yp.api.AuditRequest)")
     void methodAnnotatedWithAuditRequest() {
@@ -33,13 +38,6 @@ public class RecordUnencryptedAuditAspect {
     @Before(value = "methodAnnotatedWithAuditRequest()")
     public void before(JoinPoint joinPoint) {
         log.info("before calling method annotated with audit request");
-
-        Object[] args = joinPoint.getArgs();
-
-        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        String[] paramNames = signature.getParameterNames();
-        Method method = signature.getMethod();
-        AuditRequest annotation = method.getAnnotation(AuditRequest.class);
     }
 
     @AfterReturning(pointcut = "methodAnnotatedWithAuditRequest()")
@@ -69,8 +67,8 @@ public class RecordUnencryptedAuditAspect {
                     annotation.actionType(),
                     StringUtils.isNotBlank(userId) ? userId : ipAddress,
                     ipAddress,
-                    requestPayload.getClass().getSimpleName(),
-                    new ObjectMapper().writeValueAsString(requestPayload));
+                    requestPayload != null ? requestPayload.getClass().getSimpleName() : "",
+                    requestPayload != null ? new ObjectMapper().writeValueAsString(requestPayload) : null );
         } catch (JsonProcessingException e) {
             log.error("Unexpected error serializing payload for audit contract");
             throw new RuntimeException(e);
@@ -78,7 +76,7 @@ public class RecordUnencryptedAuditAspect {
     }
 
     private Object getParameter(String parameterName, String[] names, Object[] values) {
-        for (int i = 0; i < names.length; i++) {
+         for (int i = 0; i < names.length; i++) {
             if (parameterName.equals(names[i])) {
                 return values[i];
             }
