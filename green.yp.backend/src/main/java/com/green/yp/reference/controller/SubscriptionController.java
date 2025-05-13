@@ -8,6 +8,9 @@ import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.reference.dto.SubscriptionDto;
 import com.green.yp.reference.service.SubscriptionService;
 import com.green.yp.util.RequestUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Validated
 @RequestMapping("reference")
+@Tag(name = "REST endpoint to manage supported types of subscriptions")
 public class SubscriptionController extends BaseRestController {
 
     private final SubscriptionService subscriptionService;
@@ -32,17 +36,21 @@ public class SubscriptionController extends BaseRestController {
         this.subscriptionService = subscriptionService;
     }
 
+    @Operation(summary = "Returns the list of active subscriptions")
     @GetMapping(value = "/subscription", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseApi<List<SubscriptionDto>> findActiveSubscriptions() {
         return new ResponseApi<>(subscriptionService.findActiveSubscription(), null);
     }
 
+    @Operation(summary = "Returns the list of active subscriptions for a line of business")
     @GetMapping(value = "/lob/subscription/", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseApi<List<SubscriptionDto>> findActiveSubscriptions(
             @RequestParam("lob") UUID lineOfBusinessId) {
         return new ResponseApi<>(subscriptionService.findActiveLobSubscription(lineOfBusinessId), null);
     }
 
+    @Operation(summary = "Creates a new subscription")
+    @ApiResponse(responseCode = "200", description = "Subscription created")
     @PostMapping(
             value = "/subscription",
             consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -54,6 +62,7 @@ public class SubscriptionController extends BaseRestController {
                 null);
     }
 
+    @Operation(summary = "updates an existing subscription")
     @PutMapping(
             value = "/subscription",
             consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -65,6 +74,7 @@ public class SubscriptionController extends BaseRestController {
                 null);
     }
 
+    @Operation(summary = "Updates one or more fields of a subscription")
     @PatchMapping(value = "/subscription/{subscriptionId}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
