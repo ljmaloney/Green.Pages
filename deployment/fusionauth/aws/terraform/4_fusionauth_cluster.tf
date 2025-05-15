@@ -1,7 +1,7 @@
-resource "aws_ecs_cluster" "fusionauth_cluster" {
+resource "aws_ecs_cluster" "fusionauth-cluster" {
   name = "fusionauth-cluster"
 }
-resource "aws_ecs_task_definition" "fusionauth_task" {
+resource "aws_ecs_task_definition" "fusionauth-task" {
   family                   = "fusionauth-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
@@ -16,7 +16,7 @@ resource "aws_ecs_task_definition" "fusionauth_task" {
       environment = [
         {
           name  = "DATABASE_URL"
-          value = "jdbc:postgresql://${aws_db_instance.green_yp_postgres_db.address}:5432/fusionauth"
+          value = "jdbc:postgresql://${aws_db_instance.greenyp-psql-fa-db.address}:5432/fusionauth"
         },
         {
           name  = "DATABASE_USERNAME"
@@ -54,15 +54,15 @@ resource "aws_ecs_task_definition" "fusionauth_task" {
     }
   ])
 }
-resource "aws_ecs_service" "fusionauth_service" {
+resource "aws_ecs_service" "fusionauth-service" {
   name            = "fusionauth-service"
-  cluster         = aws_ecs_cluster.fusionauth_cluster.id
-  task_definition = aws_ecs_task_definition.fusionauth_task.arn
+  cluster         = aws_ecs_cluster.fusionauth-cluster.id
+  task_definition = aws_ecs_task_definition.fusionauth-task.arn
   desired_count   = 1
   launch_type     = "FARGATE"
   network_configuration {
-    subnets          = [aws_subnet.greenyp_vpc_sn_a.id, aws_subnet.greenyp_vpc_sn_b.id]
-    security_groups = [aws_security_group.greenyp_fusionauth_iam_sg.id]
+    subnets          = [aws_subnet.greenyp-vpc-sn-a.id, aws_subnet.greenyp-vpc-sn-b.id]
+    security_groups = [aws_security_group.greenyp-fusionauth-sg.id]
     assign_public_ip = true
   }
 }

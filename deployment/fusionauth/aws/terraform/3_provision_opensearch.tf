@@ -1,6 +1,6 @@
 resource "aws_opensearch_domain" "green_yp_fusionauth_es" {
-  domain_name = "green_yp_fusionauth_es"
-  opensearch_version = "2.19"
+  domain_name = "green-yp-fusionauth-es"
+  engine_version = "7.10"
   cluster_config {
     instance_type = "t3.small.search"
     instance_count = 2
@@ -15,7 +15,7 @@ resource "aws_opensearch_domain" "green_yp_fusionauth_es" {
     volume_type = "gp2"
   }
   vpc_options {
-    subnet_ids = [aws_subnet.greenyp_vpc_sn_a.id, aws_subnet.greenyp_vpc_sn_b.id]
-    security_group_ids = [aws_security_group.greenyp_fusionauth_iam_sg.id]
+    subnet_ids = [aws_subnet.greenyp-vpc-sn-a.id, aws_subnet.greenyp-vpc-sn-b.id]
+    security_group_ids = [aws_security_group.greenyp-fusionauth-sg.id]
   }
 }
