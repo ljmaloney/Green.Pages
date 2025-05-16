@@ -4,10 +4,16 @@ plugins {
     id 'org.springframework.boot' version '3.4.5'
     id 'io.spring.dependency-management' version '1.1.2'
     id("org.springdoc.openapi-gradle-plugin") version "1.6.0"
+    id 'com.google.cloud.tools.jib' version '3.4.5'
+    id 'com.bmuschko.docker-spring-boot-application' version '9.4.0'
 }
 
 group = 'com.green.yp'
-version = '0.0.1-SNAPSHOT'
+
+def versionFile = file("${rootDir}/version.properties")
+def versionProps = new Properties()
+versionProps.load(new FileInputStream(versionFile))
+version = versionProps['version']
 
 java {
     sourceCompatibility = '21'
@@ -33,7 +39,6 @@ ext {
     springCloudVersion = "2024.0.1"
     springDocVersion = "2.8.5"
     lombokVersion = "1.18.30"
-    flywayMySql="11.8.0"
     hikariVersion="6.3.0"
 }
 
@@ -49,9 +54,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-batch'
-//    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-//    implementation 'redis.clients:jedis'
     implementation "com.zaxxer:HikariCP:${hikariVersion}"
     implementation 'commons-io:commons-io:2.14.0'
     implementation 'io.fusionauth:fusionauth-java-client:1.47.0'
@@ -91,7 +94,6 @@ dependencies {
     testImplementation "org.projectlombok:lombok:${lombokVersion}"
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-//    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
     runtimeOnly 'com.mysql:mysql-connector-j'
 
     testImplementation 'org.apache.groovy:groovy-all:4.0.26'
@@ -139,4 +141,34 @@ dependencyManagement {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+tasks.named('jib') {
+    dependsOn 'test'  // Ensure Jib runs only after tests pass
+}
+
+docker{
+    springBootApplication {
+        baseImage = 'eclipse-temurin:21-alpine'
+        ports = [8080, 8080]
+    }
+}
+
+jib {
+    to {
+        image = "${project.group}/${project.name}:${version}"
+        tags = ["latest", "${version}"]
+    }
+    to {
+        image = System.getenv('ECR_REPO_URI') ?: "${project.group}/${project.name}"
+        tags = ["latest", "v${version}"]
+        auth {
+            username = "AWS"
+            password = System.getenv('AWS_ECR_PASSWORD')  // set in CI
+        }
+    }
+    container {
+        mainClass = 'com.green.yp.GreenYPBackendApplication'
+        ports = ['8080']
+    }
 }
