@@ -60,3 +60,6 @@ include the provisioning of FusionAuth dependencies and a load balancer
 4. 4_fusionauth_cluster.tf - provisions the fargate cluster, container, task, and service
 5. 5_alb.tf - provisions the Application Load Balancer
 6. 6_identity_access_management.tf
+
+### Using AWS Kubernetes instead of Fargate -- 
+Follow this instructions -- https://fusionauth.io/docs/get-started/download-and-install/kubernetes/eks
