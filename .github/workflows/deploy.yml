@@ -25,6 +25,8 @@ jobs:
           cache: gradle
 
       - name: Bump version (main/master only)
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         run: |
           FILE=version.properties
