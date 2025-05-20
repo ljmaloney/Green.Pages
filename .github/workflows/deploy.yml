@@ -71,13 +71,13 @@ jobs:
       - name: Get AWS ECR Login Password
         run: |
           echo "AWS_ECR_PASSWORD=$(aws ecr get-login-password --region $AWS_REGION)" >> $GITHUB_ENV
-            - name: Build and push Docker image to ECR with Jib
-              run: |
-                ./gradlew jib \
-                  -Djib.to.image=$ECR_REPO_URI/images/green-yp-service \
-                  -Djib.to.auth.username=AWS \
-                  -Djib.to.auth.password=$AWS_ECR_PASSWORD \
-                  -Djib.to.tags=latest,v${VERSION}
+#            - name: Build and push Docker image to ECR with Jib
+#              run: |
+#                ./gradlew jib \
+#                  -Djib.to.image=$ECR_REPO_URI/images/green-yp-service \
+#                  -Djib.to.auth.username=AWS \
+#                  -Djib.to.auth.password=$AWS_ECR_PASSWORD \
+#                  -Djib.to.tags=latest,v${VERSION}
 
       - name: Build and push backend image
         run: |
