@@ -156,16 +156,11 @@ docker{
 
 jib {
     to {
-        image = "${project.group}/${project.name}:${version}"
+        image = "${project.group}-${project.name}-${version}"
         tags = ["latest", "${version}"]
     }
-    to {
-        image = System.getenv('ECR_REPO_URI') ?: "${project.group}/${project.name}"
-        tags = ["latest", "v${version}"]
-        auth {
-            username = "AWS"
-            password = System.getenv('AWS_ECR_PASSWORD')  // set in CI
-        }
+    from {
+        image = 'eclipse-temurin:21-alpine'
     }
     container {
         mainClass = 'com.green.yp.GreenYPBackendApplication'
