@@ -70,10 +70,15 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Get AWS ECR Login Password
+        run: | 
+          PASSWORD=$(aws ecr get-login-password --region $AWS_REGION)
+          if [ -z "$PASSWORD" ]; then
+            echo "❌ Failed to get ECR login password"
+          exit 1
+          fi
+          echo "AWS_ECR_PASSWORD=$PASSWORD" >> $GITHUB_ENV
+      - name: Build and push Docker image to ECR with Jib
         run: |
-          echo "AWS_ECR_PASSWORD=$(aws ecr get-login-password --region $AWS_REGION)" >> $GITHUB_ENV
-            - name: Build and push Docker image to ECR with Jib
-              run: |
                 ./gradlew jib \
                   -Djib.to.image=$ECR_REPO_URI \
                   -Djib.to.auth.username=AWS \
