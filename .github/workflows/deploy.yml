@@ -14,6 +14,7 @@ jobs:
     env:
       ECR_REPO_URI: ${{ secrets.ECR_REPO_URI }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
+      GH_PAT: ${{ secrets.GH_PAT }}
 
     steps:
       - name: Checkout code
@@ -27,8 +28,6 @@ jobs:
           cache: gradle
 
       - name: Bump version (main/master only)
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         run: |
           FILE=version.properties
@@ -85,10 +84,10 @@ jobs:
                   -Djib.to.auth.password=$AWS_ECR_PASSWORD \
                   -Djib.to.tags=latest,v${VERSION}
 
-      - name: Build with Jib and push to AWS ECR
+      - name: Build and push backend image
         run: |
-          IMAGE_TAG=$ECR_REPO_URI:$VERSION
-          ./gradlew jib \
+          IMAGE_TAG=$ECR_REPO_URI/green-yp-service:$VERSION
+          ./gradlew :green.yp.backend:jib \
             -Djib.to.image=$IMAGE_TAG \
             -Djib.to.auth.username=AWS \
             -Djib.to.auth.password=$(aws ecr get-login-password --region $AWS_REGION)
