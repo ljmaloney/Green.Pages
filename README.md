@@ -21,7 +21,7 @@ Caveat: This is for a development workstation ONLY. The secrets are handled in a
    2. fusionauth.green.yp.client.secret 
    3. fusionauth.green.yp.app.id
    4. fusionauth.green.yp.tenant
-5. Initialize the MySQL tables using greenyp_ddl.sql
+5. Initialize the MySQL tables using V1.1__greenyp_initial_schema.sql
 6. Start the backend using gradle bootRun
 
 ## Open API / Swagger
