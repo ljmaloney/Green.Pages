@@ -6,29 +6,19 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.*;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-@Data
-public class LineOfBusinessDto {
-    private UUID lineOfBusinessId;
-
-    private String createByReference;
-
-    private OffsetDateTime createDate;
-
-    @Builder.Default
-    private LineOfBusinessCreateType createType = LineOfBusinessCreateType.SYSTEM_DEFAULT;
-
-    @NotNull
-    private String description;
-
-    @NotNull
-    private Boolean enableDistanceRadius;
-
-    private OffsetDateTime lastUpdateDate;
-
-    @NotNull
-    @NonNull
-    private String lineOfBusiness;
+public record LineOfBusinessDto (UUID lineOfBusinessId,
+                                 OffsetDateTime createDate,
+                                 OffsetDateTime lastUpdateDate,
+                                 @NotNull
+                                 String lineOfBusinessName, LineOfBusinessCreateType createType,
+                                 String createByReference,
+                                 String description,
+                                 Boolean enableDistanceRadius,
+                                 String iconName,
+                                 String iconFileName){
+    public LineOfBusinessDto {
+       if ( createType == null )
+           createType = LineOfBusinessCreateType.SYSTEM_DEFAULT;
+    }
 }

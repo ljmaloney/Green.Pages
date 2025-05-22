@@ -16,6 +16,12 @@
           "protocol": "tcp"
         }
       ],
+      "environment": [
+        {
+          "name": "SPRING_PROFILES_ACTIVE",
+          "value": "prod"
+        }
+      ],
       "secrets": [
         {
           "name": "GYP_DB_USERNAME",
@@ -58,7 +64,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/greenyp-springboot",
+          "awslogs-group": "/ecs/greenyp-service-api",
           "awslogs-create-group": "true",
           "awslogs-region": "us-east-1",
           "awslogs-stream-prefix": "ecs"

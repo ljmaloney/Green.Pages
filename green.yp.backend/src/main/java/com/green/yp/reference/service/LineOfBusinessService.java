@@ -76,16 +76,16 @@ public class LineOfBusinessService {
   public LineOfBusinessDto createLineOfBusiness(
       @NotNull LineOfBusinessDto lobDto, String userId, @NotNull String ipAddress) {
 
-    if (lobDto.getLineOfBusinessId() != null) {
+    if (lobDto.lineOfBusinessId() != null) {
       throw new PreconditionFailedException(
           "Attempting to create new line of business and lineOfBusinessId is not null");
     }
 
     Optional<LineOfBusiness> lineOfBusinessOptional =
-        repository.findLineOfBusinessByLineOfBusiness(lobDto.getLineOfBusiness());
+        repository.findLineOfBusinessByLineOfBusinessName(lobDto.lineOfBusinessName());
     if (lineOfBusinessOptional.isPresent()) {
       throw new PreconditionFailedException(
-          ErrorCodeType.LINE_OF_BUSINESS_EXISTS.getMessageFormat(), lobDto.getLineOfBusiness());
+          ErrorCodeType.LINE_OF_BUSINESS_EXISTS.getMessageFormat(), lobDto.lineOfBusinessName());
     }
 
     LineOfBusiness lob = lineOfBusinessMapper.fromDto(lobDto);
@@ -105,13 +105,13 @@ public class LineOfBusinessService {
   public LineOfBusinessDto updateLineOfBusiness(
       @NotNull LineOfBusinessDto lobDto, String userId, @NotNull String ipAddress) {
     Optional<LineOfBusiness> lineOfBusinessOptional =
-        repository.findById(lobDto.getLineOfBusinessId());
+        repository.findById(lobDto.lineOfBusinessId());
 
     LineOfBusiness lineOfBusiness =
         lineOfBusinessOptional.orElseThrow(
-            () -> new NotFoundException("LineOfBusiness", lobDto.getLineOfBusiness()));
+            () -> new NotFoundException("LineOfBusiness", lobDto.lineOfBusinessName()));
 
-    lineOfBusiness.setDescription(lobDto.getDescription());
+    lineOfBusiness.setDescription(lobDto.description());
 
     lineOfBusiness = repository.saveAndFlush(lineOfBusiness);
 
