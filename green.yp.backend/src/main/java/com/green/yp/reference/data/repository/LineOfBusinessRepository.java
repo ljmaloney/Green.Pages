@@ -12,5 +12,5 @@ public interface LineOfBusinessRepository extends JpaRepository<LineOfBusiness, 
         return findAll(Sort.by(Sort.Direction.ASC, "lineOfBusiness"));
     }
 
-    Optional<LineOfBusiness> findLineOfBusinessByLineOfBusiness(String lineOfBusiness);
+    Optional<LineOfBusiness> findLineOfBusinessByLineOfBusinessName(String lineOfBusiness);
 }

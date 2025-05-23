@@ -1,0 +1,11 @@
+DROP PROCEDURE IF EXISTS `?`;
+DELIMITER //
+CREATE PROCEDURE `?`()
+BEGIN
+    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION BEGIN END;
+ALTER TABLE `line_of_business` ADD COLUMN `icon_name` varchar(100) default 'flower-2'
+    after line_of_business;
+END //
+DELIMITER ;
+CALL `?`();
+DROP PROCEDURE `?`;

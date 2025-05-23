@@ -1,0 +1,11 @@
+DROP PROCEDURE IF EXISTS `?`;
+DELIMITER //
+CREATE PROCEDURE `?`()
+BEGIN
+    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION BEGIN END;
+ALTER TABLE `line_of_business` ADD COLUMN `short_description` varchar(200)
+    after enable_distance_radius;
+END //
+DELIMITER ;
+CALL `?`();
+DROP PROCEDURE `?`;
