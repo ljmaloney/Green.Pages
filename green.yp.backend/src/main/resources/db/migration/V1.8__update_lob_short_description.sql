@@ -1,0 +1,6 @@
+update line_of_business set short_description='Regular lawn maintaince' where id = uuid_to_bin('c891d114-7603-40aa-be8d-e55a23d0d1ff');
+update line_of_business set short_description='Plant nurseries, growing young trees, shrubs, and garden plants' where id = uuid_to_bin('6b3afbf9-e575-419b-8539-e983ecf6c8ab');
+update line_of_business set short_description='Supplies gravel, flagstone, and pavers' where id = uuid_to_bin('94b68c0d-4124-4a76-83fa-b022c308a42c');
+update line_of_business set short_description='Professional landscape design and installation' where id = uuid_to_bin('6ea15820-5d6d-49d7-82ab-93c23c37f637');
+update line_of_business set short_description='Installation and maintaince of ponds and water features'  where id = uuid_to_bin('54286c5f-7181-4166-a07e-21c0a05d57e5');
+update line_of_business set short_description='Supplier of plants, tools, fertilizer and gardening equipment' where id = uuid_to_bin('250f0927-f063-4707-b015-3a1a9c549115');
