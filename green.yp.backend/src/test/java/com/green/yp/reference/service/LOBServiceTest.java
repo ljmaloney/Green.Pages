@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,10 +57,10 @@ public class LOBServiceTest {
 
         List<LineOfBusiness> lobList = List.of(
                 LineOfBusiness.builder()
-                        .lineOfBusiness("Lawn Care")
+                        .lineOfBusinessName("Lawn Care")
                         .build(),
                 LineOfBusiness.builder()
-                        .lineOfBusiness("Pond supplies")
+                        .lineOfBusinessName("Pond supplies")
                         .build());
 
         when(lobRepository.findAllOrderByLineOfBusinessAsc()).thenReturn(lobList);
@@ -74,24 +75,27 @@ public class LOBServiceTest {
     void testCreateLineOfBusiness_Success() {
 
         LineOfBusinessDto lobDto = LineOfBusinessDto.builder()
-                   .lineOfBusiness("Lawn care")
+                   .lineOfBusinessName("Lawn care")
                 .description("Basic lawn care and maintaince service")
                 .createType(LineOfBusinessCreateType.SYSTEM_DEFAULT)
                 .build();
 
-        LineOfBusiness lob = new LineOfBusiness(UUID.randomUUID(), OffsetDateTime.now(), OffsetDateTime.now(),
-                lobDto.getLineOfBusiness(), lobDto.getDescription(), lobDto.getCreateType(), null, true);
+        LineOfBusiness lob = LineOfBusiness.builder()
+                .lineOfBusinessName("Lawn care")
+                .description("Basic lawn care and maintaince service")
+                .shortDescription("")
+                .build();
 
-        when(lobRepository.findById(eq(lobDto.getLineOfBusinessId()))).thenReturn(Optional.empty());
+        when(lobRepository.findById(eq(lobDto.lineOfBusinessId()))).thenReturn(Optional.empty());
 
         when(lobRepository.saveAndFlush(any(LineOfBusiness.class)))
                 .thenReturn(lob);
 
         LineOfBusinessDto createdDto = lobService.createLineOfBusiness(lobDto, null, "127.0.0.1");
 
-        assertThat(createdDto.getCreateDate()).isNotNull();
-        assertThat(createdDto.getLineOfBusiness()).isEqualTo("Lawn care");
-        assertThat(createdDto.getDescription()).isEqualTo("Basic lawn care and maintaince service");
+        assertThat(createdDto.createDate()).isNotNull();
+        assertThat(createdDto.lineOfBusinessName()).isEqualTo("Lawn care");
+        assertThat(createdDto.description()).isEqualTo("Basic lawn care and maintaince service");
     }
 
     @Test
@@ -99,21 +103,21 @@ public class LOBServiceTest {
 
         LineOfBusinessDto lobDto = LineOfBusinessDto.builder()
                 .lineOfBusinessId(UUID.randomUUID())
-                .lineOfBusiness("Lawn care")
+                .lineOfBusinessName("Lawn care")
                 .description("Basic lawn care and maintaince service")
                 .createType(LineOfBusinessCreateType.SYSTEM_DEFAULT)
                 .build();
 
         LineOfBusiness lob = new LineOfBusiness();
-        lob.setId(lobDto.getLineOfBusinessId());
-        lob.setLineOfBusiness(lobDto.getLineOfBusiness());
-        lob.setCreateType(lobDto.getCreateType());
-        lob.setDescription(lobDto.getDescription());
+        lob.setId(lobDto.lineOfBusinessId());
+        lob.setLineOfBusinessName(lobDto.lineOfBusinessName());
+        lob.setCreateType(lobDto.createType());
+        lob.setDescription(lobDto.description());
         lob.setVersion(1L);
         lob.setCreateDate(OffsetDateTime.now());
         lob.setLastUpdateDate(OffsetDateTime.now());
 
-        when(lobRepository.findById(eq(lobDto.getLineOfBusinessId()))).thenReturn(Optional.of(lob));
+        when(lobRepository.findById(eq(lobDto.lineOfBusinessId()))).thenReturn(Optional.of(lob));
 
         when(lobRepository.saveAndFlush(any(LineOfBusiness.class)))
                 .thenReturn(lob);
@@ -130,20 +134,20 @@ public class LOBServiceTest {
     @Test
     void testUpdateLineOfBusiness_NotFound() {
         LineOfBusinessDto lobDto = LineOfBusinessDto.builder()
-                .lineOfBusiness("Lawn care")
+                .lineOfBusinessName("Lawn care")
                 .description("Basic lawn care and maintaince service")
                 .createType(LineOfBusinessCreateType.SYSTEM_DEFAULT)
                 .build();
 
         LineOfBusiness lob = new LineOfBusiness();
-        lob.setLineOfBusiness(lobDto.getLineOfBusiness());
-        lob.setCreateType(lobDto.getCreateType());
-        lob.setDescription(lobDto.getDescription());
+        lob.setLineOfBusinessName(lobDto.lineOfBusinessName());
+        lob.setCreateType(lobDto.createType());
+        lob.setDescription(lobDto.description());
         lob.setVersion(1L);
         lob.setCreateDate(OffsetDateTime.now());
         lob.setLastUpdateDate(OffsetDateTime.now());
 
-        when(lobRepository.findById(eq(lobDto.getLineOfBusinessId()))).thenReturn(Optional.empty());
+        when(lobRepository.findById(eq(lobDto.lineOfBusinessId()))).thenReturn(Optional.empty());
 
         assertThrows(
                 NotFoundException.class,
@@ -160,28 +164,28 @@ public class LOBServiceTest {
     void testUpdateLineOfBusiness_Success() {
 
         LineOfBusinessDto lobDto = LineOfBusinessDto.builder()
-                .lineOfBusiness("Lawn care")
+                .lineOfBusinessName("Lawn care")
                 .description("Basic lawn care and maintaince service")
                 .createType(LineOfBusinessCreateType.SYSTEM_DEFAULT)
                 .build();
 
         LineOfBusiness lob = new LineOfBusiness();
-        lob.setLineOfBusiness(lobDto.getLineOfBusiness());
-        lob.setCreateType(lobDto.getCreateType());
-        lob.setDescription(lobDto.getDescription());
+        lob.setLineOfBusinessName(lobDto.lineOfBusinessName());
+        lob.setCreateType(lobDto.createType());
+        lob.setDescription(lobDto.description());
         lob.setVersion(1L);
         lob.setCreateDate(OffsetDateTime.now());
         lob.setLastUpdateDate(OffsetDateTime.now());
 
-        when(lobRepository.findById(eq(lobDto.getLineOfBusinessId()))).thenReturn(Optional.of(lob));
+        when(lobRepository.findById(eq(lobDto.lineOfBusinessId()))).thenReturn(Optional.of(lob));
 
         when(lobRepository.saveAndFlush(any(LineOfBusiness.class)))
                 .thenReturn(lob);
 
         LineOfBusinessDto createdDto = lobService.updateLineOfBusiness(lobDto, null, "127.0.0.1");
 
-        assertThat(createdDto.getCreateDate()).isNotNull();
-        assertThat(createdDto.getLineOfBusiness()).isEqualTo("Lawn care");
-        assertThat(createdDto.getDescription()).isEqualTo("Basic lawn care and maintaince service");
+        assertThat(createdDto.createDate()).isNotNull();
+        assertThat(createdDto.lineOfBusinessName()).isEqualTo("Lawn care");
+        assertThat(createdDto.description()).isEqualTo("Basic lawn care and maintaince service");
     }
 }

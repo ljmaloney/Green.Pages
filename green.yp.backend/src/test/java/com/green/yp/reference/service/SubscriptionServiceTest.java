@@ -109,7 +109,7 @@ public class SubscriptionServiceTest {
 
         when(lobService.findLineOfBusiness(eq(lobId))).thenReturn(LineOfBusinessDto.builder()
                 .lineOfBusinessId(lobId)
-                .lineOfBusiness("Lawn maintiance")
+                .lineOfBusinessName("Lawn maintiance")
                 .build());
 
         List<SubscriptionDto> subscriptions = subscriptionService.findActiveLobSubscription(lobId);
