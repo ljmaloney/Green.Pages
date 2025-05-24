@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LineOfBusinessRepository extends JpaRepository<LineOfBusiness, UUID> {
     default List<LineOfBusiness> findAllOrderByLineOfBusinessAsc() {
-        return findAll(Sort.by(Sort.Direction.ASC, "lineOfBusiness"));
+        return findAll(Sort.by(Sort.Direction.ASC, "lineOfBusinessName"));
     }
 
     Optional<LineOfBusiness> findLineOfBusinessByLineOfBusinessName(String lineOfBusiness);
