@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import lombok.Data;
 import lombok.NonNull;
@@ -37,4 +38,6 @@ public class CreateSubscriptionRequest {
 
   @NotNull @NonNull private Date startDate;
   @NotNull @NonNull private SubscriptionType subscriptionType;
+
+  private List<String> features;
 }
