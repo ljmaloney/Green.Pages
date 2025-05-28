@@ -5,6 +5,8 @@ import com.green.yp.reference.data.enumeration.SubscriptionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -72,4 +74,15 @@ public class Subscription extends Mutable {
     @OneToMany(mappedBy = "subscription", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<SubscriptionFeature> features = new ArrayList<>();
+
+    @Override
+    public void onPrePersist() {
+       super.onPrePersist();
+       features.forEach(feature -> feature.setSubscription(this));
+    }
+
+    @Override
+    public void onPreUpdate() {
+        features.forEach(feature -> feature.setSubscription(this));
+    }
 }

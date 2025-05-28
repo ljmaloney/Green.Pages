@@ -8,13 +8,16 @@ import com.green.yp.api.apitype.enumeration.AuditActionType;
 import com.green.yp.api.apitype.enumeration.AuditObjectType;
 import com.green.yp.common.ServiceUtils;
 import com.green.yp.exception.NotFoundException;
+import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.reference.data.enumeration.SubscriptionType;
 import com.green.yp.reference.data.model.Subscription;
 import com.green.yp.reference.data.repository.SubscriptionRepository;
 import com.green.yp.reference.dto.SubscriptionDto;
 import com.green.yp.reference.mapper.SubscriptionMapper;
+import com.green.yp.util.DateUtils;
 import jakarta.validation.constraints.NotNull;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -131,7 +134,7 @@ public class SubscriptionService {
             log.error(
                     "Unexpected error when attempting to update subscription id: {}",
                     updateRequest.getSubscriptionId());
-            throw new RuntimeException(e);
+            throw new PreconditionFailedException("Attempt to update using invalid payload");
         }
 
         subscription = subscriptionRepository.saveAndFlush(subscription);
@@ -151,7 +154,16 @@ public class SubscriptionService {
         Subscription subscription = subscriptionRepository.findById(subscriptionId)
                 .orElseThrow(() -> new NotFoundException("Subscription", subscriptionId));
 
-        ServiceUtils.patchEntity(patchRequest, subscription);
+    ServiceUtils.patchEntity(
+        patchRequest,
+        subscription,
+        (name, value) -> {
+          return switch (name) {
+                case "monthlyAutopayAmount", "quarterlyAutopayAmount", "annualBillAmount" -> BigDecimal.valueOf((double)value);
+                case "startDate", "endDate" -> DateUtils.parseDate(value.toString(), Date.class);
+                default -> value;
+          };
+        });
         return subscriptionMapper.mapToDto(subscriptionRepository.saveAndFlush(subscription));
     }
 }
