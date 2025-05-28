@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import lombok.*;
 
@@ -35,4 +36,5 @@ public class SubscriptionDto {
     private SubscriptionType subscriptionType;
     @NotNull
     private Integer sortOrder;
+    private List<String> features;
 }
