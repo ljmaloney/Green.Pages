@@ -83,8 +83,8 @@ public class SubscriptionServiceTest {
 
     assertThat(subscriptions).isNotEmpty();
     SubscriptionDto dto = subscriptions.get(0);
-    assertThat(dto.getShortDescription()).isEqualTo(subs.get(0).getShortDescription());
-    assertThat(dto.getStartDate()).isEqualTo(subs.get(0).getStartDate());
+    assertThat(dto.shortDescription()).isEqualTo(subs.get(0).getShortDescription());
+    assertThat(dto.startDate()).isEqualTo(subs.get(0).getStartDate());
   }
 
   @Test
@@ -115,15 +115,15 @@ public class SubscriptionServiceTest {
         .thenReturn(
             LineOfBusinessDto.builder()
                 .lineOfBusinessId(lobId)
-                .lineOfBusinessName("Lawn maintiance")
+                .lineOfBusinessName("Lawn maintenance")
                 .build());
 
     List<SubscriptionDto> subscriptions = subscriptionService.findActiveLobSubscription(lobId);
 
     assertThat(subscriptions).isNotEmpty();
     SubscriptionDto dto = subscriptions.get(0);
-    assertThat(dto.getShortDescription()).isEqualTo(subs.get(0).getShortDescription());
-    assertThat(dto.getStartDate()).isEqualTo(subs.get(0).getStartDate());
-    assertThat(dto.getLineOfBusinessId()).isEqualTo(subs.get(0).getLineOfBusinessId());
+    assertThat(dto.shortDescription()).isEqualTo(subs.get(0).getShortDescription());
+    assertThat(dto.startDate()).isEqualTo(subs.get(0).getStartDate());
+    assertThat(dto.lineOfBusinessId()).isEqualTo(subs.get(0).getLineOfBusinessId());
   }
 }

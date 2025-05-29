@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class DefaultEmailProviderService implements EmailProviderInterface {
-    @Override
-    public Optional<Object> sendEmail(
-            EmailTemplateName templateName, String[] toEmailAddress, Object params) {
-        log.info("Sending email {} to {} with Parameters [{}]", templateName, toEmailAddress, params);
-        return Optional.empty();
-    }
+  @Override
+  public Optional<Object> sendEmail(
+      EmailTemplateName templateName, String[] toEmailAddress, Object params) {
+    log.info("Sending email {} to {} with Parameters [{}]", templateName, toEmailAddress, params);
+    return Optional.empty();
+  }
 }
