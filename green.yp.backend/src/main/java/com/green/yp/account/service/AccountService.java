@@ -183,7 +183,7 @@ public class AccountService {
           "Existing payment method not provided or new payment method specified");
     }
 
-   invoiceContract.findInvoice(paymentRequest.invoiceId(), requestIP);
+    invoiceContract.findInvoice(paymentRequest.invoiceId(), requestIP);
 
     PaymentResponse paymentResponse =
         paymentContract.applyPayment(paymentRequest, userId, requestIP);
@@ -256,7 +256,7 @@ public class AccountService {
       }
 
       contactContract.updatePrimaryContact(
-              request, account.getProducerId(), locationResponse.locationId(), ipAddress);
+          request, account.getProducerId(), locationResponse.locationId(), ipAddress);
       adminContacts = contactContract.findAdminContacts(account.getProducerId());
     }
 
@@ -356,7 +356,7 @@ public class AccountService {
   private List<String> getAdminEmails(UUID accountId) {
     List<ProducerContactResponse> contacts = contactContract.findAdminContacts(accountId);
 
-    return  contacts.stream().map(contact -> contact.emailAddress()).toList();
+    return contacts.stream().map(contact -> contact.emailAddress()).toList();
   }
 
   /**

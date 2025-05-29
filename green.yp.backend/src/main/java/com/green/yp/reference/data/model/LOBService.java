@@ -15,22 +15,22 @@ import lombok.*;
 @Builder
 @Table(name = "lob_service", schema = "greenyp")
 public class LOBService extends Mutable {
-    @Column(name = "line_of_business_id")
-    private UUID lineOfBusinessId;
+  @Column(name = "line_of_business_id")
+  private UUID lineOfBusinessId;
 
-    @NotNull
-    @Column(name = "created_by_reference", nullable = false, length = 50)
-    private String createdByReference;
+  @NotNull
+  @Column(name = "created_by_reference", nullable = false, length = 50)
+  private String createdByReference;
 
-    @NotNull
-    @Column(name = "created_by_type", nullable = false, length = 50)
-    @Enumerated(EnumType.STRING)
-    private CreatedByType createdByType;
+  @NotNull
+  @Column(name = "created_by_type", nullable = false, length = 50)
+  @Enumerated(EnumType.STRING)
+  private CreatedByType createdByType;
 
-    @NotNull
-    @Column(name = "service_name", nullable = false, length = 50)
-    private String serviceName;
+  @NotNull
+  @Column(name = "service_name", nullable = false, length = 50)
+  private String serviceName;
 
-    @Column(name = "service_description", length = 512)
-    private String serviceDescription;
+  @Column(name = "service_description", length = 512)
+  private String serviceDescription;
 }

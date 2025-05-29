@@ -9,12 +9,12 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(
-        componentModel = "spring",
-        unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        injectionStrategy = InjectionStrategy.CONSTRUCTOR)
+    componentModel = "spring",
+    unmappedTargetPolicy = ReportingPolicy.IGNORE,
+    injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface ProducerLocationHoursMapper {
-    List<LocationHoursResponse> fromEntity(List<ProducerLocationHours> allByProducerLocationId);
+  List<LocationHoursResponse> fromEntity(List<ProducerLocationHours> allByProducerLocationId);
 
-    @Mapping(source = "entity.id", target = "locationHoursId")
-    LocationHoursResponse fromEntity(ProducerLocationHours entity);
+  @Mapping(source = "entity.id", target = "locationHoursId")
+  LocationHoursResponse fromEntity(ProducerLocationHours entity);
 }

@@ -14,19 +14,20 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(
-        componentModel = "spring",
-        unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        injectionStrategy = InjectionStrategy.CONSTRUCTOR)
+    componentModel = "spring",
+    unmappedTargetPolicy = ReportingPolicy.IGNORE,
+    injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface ProducerLocationMapper {
-    @Mapping(source = "producerId", target = "producerId")
-    ProducerLocation toEntity(LocationRequest createLocationRequest, @NotNull UUID producerId);
-    ProducerLocation toEntity(LocationRequest createLocationRequest);
+  @Mapping(source = "producerId", target = "producerId")
+  ProducerLocation toEntity(LocationRequest createLocationRequest, @NotNull UUID producerId);
 
-    @Mapping(source = "location.id", target = "locationId")
-    ProducerLocationResponse fromEntity(ProducerLocation location);
+  ProducerLocation toEntity(LocationRequest createLocationRequest);
 
-    @Mapping(source = "entity.id", target = "locationHoursId")
-    LocationHoursResponse fromEntity(ProducerLocationHours entity);
+  @Mapping(source = "location.id", target = "locationId")
+  ProducerLocationResponse fromEntity(ProducerLocation location);
 
-    List<ProducerLocationResponse> fromEntity(List<ProducerLocation> producerLocations);
+  @Mapping(source = "entity.id", target = "locationHoursId")
+  LocationHoursResponse fromEntity(ProducerLocationHours entity);
+
+  List<ProducerLocationResponse> fromEntity(List<ProducerLocation> producerLocations);
 }

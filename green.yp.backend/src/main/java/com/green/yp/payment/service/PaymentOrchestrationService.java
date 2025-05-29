@@ -26,112 +26,118 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class PaymentOrchestrationService {
 
-    private final InvoiceContract invoiceContract;
+  private final InvoiceContract invoiceContract;
 
-    private final PaymentTransactionRepository paymentTransactionRepository;
+  private final PaymentTransactionRepository paymentTransactionRepository;
 
-    private final PaymentMethodService paymentMethodService;
+  private final PaymentMethodService paymentMethodService;
 
-    private final PaymentTransactionService transactionService;
+  private final PaymentTransactionService transactionService;
 
-    private final PaymentIntegrationInterface paymentIntegration;
+  private final PaymentIntegrationInterface paymentIntegration;
 
-    private final PaymentMapper paymentMapper;
+  private final PaymentMapper paymentMapper;
 
-    public PaymentOrchestrationService(InvoiceContract invoiceContract, PaymentTransactionRepository paymentTransactionRepository, PaymentMethodService paymentMethodService, PaymentTransactionService transactionService, PaymentIntegrationInterface paymentIntegration, PaymentMapper paymentMapper) {
-        this.invoiceContract = invoiceContract;
-        this.paymentTransactionRepository = paymentTransactionRepository;
-        this.paymentMethodService = paymentMethodService;
-        this.transactionService = transactionService;
-        this.paymentIntegration = paymentIntegration;
-        this.paymentMapper = paymentMapper;
+  public PaymentOrchestrationService(
+      InvoiceContract invoiceContract,
+      PaymentTransactionRepository paymentTransactionRepository,
+      PaymentMethodService paymentMethodService,
+      PaymentTransactionService transactionService,
+      PaymentIntegrationInterface paymentIntegration,
+      PaymentMapper paymentMapper) {
+    this.invoiceContract = invoiceContract;
+    this.paymentTransactionRepository = paymentTransactionRepository;
+    this.paymentMethodService = paymentMethodService;
+    this.transactionService = transactionService;
+    this.paymentIntegration = paymentIntegration;
+    this.paymentMapper = paymentMapper;
+  }
+
+  public PaymentResponse applyPayment(
+      @NotNull @NonNull ApplyPaymentMethodRequest paymentRequest,
+      @NotNull @NonNull UUID invoiceId,
+      @NotNull @NonNull ProducerPaymentType paymentType,
+      String requestIP) {
+
+    Optional<PaymentTransaction> transaction =
+        transactionService
+            .findTransaction(invoiceId, paymentType, PaymentTransactionStatus.SUCCESS)
+            .or(
+                () -> {
+                  InvoiceResponse invoiceResponse =
+                      invoiceContract.findInvoice(invoiceId, requestIP);
+                  PaymentMethodResponse paymentMethod =
+                      paymentMethodService.createPaymentMethod(
+                          paymentMapper.toPaymentRequest(paymentRequest));
+                  return Optional.ofNullable(
+                      applyPayment(invoiceResponse, paymentMethod, paymentType, requestIP));
+                });
+
+    return paymentMapper.fromTransaction(transaction.get());
+  }
+
+  public PaymentResponse applyPayment(
+      ApplyPaymentRequest paymentRequest, String userId, String requestIP) {
+
+    Optional<PaymentTransaction> transaction =
+        transactionService
+            .findTransaction(
+                paymentRequest.invoiceId(),
+                paymentRequest.paymentType(),
+                PaymentTransactionStatus.SUCCESS)
+            .or(
+                () -> {
+                  InvoiceResponse invoiceResponse =
+                      invoiceContract.findInvoice(paymentRequest.invoiceId(), requestIP);
+                  PaymentMethodResponse paymentMethod = null;
+                  if (paymentRequest.savedPaymentMethodId() != null) {
+                    paymentMethod =
+                        paymentMethodService.findPaymentMethod(
+                            paymentRequest.savedPaymentMethodId());
+                  } else if (paymentRequest.newPaymentMethod() != null) {
+                    paymentMethod =
+                        paymentMethodService.createPaymentMethod(paymentRequest.newPaymentMethod());
+                  } else {
+                    throw new PreconditionFailedException("Payment must be either saved or new");
+                  }
+                  return Optional.ofNullable(
+                      applyPayment(
+                          invoiceResponse, paymentMethod, paymentRequest.paymentType(), requestIP));
+                });
+
+    return paymentMapper.fromTransaction(transaction.get());
+  }
+
+  private PaymentTransaction applyPayment(
+      InvoiceResponse invoiceResponse,
+      PaymentMethodResponse paymentMethod,
+      ProducerPaymentType paymentType,
+      String requestIP) {
+    log.info(
+        "Apply payment on invoice {} using method {}",
+        invoiceResponse.invoiceId(),
+        paymentMethod.paymentMethodId());
+
+    PaymentIntegrationRequest request =
+        new PaymentIntegrationRequest(
+            invoiceResponse.invoiceId(),
+            invoiceResponse.invoiceNumber(),
+            "",
+            invoiceResponse.invoiceTotal(),
+            paymentMethod);
+
+    PaymentIntegrationResponse response = paymentIntegration.applyPayment(request, requestIP);
+
+    PaymentTransaction transaction =
+        transactionService.createTransaction(invoiceResponse, paymentMethod, paymentType, response);
+
+    if (response.isFailed()) {
+
+    } else {
+      InvoiceResponse paidInvoice =
+          invoiceContract.markInvoicePaid(invoiceResponse.invoiceId(), requestIP);
+      // invoiceContract.sendPaidInvoiceEmail(paidInvoice.invoiceId(), paymentMethod.)
     }
-
-    public PaymentResponse applyPayment(
-            @NotNull @NonNull ApplyPaymentMethodRequest paymentRequest,
-            @NotNull @NonNull UUID invoiceId,
-            @NotNull @NonNull ProducerPaymentType paymentType,
-            String requestIP) {
-
-        Optional<PaymentTransaction> transaction =
-                transactionService
-                        .findTransaction(invoiceId, paymentType, PaymentTransactionStatus.SUCCESS)
-                        .or(
-                                () -> {
-                                    InvoiceResponse invoiceResponse =
-                                            invoiceContract.findInvoice(invoiceId, requestIP);
-                                    PaymentMethodResponse paymentMethod =
-                                            paymentMethodService.createPaymentMethod(
-                                                    paymentMapper.toPaymentRequest(paymentRequest));
-                                    return Optional.ofNullable(
-                                            applyPayment(invoiceResponse, paymentMethod, paymentType, requestIP));
-                                });
-
-        return paymentMapper.fromTransaction(transaction.get());
-    }
-
-    public PaymentResponse applyPayment(
-            ApplyPaymentRequest paymentRequest, String userId, String requestIP) {
-
-        Optional<PaymentTransaction> transaction =
-                transactionService
-                        .findTransaction(
-                                paymentRequest.invoiceId(),
-                                paymentRequest.paymentType(),
-                                PaymentTransactionStatus.SUCCESS)
-                        .or(
-                                () -> {
-                                    InvoiceResponse invoiceResponse =
-                                            invoiceContract.findInvoice(paymentRequest.invoiceId(), requestIP);
-                                    PaymentMethodResponse paymentMethod = null;
-                                    if (paymentRequest.savedPaymentMethodId() != null) {
-                                        paymentMethod =
-                                                paymentMethodService.findPaymentMethod(
-                                                        paymentRequest.savedPaymentMethodId());
-                                    } else if (paymentRequest.newPaymentMethod() != null) {
-                                        paymentMethod =
-                                                paymentMethodService.createPaymentMethod(paymentRequest.newPaymentMethod());
-                                    } else {
-                                        throw new PreconditionFailedException("Payment must be either saved or new");
-                                    }
-                                    return Optional.ofNullable(
-                                            applyPayment(
-                                                    invoiceResponse, paymentMethod, paymentRequest.paymentType(), requestIP));
-                                });
-
-        return paymentMapper.fromTransaction(transaction.get());
-    }
-
-    private PaymentTransaction applyPayment(
-            InvoiceResponse invoiceResponse,
-            PaymentMethodResponse paymentMethod,
-            ProducerPaymentType paymentType,
-            String requestIP) {
-        log.info(
-                "Apply payment on invoice {} using method {}",
-                invoiceResponse.invoiceId(),
-                paymentMethod.paymentMethodId());
-
-        PaymentIntegrationRequest request =
-                new PaymentIntegrationRequest(
-                        invoiceResponse.invoiceId(),
-                        invoiceResponse.invoiceNumber(),
-                        "",
-                        invoiceResponse.invoiceTotal(),
-                        paymentMethod);
-
-        PaymentIntegrationResponse response = paymentIntegration.applyPayment(request, requestIP);
-
-        PaymentTransaction transaction =
-                transactionService.createTransaction(invoiceResponse, paymentMethod, paymentType, response);
-
-        if (response.isFailed()) {
-
-        } else {
-            InvoiceResponse paidInvoice =
-                    invoiceContract.markInvoicePaid(invoiceResponse.invoiceId(), requestIP);
-            // invoiceContract.sendPaidInvoiceEmail(paidInvoice.invoiceId(), paymentMethod.)
-        }
-        return transaction;
-    }
+    return transaction;
+  }
 }

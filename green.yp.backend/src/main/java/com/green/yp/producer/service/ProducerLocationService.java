@@ -39,10 +39,11 @@ public class ProducerLocationService {
 
   final ProducerLocationHoursService hoursService;
 
-  public ProducerLocationService(ProducerLocationMapper producerLocationMapper,
-                                 ProducerLocationRepository locationRepository,
-                                 ProducerOrchestrationService producerService,
-                                 ProducerLocationHoursService hoursService) {
+  public ProducerLocationService(
+      ProducerLocationMapper producerLocationMapper,
+      ProducerLocationRepository locationRepository,
+      ProducerOrchestrationService producerService,
+      ProducerLocationHoursService hoursService) {
     this.producerLocationMapper = producerLocationMapper;
     this.locationRepository = locationRepository;
     this.producerService = producerService;
@@ -147,7 +148,7 @@ public class ProducerLocationService {
             .findById(locationId)
             .orElseThrow(() -> new NotFoundException("ProducerLocation", locationId));
 
-    if (TRUE.equals(includeHours)) {
+    if (includeHours) {
       return producerLocationMapper.fromEntity(location);
     }
     location.setLocationHours(null);
@@ -168,7 +169,7 @@ public class ProducerLocationService {
       producerLocations = locationRepository.findProducerLocationsByProducerId(producerId);
     }
 
-    if (FALSE.equals(includeHours)) {
+    if (!includeHours) {
       producerLocations.forEach(location -> location.setLocationHours(null));
     }
     return producerLocationMapper.fromEntity(producerLocations);

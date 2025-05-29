@@ -9,15 +9,15 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(
-        componentModel = "spring",
-        unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        injectionStrategy = InjectionStrategy.CONSTRUCTOR)
+    componentModel = "spring",
+    unmappedTargetPolicy = ReportingPolicy.IGNORE,
+    injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface ProducerAuthUserMapper {
 
-    @Mapping(source = "request.userName", target = "userId")
-    ProducerUserCredentials toEntity(UserCredentialsRequest request);
+  @Mapping(source = "request.userName", target = "userId")
+  ProducerUserCredentials toEntity(UserCredentialsRequest request);
 
-    @Mapping(source = "credentials.userId", target = "userName")
-    @Mapping(source = "credentials.id", target = "credentialsId")
-    ProducerCredentialsResponse fromEntity(ProducerUserCredentials credentials);
+  @Mapping(source = "credentials.userId", target = "userName")
+  @Mapping(source = "credentials.id", target = "credentialsId")
+  ProducerCredentialsResponse fromEntity(ProducerUserCredentials credentials);
 }

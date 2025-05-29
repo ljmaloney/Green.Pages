@@ -15,38 +15,41 @@ import java.time.LocalDate;
 @Table(name = "subscription_feature", schema = "greenyp")
 public class SubscriptionFeature extends Mutable {
 
-    @Column(name="start_date")
-    @Temporal(TemporalType.DATE)
-    private LocalDate startDate;
+  @Column(name = "start_date")
+  @Temporal(TemporalType.DATE)
+  private LocalDate startDate;
 
-    @Column(name="end_date")
-    @Temporal(TemporalType.DATE)
-    private LocalDate endDate;
+  @Column(name = "end_date")
+  @Temporal(TemporalType.DATE)
+  private LocalDate endDate;
 
-    @Column(name="feature_name")
-    private String featureName;
+  @Column(name = "feature_name")
+  private String featureName;
 
-    @ManyToOne
-    @JoinColumn(name="subscription_id")
-    private Subscription subscription;
+  @ManyToOne
+  @JoinColumn(name = "subscription_id")
+  private Subscription subscription;
 
   @Override
   public void onPrePersist() {
-        if ( startDate == null )
-            startDate = LocalDate.now();
-        if ( endDate == null )
-            endDate = LocalDate.of(9999,12,31);
-        super.onPrePersist();
-    }
+    if (startDate == null) startDate = LocalDate.now();
+    if (endDate == null) endDate = LocalDate.of(9999, 12, 31);
+    super.onPrePersist();
+  }
 
   @Override
   public String toString() {
-      return new StringBuilder("SubscriptionFeature [")
-              .append("id:").append(getId().toString())
-              .append(", subscriptionId:").append(subscription.getId())
-              .append(", startDate:").append(startDate)
-              .append(", endDate:").append(endDate)
-              .append(", featureName:").append(featureName)
-              .append("]").toString();
-    }
+    return "SubscriptionFeature [" +
+           "id:" +
+           getId().toString() +
+           ", subscriptionId:" +
+           subscription.getId() +
+           ", startDate:" +
+           startDate +
+           ", endDate:" +
+           endDate +
+           ", featureName:" +
+           featureName +
+           "]";
+  }
 }

@@ -19,54 +19,52 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Validated
 @RequestMapping("producer/location")
-@Tag(name="endpoints for managing hours of business at a location")
+@Tag(name = "endpoints for managing hours of business at a location")
 public class ProducerLocationHoursController {
 
-    private final ProducerLocationHoursService locationHoursService;
+  private final ProducerLocationHoursService locationHoursService;
 
-    public ProducerLocationHoursController(ProducerLocationHoursService locationHoursService) {
-        this.locationHoursService = locationHoursService;
-    }
+  public ProducerLocationHoursController(ProducerLocationHoursService locationHoursService) {
+    this.locationHoursService = locationHoursService;
+  }
 
-    @GetMapping(
-            path = "/{locationId}/hours",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseApi<List<LocationHoursResponse>> getLocationHours(
-            @PathVariable("locationId") UUID locationId) {
-        return new ResponseApi<>(
-                locationHoursService.findLocationHours(locationId, null, RequestUtil.getRequestIP()), null);
-    }
+  @GetMapping(path = "/{locationId}/hours", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<List<LocationHoursResponse>> getLocationHours(
+      @PathVariable("locationId") UUID locationId) {
+    return new ResponseApi<>(
+        locationHoursService.findLocationHours(locationId, null, RequestUtil.getRequestIP()), null);
+  }
 
-    @PostMapping(
-            path = "/hours",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseApi<LocationHoursResponse> createLocationHours(
-            @Valid @RequestBody LocationHoursRequest request) {
-        return new ResponseApi<>(
-                locationHoursService.createLocationHours(request, null, RequestUtil.getRequestIP()), null);
-    }
+  @PostMapping(
+      path = "/hours",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<LocationHoursResponse> createLocationHours(
+      @Valid @RequestBody LocationHoursRequest request) {
+    return new ResponseApi<>(
+        locationHoursService.createLocationHours(request, null, RequestUtil.getRequestIP()), null);
+  }
 
-    @PutMapping(
-            path = "/hours",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseApi<LocationHoursResponse> updateLocationHours(
-            @Valid @RequestBody LocationHoursRequest hoursRequest) {
-        return new ResponseApi<>(
-                locationHoursService.updateLocationHours(hoursRequest, null, RequestUtil.getRequestIP()),
-                null);
-    }
+  @PutMapping(
+      path = "/hours",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<LocationHoursResponse> updateLocationHours(
+      @Valid @RequestBody LocationHoursRequest hoursRequest) {
+    return new ResponseApi<>(
+        locationHoursService.updateLocationHours(hoursRequest, null, RequestUtil.getRequestIP()),
+        null);
+  }
 
-    @DeleteMapping(path = "/hours/{locationHoursId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteLocationHours(@PathVariable("locationHoursId") UUID locationHoursId) {
-        locationHoursService.deleteLocationHours(locationHoursId, null, RequestUtil.getRequestIP());
-    }
+  @DeleteMapping(path = "/hours/{locationHoursId}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteLocationHours(@PathVariable("locationHoursId") UUID locationHoursId) {
+    locationHoursService.deleteLocationHours(locationHoursId, null, RequestUtil.getRequestIP());
+  }
 
-    @DeleteMapping(path = "{locationId}/hours")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAllLocationHours(@PathVariable("locationId") UUID locationId) {
-        locationHoursService.deleteAllHours(locationId, null, RequestUtil.getRequestIP());
-    }
+  @DeleteMapping(path = "{locationId}/hours")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteAllLocationHours(@PathVariable("locationId") UUID locationId) {
+    locationHoursService.deleteAllHours(locationId, null, RequestUtil.getRequestIP());
+  }
 }

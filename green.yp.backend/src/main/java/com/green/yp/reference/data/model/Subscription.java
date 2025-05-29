@@ -1,12 +1,11 @@
 package com.green.yp.reference.data.model;
 
+import com.green.yp.common.data.converter.BooleanConverter;
 import com.green.yp.common.data.embedded.Mutable;
 import com.green.yp.reference.data.enumeration.SubscriptionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -56,6 +55,11 @@ public class Subscription extends Mutable {
     @NotNull
     @Column(name = "short_description", length = 100, nullable = false)
     private String shortDescription;
+
+    @NotNull
+    @Column(name="coming_soon_indicator", nullable = false)
+    @Convert(converter = BooleanConverter.class)
+    private Boolean comingSoon;
 
     @NotNull
     @Column(name = "sort_order")

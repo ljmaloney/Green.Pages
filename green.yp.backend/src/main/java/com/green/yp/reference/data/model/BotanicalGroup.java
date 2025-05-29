@@ -13,25 +13,25 @@ import lombok.*;
 @Builder
 @Table(name = "botanical_group", schema = "greenyp")
 public class BotanicalGroup {
-    @NonNull
-    @NotNull
-    @Id
-    @Column(name = "name")
-    private String name;
+  @NonNull
+  @NotNull
+  @Id
+  @Column(name = "name")
+  private String name;
 
-    @Column(name = "create_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private OffsetDateTime createDate;
+  @Column(name = "create_date")
+  @Temporal(TemporalType.TIMESTAMP)
+  private OffsetDateTime createDate;
 
-    @Column(name = "genus")
-    private String genus;
+  @Column(name = "genus")
+  private String genus;
 
-    @Column(name = "species")
-    private String species;
+  @Column(name = "species")
+  private String species;
 
-    @Column(name = "sub_species")
-    private String subSpecies;
+  @Column(name = "sub_species")
+  private String subSpecies;
 
-    @Column(name = "description")
-    private String description;
+  @Column(name = "description")
+  private String description;
 }

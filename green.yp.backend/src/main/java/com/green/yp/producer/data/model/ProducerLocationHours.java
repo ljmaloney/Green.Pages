@@ -15,28 +15,28 @@ import lombok.*;
 @Builder
 @Table(name = "producer_location_hours", schema = "greenyp")
 public class ProducerLocationHours extends Mutable {
-    @NotNull
-    @Column(name = "producer_id", nullable = false)
-    private UUID producerId;
+  @NotNull
+  @Column(name = "producer_id", nullable = false)
+  private UUID producerId;
 
-    @NotNull
-    @Column(name = "producer_location_id", nullable = false, insertable = false, updatable = false)
-    private UUID producerLocationId;
+  @NotNull
+  @Column(name = "producer_location_id", nullable = false, insertable = false, updatable = false)
+  private UUID producerLocationId;
 
-    @NotNull
-    @Column(name = "day_of_week")
-    @Enumerated(EnumType.STRING)
-    private DayOfWeekType dayOfWeek;
+  @NotNull
+  @Column(name = "day_of_week")
+  @Enumerated(EnumType.STRING)
+  private DayOfWeekType dayOfWeek;
 
-    @NotNull
-    @Column(name = "open_time")
-    private String openTime;
+  @NotNull
+  @Column(name = "open_time")
+  private String openTime;
 
-    @NotNull
-    @Column(name = "close_time")
-    private String closeTime;
+  @NotNull
+  @Column(name = "close_time")
+  private String closeTime;
 
-    @ManyToOne
-    @JoinColumn(name = "producer_location_id")
-    private ProducerLocation producerLocation;
+  @ManyToOne
+  @JoinColumn(name = "producer_location_id")
+  private ProducerLocation producerLocation;
 }

@@ -54,7 +54,9 @@ public class LineOfBusinessController {
 
   @Operation(summary = "Creates a new line of business")
   @ApiResponse(responseCode = "200", description = "Line of business created")
-  @ApiResponse(responseCode = "412", description = "Precondition for line of business creation failed")
+  @ApiResponse(
+      responseCode = "412",
+      description = "Precondition for line of business creation failed")
   @PostMapping(
       path = "/lob",
       consumes = MediaType.APPLICATION_JSON_VALUE,

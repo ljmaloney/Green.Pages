@@ -10,34 +10,23 @@ import java.util.UUID;
 import lombok.Data;
 import lombok.NonNull;
 
-@Data
-public class CreateSubscriptionRequest {
-  @NotNull @NonNull private BigDecimal annualBillAmount;
-
-  @NotNull
-  @NonNull
-  @Size(min = 0, max = 30, message = "The service name must be less than 30 characters")
-  private String displayName;
-
-  @NotNull @NonNull private Date endDate;
-
-  private String htmlDescription;
-
-  private UUID lineOfBusinessId;
-
-  @NotNull @NonNull private BigDecimal monthlyAutopayAmount;
-
-  @NotNull @NonNull private BigDecimal quarterlyAutopayAmount;
-
-  @NotNull
-  @NonNull
-  @Size(min = 0, max = 100, message = "The service name must be less than 100 characters")
-  private String shortDescription;
-
-  @NotNull @NonNull private Integer sortOrder;
-
-  @NotNull @NonNull private Date startDate;
-  @NotNull @NonNull private SubscriptionType subscriptionType;
-
-  private List<String> features;
-}
+public record CreateSubscriptionRequest(
+    @NotNull
+        @NonNull
+        @Size(min = 0, max = 30, message = "The service name must be less than 30 characters")
+        String displayName,
+    @NotNull @NonNull SubscriptionType subscriptionType,
+    @NotNull @NonNull Date startDate,
+    @NotNull @NonNull Date endDate,
+    String htmlDescription,
+    UUID lineOfBusinessId,
+    @NotNull @NonNull BigDecimal annualBillAmount,
+    @NotNull @NonNull BigDecimal monthlyAutopayAmount,
+    @NotNull @NonNull BigDecimal quarterlyAutopayAmount,
+    @NotNull
+        @NonNull
+        @Size(min = 0, max = 100, message = "The service name must be less than 100 characters")
+        String shortDescription,
+    @NotNull @NonNull Integer sortOrder,
+    boolean comingSoon,
+    List<String> features) {}

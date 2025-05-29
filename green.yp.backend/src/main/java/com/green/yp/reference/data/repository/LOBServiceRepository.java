@@ -6,5 +6,5 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LOBServiceRepository extends JpaRepository<LOBService, UUID> {
-    List<LOBService> findLOBServicesByLineOfBusinessId(UUID lineOfBusinessId);
+  List<LOBService> findLOBServicesByLineOfBusinessId(UUID lineOfBusinessId);
 }

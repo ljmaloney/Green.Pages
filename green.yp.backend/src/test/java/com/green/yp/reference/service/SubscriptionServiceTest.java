@@ -37,40 +37,37 @@ import org.springframework.test.util.ReflectionTestUtils;
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class SubscriptionServiceTest {
 
-    @Mock
-    private SubscriptionRepository subscriptionRepository;
+  @Mock private SubscriptionRepository subscriptionRepository;
 
-    @Mock
-    LineOfBusinessService lobService;
+  @Mock LineOfBusinessService lobService;
 
-    @InjectMocks
-    SubscriptionService subscriptionService;
+  @InjectMocks SubscriptionService subscriptionService;
 
-    @BeforeEach
-    public void setup() {
-        ReflectionTestUtils.setField(
-                subscriptionService, "subscriptionMapper", new SubscriptionMapperImpl());
-    }
+  @BeforeEach
+  public void setup() {
+    ReflectionTestUtils.setField(
+        subscriptionService, "subscriptionMapper", new SubscriptionMapperImpl());
+  }
 
-    @Test
-    void getActiveSubscriptions_NotFound() {
-        OffsetDateTime testDate = OffsetDateTime.now();
-        String lob = null;
+  @Test
+  void getActiveSubscriptions_NotFound() {
+    OffsetDateTime testDate = OffsetDateTime.now();
+    String lob = null;
 
-        when(subscriptionRepository.findAllActive(any(Date.class), any())).thenReturn(new ArrayList<>());
+    when(subscriptionRepository.findAllActive(any(Date.class), any()))
+        .thenReturn(new ArrayList<>());
 
-        assertThrows(
-                NotFoundException.class,
-                () -> subscriptionService.findActiveSubscription());
+    assertThrows(NotFoundException.class, () -> subscriptionService.findActiveSubscription());
+  }
 
-    }
+  @Test
+  void testFindActiveSubscription_Success() throws ParseException {
+    OffsetDateTime testDate = OffsetDateTime.now();
+    String lob = null;
 
-    @Test
-    void testFindActiveSubscription_Success() throws ParseException {
-        OffsetDateTime testDate = OffsetDateTime.now();
-        String lob = null;
-
-        List<Subscription> subs = List.of(Subscription.builder()
+    List<Subscription> subs =
+        List.of(
+            Subscription.builder()
                 .startDate(new SimpleDateFormat("yyyy-MM-dd").parse("2022-01-01"))
                 .endDate(new SimpleDateFormat("yyyy-MM-dd").parse("2023-12-31"))
                 .annualBillAmount(BigDecimal.valueOf(150.0d))
@@ -78,23 +75,26 @@ public class SubscriptionServiceTest {
                 .displayName("Basic Subscription")
                 .build());
 
-        when(subscriptionRepository.findAllActive(any(Date.class), eq(SubscriptionType.TOP_LEVEL), eq(SubscriptionType.ADD_ON))).thenReturn(subs);
+    when(subscriptionRepository.findAllActive(
+            any(Date.class), eq(SubscriptionType.TOP_LEVEL), eq(SubscriptionType.ADD_ON)))
+        .thenReturn(subs);
 
-        List<SubscriptionDto> subscriptions = subscriptionService.findActiveSubscription();
+    List<SubscriptionDto> subscriptions = subscriptionService.findActiveSubscription();
 
-        assertThat(subscriptions).isNotEmpty();
-        SubscriptionDto dto = subscriptions.get(0);
-        assertThat(dto.getShortDescription()).isEqualTo(subs.get(0).getShortDescription());
-        assertThat(dto.getStartDate()).isEqualTo(subs.get(0).getStartDate());
+    assertThat(subscriptions).isNotEmpty();
+    SubscriptionDto dto = subscriptions.get(0);
+    assertThat(dto.shortDescription()).isEqualTo(subs.get(0).getShortDescription());
+    assertThat(dto.startDate()).isEqualTo(subs.get(0).getStartDate());
+  }
 
-    }
+  @Test
+  void testGetActiveSubscriptions_ByLineOfBusiness_Success() throws ParseException {
+    OffsetDateTime testDate = OffsetDateTime.now();
+    UUID lobId = UUID.randomUUID();
 
-    @Test
-    void testGetActiveSubscriptions_ByLineOfBusiness_Success() throws ParseException {
-        OffsetDateTime testDate = OffsetDateTime.now();
-        UUID lobId = UUID.randomUUID();
-
-        List<Subscription> subs = List.of(Subscription.builder()
+    List<Subscription> subs =
+        List.of(
+            Subscription.builder()
                 .startDate(new SimpleDateFormat("yyyy-MM-dd").parse("2022-01-01"))
                 .endDate(new SimpleDateFormat("yyyy-MM-dd").parse("2023-12-31"))
                 .subscriptionType(SubscriptionType.LINE_OF_BUSINESS)
@@ -104,21 +104,26 @@ public class SubscriptionServiceTest {
                 .displayName("Basic Subscription")
                 .build());
 
-        when(subscriptionRepository.findAllActive(eq(lobId),
-                any(Date.class), eq(SubscriptionType.LINE_OF_BUSINESS), eq(SubscriptionType.LINE_OF_BUSINESS_ADD_ON))).thenReturn(subs);
+    when(subscriptionRepository.findAllActive(
+            eq(lobId),
+            any(Date.class),
+            eq(SubscriptionType.LINE_OF_BUSINESS),
+            eq(SubscriptionType.LINE_OF_BUSINESS_ADD_ON)))
+        .thenReturn(subs);
 
-        when(lobService.findLineOfBusiness(eq(lobId))).thenReturn(LineOfBusinessDto.builder()
+    when(lobService.findLineOfBusiness(eq(lobId)))
+        .thenReturn(
+            LineOfBusinessDto.builder()
                 .lineOfBusinessId(lobId)
-                .lineOfBusinessName("Lawn maintiance")
+                .lineOfBusinessName("Lawn maintenance")
                 .build());
 
-        List<SubscriptionDto> subscriptions = subscriptionService.findActiveLobSubscription(lobId);
+    List<SubscriptionDto> subscriptions = subscriptionService.findActiveLobSubscription(lobId);
 
-        assertThat(subscriptions).isNotEmpty();
-        SubscriptionDto dto = subscriptions.get(0);
-        assertThat(dto.getShortDescription()).isEqualTo(subs.get(0).getShortDescription());
-        assertThat(dto.getStartDate()).isEqualTo(subs.get(0).getStartDate());
-        assertThat(dto.getLineOfBusinessId()).isEqualTo(subs.get(0).getLineOfBusinessId());
-    }
-
+    assertThat(subscriptions).isNotEmpty();
+    SubscriptionDto dto = subscriptions.get(0);
+    assertThat(dto.shortDescription()).isEqualTo(subs.get(0).getShortDescription());
+    assertThat(dto.startDate()).isEqualTo(subs.get(0).getStartDate());
+    assertThat(dto.lineOfBusinessId()).isEqualTo(subs.get(0).getLineOfBusinessId());
+  }
 }

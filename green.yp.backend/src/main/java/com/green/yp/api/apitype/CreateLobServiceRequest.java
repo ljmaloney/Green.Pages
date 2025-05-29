@@ -8,22 +8,13 @@ import lombok.NonNull;
 
 @Data
 public class CreateLobServiceRequest {
-    @NotNull
-    @NonNull
-    private UUID lineOfBusinessId;
+  @NotNull @NonNull private UUID lineOfBusinessId;
 
-    @NotNull
-    @NonNull
-    private String createdByReference;
+  @NotNull @NonNull private String createdByReference;
 
-    @NotNull
-    @NonNull
-    private CreatedByType createdByType;
+  @NotNull @NonNull private CreatedByType createdByType;
 
-    @NotNull
-    @NonNull
-    private String serviceName;
+  @NotNull @NonNull private String serviceName;
 
-    private String serviceDescription;
-
+  private String serviceDescription;
 }

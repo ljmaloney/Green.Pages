@@ -7,20 +7,19 @@ import java.util.UUID;
 import lombok.*;
 
 @Builder
-public record LineOfBusinessDto (UUID lineOfBusinessId,
-                                 OffsetDateTime createDate,
-                                 OffsetDateTime lastUpdateDate,
-                                 @NotNull
-                                 String lineOfBusinessName,
-                                 LineOfBusinessCreateType createType,
-                                 String createByReference,
-                                 String shortDescription,
-                                 String description,
-                                 Boolean enableDistanceRadius,
-                                 String iconName,
-                                 String iconFileName){
-    public LineOfBusinessDto {
-       if ( createType == null )
-           createType = LineOfBusinessCreateType.SYSTEM_DEFAULT;
-    }
+public record LineOfBusinessDto(
+    UUID lineOfBusinessId,
+    OffsetDateTime createDate,
+    OffsetDateTime lastUpdateDate,
+    @NotNull String lineOfBusinessName,
+    LineOfBusinessCreateType createType,
+    String createByReference,
+    String shortDescription,
+    String description,
+    Boolean enableDistanceRadius,
+    String iconName,
+    String iconFileName) {
+  public LineOfBusinessDto {
+    if (createType == null) createType = LineOfBusinessCreateType.SYSTEM_DEFAULT;
+  }
 }

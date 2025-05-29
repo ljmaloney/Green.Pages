@@ -22,35 +22,35 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Validated
 @RequestMapping("producer")
-@Tag(name="endpoints for managing the authorized users of the subscription")
+@Tag(name = "endpoints for managing the authorized users of the subscription")
 public class ProducerUserController {
 
-    private final ProducerUserService userService;
+  private final ProducerUserService userService;
 
-    public ProducerUserController(ProducerUserService userService) {
-        this.userService = userService;
-    }
+  public ProducerUserController(ProducerUserService userService) {
+    this.userService = userService;
+  }
 
-    @PostMapping(path = "/{producerId}/authorize/user",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseApi<ProducerCredentialsResponse> createAuthorizedUser(@NotNull @NonNull @PathVariable("producerId") UUID producerId,
-                                                                         @NotNull @NonNull @Valid @RequestBody UserCredentialsRequest credentialsRequest)
-            throws NoSuchAlgorithmException {
-        return new ResponseApi<>(userService.createUserCredentials(credentialsRequest,
-                null,
-                producerId,
-                null,
-                RequestUtil.getRequestIP()), null);
-    }
+  @PostMapping(
+      path = "/{producerId}/authorize/user",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<ProducerCredentialsResponse> createAuthorizedUser(
+      @NotNull @NonNull @PathVariable("producerId") UUID producerId,
+      @NotNull @NonNull @Valid @RequestBody UserCredentialsRequest credentialsRequest)
+      throws NoSuchAlgorithmException {
+    return new ResponseApi<>(
+        userService.createUserCredentials(
+            credentialsRequest, null, producerId, null, RequestUtil.getRequestIP()),
+        null);
+  }
 
-    @GetMapping(path = "/{producerId}/search/users",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseApi<List<ProducerUserResponse>> findProducerUsers(@PathVariable UUID producerId,
-                                                                     @RequestParam("firstName") String firstName,
-                                                                     @RequestParam("lastName") String lastName) {
-        log.info("Search producerUsers by firstname : {} and lastName: {}", firstName, lastName);
-        return userService.findUsers(producerId, firstName, lastName);
-    }
-
+  @GetMapping(path = "/{producerId}/search/users", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<List<ProducerUserResponse>> findProducerUsers(
+      @PathVariable UUID producerId,
+      @RequestParam("firstName") String firstName,
+      @RequestParam("lastName") String lastName) {
+    log.info("Search producerUsers by firstname : {} and lastName: {}", firstName, lastName);
+    return userService.findUsers(producerId, firstName, lastName);
+  }
 }

@@ -10,14 +10,14 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(
-        componentModel = "spring",
-        unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        injectionStrategy = InjectionStrategy.CONSTRUCTOR)
+    componentModel = "spring",
+    unmappedTargetPolicy = ReportingPolicy.IGNORE,
+    injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface ProducerProductMapper {
-    List<ProducerProductResponse> fromEntity(List<ProducerProduct> producerProducts);
+  List<ProducerProductResponse> fromEntity(List<ProducerProduct> producerProducts);
 
-    @Mapping(source = "product.id", target = "productId")
-    ProducerProductResponse fromEntity(ProducerProduct product);
+  @Mapping(source = "product.id", target = "productId")
+  ProducerProductResponse fromEntity(ProducerProduct product);
 
-    ProducerProduct toEntity(CreateProductRequest productRequest);
+  ProducerProduct toEntity(CreateProductRequest productRequest);
 }
