@@ -1,0 +1,11 @@
+DROP PROCEDURE IF EXISTS `?`;
+DELIMITER //
+CREATE PROCEDURE `?`()
+BEGIN
+    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION BEGIN END;
+ALTER TABLE `subscription` ADD COLUMN `coming_soon_indicator` char(1) default 'N'
+    after sort_order;
+END //
+DELIMITER ;
+CALL `?`();
+DROP PROCEDURE `?`;
