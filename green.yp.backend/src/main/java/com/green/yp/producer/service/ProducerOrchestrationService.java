@@ -187,7 +187,7 @@ public class ProducerOrchestrationService {
     // validate subscription
     SubscriptionDto subscriptionDto = subscriptionContract.findSubscription(subscriptionId);
 
-    if (!subscriptionDto.getSubscriptionType().isPrimarySubscription()) {
+    if (!subscriptionDto.subscriptionType().isPrimarySubscription()) {
       throw new PreconditionFailedException(
           "Requested subscription is not a top-level(primary) subscription");
     }
@@ -201,7 +201,7 @@ public class ProducerOrchestrationService {
           ProducerSubscription.builder()
               .producerId(producer.getId())
               .producer(producer)
-              .subscriptionId(subscriptionDto.getSubscriptionId())
+              .subscriptionId(subscriptionDto.subscriptionId())
               .nextInvoiceDate(LocalDate.now().plusDays(1L))
               .startDate(LocalDate.now())
               .endDate(LocalDate.now().plusDays(1))
@@ -240,7 +240,7 @@ public class ProducerOrchestrationService {
                     ProducerSubscription.builder()
                         .producerId(producer.getId())
                         .producer(producer)
-                        .subscriptionId(subscriptionDto.getSubscriptionId())
+                        .subscriptionId(subscriptionDto.subscriptionId())
                         .nextInvoiceDate(newEndDate.plusDays(1L).toLocalDate())
                         .startDate(newEndDate.toLocalDate())
                         .endDate(null)

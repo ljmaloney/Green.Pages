@@ -1,5 +1,6 @@
 package com.green.yp.reference.data.model;
 
+import com.green.yp.common.data.converter.BooleanConverter;
 import com.green.yp.common.data.embedded.Mutable;
 import com.green.yp.reference.data.enumeration.SubscriptionType;
 import jakarta.persistence.*;
@@ -56,6 +57,11 @@ public class Subscription extends Mutable {
     @NotNull
     @Column(name = "short_description", length = 100, nullable = false)
     private String shortDescription;
+
+    @NotNull
+    @Column(name="coming_soon_indicator", nullable = false)
+    @Convert(converter = BooleanConverter.class)
+    private Boolean comingSoon;
 
     @NotNull
     @Column(name = "sort_order")
