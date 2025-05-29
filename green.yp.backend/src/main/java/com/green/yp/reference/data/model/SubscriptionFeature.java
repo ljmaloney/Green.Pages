@@ -38,4 +38,15 @@ public class SubscriptionFeature extends Mutable {
             endDate = LocalDate.of(9999,12,31);
         super.onPrePersist();
     }
+
+  @Override
+  public String toString() {
+      return new StringBuilder("SubscriptionFeature [")
+              .append("id:").append(getId().toString())
+              .append(", subscriptionId:").append(subscription.getId())
+              .append(", startDate:").append(startDate)
+              .append(", endDate:").append(endDate)
+              .append(", featureName:").append(featureName)
+              .append("]").toString();
+    }
 }
