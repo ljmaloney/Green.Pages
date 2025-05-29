@@ -33,137 +33,144 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class SubscriptionService {
 
-    final
-    SubscriptionMapper subscriptionMapper;
+  final SubscriptionMapper subscriptionMapper;
 
-    final
-    SubscriptionRepository subscriptionRepository;
+  final SubscriptionRepository subscriptionRepository;
 
-    final
-    LineOfBusinessService lobService;
+  final LineOfBusinessService lobService;
 
-    public SubscriptionService(SubscriptionMapper subscriptionMapper,
-                               SubscriptionRepository subscriptionRepository,
-                               LineOfBusinessService lobService) {
-        this.subscriptionMapper = subscriptionMapper;
-        this.subscriptionRepository = subscriptionRepository;
-        this.lobService = lobService;
+  public SubscriptionService(
+      SubscriptionMapper subscriptionMapper,
+      SubscriptionRepository subscriptionRepository,
+      LineOfBusinessService lobService) {
+    this.subscriptionMapper = subscriptionMapper;
+    this.subscriptionRepository = subscriptionRepository;
+    this.lobService = lobService;
+  }
+
+  @Cacheable("activeSubscriptions")
+  public List<SubscriptionDto> findActiveSubscription() {
+    List<Subscription> subscriptionList =
+        subscriptionRepository.findAllActive(
+            new Date(), SubscriptionType.TOP_LEVEL, SubscriptionType.ADD_ON);
+    if (CollectionUtils.isEmpty(subscriptionList)) {
+      throw new NotFoundException("No active subscriptions found");
     }
 
-    @Cacheable("activeSubscriptions")
-    public List<SubscriptionDto> findActiveSubscription() {
-        List<Subscription> subscriptionList =
-                subscriptionRepository.findAllActive(
-                        new Date(), SubscriptionType.TOP_LEVEL, SubscriptionType.ADD_ON);
-        if (CollectionUtils.isEmpty(subscriptionList)) {
-            throw new NotFoundException("No active subscriptions found");
-        }
+    return subscriptionMapper.mapToDto(subscriptionList);
+  }
 
-        return subscriptionMapper.mapToDto(subscriptionList);
+  @Cacheable("subscription")
+  public SubscriptionDto findActiveSubscription(@NotNull @NonNull UUID subscriptionId) {
+
+    Subscription subscription =
+        subscriptionRepository
+            .findById(subscriptionId)
+            .orElseThrow(
+                () ->
+                    new NotFoundException(
+                        String.format(
+                            "No currently active subscription found for: %s", subscriptionId)));
+
+    return subscriptionMapper.mapToDto(subscription);
+  }
+
+  @Cacheable("lobSubscription")
+  public List<SubscriptionDto> findActiveLobSubscription(@NotNull @NonNull UUID lineOfBusinessId) {
+    lobService.findLineOfBusiness(lineOfBusinessId);
+
+    List<Subscription> subscriptionList =
+        subscriptionRepository.findAllActive(
+            lineOfBusinessId,
+            new Date(),
+            SubscriptionType.LINE_OF_BUSINESS,
+            SubscriptionType.LINE_OF_BUSINESS_ADD_ON);
+    if (CollectionUtils.isEmpty(subscriptionList)) {
+      throw new NotFoundException("No active subscriptions found");
     }
 
-    @Cacheable("subscription")
-    public SubscriptionDto findActiveSubscription(@NotNull @NonNull UUID subscriptionId) {
+    return subscriptionMapper.mapToDto(subscriptionList);
+  }
 
-        Subscription subscription =
-                subscriptionRepository
-                        .findById(subscriptionId)
-                        .orElseThrow(
-                                () ->
-                                        new NotFoundException(
-                                                String.format(
-                                                        "No currently active subscription found for: %s", subscriptionId)));
-
-        return subscriptionMapper.mapToDto(subscription);
+  @AuditRequest(
+      requestParameter = "createRequest",
+      objectType = AuditObjectType.SUBSCRIPTION,
+      actionType = AuditActionType.CREATE)
+  @CacheEvict(
+      value = {"activeSubscriptions"},
+      allEntries = true)
+  public SubscriptionDto createSubscription(
+      CreateSubscriptionRequest createRequest, String userId, String ipAddress) {
+    if (createRequest.lineOfBusinessId() != null) {
+      lobService.findLineOfBusiness(createRequest.lineOfBusinessId());
     }
 
-    @Cacheable("lobSubscription")
-    public List<SubscriptionDto> findActiveLobSubscription(@NotNull @NonNull UUID lineOfBusinessId) {
-        lobService.findLineOfBusiness(lineOfBusinessId);
+    Subscription subscription =
+        subscriptionRepository.saveAndFlush(subscriptionMapper.mapToEntity(createRequest));
+    log.info("Created new subscription - {}", subscription);
+    return subscriptionMapper.mapToDto(subscription);
+  }
 
-        List<Subscription> subscriptionList =
-                subscriptionRepository.findAllActive(
-                        lineOfBusinessId,
-                        new Date(),
-                        SubscriptionType.LINE_OF_BUSINESS,
-                        SubscriptionType.LINE_OF_BUSINESS_ADD_ON);
-        if (CollectionUtils.isEmpty(subscriptionList)) {
-            throw new NotFoundException("No active subscriptions found");
-        }
-
-        return subscriptionMapper.mapToDto(subscriptionList);
+  @AuditRequest(
+      requestParameter = "updateRequest",
+      objectType = AuditObjectType.SUBSCRIPTION,
+      actionType = AuditActionType.UPDATE)
+  @CacheEvict(
+      value = {"activeSubscriptions", "subscriptions"},
+      allEntries = true)
+  public SubscriptionDto updateSubscription(
+      UpdateSubscriptionRequest updateRequest, String userId, String ipAddress) {
+    if (updateRequest.lineOfBusinessId() != null) {
+      lobService.findLineOfBusiness(updateRequest.lineOfBusinessId());
     }
 
-    @AuditRequest(
-            requestParameter = "createRequest",
-            objectType = AuditObjectType.SUBSCRIPTION,
-            actionType = AuditActionType.CREATE)
-    @CacheEvict(value = {"activeSubscriptions"}, allEntries = true)
-    public SubscriptionDto createSubscription(
-            CreateSubscriptionRequest createRequest, String userId, String ipAddress) {
-        if (createRequest.getLineOfBusinessId() != null) {
-            lobService.findLineOfBusiness(createRequest.getLineOfBusinessId());
-        }
+    Subscription subscription =
+        subscriptionRepository
+            .findById(updateRequest.subscriptionId())
+            .orElseThrow(
+                () -> new NotFoundException("SubscriptionId", updateRequest.subscriptionId()));
 
-        Subscription subscription =
-                subscriptionRepository.saveAndFlush(subscriptionMapper.mapToEntity(createRequest));
-        log.info("Created new subscription - {}", subscription);
-        return subscriptionMapper.mapToDto(subscription);
+    try {
+      PropertyUtils.copyProperties(subscription, updateRequest);
+    } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+      log.error(
+          "Unexpected error when attempting to update subscription id: {}",
+          updateRequest.subscriptionId());
+      throw new PreconditionFailedException("Attempt to update using invalid payload");
     }
 
-    @AuditRequest(
-            requestParameter = "updateRequest",
-            objectType = AuditObjectType.SUBSCRIPTION,
-            actionType = AuditActionType.UPDATE)
-    @CacheEvict(value = {"activeSubscriptions", "subscriptions"}, allEntries = true)
-    public SubscriptionDto updateSubscription(
-            UpdateSubscriptionRequest updateRequest, String userId, String ipAddress) {
-        if (updateRequest.getLineOfBusinessId() != null) {
-            lobService.findLineOfBusiness(updateRequest.getLineOfBusinessId());
-        }
+    subscription = subscriptionRepository.saveAndFlush(subscription);
 
-        Subscription subscription =
-                subscriptionRepository
-                        .findById(updateRequest.getSubscriptionId())
-                        .orElseThrow(
-                                () -> new NotFoundException("SubscriptionId", updateRequest.getSubscriptionId()));
+    log.info("Updated subscription - {}", subscription);
+    return subscriptionMapper.mapToDto(subscription);
+  }
 
-        try {
-            PropertyUtils.copyProperties(subscription, updateRequest);
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            log.error(
-                    "Unexpected error when attempting to update subscription id: {}",
-                    updateRequest.getSubscriptionId());
-            throw new PreconditionFailedException("Attempt to update using invalid payload");
-        }
+  @AuditRequest(
+      requestParameter = "patchRequest",
+      objectType = AuditObjectType.SUBSCRIPTION,
+      actionType = AuditActionType.PATCH)
+  @CacheEvict(
+      value = {"activeSubscriptions", "subscriptions"},
+      allEntries = true)
+  public SubscriptionDto patchSubscription(UUID subscriptionId, PatchRequest patchRequest) {
+    log.debug("Patching subscription {} ", subscriptionId);
 
-        subscription = subscriptionRepository.saveAndFlush(subscription);
-
-        log.info("Updated subscription - {}", subscription);
-        return subscriptionMapper.mapToDto(subscription);
-    }
-
-    @AuditRequest(
-            requestParameter = "patchRequest",
-            objectType = AuditObjectType.SUBSCRIPTION,
-            actionType = AuditActionType.PATCH)
-    @CacheEvict(value = {"activeSubscriptions", "subscriptions"}, allEntries = true)
-    public SubscriptionDto patchSubscription(UUID subscriptionId, PatchRequest patchRequest) {
-        log.debug("Patching subscription {} ", subscriptionId);
-
-        Subscription subscription = subscriptionRepository.findById(subscriptionId)
-                .orElseThrow(() -> new NotFoundException("Subscription", subscriptionId));
+    Subscription subscription =
+        subscriptionRepository
+            .findById(subscriptionId)
+            .orElseThrow(() -> new NotFoundException("Subscription", subscriptionId));
 
     ServiceUtils.patchEntity(
         patchRequest,
         subscription,
         (name, value) -> {
           return switch (name) {
-                case "monthlyAutopayAmount", "quarterlyAutopayAmount", "annualBillAmount" -> BigDecimal.valueOf((double)value);
-                case "startDate", "endDate" -> DateUtils.parseDate(value.toString(), Date.class);
-                default -> value;
+            case "monthlyAutopayAmount", "quarterlyAutopayAmount", "annualBillAmount" ->
+                BigDecimal.valueOf((double) value);
+            case "startDate", "endDate" -> DateUtils.parseDate(value.toString(), Date.class);
+            default -> value;
           };
         });
-        return subscriptionMapper.mapToDto(subscriptionRepository.saveAndFlush(subscription));
-    }
+    return subscriptionMapper.mapToDto(subscriptionRepository.saveAndFlush(subscription));
+  }
 }

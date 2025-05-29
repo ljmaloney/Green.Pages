@@ -16,38 +16,38 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 @RestControllerAdvice
 @Slf4j
 public class GreenControllerAdvice {
-    @ExceptionHandler(Throwable.class)
-    public ResponseApi<Void> handleError(Throwable e) {
-        log.error("An unexpected error occurred - {}", e.getMessage(), e);
-        return new ResponseApi<>(
-                null,
-                new ErrorMessageApi(
-                        ErrorCodeType.SYSTEM_ERROR, "Unexpected error has occurred", e.getMessage()));
-    }
+  @ExceptionHandler(Throwable.class)
+  public ResponseApi<Void> handleError(Throwable e) {
+    log.error("An unexpected error occurred - {}", e.getMessage(), e);
+    return new ResponseApi<>(
+        null,
+        new ErrorMessageApi(
+            ErrorCodeType.SYSTEM_ERROR, "Unexpected error has occurred", e.getMessage()));
+  }
 
-    @ExceptionHandler(NoResourceFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleMissing(NoResourceFoundException ex, HttpServletRequest request) {
-        log.warn("Static resource not found: {} {}", request.getMethod(), request.getRequestURI());
-        return"Requested resource was not found";
-    }
+  @ExceptionHandler(NoResourceFoundException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public String handleMissing(NoResourceFoundException ex, HttpServletRequest request) {
+    log.warn("Static resource not found: {} {}", request.getMethod(), request.getRequestURI());
+    return "Requested resource was not found";
+  }
 
-    @ExceptionHandler(NotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseApi<Void> handleError(NotFoundException e) {
-        log.error("Requested resource was not found, message - {}", e.getMessage());
-        return new ResponseApi<>(
-                null,
-                new ErrorMessageApi(e.getErrorCode(), "Requested resource was not found", e.getMessage()));
-    }
+  @ExceptionHandler(NotFoundException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public ResponseApi<Void> handleError(NotFoundException e) {
+    log.error("Requested resource was not found, message - {}", e.getMessage());
+    return new ResponseApi<>(
+        null,
+        new ErrorMessageApi(e.getErrorCode(), "Requested resource was not found", e.getMessage()));
+  }
 
-    @ExceptionHandler(PreconditionFailedException.class)
-    @ResponseStatus(HttpStatus.PRECONDITION_FAILED)
-    public ResponseApi<Void> handleError(PreconditionFailedException e) {
-        log.error("One or more business rule validations failed - {}", e.getMessage());
-        return new ResponseApi<>(
-                null,
-                new ErrorMessageApi(
-                        e.getErrorCode(), "One or more business rule validations failed ", e.getMessage()));
-    }
+  @ExceptionHandler(PreconditionFailedException.class)
+  @ResponseStatus(HttpStatus.PRECONDITION_FAILED)
+  public ResponseApi<Void> handleError(PreconditionFailedException e) {
+    log.error("One or more business rule validations failed - {}", e.getMessage());
+    return new ResponseApi<>(
+        null,
+        new ErrorMessageApi(
+            e.getErrorCode(), "One or more business rule validations failed ", e.getMessage()));
+  }
 }

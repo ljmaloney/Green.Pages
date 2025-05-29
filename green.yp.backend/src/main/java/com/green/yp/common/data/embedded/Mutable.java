@@ -14,7 +14,7 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = true)
 public class Mutable extends Versioned {
 
-    @Column(length = 16)
-    @Id
-    private UUID id = UUID.randomUUID();
+  @Column(length = 16)
+  @Id
+  private UUID id = UUID.randomUUID();
 }

@@ -8,16 +8,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
-    private final EmailProviderInterface emailProvider;
+  private final EmailProviderInterface emailProvider;
 
-    public EmailService(EmailProviderInterface emailProvider) {
-        this.emailProvider = emailProvider;
-    }
+  public EmailService(EmailProviderInterface emailProvider) {
+    this.emailProvider = emailProvider;
+  }
 
-    @Async("sendEmailThreadPool")
-    public void sendEmail(EmailTemplateName emailTemplateName, Object object, String... adminEmails) {
-        // TODO: prepare template params from input data
+  @Async("sendEmailThreadPool")
+  public void sendEmail(EmailTemplateName emailTemplateName, Object object, String... adminEmails) {
+    // TODO: prepare template params from input data
 
-        emailProvider.sendEmail(emailTemplateName, adminEmails, null);
-    }
+    emailProvider.sendEmail(emailTemplateName, adminEmails, null);
+  }
 }

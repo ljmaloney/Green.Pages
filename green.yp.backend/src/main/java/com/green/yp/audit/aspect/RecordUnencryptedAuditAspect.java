@@ -22,63 +22,63 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class RecordUnencryptedAuditAspect {
 
-    private final ProducerAuditContract auditContract;
+  private final ProducerAuditContract auditContract;
 
-    public RecordUnencryptedAuditAspect(ProducerAuditContract auditContract) {
-        this.auditContract = auditContract;
+  public RecordUnencryptedAuditAspect(ProducerAuditContract auditContract) {
+    this.auditContract = auditContract;
+  }
+
+  @Pointcut(value = "@annotation(com.green.yp.api.AuditRequest)")
+  void methodAnnotatedWithAuditRequest() {
+    log.info("method annotated with audit request");
+  }
+
+  @Before(value = "methodAnnotatedWithAuditRequest()")
+  public void before(JoinPoint joinPoint) {
+    log.info("before calling method annotated with audit request");
+  }
+
+  @AfterReturning(pointcut = "methodAnnotatedWithAuditRequest()")
+  public void writeAuditLog(JoinPoint joinPoint) {
+    log.info("called method annotated with audit request");
+
+    Object[] args = joinPoint.getArgs();
+
+    MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+    String[] paramNames = signature.getParameterNames();
+
+    Method method = signature.getMethod();
+    AuditRequest annotation = method.getAnnotation(AuditRequest.class);
+
+    String requestParameterName = annotation.requestParameter();
+
+    Object requestPayload = getParameter(requestParameterName, paramNames, args);
+    String userId = (String) getParameter("userId", paramNames, args);
+    String ipAddress = (String) getParameter("ipAddress", paramNames, args);
+    if (ipAddress == null) {
+      ipAddress = RequestUtil.getRequestIP();
     }
 
-    @Pointcut(value = "@annotation(com.green.yp.api.AuditRequest)")
-    void methodAnnotatedWithAuditRequest() {
-        log.info("method annotated with audit request");
+    try {
+      auditContract.createAuditRecord(
+          annotation.objectType(),
+          annotation.actionType(),
+          StringUtils.isNotBlank(userId) ? userId : ipAddress,
+          ipAddress,
+          requestPayload != null ? requestPayload.getClass().getSimpleName() : "",
+          requestPayload != null ? new ObjectMapper().writeValueAsString(requestPayload) : null);
+    } catch (JsonProcessingException e) {
+      log.error("Unexpected error serializing payload for audit contract");
+      throw new SystemException("Unexpected error serializing payload for audit contract", e);
     }
+  }
 
-    @Before(value = "methodAnnotatedWithAuditRequest()")
-    public void before(JoinPoint joinPoint) {
-        log.info("before calling method annotated with audit request");
+  private Object getParameter(String parameterName, String[] names, Object[] values) {
+    for (int i = 0; i < names.length; i++) {
+      if (parameterName.equals(names[i])) {
+        return values[i];
+      }
     }
-
-    @AfterReturning(pointcut = "methodAnnotatedWithAuditRequest()")
-    public void writeAuditLog(JoinPoint joinPoint) {
-        log.info("called method annotated with audit request");
-
-        Object[] args = joinPoint.getArgs();
-
-        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        String[] paramNames = signature.getParameterNames();
-
-        Method method = signature.getMethod();
-        AuditRequest annotation = method.getAnnotation(AuditRequest.class);
-
-        String requestParameterName = annotation.requestParameter();
-
-        Object requestPayload = getParameter(requestParameterName, paramNames, args);
-        String userId = (String) getParameter("userId", paramNames, args);
-        String ipAddress = (String) getParameter("ipAddress", paramNames, args);
-        if (ipAddress == null) {
-            ipAddress = RequestUtil.getRequestIP();
-        }
-
-        try {
-            auditContract.createAuditRecord(
-                    annotation.objectType(),
-                    annotation.actionType(),
-                    StringUtils.isNotBlank(userId) ? userId : ipAddress,
-                    ipAddress,
-                    requestPayload != null ? requestPayload.getClass().getSimpleName() : "",
-                    requestPayload != null ? new ObjectMapper().writeValueAsString(requestPayload) : null );
-        } catch (JsonProcessingException e) {
-            log.error("Unexpected error serializing payload for audit contract");
-            throw new SystemException("Unexpected error serializing payload for audit contract", e);
-        }
-    }
-
-    private Object getParameter(String parameterName, String[] names, Object[] values) {
-         for (int i = 0; i < names.length; i++) {
-            if (parameterName.equals(names[i])) {
-                return values[i];
-            }
-        }
-        return null;
-    }
+    return null;
+  }
 }

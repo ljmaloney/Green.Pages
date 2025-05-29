@@ -30,8 +30,8 @@ public class ProducerServicesService {
 
   private final ProducerServiceRepository serviceRepository;
 
-  public ProducerServicesService(ProducerServiceMapper serviceMapper,
-                                 ProducerServiceRepository serviceRepository) {
+  public ProducerServicesService(
+      ProducerServiceMapper serviceMapper, ProducerServiceRepository serviceRepository) {
     this.serviceMapper = serviceMapper;
     this.serviceRepository = serviceRepository;
   }

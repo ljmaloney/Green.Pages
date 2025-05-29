@@ -10,8 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface PaymentTransactionRepository extends JpaRepository<PaymentTransaction, UUID> {
-    @Query(
-            """
+  @Query(
+      """
                       SELECT trans
                       FROM PaymentTransaction trans
                       WHERE
@@ -19,8 +19,8 @@ public interface PaymentTransactionRepository extends JpaRepository<PaymentTrans
                           AND trans.paymentType=:paymentType
                           AND trans.status=:status
                     """)
-    Optional<PaymentTransaction> findTransaction(
-            @Param("invoiceId") UUID invoiceId,
-            @Param("paymentType") ProducerPaymentType paymentType,
-            @Param("status") PaymentTransactionStatus status);
+  Optional<PaymentTransaction> findTransaction(
+      @Param("invoiceId") UUID invoiceId,
+      @Param("paymentType") ProducerPaymentType paymentType,
+      @Param("status") PaymentTransactionStatus status);
 }

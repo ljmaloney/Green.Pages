@@ -7,15 +7,15 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.NonNull;
 
-public record ProducerServiceResponse(@NotNull @NonNull UUID producerServiceId,
-                                      @NotNull @NonNull OffsetDateTime createDate,
-                                      @NotNull @NonNull OffsetDateTime lastUpdateDate,
-                                      @NotNull @NonNull UUID producerId,
-                                      @NotNull @NonNull UUID producerLocationId,
-                                      BigDecimal minServicePrice,
-                                      BigDecimal maxServicePrice,
-                                      ServicePriceUnitsType priceUnitsType,
-                                      String shortDescription,
-                                      String description,
-                                      String serviceTerms) {
-}
+public record ProducerServiceResponse(
+    @NotNull @NonNull UUID producerServiceId,
+    @NotNull @NonNull OffsetDateTime createDate,
+    @NotNull @NonNull OffsetDateTime lastUpdateDate,
+    @NotNull @NonNull UUID producerId,
+    @NotNull @NonNull UUID producerLocationId,
+    BigDecimal minServicePrice,
+    BigDecimal maxServicePrice,
+    ServicePriceUnitsType priceUnitsType,
+    String shortDescription,
+    String description,
+    String serviceTerms) {}

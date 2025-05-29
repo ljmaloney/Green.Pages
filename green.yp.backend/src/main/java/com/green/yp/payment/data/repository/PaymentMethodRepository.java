@@ -11,13 +11,13 @@ import org.springframework.data.repository.query.Param;
 
 public interface PaymentMethodRepository extends JpaRepository<PaymentMethod, UUID> {
 
-    @Query(
-            """
+  @Query(
+      """
                        SELECT
                             pm
                        FROM PaymentMethod pm
                        WHERE pm.producerId=:producerId and pm.cancelDate IS NULL
                             and pm.active=TRUE
                     """)
-    Optional<PaymentMethod> findActiveMethod(@NotNull @NonNull @Param("producerId") UUID producerId);
+  Optional<PaymentMethod> findActiveMethod(@NotNull @NonNull @Param("producerId") UUID producerId);
 }

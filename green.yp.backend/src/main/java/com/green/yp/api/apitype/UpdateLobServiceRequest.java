@@ -10,21 +10,15 @@ import lombok.NonNull;
 
 @Data
 public class UpdateLobServiceRequest {
-    @NonNull
-    @NotNull
-    private UUID lobServiceId;
-    @NonNull
-    @NotNull
-    private String createdByReference;
-    @NonNull
-    @NotNull
-    private CreatedByType createdByType;
+  @NonNull @NotNull private UUID lobServiceId;
+  @NonNull @NotNull private String createdByReference;
+  @NonNull @NotNull private CreatedByType createdByType;
 
-    @NonNull
-    @NotNull
-    @Size(min = 0, max = 50, message = "The service name must be less than 50 characters")
-    @Pattern(regexp = "/([A-Za-z\\s\\d\\-])\\w+/gix")
-    private String serviceName;
+  @NonNull
+  @NotNull
+  @Size(min = 0, max = 50, message = "The service name must be less than 50 characters")
+  @Pattern(regexp = "/([A-Za-z\\s\\d\\-])\\w+/gix")
+  private String serviceName;
 
-    private String serviceDescription;
+  private String serviceDescription;
 }

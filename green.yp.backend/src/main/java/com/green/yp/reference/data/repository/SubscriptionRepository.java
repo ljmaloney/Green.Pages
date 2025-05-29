@@ -12,16 +12,16 @@ import org.springframework.data.repository.query.Param;
 
 public interface SubscriptionRepository extends JpaRepository<Subscription, UUID> {
 
-    @Query(
-            """
+  @Query(
+      """
                         select subs from Subscription subs
                         where subs.id=:subscriptionId and :currentDate between subs.startDate and subs.endDate
                     """)
-    Optional<Subscription> findAllActive(
-            @Param("subscriptionId") UUID subscriptionId, @Param("currentDate") Date date);
+  Optional<Subscription> findAllActive(
+      @Param("subscriptionId") UUID subscriptionId, @Param("currentDate") Date date);
 
-    @Query(
-            """
+  @Query(
+      """
                         SELECT subs
                         FROM Subscription subs
                         WHERE
@@ -29,12 +29,12 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, UUID
                             and subs.subscriptionType in (:subscriptionTypes)
                         ORDER BY subs.sortOrder ASC
                     """)
-    List<Subscription> findAllActive(
-            @Param("currentDate") Date date,
-            @Param("subscriptionTypes") SubscriptionType... subscriptionTypes);
+  List<Subscription> findAllActive(
+      @Param("currentDate") Date date,
+      @Param("subscriptionTypes") SubscriptionType... subscriptionTypes);
 
-    @Query(
-            """
+  @Query(
+      """
                         select subs
                         from Subscription subs
                         where
@@ -42,8 +42,8 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, UUID
                             and :currentDate between subs.startDate and subs.endDate
                             and subs.subscriptionType in (:subscriptionTypes)
                     """)
-    List<Subscription> findAllActive(
-            @Param("lineOfBusiness") UUID lineOfBusinessId,
-            @Param("currentDate") Date date,
-            @Param("subscriptionTypes") SubscriptionType... subscriptionType);
+  List<Subscription> findAllActive(
+      @Param("lineOfBusiness") UUID lineOfBusinessId,
+      @Param("currentDate") Date date,
+      @Param("subscriptionTypes") SubscriptionType... subscriptionType);
 }

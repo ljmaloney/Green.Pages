@@ -12,23 +12,23 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(
-        componentModel = "spring",
-        unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        injectionStrategy = InjectionStrategy.CONSTRUCTOR)
+    componentModel = "spring",
+    unmappedTargetPolicy = ReportingPolicy.IGNORE,
+    injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface LineOfBusinessMapper {
-    @Mapping(source = "id", target = "lobServiceId")
-    LOBServiceDto fromEntity(LOBService service);
+  @Mapping(source = "id", target = "lobServiceId")
+  LOBServiceDto fromEntity(LOBService service);
 
-    List<LOBServiceDto> fromEntity(List<LOBService> services);
+  List<LOBServiceDto> fromEntity(List<LOBService> services);
 
-    LOBService toEntity(CreateLobServiceRequest serviceRequest);
+  LOBService toEntity(CreateLobServiceRequest serviceRequest);
 
-    List<LineOfBusinessDto> toDto(List<LineOfBusiness> lobList);
+  List<LineOfBusinessDto> toDto(List<LineOfBusiness> lobList);
 
-    LineOfBusiness fromDto(LineOfBusinessDto dto);
+  LineOfBusiness fromDto(LineOfBusinessDto dto);
 
-    @Mapping(source = "lineOfBusiness.id", target = "lineOfBusinessId")
-    LineOfBusinessDto toDto(LineOfBusiness lineOfBusiness);
+  @Mapping(source = "lineOfBusiness.id", target = "lineOfBusinessId")
+  LineOfBusinessDto toDto(LineOfBusiness lineOfBusiness);
 
-    List<LineOfBusinessDto> toApi(List<LineOfBusinessDto> allLineOfBusiness);
+  List<LineOfBusinessDto> toApi(List<LineOfBusinessDto> allLineOfBusiness);
 }

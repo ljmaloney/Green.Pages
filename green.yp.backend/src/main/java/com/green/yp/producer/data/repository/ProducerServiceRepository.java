@@ -10,8 +10,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface ProducerServiceRepository extends JpaRepository<ProducerService, UUID> {
 
-    @Query(
-            """
+  @Query(
+      """
                         SELECT service
                         FROM  ProducerService service
                         WHERE service.producerId=:producerId
@@ -19,18 +19,18 @@ public interface ProducerServiceRepository extends JpaRepository<ProducerService
                             AND service.shortDescription=:description
 
                     """)
-    Optional<ProducerService> findProducerService(
-            @Param("producerId") UUID producerId,
-            @Param("producerLocationId") UUID producerLocationId,
-            @Param("description") String description);
+  Optional<ProducerService> findProducerService(
+      @Param("producerId") UUID producerId,
+      @Param("producerLocationId") UUID producerLocationId,
+      @Param("description") String description);
 
-    @Query(
-            """
+  @Query(
+      """
                          SELECT service
                          FROM  ProducerService service
                          WHERE service.producerId=:producerId
                              AND service.producerLocationId=:producerLocationId
                     """)
-    List<ProducerService> findServices(
-            @Param("producerId") UUID producerId, @Param("producerLocationId") UUID producerLocationId);
+  List<ProducerService> findServices(
+      @Param("producerId") UUID producerId, @Param("producerLocationId") UUID producerLocationId);
 }

@@ -11,10 +11,12 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface ProducerLobRepository extends JpaRepository<ProducerLineOfBusiness, ProducerLineOfBusinessId> {
-    @Modifying
-    @Query("""
+public interface ProducerLobRepository
+    extends JpaRepository<ProducerLineOfBusiness, ProducerLineOfBusinessId> {
+  @Modifying
+  @Query(
+      """
                 DELETE FROM ProducerLineOfBusiness pl WHERE pl.producerId IN (:producerIds)
             """)
-    int deleteProducerLinesOfBusiness(@NotNull @NonNull @Param("producerIds") List<UUID> producerIds);
+  int deleteProducerLinesOfBusiness(@NotNull @NonNull @Param("producerIds") List<UUID> producerIds);
 }

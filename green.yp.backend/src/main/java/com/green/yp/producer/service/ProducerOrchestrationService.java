@@ -381,16 +381,16 @@ public class ProducerOrchestrationService {
     producerRepository.delete(producerIds, ProducerSubscriptionType.LIVE_UNPAID);
   }
 
-  private void validateNotCancelled(Producer producer){
+  private void validateNotCancelled(Producer producer) {
     if (producer.getCancelDate() != null) {
       log.info(
-              "Producer {} subscription cancelled as of {}",
-              producer.getId(),
-              producer.getCancelDate());
+          "Producer {} subscription cancelled as of {}",
+          producer.getId(),
+          producer.getCancelDate());
       throw new PreconditionFailedException(
-              String.format("Subscription for %s cancelled as of %s",
-                      producer.getId(),
-                      producer.getCancelDate()));
+          String.format(
+              "Subscription for %s cancelled as of %s",
+              producer.getId(), producer.getCancelDate()));
     }
   }
 }

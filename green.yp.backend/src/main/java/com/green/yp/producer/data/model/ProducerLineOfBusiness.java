@@ -14,18 +14,18 @@ import lombok.*;
 @Table(name = "producer_line_of_business", schema = "greenyp")
 public class ProducerLineOfBusiness {
 
-    @Id
-    @Column(name = "producer_id")
-    private UUID producerId;
+  @Id
+  @Column(name = "producer_id")
+  private UUID producerId;
 
-    @Id
-    @Column(name = "line_of_business_id", length = 50)
-    private UUID lineOfBusinessId;
+  @Id
+  @Column(name = "line_of_business_id", length = 50)
+  private UUID lineOfBusinessId;
 
-    @Column(name = "primary_lob")
-    private Boolean primaryLob;
+  @Column(name = "primary_lob")
+  private Boolean primaryLob;
 
-    @ManyToOne
-    @JoinColumn(name = "producer_id", insertable = false, updatable = false)
-    private Producer producer;
+  @ManyToOne
+  @JoinColumn(name = "producer_id", insertable = false, updatable = false)
+  private Producer producer;
 }

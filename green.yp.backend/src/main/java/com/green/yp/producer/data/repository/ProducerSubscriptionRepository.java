@@ -14,8 +14,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ProducerSubscriptionRepository extends JpaRepository<ProducerSubscription, UUID> {
-    @Query(
-            """
+  @Query(
+      """
                         SELECT
                           new com.green.yp.producer.data.record.ProducerSubscriptionRecord(ps, subs)
                         FROM
@@ -24,11 +24,11 @@ public interface ProducerSubscriptionRepository extends JpaRepository<ProducerSu
                         WHERE
                            ps.producerId=:producerId
                     """)
-    List<ProducerSubscriptionRecord> findAllSubscriptions(
-            @NotNull @NonNull @Param("producerId") UUID producerId);
+  List<ProducerSubscriptionRecord> findAllSubscriptions(
+      @NotNull @NonNull @Param("producerId") UUID producerId);
 
-    @Query(
-            """
+  @Query(
+      """
                         SELECT
                           new com.green.yp.producer.data.record.ProducerSubscriptionRecord(ps, subs)
                         FROM
@@ -40,13 +40,15 @@ public interface ProducerSubscriptionRepository extends JpaRepository<ProducerSu
                            AND subs.subscriptionType IN (:subscriptionTypes)
                         ORDER BY ps.createDate, ps.endDate
                     """)
-    List<ProducerSubscriptionRecord> findActiveSubscriptions(@NotNull @NonNull @Param("producerId") UUID producerId,
-                                                             @Param("currentDate") LocalDate currentDate,
-                                                             @Param("subscriptionTypes") SubscriptionType... subscriptionTypes);
+  List<ProducerSubscriptionRecord> findActiveSubscriptions(
+      @NotNull @NonNull @Param("producerId") UUID producerId,
+      @Param("currentDate") LocalDate currentDate,
+      @Param("subscriptionTypes") SubscriptionType... subscriptionTypes);
 
-    @Modifying
-    @Query("""
+  @Modifying
+  @Query(
+      """
         DELETE FROM ProducerSubscription ps  WHERE ps.producerId IN (:producerIds)
     """)
-    void deleteProducerSubscriptions(@NotNull @NonNull @Param("producerIds") List<UUID> producerIds);
+  void deleteProducerSubscriptions(@NotNull @NonNull @Param("producerIds") List<UUID> producerIds);
 }

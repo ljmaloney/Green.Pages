@@ -8,29 +8,29 @@ import org.owasp.esapi.Encoder;
 
 public interface XssSanitizeInterface {
 
-    Pattern PATTERN_NULL = Pattern.compile("\0");
+  Pattern PATTERN_NULL = Pattern.compile("\0");
 
-    default String cleanXSS(String value) {
-        if (StringUtils.isNotEmpty(value)) {
-            String stripedValue = getCanonicalizedString(value);
-            var cleanJson = Jsoup.clean(stripedValue, Safelist.relaxed());
-            return cleanJson
-                    .replace(Character.valueOf((char) 92).toString(), "\\")
-                    .replace("\n", "\\n")
-                    .replace("\t", "\\t")
-                    .replace("\r", "\\r")
-                    .replace(Character.valueOf('"').toString(), "\"");
-        }
-        return value;
+  default String cleanXSS(String value) {
+    if (StringUtils.isNotEmpty(value)) {
+      String stripedValue = getCanonicalizedString(value);
+      var cleanJson = Jsoup.clean(stripedValue, Safelist.relaxed());
+      return cleanJson
+          .replace(Character.valueOf((char) 92).toString(), "\\")
+          .replace("\n", "\\n")
+          .replace("\t", "\\t")
+          .replace("\r", "\\r")
+          .replace(Character.valueOf('"').toString(), "\"");
     }
+    return value;
+  }
 
-    default String getCanonicalizedString(final String value) {
-        String stripedValue = getEsapiEncoder().canonicalize(value);
-        // Avoid null characters
-        stripedValue = PATTERN_NULL.matcher(stripedValue).replaceAll("");
+  default String getCanonicalizedString(final String value) {
+    String stripedValue = getEsapiEncoder().canonicalize(value);
+    // Avoid null characters
+    stripedValue = PATTERN_NULL.matcher(stripedValue).replaceAll("");
 
-        return stripedValue;
-    }
+    return stripedValue;
+  }
 
-    Encoder getEsapiEncoder();
+  Encoder getEsapiEncoder();
 }

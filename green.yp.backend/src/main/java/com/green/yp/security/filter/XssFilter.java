@@ -19,35 +19,33 @@ import org.springframework.stereotype.Component;
 @Order(1)
 public class XssFilter extends HttpFilter implements Filter {
 
-    private static final List<String> EXCLUDED_URL_LIST = List.of("/v3/api-docs", "/swagger-ui/*");
+  private static final List<String> EXCLUDED_URL_LIST = List.of("/v3/api-docs", "/swagger-ui/*");
 
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        log.info("########## Initiating Custom filter ##########");
-        super.init(filterConfig);
+  @Override
+  public void init(FilterConfig filterConfig) throws ServletException {
+    log.info("########## Initiating Custom filter ##########");
+    super.init(filterConfig);
+  }
+
+  @Override
+  public void doFilter(
+      HttpServletRequest request, HttpServletResponse response, FilterChain filterchain)
+      throws IOException, ServletException {
+
+    final String path = request.getServletPath();
+
+    if (EXCLUDED_URL_LIST.stream().anyMatch(path::startsWith)) {
+
+      log.debug("Ignoring XSSContentFilter for {}", path);
+      filterchain.doFilter(request, response);
+    } else {
+      log.debug("Sanitizing content using XSSRequestWrapper", path);
+      filterchain.doFilter(new XSSRequestWrapper(request), response);
     }
+  }
 
-    @Override
-    public void doFilter(HttpServletRequest request,
-                         HttpServletResponse response,
-                         FilterChain filterchain) throws IOException, ServletException {
-
-        final String path = request.getServletPath();
-
-        if (EXCLUDED_URL_LIST
-                .stream()
-                .anyMatch(path::startsWith)) {
-
-            log.debug("Ignoring XSSContentFilter for {}", path);
-            filterchain.doFilter(request, response);
-        } else {
-            log.debug("Sanitizing content using XSSRequestWrapper", path);
-            filterchain.doFilter(new XSSRequestWrapper(request), response);
-        }
-    }
-
-    @Override
-    public void destroy() {
-        super.destroy();
-    }
+  @Override
+  public void destroy() {
+    super.destroy();
+  }
 }

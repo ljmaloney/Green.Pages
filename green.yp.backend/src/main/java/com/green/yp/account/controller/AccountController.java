@@ -27,92 +27,93 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Validated
 @RequestMapping("account")
-@Tag( name="Orchestration Service supporting creation of subscriber / producer account")
+@Tag(name = "Orchestration Service supporting creation of subscriber / producer account")
 public class AccountController {
 
-    private final AccountService accountService;
+  private final AccountService accountService;
 
-    public AccountController(AccountService accountService) {
-        this.accountService = accountService;
-    }
+  public AccountController(AccountService accountService) {
+    this.accountService = accountService;
+  }
 
-    @ApiResponse(responseCode = org.apache.hc.core5.http.HttpStatus.SC_OK+"",
-            description = "Returns the requested account information",
-            content = @Content(mediaType = "application/json"))
-    @GetMapping(
-            path = "/{accountId}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseApi<AccountResponse> findAccount(
-            @PathVariable(name = "accountId") String accountId) {
-        return new ResponseApi<>(accountService.findAccount(UUID.fromString(accountId)), null);
-    }
+  @ApiResponse(
+      responseCode = org.apache.hc.core5.http.HttpStatus.SC_OK + "",
+      description = "Returns the requested account information",
+      content = @Content(mediaType = "application/json"))
+  @GetMapping(path = "/{accountId}", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<AccountResponse> findAccount(
+      @PathVariable(name = "accountId") String accountId) {
+    return new ResponseApi<>(accountService.findAccount(UUID.fromString(accountId)), null);
+  }
 
-    @PostMapping(
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary="Creates the subscriber/producer account")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseApi<AccountResponse> createAccount(
-            @RequestBody @Valid CreateAccountRequest account) throws NoSuchAlgorithmException {
+  @PostMapping(
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Creates the subscriber/producer account")
+  @ResponseStatus(HttpStatus.CREATED)
+  public ResponseApi<AccountResponse> createAccount(
+      @RequestBody @Valid CreateAccountRequest account) throws NoSuchAlgorithmException {
     return new ResponseApi<>(
         accountService.createAccount(account, RequestUtil.getRequestIP()), null);
-    }
+  }
 
-    @Operation(summary = "Applies the initial subscription payment",
-        description = "Creates an invoice and applies the initial payment for a new subscription")
-    @PostMapping(
-            path = "/applyInitialPayment",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseApi<ApiPaymentResponse> applyInitialPayment(
-            @RequestBody @Valid ApplyPaymentMethodRequest paymentRequest) {
-        return new ResponseApi<>(
-                accountService.applyInitialPayment(paymentRequest, RequestUtil.getRequestIP()), null);
-    }
+  @Operation(
+      summary = "Applies the initial subscription payment",
+      description = "Creates an invoice and applies the initial payment for a new subscription")
+  @PostMapping(
+      path = "/applyInitialPayment",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<ApiPaymentResponse> applyInitialPayment(
+      @RequestBody @Valid ApplyPaymentMethodRequest paymentRequest) {
+    return new ResponseApi<>(
+        accountService.applyInitialPayment(paymentRequest, RequestUtil.getRequestIP()), null);
+  }
 
-    @Operation(summary = "Applies a payment on an existing subscription with an invoice")
-    @PostMapping(
-            path = "/applyPayment",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseApi<ApiPaymentResponse> applyPayment(
-            @RequestBody @Valid ApplyPaymentRequest paymentRequest) {
-        return new ResponseApi<>(
-                accountService.applyPayment(paymentRequest, null, RequestUtil.getRequestIP()), null);
-    }
+  @Operation(summary = "Applies a payment on an existing subscription with an invoice")
+  @PostMapping(
+      path = "/applyPayment",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<ApiPaymentResponse> applyPayment(
+      @RequestBody @Valid ApplyPaymentRequest paymentRequest) {
+    return new ResponseApi<>(
+        accountService.applyPayment(paymentRequest, null, RequestUtil.getRequestIP()), null);
+  }
 
-    @Operation(summary = "Update the subscriber / producer account records")
-    @PutMapping(
-            name = "/account",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseApi<AccountResponse> updateAccount(
-            @RequestBody @Valid UpdateAccountRequest account) {
-        try {
-            return new ResponseApi<>(
-                    accountService.updateAccount(account, RequestUtil.getRequestIP()), null);
-        } catch (NoSuchAlgorithmException e) {
-            throw new SystemException("System error, missing configuration", e);
-        }
+  @Operation(summary = "Update the subscriber / producer account records")
+  @PutMapping(
+      name = "/account",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  public ResponseApi<AccountResponse> updateAccount(
+      @RequestBody @Valid UpdateAccountRequest account) {
+    try {
+      return new ResponseApi<>(
+          accountService.updateAccount(account, RequestUtil.getRequestIP()), null);
+    } catch (NoSuchAlgorithmException e) {
+      throw new SystemException("System error, missing configuration", e);
     }
+  }
 
-    @Operation(summary = "Removes / disables unpaid accounts",
-    description = "Removes or disables unpaid accounts where a payment has not been received in over specified number of days")
-    @PostMapping(path="/clean/unpaid",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseApi<String> cleanUnpaidAccounts(@RequestParam(name = "days", defaultValue = "30", required = false) Integer daysOld){
-        return new ResponseApi<>(accountService.cleanUnpaidAccounts(daysOld, RequestUtil.getRequestIP()), null);
-    }
+  @Operation(
+      summary = "Removes / disables unpaid accounts",
+      description =
+          "Removes or disables unpaid accounts where a payment has not been received in over specified number of days")
+  @PostMapping(path = "/clean/unpaid", produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  public ResponseApi<String> cleanUnpaidAccounts(
+      @RequestParam(name = "days", defaultValue = "30", required = false) Integer daysOld) {
+    return new ResponseApi<>(
+        accountService.cleanUnpaidAccounts(daysOld, RequestUtil.getRequestIP()), null);
+  }
 
-    @Operation(summary = "Cancels or disables an account")
-    @DeleteMapping(
-            path = "/{accountId}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseApi<String> cancelAccount(@PathVariable UUID accountId) {
-        return new ResponseApi<>(
-                accountService.cancelAccount(accountId, RequestUtil.getRequestIP()), null);
-    }
+  @Operation(summary = "Cancels or disables an account")
+  @DeleteMapping(path = "/{accountId}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  public ResponseApi<String> cancelAccount(@PathVariable UUID accountId) {
+    return new ResponseApi<>(
+        accountService.cancelAccount(accountId, RequestUtil.getRequestIP()), null);
+  }
 }

@@ -11,26 +11,27 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(
-        componentModel = "spring",
-        unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        injectionStrategy = InjectionStrategy.CONSTRUCTOR)
+    componentModel = "spring",
+    unmappedTargetPolicy = ReportingPolicy.IGNORE,
+    injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface SubscriptionMapper {
-    List<SubscriptionDto> mapToDto(List<Subscription> subscriptionList);
+  List<SubscriptionDto> mapToDto(List<Subscription> subscriptionList);
 
-    @Mapping(source = "subscription.id", target = "subscriptionId")
-    @Mapping(source = "subscription.features", target="features")
-    SubscriptionDto mapToDto(Subscription subscription);
-    List<String> toFeatureStringList(List<SubscriptionFeature> features);
-    default String mapFeatureToString(SubscriptionFeature feature){
-        return feature.getFeatureName();
-    }
+  @Mapping(source = "subscription.id", target = "subscriptionId")
+  @Mapping(source = "subscription.features", target = "features")
+  SubscriptionDto mapToDto(Subscription subscription);
 
-    Subscription mapToEntity(CreateSubscriptionRequest createRequest);
-    default List<SubscriptionFeature> mapToEntity(List<String> features){
-        return features.stream().map(s -> SubscriptionFeature
-                    .builder()
-                    .featureName(s)
-                    .build())
-                .toList();
-    }
+  List<String> toFeatureStringList(List<SubscriptionFeature> features);
+
+  default String mapFeatureToString(SubscriptionFeature feature) {
+    return feature.getFeatureName();
+  }
+
+  Subscription mapToEntity(CreateSubscriptionRequest createRequest);
+
+  default List<SubscriptionFeature> mapToEntity(List<String> features) {
+    return features.stream()
+        .map(s -> SubscriptionFeature.builder().featureName(s).build())
+        .toList();
+  }
 }

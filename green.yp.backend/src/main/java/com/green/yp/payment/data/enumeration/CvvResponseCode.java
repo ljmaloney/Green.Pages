@@ -17,52 +17,52 @@ import org.apache.commons.lang3.StringUtils;
 @Getter
 @AllArgsConstructor
 public enum CvvResponseCode {
-    MATCHES("M", "Matches"),
-    DOES_NOT_MATCH("N", "Does not match"),
-    NOT_VERIFIED("U", "Not verified"),
-    NOT_PROVIDED("I", "Not provided"),
-    NOT_APPLICABLE("A", "Not Applicable"),
-    BYPASS("B", "Bypass");
+  MATCHES("M", "Matches"),
+  DOES_NOT_MATCH("N", "Does not match"),
+  NOT_VERIFIED("U", "Not verified"),
+  NOT_PROVIDED("I", "Not provided"),
+  NOT_APPLICABLE("A", "Not Applicable"),
+  BYPASS("B", "Bypass");
 
-    private static final Map<String, CvvResponseCode> RESPONSE_CODE_MAP =
-            Stream.of(values())
-                    .collect(Collectors.toMap(CvvResponseCode::getResponseCode, Function.identity()));
+  private static final Map<String, CvvResponseCode> RESPONSE_CODE_MAP =
+      Stream.of(values())
+          .collect(Collectors.toMap(CvvResponseCode::getResponseCode, Function.identity()));
 
-    private final String responseCode;
-    private final String description;
+  private final String responseCode;
+  private final String description;
 
-    public static CvvResponseCode fromResponseCode(String responseCode) {
-        if (StringUtils.isBlank(responseCode)) {
-            return null;
-        }
+  public static CvvResponseCode fromResponseCode(String responseCode) {
+    if (StringUtils.isBlank(responseCode)) {
+      return null;
+    }
 
-        return RESPONSE_CODE_MAP.computeIfAbsent(
-                responseCode,
-                key -> {
-                    throw new IllegalArgumentException(key);
-                });
+    return RESPONSE_CODE_MAP.computeIfAbsent(
+        responseCode,
+        key -> {
+          throw new IllegalArgumentException(key);
+        });
+  }
+
+  @Override
+  public String toString() {
+    return responseCode;
+  }
+
+  @Converter(autoApply = true)
+  public static class CvvResponseCodeConverter
+      implements AttributeConverter<CvvResponseCode, String> {
+
+    @Override
+    public String convertToDatabaseColumn(CvvResponseCode type) {
+      if (type == null) {
+        return null;
+      }
+      return type.getResponseCode();
     }
 
     @Override
-    public String toString() {
-        return responseCode;
+    public CvvResponseCode convertToEntityAttribute(String code) {
+      return CvvResponseCode.fromResponseCode(code);
     }
-
-    @Converter(autoApply = true)
-    public static class CvvResponseCodeConverter
-            implements AttributeConverter<CvvResponseCode, String> {
-
-        @Override
-        public String convertToDatabaseColumn(CvvResponseCode type) {
-            if (type == null) {
-                return null;
-            }
-            return type.getResponseCode();
-        }
-
-        @Override
-        public CvvResponseCode convertToEntityAttribute(String code) {
-            return CvvResponseCode.fromResponseCode(code);
-        }
-    }
+  }
 }
