@@ -13,6 +13,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -88,7 +91,15 @@ public class LineOfBusinessController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<LineOfBusinessDto> updateDescription(LineOfBusinessDto lobDto) {
     return new ResponseApi<>(
-        lobService.updateLineOfBusiness(lobDto, null, RequestUtil.getRequestIP()), null);
+        lobService.updateLineOfBusinessDescription(lobDto, null, RequestUtil.getRequestIP()), null);
+  }
+
+  @Operation(summary="Updates fields for an existing line of business")
+  @ApiResponse(responseCode="200")
+  @PutMapping( path="/lob", consumes = MediaType.APPLICATION_JSON_VALUE,
+          produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<LineOfBusinessDto> updateLineOfBusiness(@RequestBody @Valid @NotNull LineOfBusinessDto lineOfBusinessDto){
+    return new ResponseApi<>(lobService.updateLineOfBusiness(lineOfBusinessDto, null, RequestUtil.getRequestIP()), null);
   }
 
   @Operation(summary = "Updates a line of business")

@@ -34,7 +34,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 @Slf4j
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class LOBServiceTest {
+class LOBServiceTest {
 
     @Mock
     LineOfBusinessRepository lobRepository;
@@ -46,7 +46,7 @@ public class LOBServiceTest {
     private LineOfBusinessService lobService;
 
     @BeforeEach
-    public void initialize() {
+    void initialize() {
         ReflectionTestUtils.setField(
                 lobService, "lineOfBusinessMapper", new LineOfBusinessMapperImpl());
     }
@@ -85,7 +85,7 @@ public class LOBServiceTest {
                 .shortDescription("")
                 .build();
 
-        when(lobRepository.findById(eq(lobDto.lineOfBusinessId()))).thenReturn(Optional.empty());
+        when(lobRepository.findById(lobDto.lineOfBusinessId())).thenReturn(Optional.empty());
 
         when(lobRepository.saveAndFlush(any(LineOfBusiness.class)))
                 .thenReturn(lob);
@@ -116,7 +116,7 @@ public class LOBServiceTest {
         lob.setCreateDate(OffsetDateTime.now());
         lob.setLastUpdateDate(OffsetDateTime.now());
 
-        when(lobRepository.findById(eq(lobDto.lineOfBusinessId()))).thenReturn(Optional.of(lob));
+        when(lobRepository.findById(lobDto.lineOfBusinessId())).thenReturn(Optional.of(lob));
 
         when(lobRepository.saveAndFlush(any(LineOfBusiness.class)))
                 .thenReturn(lob);
@@ -146,11 +146,11 @@ public class LOBServiceTest {
         lob.setCreateDate(OffsetDateTime.now());
         lob.setLastUpdateDate(OffsetDateTime.now());
 
-        when(lobRepository.findById(eq(lobDto.lineOfBusinessId()))).thenReturn(Optional.empty());
+        when(lobRepository.findById(lobDto.lineOfBusinessId())).thenReturn(Optional.empty());
 
         assertThrows(
                 NotFoundException.class,
-                () -> lobService.updateLineOfBusiness(lobDto, null, "127.0.0.1"));
+                () -> lobService.updateLineOfBusinessDescription(lobDto, null, "127.0.0.1"));
 
         verify(producerAuditContract, times(0))
                 .createAuditRecord(eq(AuditObjectType.LINE_OF_BUSINESS), eq(AuditActionType.UPDATE_LINE_OF_BUSINESS),
@@ -176,12 +176,12 @@ public class LOBServiceTest {
         lob.setCreateDate(OffsetDateTime.now());
         lob.setLastUpdateDate(OffsetDateTime.now());
 
-        when(lobRepository.findById(eq(lobDto.lineOfBusinessId()))).thenReturn(Optional.of(lob));
+        when(lobRepository.findById(lobDto.lineOfBusinessId())).thenReturn(Optional.of(lob));
 
         when(lobRepository.saveAndFlush(any(LineOfBusiness.class)))
                 .thenReturn(lob);
 
-        LineOfBusinessDto createdDto = lobService.updateLineOfBusiness(lobDto, null, "127.0.0.1");
+        LineOfBusinessDto createdDto = lobService.updateLineOfBusinessDescription(lobDto, null, "127.0.0.1");
 
         assertThat(createdDto.createDate()).isNotNull();
         assertThat(createdDto.lineOfBusinessName()).isEqualTo("Lawn care");
