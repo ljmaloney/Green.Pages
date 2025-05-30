@@ -1,6 +1,5 @@
 package com.green.yp.producer.service;
 
-import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
 import com.green.yp.api.AuditRequest;
@@ -57,7 +56,7 @@ public class ProducerLocationService {
   public ProducerLocationResponse createLocation(
       LocationRequest createLocationRequest, UUID producerId, String ipAddress) {
 
-    Producer producer = producerService.findActiveProducer(producerId);
+    producerService.findActiveProducer(producerId);
 
     ProducerLocation location = producerLocationMapper.toEntity(createLocationRequest);
     location.setProducerId(producerId);
@@ -139,7 +138,7 @@ public class ProducerLocationService {
   public ProducerLocationResponse findLocation(
       @NonNull @NotNull UUID locationId, @NotNull @NonNull Boolean includeHours) {
     log.info(
-        "Loading location for locationId {} and producerId {} including hours-{}",
+        "Loading location for locationId {} including hours-{}",
         locationId,
         includeHours);
 
@@ -163,8 +162,8 @@ public class ProducerLocationService {
     log.info("Loading all locations for {}, includeHours:{}", producerId, includeHours);
 
     List<ProducerLocation> producerLocations;
-    if (activeOnly.booleanValue()) {
-      producerLocations = locationRepository.findActiveLocations(producerId, activeOnly);
+    if (activeOnly) {
+      producerLocations = locationRepository.findActiveLocations(producerId, true);
     } else {
       producerLocations = locationRepository.findProducerLocationsByProducerId(producerId);
     }
@@ -197,9 +196,7 @@ public class ProducerLocationService {
               locationRepository.save(loc);
               log.info("Location identified by {} deleted ", locationId);
             },
-            () -> {
-              log.info("Location identified by {} already deleted or is Primary", locationId);
-            });
+            () -> log.info("Location identified by {} already deleted or is Primary", locationId));
   }
 
   @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
