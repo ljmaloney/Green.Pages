@@ -15,7 +15,9 @@ import com.green.yp.reference.data.repository.LineOfBusinessRepository;
 import com.green.yp.reference.dto.LOBServiceDto;
 import com.green.yp.reference.dto.LineOfBusinessDto;
 import com.green.yp.reference.mapper.LineOfBusinessMapper;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -102,7 +104,7 @@ public class LineOfBusinessService {
   @CacheEvict(
       value = {"allLineOfBusiness", LINE_OF_BUSINESS},
       allEntries = true)
-  public LineOfBusinessDto updateLineOfBusiness(
+  public LineOfBusinessDto updateLineOfBusinessDescription(
       @NotNull LineOfBusinessDto lobDto, String userId, @NotNull String ipAddress) {
     Optional<LineOfBusiness> lineOfBusinessOptional =
         repository.findById(lobDto.lineOfBusinessId());
@@ -116,6 +118,22 @@ public class LineOfBusinessService {
     lineOfBusiness = repository.saveAndFlush(lineOfBusiness);
 
     return lineOfBusinessMapper.toDto(lineOfBusiness);
+  }
+
+  @AuditRequest(
+          requestParameter = "lobDto",
+          objectType = AuditObjectType.LINE_OF_BUSINESS,
+          actionType = AuditActionType.UPDATE)
+  @CacheEvict(
+          value = {"allLineOfBusiness", LINE_OF_BUSINESS},
+          allEntries = true)
+  public LineOfBusinessDto updateLineOfBusiness(@Valid @NotNull LineOfBusinessDto lineOfBusinessDto, String userId, @NotNull String ipAddress) {
+    var lineOfBusiness = repository.findById(lineOfBusinessDto.lineOfBusinessId()).orElseThrow(
+            () -> new NotFoundException("LineOfBusiness", lineOfBusinessDto.lineOfBusinessId()));
+
+    return lineOfBusinessMapper.toDto(
+            repository.save(lineOfBusinessMapper
+                    .fromDtoToEntity(lineOfBusinessDto, lineOfBusiness)));
   }
 
   public List<LOBServiceDto> findServices(UUID lineOfBusinessId) {

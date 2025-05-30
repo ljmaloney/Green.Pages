@@ -91,7 +91,7 @@ false, "flower", null
             .createByReference(null)
             .build();
 
-    when(lineOfBusinessService.updateLineOfBusiness(any(LineOfBusinessDto.class), any(), any()))
+    when(lineOfBusinessService.updateLineOfBusinessDescription(any(LineOfBusinessDto.class), any(), any()))
         .thenReturn(lobDto);
 
     ResponseApi<LineOfBusinessDto> responseDto =
