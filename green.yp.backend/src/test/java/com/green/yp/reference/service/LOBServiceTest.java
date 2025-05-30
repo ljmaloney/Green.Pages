@@ -66,8 +66,9 @@ class LOBServiceTest {
 
         List<LineOfBusinessDto> lineOfBusinessDtos = lobService.getAllLineOfBusiness();
 
-        assertThat(lineOfBusinessDtos).isNotNull();
-        assertThat(lineOfBusinessDtos.size()).isGreaterThan(0);
+        assertThat(lineOfBusinessDtos)
+                .isNotNull()
+                .hasSizeGreaterThan(0);
     }
 
     @Test
