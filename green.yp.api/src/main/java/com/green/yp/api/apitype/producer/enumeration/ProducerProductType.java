@@ -9,5 +9,6 @@ public enum ProducerProductType {
   HARDWARE, // miscellaneous hardware
   LANDSCAPE_PRODUCTS, // misc landscape produces, does not include bagged, bulk, or stone
   LANDSCAPE_TOOLS, // landscaping tools
-  POND_MAINTENANCE // pond maintaince products
+  POND_MAINTENANCE,  // pond maintaince products
+  SOIL_AMENDMENTS
 }

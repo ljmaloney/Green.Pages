@@ -3,6 +3,8 @@ package com.green.yp.api.apitype.producer;
 import com.green.yp.api.apitype.producer.enumeration.LocationDisplayType;
 import com.green.yp.api.apitype.producer.enumeration.ProducerLocationType;
 import jakarta.validation.constraints.NotNull;
+
+import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.NonNull;
@@ -20,7 +22,7 @@ public record LocationRequest(
         @NotNull @NonNull String city,
         @NotNull @NonNull String state,
         @NotNull @NonNull String postalCode,
-        String latitude,
-        String longitude,
+        BigDecimal latitude,
+        BigDecimal longitude,
         String websiteUrl) {
 }

@@ -6,6 +6,7 @@ import com.green.yp.common.data.converter.BooleanConverter;
 import com.green.yp.common.data.embedded.Mutable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -63,11 +64,11 @@ public class ProducerLocation extends Mutable {
   @Column(name = "postal_code", length = 10, nullable = false)
   private String postalCode;
 
-  @Column(name = "latitude")
-  private String latitude;
+  @Column(name = "latitude", precision = 9, scale = 5)
+  private BigDecimal latitude;
 
-  @Column(name = "longitude")
-  private String longitude;
+  @Column(name = "longitude", precision = 9, scale = 5)
+  private BigDecimal longitude;
 
   @Column(name = "website_url", length = 150)
   private String websiteUrl;
@@ -76,7 +77,7 @@ public class ProducerLocation extends Mutable {
   private List<ProducerLocationHours> locationHours;
 
   public boolean isActive() {
-    return active != null && active.booleanValue();
+    return active != null && active;
   }
 
   public void addAllHours(List<ProducerLocationHours> locationHours) {
