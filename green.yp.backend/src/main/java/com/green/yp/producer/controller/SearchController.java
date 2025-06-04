@@ -3,6 +3,8 @@ package com.green.yp.producer.controller;
 import com.green.yp.api.apitype.search.SearchResponse;
 import com.green.yp.producer.service.ProducerSearchService;
 import java.util.UUID;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/search")
+@Tag(name = "Endpoints supporting searching using various criteria from the public pages")
 public class SearchController {
   private final ProducerSearchService searchService;
 

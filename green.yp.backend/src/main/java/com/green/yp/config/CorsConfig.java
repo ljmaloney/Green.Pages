@@ -11,7 +11,7 @@ public class CorsConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/reference/**")
                 .allowedOrigins("http://localhost:8080","http://services.greenyp.com","https://services.greenyp.com")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("Content-Type", "Authorization")
                 .allowCredentials(true);
         registry.addMapping("/account/**")
@@ -20,6 +20,11 @@ public class CorsConfig implements WebMvcConfigurer {
                 .allowedHeaders("Content-Type", "Authorization")
                 .allowCredentials(true);
         registry.addMapping("/producer/**")
+                .allowedOrigins("http://localhost:8080","http://services.greenyp.com","https://services.greenyp.com")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("Content-Type", "Authorization")
+                .allowCredentials(true);
+        registry.addMapping("/search/**")
                 .allowedOrigins("http://localhost:8080","http://services.greenyp.com","https://services.greenyp.com")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("Content-Type", "Authorization")

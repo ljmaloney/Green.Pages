@@ -1,10 +1,14 @@
 package com.green.yp.api.apitype.search;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.math.BigDecimal;
 import java.util.UUID;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record ProducerSearchResponse(
     UUID producerId,
+    UUID producerLocationId,
     String businessName,
     String phone,
     String cellPhone,
@@ -15,8 +19,8 @@ public record ProducerSearchResponse(
     String state,
     String postalCode,
     String websiteUrl,
-    String latitude,
-    String longitude,
+    BigDecimal latitude,
+    BigDecimal longitude,
     BigDecimal distance,
     String businessNarrative,
     String iconLink) {}

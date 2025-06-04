@@ -3,10 +3,7 @@ package com.green.yp.producer.service;
 import com.green.yp.api.AuditRequest;
 import com.green.yp.api.apitype.enumeration.AuditActionType;
 import com.green.yp.api.apitype.enumeration.AuditObjectType;
-import com.green.yp.api.apitype.producer.CreateProducerRequest;
-import com.green.yp.api.apitype.producer.ProducerRequest;
-import com.green.yp.api.apitype.producer.ProducerResponse;
-import com.green.yp.api.apitype.producer.ProducerSubscriptionResponse;
+import com.green.yp.api.apitype.producer.*;
 import com.green.yp.api.apitype.producer.enumeration.InvoiceCycleType;
 import com.green.yp.api.apitype.producer.enumeration.ProducerSubscriptionType;
 import com.green.yp.api.contract.LineOfBusinessContract;
@@ -48,6 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ProducerOrchestrationService {
 
+  private final static String PRODUCER_ID = "ProducerId";
+
   final LineOfBusinessContract lobContract;
 
   final ProducerMapper producerMapper;
@@ -73,6 +72,10 @@ public class ProducerOrchestrationService {
     this.producerLobRepository = producerLobRepository;
     this.subscriptionRepository = subscriptionRepository;
     this.subscriptionContract = subscriptionContract;
+  }
+
+  public ProducerProfileResponse getProducerProfile(UUID producerLocationId) {
+    return null;
   }
 
   @AuditRequest(
@@ -167,7 +170,7 @@ public class ProducerOrchestrationService {
     Producer producer =
         producerRepository
             .findById(producerId)
-            .orElseThrow(() -> new NotFoundException("ProducerId", producerId));
+            .orElseThrow(() -> new NotFoundException(PRODUCER_ID, producerId));
 
     if (producer.getCancelDate() != null
         && producer.getCancelDate().isAfter(OffsetDateTime.now())) {
@@ -257,7 +260,7 @@ public class ProducerOrchestrationService {
     Producer producer =
         producerRepository
             .findById(producerId)
-            .orElseThrow(() -> new NotFoundException("ProducerId", producerId));
+            .orElseThrow(() -> new NotFoundException(PRODUCER_ID, producerId));
 
     // the cancel date is the last day of the current month
     // directory listing remains active and customer access remains available
@@ -277,7 +280,7 @@ public class ProducerOrchestrationService {
     Producer producer =
         producerRepository
             .findById(producerId)
-            .orElseThrow(() -> new NotFoundException("ProducerId", producerId));
+            .orElseThrow(() -> new NotFoundException(PRODUCER_ID, producerId));
 
     ProducerLineOfBusiness primaryLob =
         producer.getLinesOfBusiness().stream()
@@ -318,7 +321,7 @@ public class ProducerOrchestrationService {
 
     producerRepository
         .findById(producerId)
-        .orElseThrow(() -> new NotFoundException("ProducerId", producerId));
+        .orElseThrow(() -> new NotFoundException(PRODUCER_ID, producerId));
 
     List<ProducerSubscriptionRecord> subscriptions =
         subscriptionRepository.findAllSubscriptions(producerId);
@@ -336,7 +339,7 @@ public class ProducerOrchestrationService {
     Producer producer =
         producerRepository
             .findById(producerId)
-            .orElseThrow(() -> new NotFoundException("ProducerId", producerId));
+            .orElseThrow(() -> new NotFoundException(PRODUCER_ID, producerId));
 
     if (producer.getSubscriptionType() == ProducerSubscriptionType.LIVE_ACTIVE) {
       return findProducer(producerId);
