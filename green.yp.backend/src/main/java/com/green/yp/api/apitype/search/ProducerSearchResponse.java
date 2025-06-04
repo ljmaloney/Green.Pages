@@ -5,6 +5,7 @@ import java.util.UUID;
 
 public record ProducerSearchResponse(
     UUID producerId,
+    UUID producerLocationId,
     String businessName,
     String phone,
     String cellPhone,

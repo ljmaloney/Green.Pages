@@ -14,6 +14,7 @@ public interface ProducerSearchMapper {
   List<ProducerSearchResponse> toResponse(List<ProducerSearchRecord> records);
 
   @Mapping(target = "producerId", source = "producer.id")
+  @Mapping(target = "producerLocationId", source = "location.id")
   @Mapping(target = "businessName", source = "producer.name")
   @Mapping(target = "businessNarrative", source = "producer.narrative")
   @Mapping(target = "latitude", source = "location.latitude")
