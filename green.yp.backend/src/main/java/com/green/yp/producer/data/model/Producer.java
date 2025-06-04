@@ -17,7 +17,7 @@ import lombok.*;
 @Builder
 @Table(name = "producer", schema = "greenyp")
 public class Producer extends Mutable {
-  @Column(name = "name", length = 60, nullable = false)
+  @Column(name = "name", length = 150, nullable = false)
   private String name;
 
   @Column(name = "subscription_type")
