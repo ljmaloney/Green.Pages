@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ProducerLocationService {
 
-  final static String PRODUCER_LOCATION = "ProducerLocation;"
+  private final static String PRODUCER_LOCATION = "ProducerLocation";
 
   final ProducerLocationMapper producerLocationMapper;
 
