@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,6 +44,17 @@ public class ProducerCsvImportService {
 
         List<UUID> createdProducerIds = new ArrayList<>();
 
+        String type = "";
+        String licenseNumber = "";
+        String contact = "";
+        String company = "";
+        String address = "";
+        String city = "";
+        String state = "";
+        String zip = "";
+        String county = "";
+        String phone = "";
+
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             CSVParser csvParser = CSVFormat.DEFAULT.builder()
                     .setSkipHeaderRecord(true)
@@ -50,15 +62,22 @@ public class ProducerCsvImportService {
                     .parse(reader);
 
             for (CSVRecord record : csvParser) {
-                String type = record.get(0);
-                String contact = record.get(2);
-                String company = record.get(3);
-                String address = record.get(4);
-                String city = record.get(5);
-                String state = record.get(6);
-                String zip = record.get(7);
-                String county = record.get(8);
-                String phone = record.get(9);
+                if ( record.getRecordNumber() == 1 ){
+                    continue;
+                }
+                 type = record.get(0);
+                 licenseNumber = record.get(1);
+                 contact = record.get(2);
+                 company = record.get(3);
+                 address = record.get(4);
+                 city = record.get(5);
+                 state = record.get(6);
+                 zip = record.get(7);
+                 county = record.get(8);
+                 phone = StringUtils.trim(record.get(9));
+                 if ( phone.length() > 12 ){
+                     phone = phone.substring(0,12);
+                 }
 
                 // Use contact as company name if company is empty
                 String businessName = company.isEmpty() ? contact : company;
@@ -96,7 +115,7 @@ public class ProducerCsvImportService {
                                 locationResponse.locationId(),
                                 ProducerContactType.PRIMARY,
                                 ProducerDisplayContactType.GENERIC_NAME_PHONE_EMAIL,
-                                contact,
+                                StringUtils.isBlank(contact) ? "Primaru" : contact,
                                null,
                                 null,
                                 phone,
@@ -109,6 +128,7 @@ public class ProducerCsvImportService {
 
             }
         } catch (Exception e) {
+            log.error("Error processing {}. {}. {}, {}", licenseNumber, contact, company, address);
             log.error("Error processing CSV file", e);
             throw new RuntimeException("Failed to process CSV file: " + e.getMessage());
         }
