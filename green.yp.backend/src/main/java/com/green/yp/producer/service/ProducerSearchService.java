@@ -21,10 +21,12 @@ public class ProducerSearchService {
 
   private final ProducerSearchRepository searchRepository;
   private final GeocodingService geocodingService;
-    private final ProducerSearchMapper producerSearchMapper;
+  private final ProducerSearchMapper producerSearchMapper;
 
-    public ProducerSearchService(
-      ProducerSearchRepository searchRepository, GeocodingService geocodingService, ProducerSearchMapper producerSearchMapper) {
+  public ProducerSearchService(
+      ProducerSearchRepository searchRepository,
+      GeocodingService geocodingService,
+      ProducerSearchMapper producerSearchMapper) {
     this.searchRepository = searchRepository;
     this.geocodingService = geocodingService;
     this.producerSearchMapper = producerSearchMapper;
@@ -32,12 +34,12 @@ public class ProducerSearchService {
 
   @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
   public SearchResponse search(
-          String zipCode, Integer distance, Pageable pageable, UUID categoryId, UUID serviceId) {
+      String zipCode, Integer distance, Pageable pageable, UUID categoryId, UUID serviceId) {
     log.info("Searching for producers near zipCode: {}, within {} miles", zipCode, distance);
 
     var coordinates = geocodingService.getCoordinates(zipCode);
 
-      Page<ProducerSearchRecord> searchResults =
+    Page<ProducerSearchRecord> searchResults =
         searchRepository.findProducers(
             coordinates.latitude(),
             coordinates.longitude(),
@@ -45,8 +47,8 @@ public class ProducerSearchService {
             categoryId,
             serviceId,
             pageable);
-    
-      return new SearchResponse(
+
+    return new SearchResponse(
         producerSearchMapper.toResponse(searchResults.getContent()),
         (int) searchResults.getTotalElements(),
         searchResults.getNumber(),

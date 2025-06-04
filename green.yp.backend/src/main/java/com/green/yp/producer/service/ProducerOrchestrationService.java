@@ -45,6 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ProducerOrchestrationService {
 
+  private final static String PRODUCER_ID = "ProducerId";
+
   final LineOfBusinessContract lobContract;
 
   final ProducerMapper producerMapper;
@@ -168,7 +170,7 @@ public class ProducerOrchestrationService {
     Producer producer =
         producerRepository
             .findById(producerId)
-            .orElseThrow(() -> new NotFoundException("ProducerId", producerId));
+            .orElseThrow(() -> new NotFoundException(PRODUCER_ID, producerId));
 
     if (producer.getCancelDate() != null
         && producer.getCancelDate().isAfter(OffsetDateTime.now())) {
@@ -258,7 +260,7 @@ public class ProducerOrchestrationService {
     Producer producer =
         producerRepository
             .findById(producerId)
-            .orElseThrow(() -> new NotFoundException("ProducerId", producerId));
+            .orElseThrow(() -> new NotFoundException(PRODUCER_ID, producerId));
 
     // the cancel date is the last day of the current month
     // directory listing remains active and customer access remains available
@@ -278,7 +280,7 @@ public class ProducerOrchestrationService {
     Producer producer =
         producerRepository
             .findById(producerId)
-            .orElseThrow(() -> new NotFoundException("ProducerId", producerId));
+            .orElseThrow(() -> new NotFoundException(PRODUCER_ID, producerId));
 
     ProducerLineOfBusiness primaryLob =
         producer.getLinesOfBusiness().stream()
@@ -319,7 +321,7 @@ public class ProducerOrchestrationService {
 
     producerRepository
         .findById(producerId)
-        .orElseThrow(() -> new NotFoundException("ProducerId", producerId));
+        .orElseThrow(() -> new NotFoundException(PRODUCER_ID, producerId));
 
     List<ProducerSubscriptionRecord> subscriptions =
         subscriptionRepository.findAllSubscriptions(producerId);
@@ -337,7 +339,7 @@ public class ProducerOrchestrationService {
     Producer producer =
         producerRepository
             .findById(producerId)
-            .orElseThrow(() -> new NotFoundException("ProducerId", producerId));
+            .orElseThrow(() -> new NotFoundException(PRODUCER_ID, producerId));
 
     if (producer.getSubscriptionType() == ProducerSubscriptionType.LIVE_ACTIVE) {
       return findProducer(producerId);

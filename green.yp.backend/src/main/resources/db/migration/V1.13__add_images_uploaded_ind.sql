@@ -1,0 +1,12 @@
+DROP PROCEDURE IF EXISTS `?`;
+DELIMITER //
+CREATE PROCEDURE `?`()
+BEGIN
+    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION BEGIN
+END;
+ALTER TABLE `producer` ADD COLUMN `has_images_uploaded` char(1)  default 'N' after cancel_date;
+END //
+DELIMITER ;
+CALL `?`();
+DROP PROCEDURE `?`;
+

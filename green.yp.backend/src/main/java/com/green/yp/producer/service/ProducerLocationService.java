@@ -12,7 +12,6 @@ import com.green.yp.api.apitype.producer.enumeration.ProducerLocationType;
 import com.green.yp.common.ServiceUtils;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
-import com.green.yp.producer.data.model.Producer;
 import com.green.yp.producer.data.model.ProducerLocation;
 import com.green.yp.producer.data.repository.ProducerLocationRepository;
 import com.green.yp.producer.mapper.ProducerLocationMapper;
@@ -29,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 public class ProducerLocationService {
+
+  final static String PRODUCER_LOCATION = "ProducerLocation;"
 
   final ProducerLocationMapper producerLocationMapper;
 
@@ -89,7 +90,7 @@ public class ProducerLocationService {
             .findById(updateLocationRequest.locationId())
             .orElseThrow(
                 () ->
-                    new NotFoundException("ProducerLocation", updateLocationRequest.locationId()));
+                    new NotFoundException(PRODUCER_LOCATION, updateLocationRequest.locationId()));
 
     location.setLocationName(updateLocationRequest.locationName());
     location.setLocationType(updateLocationRequest.locationType());
@@ -112,7 +113,7 @@ public class ProducerLocationService {
     ProducerLocation location =
         locationRepository
             .findById(locationId)
-            .orElseThrow(() -> new NotFoundException("ProducerLocation", locationId));
+            .orElseThrow(() -> new NotFoundException(PRODUCER_LOCATION, locationId));
 
     if (!location.isActive()) {
       log.error("Producer location identified by {} is not active", locationId);
@@ -145,7 +146,7 @@ public class ProducerLocationService {
     ProducerLocation location =
         locationRepository
             .findById(locationId)
-            .orElseThrow(() -> new NotFoundException("ProducerLocation", locationId));
+            .orElseThrow(() -> new NotFoundException(PRODUCER_LOCATION, locationId));
 
     if (includeHours) {
       return producerLocationMapper.fromEntity(location);
@@ -179,7 +180,7 @@ public class ProducerLocationService {
     ProducerLocation location =
         locationRepository
             .findById(locationId)
-            .orElseThrow(() -> new NotFoundException("ProducerLocation", locationId));
+            .orElseThrow(() -> new NotFoundException(PRODUCER_LOCATION, locationId));
 
     ServiceUtils.patchEntity(patchRequest, location);
 

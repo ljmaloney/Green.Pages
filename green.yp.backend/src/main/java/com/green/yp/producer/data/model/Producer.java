@@ -1,6 +1,7 @@
 package com.green.yp.producer.data.model;
 
 import com.green.yp.api.apitype.producer.enumeration.ProducerSubscriptionType;
+import com.green.yp.common.data.converter.BooleanConverter;
 import com.green.yp.common.data.embedded.Mutable;
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
@@ -34,6 +35,10 @@ public class Producer extends Mutable {
   @Column(name = "last_bill_paid_date")
   @Temporal(TemporalType.TIMESTAMP)
   private OffsetDateTime lastBillPaidDate;
+
+  @Column(name="has_images_uploaded")
+  @Convert(converter = BooleanConverter.class)
+  Boolean hasImagesUploaded;
 
   @Column(name = "website_url", length = 150)
   private String websiteUrl;
