@@ -3,10 +3,7 @@ package com.green.yp.producer.service;
 import com.green.yp.api.AuditRequest;
 import com.green.yp.api.apitype.enumeration.AuditActionType;
 import com.green.yp.api.apitype.enumeration.AuditObjectType;
-import com.green.yp.api.apitype.producer.CreateProducerRequest;
-import com.green.yp.api.apitype.producer.ProducerRequest;
-import com.green.yp.api.apitype.producer.ProducerResponse;
-import com.green.yp.api.apitype.producer.ProducerSubscriptionResponse;
+import com.green.yp.api.apitype.producer.*;
 import com.green.yp.api.apitype.producer.enumeration.InvoiceCycleType;
 import com.green.yp.api.apitype.producer.enumeration.ProducerSubscriptionType;
 import com.green.yp.api.contract.LineOfBusinessContract;
@@ -73,6 +70,10 @@ public class ProducerOrchestrationService {
     this.producerLobRepository = producerLobRepository;
     this.subscriptionRepository = subscriptionRepository;
     this.subscriptionContract = subscriptionContract;
+  }
+
+  public ProducerProfileResponse getProducerProfile(UUID producerLocationId) {
+    return null;
   }
 
   @AuditRequest(
