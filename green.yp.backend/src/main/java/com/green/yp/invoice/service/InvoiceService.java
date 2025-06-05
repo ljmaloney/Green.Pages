@@ -135,7 +135,7 @@ public class InvoiceService {
 
   private String getLineItemDescription(ProducerSubscriptionResponse subscription) {
     return switch (subscription.subscriptionType()) {
-      case TOP_LEVEL, LINE_OF_BUSINESS ->
+      case DATA_IMPORT_NO_DISPLAY, TOP_LEVEL, LINE_OF_BUSINESS ->
           String.format(
               "%s - %s",
               subscription.invoiceCycleType().getCycleDescription(),
