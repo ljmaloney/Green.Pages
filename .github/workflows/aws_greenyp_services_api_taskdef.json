@@ -1,0 +1,127 @@
+{
+    "taskDefinitionArn": "arn:aws:ecs:us-east-1:557690587797:task-definition/greenyp-springboot-task:5",
+    "containerDefinitions": [
+        {
+            "name": "greenyp-container",
+            "image": "557690587797.dkr.ecr.us-east-1.amazonaws.com/greenyp/images/green-yp-service:latest",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "containerPort": 8080,
+                    "hostPort": 8080,
+                    "protocol": "tcp",
+                    "name": "greenyp-container-8080-tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "SPRING_PROFILES_ACTIVE",
+                    "value": "prod"
+                }
+            ],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "secrets": [
+                {
+                    "name": "GYP_DB_HOSTNAME",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-1:557690587797:secret:gyp-mysql-dev-host-C03jgs"
+                },
+                {
+                    "name": "GYP_DB_PASSWD",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-1:557690587797:secret:gyp-mysql-db-password-3lSL5V"
+                },
+                {
+                    "name": "GYP_DB_PORT",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-1:557690587797:secret:gyp-mysql-dev-port-13Cl7W"
+                },
+                {
+                    "name": "GYP_DB_USERNAME",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-1:557690587797:secret:gyp-mysql-db-user-TwU2IY"
+                },
+                {
+                    "name": "GYP_FA_API_KEY",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-1:557690587797:secret:gyp-fa-api-key-NiFNQJ"
+                },
+                {
+                    "name": "GYP_FA_APP_ID",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-1:557690587797:secret:gyp-fa-app-id-SROIRO"
+                },
+                {
+                    "name": "GYP_FA_CLIENT_ID",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-1:557690587797:secret:gyp-fa-client-id-gY7j4Z"
+                },
+                {
+                    "name": "GYP_FA_CLIENT_SECRET",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-1:557690587797:secret:gyp-fa-client-secret-uGXupY"
+                },
+                {
+                    "name": "GYP_FA_TENANT_ID",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-1:557690587797:secret:gyp-fa-tenant-id-a1P455"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/greenyp-service-api",
+                    "awslogs-create-group": "true",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            },
+            "systemControls": []
+        }
+    ],
+    "family": "greenyp-springboot-task",
+    "taskRoleArn": "arn:aws:iam::557690587797:role/ecsTaskExecutionRole",
+    "executionRoleArn": "arn:aws:iam::557690587797:role/ecsTaskExecutionRole",
+    "networkMode": "awsvpc",
+    "revision": 5,
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+        },
+        {
+            "name": "ecs.capability.execution-role-awslogs"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "ecs.capability.secrets.asm.environment-variables"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.task-iam-role"
+        },
+        {
+            "name": "ecs.capability.execution-role-ecr-pull"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+        },
+        {
+            "name": "ecs.capability.task-eni"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.29"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EC2",
+        "FARGATE"
+    ],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "1024",
+    "memory": "2048",
+    "registeredAt": "2025-05-24T13:13:37.766000-04:00",
+    "registeredBy": "arn:aws:iam::557690587797:root"
+}

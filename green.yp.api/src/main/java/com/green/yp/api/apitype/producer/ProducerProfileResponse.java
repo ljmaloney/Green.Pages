@@ -2,6 +2,7 @@ package com.green.yp.api.apitype.producer;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -25,8 +26,9 @@ public record ProducerProfileResponse(
     String postalCode,
     String phone,
     String cellPhone,
-    String latitude,
-    String longitude,
+    BigDecimal latitude,
+    BigDecimal longitude,
+    String emailAddress,
     String websiteUrl,
     String businessNarrative,
     String iconLink,
