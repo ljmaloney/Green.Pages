@@ -40,8 +40,6 @@ public class ProducerLocationService {
 
   final ProducerLocationHoursService hoursService;
 
-  private final ProducerLocationGeocodeService gecodeService;
-
   public ProducerLocationService(
       ProducerLocationMapper producerLocationMapper,
       ProducerLocationRepository locationRepository,
@@ -52,7 +50,6 @@ public class ProducerLocationService {
     this.locationRepository = locationRepository;
     this.producerService = producerService;
     this.hoursService = hoursService;
-    this.gecodeService = gecodeService;
   }
 
   @AuditRequest(
@@ -127,11 +124,6 @@ public class ProducerLocationService {
           "Producer location identified by {} is not active", locationId);
     }
     return location;
-  }
-
-  @Async
-  public ProducerLocationResponse findPrimaryLocationAsync(@NotNull UUID producerId){
-    return findPrimaryLocation(producerId);
   }
 
   public ProducerLocationResponse findPrimaryLocation(@NotNull UUID producerId) {
