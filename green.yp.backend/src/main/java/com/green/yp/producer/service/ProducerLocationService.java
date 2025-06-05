@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -39,15 +40,19 @@ public class ProducerLocationService {
 
   final ProducerLocationHoursService hoursService;
 
+  private final ProducerLocationGeocodeService gecodeService;
+
   public ProducerLocationService(
       ProducerLocationMapper producerLocationMapper,
       ProducerLocationRepository locationRepository,
       ProducerOrchestrationService producerService,
-      ProducerLocationHoursService hoursService) {
+      ProducerLocationHoursService hoursService,
+      ProducerLocationGeocodeService gecodeService) {
     this.producerLocationMapper = producerLocationMapper;
     this.locationRepository = locationRepository;
     this.producerService = producerService;
     this.hoursService = hoursService;
+    this.gecodeService = gecodeService;
   }
 
   @AuditRequest(
@@ -64,8 +69,9 @@ public class ProducerLocationService {
     location.setActive(true);
 
     // TODO: lookup lat-long
-
     ProducerLocation savedLocation = locationRepository.saveAndFlush(location);
+
+    //gecodeService.geocodeLocattion(savedLocation);
 
     log.info(
         "New producer location {} named {} created for {}",
@@ -121,6 +127,11 @@ public class ProducerLocationService {
           "Producer location identified by {} is not active", locationId);
     }
     return location;
+  }
+
+  @Async
+  public ProducerLocationResponse findPrimaryLocationAsync(@NotNull UUID producerId){
+    return findPrimaryLocation(producerId);
   }
 
   public ProducerLocationResponse findPrimaryLocation(@NotNull UUID producerId) {

@@ -67,6 +67,7 @@ public interface ProducerSearchMapper {
   @Mapping(target = "addressLine2", source = "location.addressLine2")
   @Mapping(target = "addressLine3", source = "location.addressLine3")
   @Mapping(target = "city", source = "location.city")
+  @Mapping(target = "emailAddress", source = "contact.emailAddress")
   @Mapping(target = "state", source = "location.state")
   @Mapping(target = "postalCode", source = "location.postalCode")
   @Mapping(target = "iconLink", source = "producer.iconLink")

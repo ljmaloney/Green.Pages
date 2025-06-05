@@ -1,0 +1,57 @@
+name: Deploy to ECS (Manual) deploy_backend_services.yml -
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'ECR image tag (e.g. latest or 2025-06-04)'
+        required: true
+
+jobs:
+  deploy:
+    name: Deploy new image to ECS service
+    runs-on: ubuntu-latest
+
+    env:
+      ECR_REPO_URI: ${{ secrets.ECR_REPO_URI }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      GH_PAT: ${{ secrets.GH_PAT }}
+      CLUSTER_NAME: fusionauth-fargate-cluster
+      SERVICE_NAME: greenyp-services-api
+      CONTAINER_NAME: greenyp-container
+      ECR_REPO: ${{ secrets.ECR_REPO_URI }}/images/green-yp-service
+      TASK_DEF_PATH: aws_greenyp_services_api_taskdef.json
+      TASK_DEF_TEMP: taskdef.temp.json
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Replace image tag in task definition
+        run: |
+          IMAGE_URI="${{ env.ECR_REPO_URI }}:${{ github.event.inputs.image_tag }}"
+          jq --arg IMAGE "$IMAGE_URI" \
+            '.containerDefinitions[].image = $IMAGE' \
+            $TASK_DEF_PATH > $TASK_DEF_TEMP
+
+      - name: Register new task definition
+        id: register-task-def
+        run: |
+          TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://${{ env.TASK_DEF_TEMP }} \
+            --query "taskDefinition.taskDefinitionArn" --output text)
+          echo "task_definition_arn=$TASK_DEF_ARN" >> "$GITHUB_OUTPUT"
+
+      - name: Update ECS service with new task definition
+        run: |
+          aws ecs update-service \
+            --cluster ${{ env.CLUSTER_NAME }} \
+            --service ${{ env.SERVICE_NAME }} \
+            --task-definition ${{ steps.register-task-def.outputs.task_definition_arn }}
+
