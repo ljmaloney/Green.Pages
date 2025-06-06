@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.*;
+import org.locationtech.jts.geom.Point;
 
 @Entity
 @Data
@@ -69,6 +70,10 @@ public class ProducerLocation extends Mutable {
 
   @Column(name = "longitude", precision = 9, scale = 5)
   private BigDecimal longitude;
+
+  //this is a read only field, and is generated on insert and update by the db
+  @Column(name = "location_geo_point", columnDefinition = "POINT", insertable = false, updatable = false)
+  private Point locationGeoPoint;
 
   @Column(name = "website_url", length = 150)
   private String websiteUrl;
