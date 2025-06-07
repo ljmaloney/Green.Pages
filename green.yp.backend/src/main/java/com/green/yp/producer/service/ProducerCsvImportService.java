@@ -7,6 +7,8 @@ import com.green.yp.producer.data.model.ProducerLineOfBusiness;
 import com.green.yp.producer.data.model.ProducerLocation;
 import com.green.yp.producer.data.repository.ProducerLocationRepository;
 import com.green.yp.producer.data.repository.ProducerRepository;
+import com.green.yp.geolocation.data.model.PostalCodeGeocode;
+import com.green.yp.geolocation.data.repository.PostalCodeGeocodeRepository;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -38,6 +40,7 @@ public class ProducerCsvImportService {
     private final ProducerOrchestrationService producerOrchestrationService;
     private final ProducerLocationService producerLocationService;
     private final ProducerContactOrchestrationService contactOrchestrationService;
+    private final PostalCodeGeocodeRepository postalCodeGeocodeRepository;
 
     @Transactional
     public List<UUID> importProducersFromCsv(MultipartFile file, UUID lineOfBusinessId) {

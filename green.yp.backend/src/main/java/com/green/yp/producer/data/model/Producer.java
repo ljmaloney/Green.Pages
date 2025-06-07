@@ -36,7 +36,7 @@ public class Producer extends Mutable {
   @Temporal(TemporalType.TIMESTAMP)
   private OffsetDateTime lastBillPaidDate;
 
-  @Column(name="has_images_uploaded")
+  @Column(name = "has_images_uploaded")
   @Convert(converter = BooleanConverter.class)
   Boolean hasImagesUploaded;
 
