@@ -72,12 +72,12 @@ public class ProducerLocation extends Mutable {
   private BigDecimal longitude;
 
   // this is a read only field, and is generated on insert and update by the db
-  @Column(
-      name = "location_geo_point",
-      columnDefinition = "POINT",
-      insertable = false,
-      updatable = false)
-  private Point locationGeoPoint;
+  //  @Column(
+  //      name = "location_geo_point",
+  //      columnDefinition = "POINT",
+  //      insertable = false,
+  //      updatable = false)
+  //  private Point locationGeoPoint;
 
   @Column(name = "website_url", length = 150)
   private String websiteUrl;

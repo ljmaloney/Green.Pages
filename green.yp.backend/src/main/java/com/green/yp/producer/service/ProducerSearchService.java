@@ -2,15 +2,12 @@ package com.green.yp.producer.service;
 
 import com.green.yp.api.apitype.search.SearchResponse;
 import com.green.yp.geolocation.service.GeocodingService;
-import com.green.yp.producer.data.record.ProducerLocationDistanceProjection;
-import com.green.yp.producer.data.record.ProducerSearchRecord;
 import com.green.yp.producer.data.repository.ProducerSearchRepository;
 import com.green.yp.producer.mapper.ProducerSearchMapper;
-
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -41,17 +38,21 @@ public class ProducerSearchService {
     log.info("Searching for producers near zipCode: {}, within {} miles", zipCode, distance);
 
     var coordinates = geocodingService.getCoordinates(zipCode);
-    var wktPoint = String.format("POINT(%f %f)", coordinates.longitude(), coordinates.latitude());
-    var searchLocations = searchRepository.findProducersWithinDistance(wktPoint, distance, categoryId, pageable);
+    var wktPoint = String.format("POINT(%f %f)", coordinates.latitude(), coordinates.longitude());
+
+    BigDecimal distanceMeters = BigDecimal.valueOf(distance).multiply(BigDecimal.valueOf(1609.34d));
+
+    var searchLocations = searchRepository.findProducersWithinDistance(wktPoint, distanceMeters, categoryId, pageable);
 
     List<UUID> locationIds = searchLocations.get()
             .map(foundLocation -> foundLocation.getLocationId())
             .toList();
 
-    var searchResults = searchRepository.findProducers(locationIds, distance,
-            coordinates.latitude().doubleValue(), coordinates.longitude().doubleValue());
+    var searchResults = searchRepository.findProducers(locationIds,
+            coordinates.latitude().doubleValue(),
+            coordinates.longitude().doubleValue());
 
-    log.info("Found {} producers near zipCode: {}, within {} miles", searchResults.size(), zipCode, distance);
+    log.info("Found {} producers near zipCode: {}, within {} miles", searchResults.size(), zipCode, distanceMeters);
 
     return new SearchResponse(
         producerSearchMapper.toResponse(searchResults),

@@ -8,15 +8,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProducerLocationGeocodeService {
 
-    private final ProducerLocationRepository locationRepository;
+  private final ProducerLocationRepository locationRepository;
 
-    public ProducerLocationGeocodeService(ProducerLocationRepository repository){
-        this.locationRepository = repository;
-    }
+  public ProducerLocationGeocodeService(ProducerLocationRepository repository) {
+    this.locationRepository = repository;
+  }
 
-    @Async
-    public void geocodeLocation(ProducerLocation location){
-        //call geocode service
-        //update repository
-    }
+  @Async
+  public void geocodeLocation(ProducerLocation location) {
+    // call geocode service
+    // update repository
+  }
 }

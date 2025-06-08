@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ProducerLocationService {
 
-  private final static String PRODUCER_LOCATION = "ProducerLocation";
+  private static final String PRODUCER_LOCATION = "ProducerLocation";
 
   final ProducerLocationMapper producerLocationMapper;
 
@@ -68,7 +68,7 @@ public class ProducerLocationService {
     // TODO: lookup lat-long
     ProducerLocation savedLocation = locationRepository.saveAndFlush(location);
 
-    //gecodeService.geocodeLocattion(savedLocation);
+    // gecodeService.geocodeLocattion(savedLocation);
 
     log.info(
         "New producer location {} named {} created for {}",
@@ -92,8 +92,7 @@ public class ProducerLocationService {
         locationRepository
             .findById(updateLocationRequest.locationId())
             .orElseThrow(
-                () ->
-                    new NotFoundException(PRODUCER_LOCATION, updateLocationRequest.locationId()));
+                () -> new NotFoundException(PRODUCER_LOCATION, updateLocationRequest.locationId()));
 
     location.setLocationName(updateLocationRequest.locationName());
     location.setLocationType(updateLocationRequest.locationType());
@@ -141,10 +140,7 @@ public class ProducerLocationService {
 
   public ProducerLocationResponse findLocation(
       @NonNull @NotNull UUID locationId, @NotNull @NonNull Boolean includeHours) {
-    log.info(
-        "Loading location for locationId {} including hours-{}",
-        locationId,
-        includeHours);
+    log.info("Loading location for locationId {} including hours-{}", locationId, includeHours);
 
     ProducerLocation location =
         locationRepository

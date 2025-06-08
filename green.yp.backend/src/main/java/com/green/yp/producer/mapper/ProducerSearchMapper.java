@@ -36,7 +36,9 @@ public interface ProducerSearchMapper {
   @Mapping(target = "iconLink", source = "producer.iconLink")
   ProducerSearchResponse toResponse(ProducerSearchRecord searchRecord);
 
-  List<TruncatedProducerResponse> limitedOutputResponse(List<ProducerSearchRecord> producersByLineOfBusiness);
+  List<TruncatedProducerResponse> limitedOutputResponse(
+      List<ProducerSearchRecord> producersByLineOfBusiness);
+
   @Mapping(target = "producerId", source = "producer.id")
   @Mapping(target = "producerLocationId", source = "location.id")
   @Mapping(target = "businessName", source = "producer.name")
@@ -72,6 +74,8 @@ public interface ProducerSearchMapper {
   @Mapping(target = "postalCode", source = "location.postalCode")
   @Mapping(target = "iconLink", source = "producer.iconLink")
   ProducerProfileResponse toProfileResponse(ProducerSearchRecord searchRecord);
+
   List<LocationHoursResponse> toHoursResponse(List<ProducerLocationHours> locationHours);
+
   LocationHoursResponse toResponse(ProducerLocationHours locationHours);
 }

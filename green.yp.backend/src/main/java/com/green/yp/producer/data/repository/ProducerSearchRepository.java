@@ -18,53 +18,49 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProducerSearchRepository extends JpaRepository<Producer, UUID> {
 
-  @Query(value = """
-    SELECT 
-      p.id as producerId,
-      pl.id as locationId,
+  @Query(
+      value =
+          """
+    SELECT
+      bin_to_uuid(p.id) as producerId,
+      bin_to_uuid(pl.id) as locationId,
       p.name as producerName,
-      ST_Distance_Sphere(pl.location_geo_point, ST_GeomFromText( ?1, 4326)) AS distance
+      ST_Distance_Sphere(pl.location_geo_point, ST_GeomFromText( ?1, 4326))/1609.34 AS distance
     FROM producer p
     JOIN producer_location pl ON p.id = pl.producer_id
-    WHERE pl.active = true
+    WHERE pl.active = 'Y'
       AND ( ?3 IS NULL OR EXISTS (SELECT 1 FROM producer_line_of_business plob WHERE plob.producer_id = p.id AND plob.line_of_business_id = ?3
       ))
       AND (?2 IS NULL OR ST_Distance_Sphere(pl.location_geo_point, ST_GeomFromText(?1, 4326)) <= ?2
       )
     ORDER BY distance ASC, p.name ASC
     """,
-          countQuery = """
+      countQuery =
+          """
     SELECT COUNT(*)
     FROM producer p
     JOIN producer_location pl ON p.id = pl.producer_id
-    WHERE pl.active = true
+    WHERE pl.active = 'Y'
       AND (?3 IS NULL OR EXISTS ( SELECT 1 FROM producer_line_of_business plob WHERE plob.producer_id = p.id AND plob.line_of_business_id = ?3
       ))
       AND (?2 IS NULL OR ST_Distance_Sphere(pl.location_geo_point, ST_GeomFromText(?1, 4326)) <= ?2
       )
     """,
-          nativeQuery = true)
+      nativeQuery = true)
   Page<ProducerLocationDistanceProjection> findProducersWithinDistance(
-          @Param("wktPoint") String wktPoint,
-          @Param("distanceFilter") Integer distanceFilter,
-          @Param("categoryId") UUID categoryId,
-          Pageable pageable);
-
-
+      @Param("wktPoint") String wktPoint,
+      @Param("distanceFilter") BigDecimal distanceFilter,
+      @Param("categoryId") UUID categoryId,
+      Pageable pageable);
 
   @Query(
       """
         SELECT new com.green.yp.producer.data.record.ProducerSearchRecord(
             producer, location, contact,
-            CAST(
-                CASE
-                    WHEN :distance IS NOT NULL THEN
-                        ROUND(
-                            3959.0 * acos(cos(radians(:latitude)) * cos(radians(location.latitude)) *
-                            cos(radians(location.longitude) - radians(:longitude)) +
-                            sin(radians(:latitude)) * sin(radians(location.latitude))), 2)
-                    ELSE 0.0
-            END AS java.math.BigDecimal)
+            CAST(ROUND((3959.0 * acos(cos(radians(:latitude)) * cos(radians(location.latitude)) *
+                        cos(radians(location.longitude) - radians(:longitude)) +
+                       sin(radians(:latitude)) * sin(radians(location.latitude)))/ 1609.34), 2)
+            AS java.math.BigDecimal)
     )
     FROM Producer producer
     JOIN ProducerLocation location ON producer.id = location.producerId
@@ -78,12 +74,14 @@ public interface ProducerSearchRepository extends JpaRepository<Producer, UUID> 
         sin(radians(:latitude)) * sin(radians(location.latitude)))) ASC,
         producer.name ASC
     """)
-  List<ProducerSearchRecord> findProducers(@Param("producerLocationIds") List<UUID> locationIds,
-                                           @Param("distance") Integer distance,
-                                           @Param("latitude") Double latitude,
-                                           @Param("longitude") Double longitude);
+  List<ProducerSearchRecord> findProducers(
+      @Param("producerLocationIds") List<UUID> locationIds,
+      @Param("latitude") Double latitude,
+      @Param("longitude") Double longitude);
 
-  @Query(value = """
+  @Query(
+      value =
+          """
     SELECT new com.green.yp.producer.data.record.ProducerSearchRecord(
         producer, location, contact, null)
     FROM Producer producer
@@ -100,10 +98,10 @@ public interface ProducerSearchRepository extends JpaRepository<Producer, UUID> 
     ORDER BY producer.createDate DESC
     """)
   List<ProducerSearchRecord> findMostRecentProfiles(
-          @Param("lineOfBusinessId") UUID lineOfBusinessId,
-          Limit limit);
-  
-  @Query("""
+      @Param("lineOfBusinessId") UUID lineOfBusinessId, Limit limit);
+
+  @Query(
+      """
     SELECT new com.green.yp.producer.data.record.ProducerSearchRecord(
         producer, location, contact, null)
     FROM Producer producer
@@ -114,7 +112,6 @@ public interface ProducerSearchRepository extends JpaRepository<Producer, UUID> 
     AND contact.displayContactType != com.green.yp.api.apitype.producer.enumeration.ProducerDisplayContactType.NO_DISPLAY
     AND contact.producerContactType = com.green.yp.api.apitype.producer.enumeration.ProducerContactType.PRIMARY
     """)
-  Optional<ProducerSearchRecord> findProducerProfile(@Param("producerLocationId") UUID producerLocationId);
-
-
+  Optional<ProducerSearchRecord> findProducerProfile(
+      @Param("producerLocationId") UUID producerLocationId);
 }

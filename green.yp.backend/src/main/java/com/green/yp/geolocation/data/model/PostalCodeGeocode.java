@@ -37,10 +37,10 @@ public class PostalCodeGeocode {
   @Column(name = "longitude", nullable = false, precision = 9, scale = 6)
   private BigDecimal longitude;
 
-    @Column(
-            name = "geo_point",
-            columnDefinition = "POINT",
-            insertable = false,
-            updatable = false)
-    private Point geoPoint;
+//    @Column(
+//            name = "geo_point",
+//            columnDefinition = "POINT",
+//            insertable = false,
+//            updatable = false)
+//    private Point geoPoint;
 }

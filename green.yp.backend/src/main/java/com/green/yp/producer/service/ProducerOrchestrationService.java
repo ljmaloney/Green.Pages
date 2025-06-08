@@ -45,7 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ProducerOrchestrationService {
 
-  private final static String PRODUCER_ID = "ProducerId";
+  private static final String PRODUCER_ID = "ProducerId";
 
   final LineOfBusinessContract lobContract;
 

@@ -16,21 +16,24 @@ import java.util.UUID;
 @Tag(name = "Endpoints for accessing producer profile for UI display")
 public class ProducerProfileController {
 
-    private final ProducerProfileService producerProfileService;
+  private final ProducerProfileService producerProfileService;
 
-    public ProducerProfileController(ProducerProfileService producerProfileService) {
-        this.producerProfileService = producerProfileService;
-    }
+  public ProducerProfileController(ProducerProfileService producerProfileService) {
+    this.producerProfileService = producerProfileService;
+  }
 
-    @GetMapping(path = "/profile/{producerLocationId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseApi<ProducerProfileResponse> getProducerProfile(@PathVariable("producerLocationId") UUID producerLocationId){
-        return new ResponseApi<>(producerProfileService.getProducerProfile(producerLocationId), null);
-    }
+  @GetMapping(path = "/profile/{producerLocationId}", produces = MediaType.APPLICATION_JSON_VALUE)
+  ResponseApi<ProducerProfileResponse> getProducerProfile(
+      @PathVariable("producerLocationId") UUID producerLocationId) {
+    return new ResponseApi<>(producerProfileService.getProducerProfile(producerLocationId), null);
+  }
 
-    @GetMapping(path="/{lineOfBusinessId}/profiles", produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseApi<List<TruncatedProducerResponse>> getProducerProfile(@PathVariable("lineOfBusinessId") UUID lobId,
-                                                                    @RequestParam(name="mostRecent", defaultValue = "true") Boolean mostRecent,
-                                                                    @RequestParam(name="number", defaultValue = "6") Integer maxProducers){
-        return new ResponseApi<>(producerProfileService.getProfiles(lobId, mostRecent, maxProducers), null);
-    }
+  @GetMapping(path = "/{lineOfBusinessId}/profiles", produces = MediaType.APPLICATION_JSON_VALUE)
+  ResponseApi<List<TruncatedProducerResponse>> getProducerProfile(
+      @PathVariable("lineOfBusinessId") UUID lobId,
+      @RequestParam(name = "mostRecent", defaultValue = "true") Boolean mostRecent,
+      @RequestParam(name = "number", defaultValue = "6") Integer maxProducers) {
+    return new ResponseApi<>(
+        producerProfileService.getProfiles(lobId, mostRecent, maxProducers), null);
+  }
 }
