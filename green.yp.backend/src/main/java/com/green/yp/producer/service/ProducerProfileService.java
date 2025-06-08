@@ -22,7 +22,7 @@ public class ProducerProfileService {
   private final LineOfBusinessContract lineOfBusinessContract;
 
   public ProducerProfileService(
-      ProducerSearchRepository searchRepository, 
+      ProducerSearchRepository searchRepository,
       ProducerSearchMapper producerSearchMapper,
       LineOfBusinessContract lineOfBusinessContract) {
     this.searchRepository = searchRepository;
@@ -32,23 +32,26 @@ public class ProducerProfileService {
 
   public ProducerProfileResponse getProducerProfile(UUID producerLocationId) {
     log.info("Getting producer profile for locationId: {}", producerLocationId);
-    return searchRepository.findProducerProfile(producerLocationId)
+    return searchRepository
+        .findProducerProfile(producerLocationId)
         .map(producerSearchMapper::toProfileResponse)
-        .orElseThrow(() -> new NotFoundException("Producer profile not found for locationId: " + producerLocationId));
+        .orElseThrow(
+            () ->
+                new NotFoundException(
+                    "Producer profile not found for locationId: " + producerLocationId));
   }
 
   public List<TruncatedProducerResponse> getProfiles(
       UUID lineOfBusinessId, Boolean mostRecent, Integer maxLimit) {
-      log.info(
+    log.info(
         "Searching for producers with lineOfBusinessId: {}, limit: {}", lineOfBusinessId, maxLimit);
 
-      lineOfBusinessContract.findLineOfBusiness(lineOfBusinessId);
+    lineOfBusinessContract.findLineOfBusiness(lineOfBusinessId);
 
-      var results =
-        searchRepository.findMostRecentProfiles(lineOfBusinessId, Limit.of(maxLimit));
-    
+    var results = searchRepository.findMostRecentProfiles(lineOfBusinessId, Limit.of(maxLimit));
+
     log.info("Found {} producers for lineOfBusinessId: {}", results.size(), lineOfBusinessId);
-    
+
     return producerSearchMapper.limitedOutputResponse(results);
   }
 }

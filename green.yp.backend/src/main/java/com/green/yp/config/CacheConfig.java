@@ -1,26 +1,65 @@
 package com.green.yp.config;
 
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import org.cache2k.extra.spring.SpringCache2kCacheManager;
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.annotation.Bean;
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-/** Using https://cache2k.org/docs/latest/user-guide.html#spring as an in-memory cache */
+import java.util.HashMap;
+import java.util.Map;
+
 @Configuration
-@EnableCaching
+@EnableConfigurationProperties
+@ConfigurationProperties(prefix = "cache")
 public class CacheConfig {
 
-  @Bean
-  public CacheManager cacheManager() {
-    return new SpringCache2kCacheManager()
-        .defaultSetup(
-            builder ->
-                builder
-                    .permitNullValues(false)
-                    .expireAfterWrite(Duration.of(30L, ChronoUnit.MINUTES))
-                    .eternal(false));
-  }
+    private Map<String, CacheProperties> configs = new HashMap<>();
+
+    public Map<String, CacheProperties> getConfigs() {
+        return configs;
+    }
+
+    public void setConfigs(Map<String, CacheProperties> configs) {
+        this.configs = configs;
+    }
+
+    public long getExpireAfterWrite(CacheEnumeration cache) {
+        if ( configs.containsKey(cache.cacheName)){
+            return configs.get(cache.cacheName).expirationMinutes != null ? configs.get(cache.cacheName).expirationMinutes : cache.expirationMinutes;
+        }
+        return cache.getExpirationMinutes();
+    }
+
+    public long getIdleScanTime(CacheEnumeration cache) {
+        if ( configs.containsKey(cache.cacheName)){
+            return configs.get(cache.cacheName).getIdleScanTime() != null ? configs.get(cache.cacheName).getIdleScanTime() : cache.getIdleScanTime();
+        }
+        return cache.getIdleScanTime();
+    }
+
+    public boolean getEternal(CacheEnumeration cache) {
+        if ( configs.containsKey(cache.cacheName)){
+            return configs.get(cache.cacheName).getEternal() != null ? configs.get(cache.cacheName).getEternal() : cache.isEternal();
+        }
+        return cache.isEternal();
+    }
+
+    public boolean permitNullValues(CacheEnumeration cache) {
+        if ( configs.containsKey(cache.cacheName)){
+            return configs.get(cache.cacheName).permitNullValues() != null ? configs.get(cache.cacheName).permitNullValues() : cache.isPermitNullValues();
+        }
+        return cache.isPermitNullValues();
+    }
+
+    @Data
+    public class CacheProperties {
+        private Boolean permitNullValues;
+        private Long expirationMinutes;
+        private Boolean eternal;
+        private Long idleScanTime;
+
+        public Boolean permitNullValues() {
+            return permitNullValues;
+        }
+    }
 }

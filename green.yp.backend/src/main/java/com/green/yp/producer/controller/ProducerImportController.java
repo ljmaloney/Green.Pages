@@ -21,21 +21,17 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 public class ProducerImportController {
-    private final ProducerCsvImportService importService;
+  private final ProducerCsvImportService importService;
 
-    @PostMapping(
-            path = "/uploadCSV",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseApi<List<UUID>> uploadCsv(
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("lineOfBusinessId") UUID lineOfBusinessId) {
-        log.info("Processing CSV upload for lineOfBusiness: {}", lineOfBusinessId);
-        List<UUID> createdProducerIds = importService.importProducersFromCsv(file, lineOfBusinessId);
-        return new ResponseApi<>(createdProducerIds, null);
-    }
-
+  @PostMapping(
+      path = "/uploadCSV",
+      consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<List<UUID>> uploadCsv(
+      @RequestParam("file") MultipartFile file,
+      @RequestParam("lineOfBusinessId") UUID lineOfBusinessId) {
+    log.info("Processing CSV upload for lineOfBusiness: {}", lineOfBusinessId);
+    List<UUID> createdProducerIds = importService.importProducersFromCsv(file, lineOfBusinessId);
+    return new ResponseApi<>(createdProducerIds, null);
+  }
 }
-
-
