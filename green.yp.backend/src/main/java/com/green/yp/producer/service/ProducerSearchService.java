@@ -2,6 +2,7 @@ package com.green.yp.producer.service;
 
 import com.green.yp.api.apitype.search.SearchResponse;
 import com.green.yp.geolocation.service.GeocodingService;
+import com.green.yp.producer.data.record.ProducerLocationDistanceProjection;
 import com.green.yp.producer.data.repository.ProducerSearchRepository;
 import com.green.yp.producer.mapper.ProducerSearchMapper;
 import java.math.BigDecimal;
@@ -42,22 +43,29 @@ public class ProducerSearchService {
 
     BigDecimal distanceMeters = BigDecimal.valueOf(distance).multiply(BigDecimal.valueOf(1609.34d));
 
-    var searchLocations = searchRepository.findProducersWithinDistance(wktPoint, distanceMeters, categoryId, pageable);
+    var searchLocations =
+        searchRepository.findProducersWithinDistance(
+            wktPoint, distanceMeters, categoryId, pageable);
 
-    List<UUID> locationIds = searchLocations.get()
-            .map(foundLocation -> foundLocation.getLocationId())
-            .toList();
+    List<UUID> locationIds =
+        searchLocations.get().map(ProducerLocationDistanceProjection::getLocationId).toList();
 
-    var searchResults = searchRepository.findProducers(locationIds,
+    var searchResults =
+        searchRepository.findProducers(
+            locationIds,
             coordinates.latitude().doubleValue(),
             coordinates.longitude().doubleValue());
 
-    log.info("Found {} producers near zipCode: {}, within {} miles", searchResults.size(), zipCode, distanceMeters);
+    log.info(
+        "Found {} producers near zipCode: {}, within {} miles",
+        searchResults.size(),
+        zipCode,
+        distanceMeters);
 
     return new SearchResponse(
         producerSearchMapper.toResponse(searchResults),
         (int) searchLocations.getTotalElements(),
-            searchLocations.getNumber(),
-            searchLocations.getTotalPages());
+        searchLocations.getNumber(),
+        searchLocations.getTotalPages());
   }
 }
