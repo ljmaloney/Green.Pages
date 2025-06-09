@@ -11,12 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ForkJoinPool;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,6 +33,9 @@ public class ProducerCsvImportService {
   private final ProducerContactOrchestrationService contactOrchestrationService;
   private final GeocodingService geocodingService;
 
+  @Value("${green.yp.import.threads:5}")
+  private int importThreads;
+
   @Transactional
   public List<UUID> importProducersFromCsv(MultipartFile file, UUID lineOfBusinessId) {
 
@@ -41,24 +46,25 @@ public class ProducerCsvImportService {
           CSVFormat.DEFAULT.builder().setSkipHeaderRecord(true).build().parse(reader);
 
       List<CSVRecord> records = csvParser.getRecords();
+
+      var customThreadPool = new ForkJoinPool(importThreads);
+      customThreadPool.submit(() ->
       records.parallelStream()
           .filter(csvRecord -> csvRecord.getRecordNumber() != 1)
-          .forEach(
-              csvRecord -> {
-                var parsedRecord =
-                    new ProducerCsvRecord(
-                        csvRecord.get(0),
-                        csvRecord.get(1),
-                        csvRecord.get(2),
-                        csvRecord.get(3),
-                        csvRecord.get(4),
-                        csvRecord.get(5),
-                        csvRecord.get(6),
-                        csvRecord.get(7),
-                        csvRecord.get(8),
-                        StringUtils.truncate(csvRecord.get(9), 12));
-                try {
-
+              .map(csvRecord -> new ProducerCsvRecord(
+                      csvRecord.getRecordNumber(),
+                      csvRecord.get(0),
+                      csvRecord.get(1),
+                      csvRecord.get(2),
+                      csvRecord.get(3),
+                      csvRecord.get(4),
+                      csvRecord.get(5),
+                      csvRecord.get(6),
+                      csvRecord.get(7),
+                      csvRecord.get(8),
+                      StringUtils.truncate(csvRecord.get(9), 12)))
+              .forEach( parsedRecord -> {
+                  try {
                   var location = geocodingService.getCoordinates(parsedRecord.zip);
                   // Use contact as company name if company is empty
                   String businessName =
@@ -118,9 +124,9 @@ public class ProducerCsvImportService {
                 } catch (Exception e) {
                   log.error("Error processing {}", parsedRecord);
                   throw new SystemException(
-                      "Failed to process CSV record: " + csvRecord.getRecordNumber(), e);
+                      "Failed to process csv record: " + parsedRecord.recordNumber(), e);
                 }
-              });
+              }));
     }catch (SystemException se){
       throw se;
     }
@@ -131,6 +137,7 @@ public class ProducerCsvImportService {
     return createdProducerIds;
   }
     record ProducerCsvRecord(
+            long recordNumber,
             String type,
             String licenseNumber,
             String contact,
