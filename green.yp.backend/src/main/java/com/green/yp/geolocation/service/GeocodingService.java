@@ -5,4 +5,6 @@ import org.springframework.stereotype.Service;
 @Service
 public interface GeocodingService {
   GeocodeLocation getCoordinates(String zipCode);
+
+  GeocodeLocation getCoordinates(String address, String city, String state, String zip);
 }
