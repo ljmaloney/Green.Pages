@@ -124,7 +124,7 @@ public class ProducerCsvImportService {
                       null);
                   log.info("Imported : {}", parsedRecord);
                 } catch (Exception e) {
-                  log.error("Error processing {}", parsedRecord);
+                  log.error("Error processing {}", parsedRecord, e);
                   throw new SystemException(
                       "Failed to process csv record: " + parsedRecord.recordNumber(), e);
                 }
