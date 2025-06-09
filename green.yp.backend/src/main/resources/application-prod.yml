@@ -18,13 +18,16 @@ spring:
   jpa:
     generate-ddl: false
     show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
   application:
     name: Green YP Market Service APIs
 logging:
   level:
     org:
       hibernate:
-        SQL: DEBUG
+        SQL: INFO
         type:
           descriptor:
             sql:

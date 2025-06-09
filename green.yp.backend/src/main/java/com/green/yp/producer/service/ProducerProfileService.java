@@ -1,7 +1,6 @@
 package com.green.yp.producer.service;
 
 import com.green.yp.api.apitype.producer.ProducerProfileResponse;
-import com.green.yp.api.apitype.search.ProducerSearchResponse;
 import com.green.yp.api.apitype.search.TruncatedProducerResponse;
 import com.green.yp.api.contract.LineOfBusinessContract;
 import com.green.yp.exception.NotFoundException;
