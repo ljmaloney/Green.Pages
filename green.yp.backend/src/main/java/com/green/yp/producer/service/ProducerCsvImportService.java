@@ -65,7 +65,8 @@ public class ProducerCsvImportService {
                       StringUtils.truncate(csvRecord.get(9), 12)))
               .forEach( parsedRecord -> {
                   try {
-                  var location = geocodingService.getCoordinates(parsedRecord.zip);
+                    var location = geocodingService.getCoordinates(parsedRecord.address, parsedRecord.city, parsedRecord.state, parsedRecord.zip);
+
                   // Use contact as company name if company is empty
                   String businessName =
                       StringUtils.getIfBlank(parsedRecord.company, () -> parsedRecord.contact);
