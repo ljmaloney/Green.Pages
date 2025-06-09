@@ -75,7 +75,8 @@ public class Subscription extends Mutable {
     @Enumerated(EnumType.STRING)
     private SubscriptionType subscriptionType;
 
-    @OneToMany(mappedBy = "subscription", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "subscription", cascade = CascadeType.ALL,
+               orphanRemoval = true, fetch = FetchType.EAGER)
     @Builder.Default
     private List<SubscriptionFeature> features = new ArrayList<>();
 
