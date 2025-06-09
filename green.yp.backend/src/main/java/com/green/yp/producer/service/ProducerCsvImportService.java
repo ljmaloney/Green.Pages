@@ -121,6 +121,7 @@ public class ProducerCsvImportService {
                       producerResponse.producerId(),
                       locationResponse.locationId(),
                       null);
+                  log.info("Imported : {}", parsedRecord);
                 } catch (Exception e) {
                   log.error("Error processing {}", parsedRecord);
                   throw new SystemException(
