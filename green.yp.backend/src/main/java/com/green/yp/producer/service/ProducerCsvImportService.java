@@ -2,7 +2,7 @@ package com.green.yp.producer.service;
 
 import com.green.yp.api.apitype.producer.*;
 import com.green.yp.api.apitype.producer.enumeration.*;
-import com.green.yp.geolocation.data.repository.PostalCodeGeocodeRepository;
+import com.green.yp.exception.SystemException;
 import com.green.yp.geolocation.service.GeocodingService;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -25,11 +25,10 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RequiredArgsConstructor
 public class ProducerCsvImportService {
-  private final String IMPORT_SUB_ID = "e0315cb5-a2e2-40e1-abb2-4ce646439730";
+  private static final String IMPORT_SUB_ID = "e0315cb5-a2e2-40e1-abb2-4ce646439730";
   private final ProducerOrchestrationService producerOrchestrationService;
   private final ProducerLocationService producerLocationService;
   private final ProducerContactOrchestrationService contactOrchestrationService;
-  private final PostalCodeGeocodeRepository postalCodeGeocodeRepository;
   private final GeocodingService geocodingService;
 
   @Transactional
@@ -43,37 +42,27 @@ public class ProducerCsvImportService {
 
       List<CSVRecord> records = csvParser.getRecords();
       records.parallelStream()
-          .filter(record -> record.getRecordNumber() != 1)
+          .filter(csvRecord -> csvRecord.getRecordNumber() != 1)
           .forEach(
-              record -> {
-                String type = "";
-                String licenseNumber = "";
-                String contact = "";
-                String company = "";
-                String address = "";
-                String city = "";
-                String state = "";
-                String zip = "";
-                String county = "";
-                String phone = "";
+              csvRecord -> {
+                var parsedRecord =
+                    new ProducerCsvRecord(
+                        csvRecord.get(0),
+                        csvRecord.get(1),
+                        csvRecord.get(2),
+                        csvRecord.get(3),
+                        csvRecord.get(4),
+                        csvRecord.get(5),
+                        csvRecord.get(6),
+                        csvRecord.get(7),
+                        csvRecord.get(8),
+                        StringUtils.truncate(csvRecord.get(9), 12));
                 try {
-                  type = record.get(0);
-                  licenseNumber = record.get(1);
-                  contact = record.get(2);
-                  company = record.get(3);
-                  address = record.get(4);
-                  city = record.get(5);
-                  state = record.get(6);
-                  zip = record.get(7);
-                  county = record.get(8);
-                  phone = StringUtils.trim(record.get(9));
-                  if (phone.length() > 12) {
-                    phone = phone.substring(0, 12);
-                  }
-                  var location = geocodingService.getCoordinates(zip);
-                  // Use contact as company name if company is empty
-                  String businessName = company.isEmpty() ? contact : company;
 
+                  var location = geocodingService.getCoordinates(parsedRecord.zip);
+                  // Use contact as company name if company is empty
+                  String businessName =
+                      StringUtils.getIfBlank(parsedRecord.company, () -> parsedRecord.contact);
                   ProducerResponse producerResponse =
                       producerOrchestrationService.createProducer(
                           new CreateProducerRequest(
@@ -98,12 +87,12 @@ public class ProducerCsvImportService {
                               ProducerLocationType.HOME_OFFICE_PRIMARY,
                               LocationDisplayType.CITY_STATE_ZIP,
                               true,
-                              address,
+                              parsedRecord.address,
                               null,
                               null,
-                              city,
-                              state,
-                              zip,
+                              parsedRecord.city,
+                              parsedRecord.state,
+                              parsedRecord.zip,
                               location.latitude(),
                               location.longitude(),
                               null),
@@ -116,10 +105,10 @@ public class ProducerCsvImportService {
                           locationResponse.locationId(),
                           ProducerContactType.PRIMARY,
                           ProducerDisplayContactType.GENERIC_NAME_PHONE_EMAIL,
-                          StringUtils.isBlank(contact) ? "Primaru" : contact,
+                          StringUtils.getIfBlank(parsedRecord.contact, () -> "Primary"),
                           null,
                           null,
-                          phone,
+                          parsedRecord.phone,
                           null,
                           null),
                       Optional.empty(),
@@ -127,20 +116,29 @@ public class ProducerCsvImportService {
                       locationResponse.locationId(),
                       null);
                 } catch (Exception e) {
-                  log.error(
-                      "Error processing {}. {}. {}, {}",
-                      record.get(1),
-                      record.get(2),
-                      record.get(3),
-                      record.get(4));
-                  throw new RuntimeException(
-                      "Failed to process CSV record: " + record.getRecordNumber(), e);
+                  log.error("Error processing {}", parsedRecord);
+                  throw new SystemException(
+                      "Failed to process CSV record: " + csvRecord.getRecordNumber(), e);
                 }
               });
-    } catch (Exception e) {
+    }catch (SystemException se){
+      throw se;
+    }
+    catch (Exception e) {
       log.error("Error processing CSV file", e);
-      throw new RuntimeException("Failed to process CSV file: " + e.getMessage());
+      throw new SystemException("Failed to process CSV file: " + e.getMessage(), e);
     }
     return createdProducerIds;
   }
+    record ProducerCsvRecord(
+            String type,
+            String licenseNumber,
+            String contact,
+            String company,
+            String address,
+            String city,
+            String state,
+            String zip,
+            String county,
+            String phone) {}
 }
