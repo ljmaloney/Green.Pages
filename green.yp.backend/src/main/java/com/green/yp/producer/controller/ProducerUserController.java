@@ -45,6 +45,21 @@ public class ProducerUserController {
         null);
   }
 
+  @PutMapping(
+          path = "/{producerId}/authorize/user/{credentialsId}",
+          consumes = MediaType.APPLICATION_JSON_VALUE,
+          produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<ProducerCredentialsResponse> updateAuthorizedUser(
+          @NotNull @NonNull @PathVariable("producerId") UUID producerId,
+          @NotNull @NonNull @PathVariable("credentialsId") UUID credentialsId,
+          @NotNull @NonNull @Valid @RequestBody UserCredentialsRequest credentialsRequest)
+          throws NoSuchAlgorithmException {
+    return new ResponseApi<>(
+            userService.updateUserCredentials(
+                    credentialsRequest,producerId, credentialsId, RequestUtil.getRequestIP()),
+            null);
+  }
+
   @GetMapping(path = "/{producerId}/search/users", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<List<ProducerUserResponse>> findProducerUsers(
       @PathVariable UUID producerId,
