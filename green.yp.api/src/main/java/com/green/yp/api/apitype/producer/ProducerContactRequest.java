@@ -16,6 +16,7 @@ public record ProducerContactRequest(
         String genericContactName,
         String firstName,
         String lastName,
+        String title,
         @Size(max = 12, message = "The maximum length of a phone number is 12 characters")
         String phoneNumber,
         @Size(max = 12, message = "The maximum length of a cell phone number is 12 characters")
