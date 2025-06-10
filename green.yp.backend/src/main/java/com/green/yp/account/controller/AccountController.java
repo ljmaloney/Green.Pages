@@ -1,5 +1,6 @@
 package com.green.yp.account.controller;
 
+import com.green.yp.account.service.AccountPaymentService;
 import com.green.yp.account.service.AccountService;
 import com.green.yp.api.apitype.account.AccountResponse;
 import com.green.yp.api.apitype.account.CreateAccountRequest;
@@ -31,9 +32,11 @@ import org.springframework.web.bind.annotation.*;
 public class AccountController {
 
   private final AccountService accountService;
+  private final AccountPaymentService paymentService;
 
-  public AccountController(AccountService accountService) {
+  public AccountController(AccountService accountService, AccountPaymentService paymentService) {
     this.accountService = accountService;
+    this.paymentService = paymentService;
   }
 
   @ApiResponse(
@@ -67,7 +70,7 @@ public class AccountController {
   public ResponseApi<ApiPaymentResponse> applyInitialPayment(
       @RequestBody @Valid ApplyPaymentMethodRequest paymentRequest) {
     return new ResponseApi<>(
-        accountService.applyInitialPayment(paymentRequest, RequestUtil.getRequestIP()), null);
+            paymentService.applyInitialPayment(paymentRequest, RequestUtil.getRequestIP()), null);
   }
 
   @Operation(summary = "Applies a payment on an existing subscription with an invoice")
@@ -78,7 +81,7 @@ public class AccountController {
   public ResponseApi<ApiPaymentResponse> applyPayment(
       @RequestBody @Valid ApplyPaymentRequest paymentRequest) {
     return new ResponseApi<>(
-        accountService.applyPayment(paymentRequest, null, RequestUtil.getRequestIP()), null);
+            paymentService.applyPayment(paymentRequest, null, RequestUtil.getRequestIP()), null);
   }
 
   @Operation(summary = "Update the subscriber / producer account records")
@@ -106,7 +109,7 @@ public class AccountController {
   public ResponseApi<String> cleanUnpaidAccounts(
       @RequestParam(name = "days", defaultValue = "30", required = false) Integer daysOld) {
     return new ResponseApi<>(
-        accountService.cleanUnpaidAccounts(daysOld, RequestUtil.getRequestIP()), null);
+            paymentService.cleanUnpaidAccounts(daysOld, RequestUtil.getRequestIP()), null);
   }
 
   @Operation(summary = "Cancels or disables an account")

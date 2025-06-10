@@ -41,8 +41,6 @@ public class AccountService {
 
   private final EmailService emailService;
 
-  private final InvoiceContract invoiceContract;
-
   private final ProducerContract producerContract;
 
   private final PaymentContract paymentContract;
@@ -55,14 +53,12 @@ public class AccountService {
 
   public AccountService(
       EmailService emailService,
-      InvoiceContract invoiceContract,
       ProducerContract producerContract,
       PaymentContract paymentContract,
       ProducerContactContract contactContract,
       ProducerLocationContract locationContract,
       AccountMapper accountMapper) {
     this.emailService = emailService;
-    this.invoiceContract = invoiceContract;
     this.producerContract = producerContract;
     this.paymentContract = paymentContract;
     this.contactContract = contactContract;
@@ -95,14 +91,16 @@ public class AccountService {
   @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
   public AccountResponse createAccount(CreateAccountRequest account, String ipAddress)
       throws NoSuchAlgorithmException {
-    log.info("Creating a new account for businessName: {}", account.getBusinessName());
+    log.info(
+        "Creating a new account for businessName: {}", account.producerRequest().businessName());
 
-    if (StringUtils.isNotBlank(account.getWebsiteUrl())) {
-      List<ProducerResponse> producers = producerContract.findProducer(account.getWebsiteUrl());
+    if (StringUtils.isNotBlank(account.producerRequest().websiteUrl())) {
+      List<ProducerResponse> producers =
+          producerContract.findProducer(account.producerRequest().websiteUrl());
       if (CollectionUtils.isNotEmpty(producers)) {
         throw new PreconditionFailedException(
             "The business %s identified by %s appears to already exist",
-            account.getBusinessName(), account.getWebsiteUrl());
+            account.producerRequest().businessName(), account.producerRequest().websiteUrl());
       }
     }
     // create producer record
@@ -111,104 +109,20 @@ public class AccountService {
     return new AccountResponse(producerResponse, null, null, null);
   }
 
-  /**
-   * Applies the first subscription payment and makes the account go "live".
-   *
-   * @param paymentRequest
-   * @param requestIP
-   * @return
-   */
-  @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-  public ApiPaymentResponse applyInitialPayment(
-      @NotNull @NonNull ApplyPaymentMethodRequest paymentRequest,
-      @NotNull @NonNull String requestIP) {
-    log.info("Apply initial subscription payment for {}", paymentRequest.producerId());
-
-    ProducerResponse producerResponse = producerContract.findProducer(paymentRequest.producerId());
-    if (producerResponse.subscriptionType() == ProducerSubscriptionType.LIVE_ACTIVE) {
-      throw new PreconditionFailedException("Producer/Account is already active");
-    }
-
-    // create invoice record for initial payment, as this is the first payment on a
-    // new subscriber, no invoice is created until this point
-    InvoiceResponse invoiceResponse =
-        invoiceContract.createInvoice(paymentRequest.producerId(), requestIP);
-
-    PaymentResponse paymentResponse =
-        paymentContract.applyPayment(
-            paymentRequest,
-            invoiceResponse.invoiceId(),
-            ProducerPaymentType.INITIAL_PAYMENT,
-            requestIP);
-
-    if (!paymentResponse.isSuccess()) {
-      log.info(
-          "Subscription payment was not successful for {} reasonCode {}",
-          paymentRequest.producerId(),
-          paymentResponse.responseCode());
-
-      return new ApiPaymentResponse(
-          paymentResponse.isSuccess(),
-          paymentResponse.responseCode(),
-          paymentResponse.responseText());
-    }
-
-    producerResponse =
-        producerContract.activateProducer(
-            paymentRequest.producerId(),
-            invoiceResponse.createDate(),
-            paymentResponse.createDate(),
-            null,
-            requestIP);
-
-    emailService.sendEmail(
-        EmailTemplateName.WELCOME_EMAIL,
-        producerResponse,
-        getAdminEmails(paymentRequest.producerId()).toArray(new String[0]));
-
-    return new ApiPaymentResponse(
-        true, paymentResponse.responseCode(), paymentResponse.responseText());
-  }
-
-  public ApiPaymentResponse applyPayment(
-      ApplyPaymentRequest paymentRequest, String userId, String requestIP) {
-    log.info(
-        "Apply subscription payment for invoice {} and producer/account {}",
-        paymentRequest.invoiceId(),
-        paymentRequest.producerId());
-
-    if (paymentRequest.savedPaymentMethodId() == null
-        && paymentRequest.newPaymentMethod() == null) {
-      throw new PreconditionFailedException(
-          "Existing payment method not provided or new payment method specified");
-    }
-
-    invoiceContract.findInvoice(paymentRequest.invoiceId(), requestIP);
-
-    PaymentResponse paymentResponse =
-        paymentContract.applyPayment(paymentRequest, userId, requestIP);
-
-    //        emailService.sendEmail(EmailTemplateName.WELCOME_EMAIL, producerResponse,
-    //                getAdminEmails(paymentRequest.producerId()).toArray(new String[0]));
-
-    return new ApiPaymentResponse(
-        true, paymentResponse.responseCode(), paymentResponse.responseText());
-  }
-
   @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
   public AccountResponse updateAccount(UpdateAccountRequest account, String ipAddress)
       throws NoSuchAlgorithmException {
 
     ProducerResponse producerResponse = null;
-    if (account.getProducerRequest() != null) {
-      producerResponse = producerContract.updateProducer(account.getProducerRequest());
+    if (account.producerRequest() != null) {
+      producerResponse = producerContract.updateProducer(account.producerRequest());
     } else {
-      producerResponse = producerContract.findProducer(account.getProducerId());
+      producerResponse = producerContract.findProducer(account.producerId());
     }
 
     // validate contact, must have contact type of PRIMARY or ADMIN for account creation
-    if (account.getPrimaryContact() != null) {
-      if (!account.getPrimaryContact().producerContactType().isAccountCreation()) {
+    if (account.primaryContact() != null) {
+      if (!account.primaryContact().producerContactType().isAccountCreation()) {
         log.info(
             "Attempt to create account with invalid contact, contact must be ADMIN or PRIMARY");
         throw new PreconditionFailedException("ContactType must be one of ADMIN or PRIMARY");
@@ -218,12 +132,12 @@ public class AccountService {
     ProducerLocationResponse locationResponse = null;
     // create or update primary location
     try {
-      locationResponse = locationContract.findPrimaryLocation(account.getProducerId());
+      locationResponse = locationContract.findPrimaryLocation(account.producerId());
     } catch (NotFoundException pfe) {
-      log.info("No Primary location found for {}", account.getProducerId());
+      log.info("No Primary location found for {}", account.producerId());
     }
-    if (account.getPrimaryLocation() != null) {
-      LocationRequest request = account.getPrimaryLocation();
+    if (account.primaryLocation() != null) {
+      LocationRequest request = account.primaryLocation();
       if (locationResponse != null) {
         if (request.locationId() != null
             && !request.locationId().equals(locationResponse.locationId())) {
@@ -233,18 +147,18 @@ public class AccountService {
         request = accountMapper.copyRequest(request, locationResponse.locationId());
       }
       locationResponse =
-          locationContract.updatePrimaryLocation(account.getProducerId(), request, ipAddress);
+          locationContract.updatePrimaryLocation(account.producerId(), request, ipAddress);
     }
 
     // create initial contact record
     List<ProducerContactResponse> adminContacts =
-        contactContract.findAdminContacts(account.getProducerId());
-    if (account.getPrimaryContact() != null) {
-      ProducerContactRequest request = account.getPrimaryContact();
+        contactContract.findAdminContacts(account.producerId());
+    if (account.primaryContact() != null) {
+      ProducerContactRequest request = account.primaryContact();
       ProducerContactResponse adminContact = getAdminContact(adminContacts, request);
 
       if (locationResponse == null) {
-        log.info("No Primary location found for {}", account.getProducerId());
+        log.info("No Primary location found for {}", account.producerId());
         throw new PreconditionFailedException(
             "Primary location is required before creating primary contact");
       }
@@ -256,25 +170,26 @@ public class AccountService {
       }
 
       contactContract.updatePrimaryContact(
-          request, account.getProducerId(), locationResponse.locationId(), ipAddress);
-      adminContacts = contactContract.findAdminContacts(account.getProducerId());
+          request, account.producerId(), locationResponse.locationId(), ipAddress);
+      adminContacts =
+          contactContract.findAdminContacts(account.producerRequest().lineOfBusinessId());
     }
 
     // create admin/master user credentials
     ProducerCredentialsResponse credentialsResponse = null;
     try {
-      credentialsResponse = producerContract.findMasterUserCredentials(account.getProducerId());
+      credentialsResponse = producerContract.findMasterUserCredentials(account.producerId());
     } catch (NotFoundException nfe) {
-      log.info("Master user admin credentials not created for {}", account.getProducerId());
+      log.info("Master user admin credentials not created for {}", account.producerId());
     }
-    if (account.getMasterUserCredentials() != null) {
-      if (account.getMasterUserCredentials().producerContactId() == null) {
+    if (account.masterUserCredentials() != null) {
+      if (account.masterUserCredentials().producerContactId() == null) {
         log.error("Master User credentials must have a producer contact, no contact was provided");
         throw new PreconditionFailedException(
             "Master User credentials must have a producer contact, no contact was provided");
       }
       adminContacts.stream()
-          .filter(c -> c.contactId().equals(account.getMasterUserCredentials().producerContactId()))
+          .filter(c -> c.contactId().equals(account.masterUserCredentials().producerContactId()))
           .findFirst()
           .orElseThrow(
               () -> {
@@ -285,25 +200,25 @@ public class AccountService {
       if (credentialsResponse == null) {
         credentialsResponse =
             producerContract.createMasterUserCredentials(
-                account.getMasterUserCredentials(),
-                account.getMasterUserCredentials().emailAddress(),
-                account.getProducerId(),
-                account.getMasterUserCredentials().producerContactId(),
+                account.masterUserCredentials(),
+                account.masterUserCredentials().emailAddress(),
+                account.producerId(),
+                account.masterUserCredentials().producerContactId(),
                 ipAddress);
       } else if (isModifyingExistingCredentials(
-          account.getMasterUserCredentials(), credentialsResponse)) {
+          account.masterUserCredentials(), credentialsResponse)) {
         credentialsResponse =
             producerContract.updateMasterCredentials(
-                account.getMasterUserCredentials(),
-                account.getProducerId(),
+                account.masterUserCredentials(),
+                account.producerId(),
                 credentialsResponse.credentialsId(),
                 ipAddress);
       } else { // replacing master user credentials
         credentialsResponse =
             producerContract.replaceMasterUserCredentials(
-                account.getProducerId(),
+                account.producerId(),
                 credentialsResponse.credentialsId(),
-                account.getMasterUserCredentials(),
+                account.masterUserCredentials(),
                 ipAddress);
       }
     }
@@ -357,37 +272,5 @@ public class AccountService {
     List<ProducerContactResponse> contacts = contactContract.findAdminContacts(accountId);
 
     return contacts.stream().map(contact -> contact.emailAddress()).toList();
-  }
-
-  /**
-   * The purpose of this method is to clean up records corresponding to any subscriptions started
-   * but never finished or made active.
-   *
-   * @param daysOld
-   * @return
-   */
-  @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-  public String cleanUnpaidAccounts(@NotNull @NonNull Integer daysOld, String ipAddress) {
-    log.info("Removing unpaid account records and credentials");
-
-    List<ProducerResponse> producers =
-        producerContract.findLastModified(daysOld, ProducerSubscriptionType.LIVE_UNPAID);
-    if (CollectionUtils.isEmpty(producers)) {
-      return String.format("No unpaid subscribers over %s days old", daysOld);
-    }
-    List<UUID> producerIds = producers.stream().map(p -> p.producerId()).toList();
-
-    producerContract.deleteCredentials(producerIds);
-
-    contactContract.deleteContacts(producerIds);
-
-    locationContract.deleteLocation(producerIds);
-
-    producerContract.deleteProducers(producerIds, ipAddress);
-
-    log.info("Removed {} unpaid account subscriptions", producers.size());
-
-    return String.format(
-        "Removed %s unpaid account subscriptions over %s days old", producerIds.size(), daysOld);
   }
 }
