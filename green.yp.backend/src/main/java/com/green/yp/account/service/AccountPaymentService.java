@@ -1,6 +1,5 @@
 package com.green.yp.account.service;
 
-import com.green.yp.account.mapper.AccountMapper;
 import com.green.yp.api.apitype.enumeration.EmailTemplateName;
 import com.green.yp.api.apitype.invoice.InvoiceResponse;
 import com.green.yp.api.apitype.payment.ApiPaymentResponse;
@@ -15,6 +14,8 @@ import com.green.yp.email.service.EmailService;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.payment.data.enumeration.ProducerPaymentType;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
+import java.util.UUID;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -23,157 +24,155 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.UUID;
-
 @Slf4j
 @Service
 public class AccountPaymentService {
 
-    private final EmailService emailService;
+  private final EmailService emailService;
 
-    private final InvoiceContract invoiceContract;
+  private final InvoiceContract invoiceContract;
 
-    private final ProducerContract producerContract;
+  private final ProducerContract producerContract;
 
-    private final PaymentContract paymentContract;
+  private final PaymentContract paymentContract;
 
-    private final ProducerContactContract contactContract;
-    private final ProducerLocationContract locationContract;
+  private final ProducerContactContract contactContract;
+  private final ProducerLocationContract locationContract;
 
-    public AccountPaymentService(EmailService emailService,
-                                 InvoiceContract invoiceContract,
-                                 ProducerContract producerContract,
-                                 PaymentContract paymentContract,
-                                 ProducerContactContract contactContract,
-                                 ProducerLocationContract locationContract) {
-        this.emailService = emailService;
-        this.invoiceContract = invoiceContract;
-        this.producerContract = producerContract;
-        this.paymentContract = paymentContract;
-        this.contactContract = contactContract;
-        this.locationContract = locationContract;
+  public AccountPaymentService(
+      EmailService emailService,
+      InvoiceContract invoiceContract,
+      ProducerContract producerContract,
+      PaymentContract paymentContract,
+      ProducerContactContract contactContract,
+      ProducerLocationContract locationContract) {
+    this.emailService = emailService;
+    this.invoiceContract = invoiceContract;
+    this.producerContract = producerContract;
+    this.paymentContract = paymentContract;
+    this.contactContract = contactContract;
+    this.locationContract = locationContract;
+  }
+
+  /**
+   * Applies the first subscription payment and makes the account go "live".
+   *
+   * @param paymentRequest
+   * @param requestIP
+   * @return
+   */
+  @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+  public ApiPaymentResponse applyInitialPayment(
+      @NotNull @NonNull ApplyPaymentMethodRequest paymentRequest,
+      @NotNull @NonNull String requestIP) {
+    log.info("Apply initial subscription payment for {}", paymentRequest.producerId());
+
+    ProducerResponse producerResponse = producerContract.findProducer(paymentRequest.producerId());
+    if (producerResponse.subscriptionType() == ProducerSubscriptionType.LIVE_ACTIVE) {
+      throw new PreconditionFailedException("Producer/Account is already active");
     }
 
-    /**
-     * Applies the first subscription payment and makes the account go "live".
-     *
-     * @param paymentRequest
-     * @param requestIP
-     * @return
-     */
-    @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-    public ApiPaymentResponse applyInitialPayment(
-            @NotNull @NonNull ApplyPaymentMethodRequest paymentRequest,
-            @NotNull @NonNull String requestIP) {
-        log.info("Apply initial subscription payment for {}", paymentRequest.producerId());
+    // create invoice record for initial payment, as this is the first payment on a
+    // new subscriber, no invoice is created until this point
+    InvoiceResponse invoiceResponse =
+        invoiceContract.createInvoice(paymentRequest.producerId(), requestIP);
 
-        ProducerResponse producerResponse = producerContract.findProducer(paymentRequest.producerId());
-        if (producerResponse.subscriptionType() == ProducerSubscriptionType.LIVE_ACTIVE) {
-            throw new PreconditionFailedException("Producer/Account is already active");
-        }
+    PaymentResponse paymentResponse =
+        paymentContract.applyPayment(
+            paymentRequest,
+            invoiceResponse.invoiceId(),
+            ProducerPaymentType.INITIAL_PAYMENT,
+            requestIP);
 
-        // create invoice record for initial payment, as this is the first payment on a
-        // new subscriber, no invoice is created until this point
-        InvoiceResponse invoiceResponse =
-                invoiceContract.createInvoice(paymentRequest.producerId(), requestIP);
+    if (!paymentResponse.isSuccess()) {
+      log.info(
+          "Subscription payment was not successful for {} reasonCode {}",
+          paymentRequest.producerId(),
+          paymentResponse.responseCode());
 
-        PaymentResponse paymentResponse =
-                paymentContract.applyPayment(
-                        paymentRequest,
-                        invoiceResponse.invoiceId(),
-                        ProducerPaymentType.INITIAL_PAYMENT,
-                        requestIP);
-
-        if (!paymentResponse.isSuccess()) {
-            log.info(
-                    "Subscription payment was not successful for {} reasonCode {}",
-                    paymentRequest.producerId(),
-                    paymentResponse.responseCode());
-
-            return new ApiPaymentResponse(
-                    paymentResponse.isSuccess(),
-                    paymentResponse.responseCode(),
-                    paymentResponse.responseText());
-        }
-
-        producerResponse =
-                producerContract.activateProducer(
-                        paymentRequest.producerId(),
-                        invoiceResponse.createDate(),
-                        paymentResponse.createDate(),
-                        null,
-                        requestIP);
-
-        emailService.sendEmail(
-                EmailTemplateName.WELCOME_EMAIL,
-                producerResponse,
-                getAdminEmails(paymentRequest.producerId()).toArray(new String[0]));
-
-        return new ApiPaymentResponse(
-                true, paymentResponse.responseCode(), paymentResponse.responseText());
+      return new ApiPaymentResponse(
+          paymentResponse.isSuccess(),
+          paymentResponse.responseCode(),
+          paymentResponse.responseText());
     }
 
-    public ApiPaymentResponse applyPayment(
-            ApplyPaymentRequest paymentRequest, String userId, String requestIP) {
-        log.info(
-                "Apply subscription payment for invoice {} and producer/account {}",
-                paymentRequest.invoiceId(),
-                paymentRequest.producerId());
+    producerResponse =
+        producerContract.activateProducer(
+            paymentRequest.producerId(),
+            invoiceResponse.createDate(),
+            paymentResponse.createDate(),
+            null,
+            requestIP);
 
-        if (paymentRequest.savedPaymentMethodId() == null
-            && paymentRequest.newPaymentMethod() == null) {
-            throw new PreconditionFailedException(
-                    "Existing payment method not provided or new payment method specified");
-        }
+    emailService.sendEmail(
+        EmailTemplateName.WELCOME_EMAIL,
+        producerResponse,
+        getAdminEmails(paymentRequest.producerId()).toArray(new String[0]));
 
-        invoiceContract.findInvoice(paymentRequest.invoiceId(), requestIP);
+    return new ApiPaymentResponse(
+        true, paymentResponse.responseCode(), paymentResponse.responseText());
+  }
 
-        PaymentResponse paymentResponse =
-                paymentContract.applyPayment(paymentRequest, userId, requestIP);
+  public ApiPaymentResponse applyPayment(
+      ApplyPaymentRequest paymentRequest, String userId, String requestIP) {
+    log.info(
+        "Apply subscription payment for invoice {} and producer/account {}",
+        paymentRequest.invoiceId(),
+        paymentRequest.producerId());
 
-        //        emailService.sendEmail(EmailTemplateName.WELCOME_EMAIL, producerResponse,
-        //                getAdminEmails(paymentRequest.producerId()).toArray(new String[0]));
-
-        return new ApiPaymentResponse(
-                true, paymentResponse.responseCode(), paymentResponse.responseText());
+    if (paymentRequest.savedPaymentMethodId() == null
+        && paymentRequest.newPaymentMethod() == null) {
+      throw new PreconditionFailedException(
+          "Existing payment method not provided or new payment method specified");
     }
 
-    /**
-     * The purpose of this method is to clean up records corresponding to any subscriptions started
-     * but never finished or made active.
-     *
-     * @param daysOld
-     * @return
-     */
-    @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-    public String cleanUnpaidAccounts(@NotNull @NonNull Integer daysOld, String ipAddress) {
-        log.info("Removing unpaid account records and credentials");
+    invoiceContract.findInvoice(paymentRequest.invoiceId(), requestIP);
 
-        List<ProducerResponse> producers =
-                producerContract.findLastModified(daysOld, ProducerSubscriptionType.LIVE_UNPAID);
-        if (CollectionUtils.isEmpty(producers)) {
-            return String.format("No unpaid subscribers over %s days old", daysOld);
-        }
-        List<UUID> producerIds = producers.stream().map(p -> p.producerId()).toList();
+    PaymentResponse paymentResponse =
+        paymentContract.applyPayment(paymentRequest, userId, requestIP);
 
-        producerContract.deleteCredentials(producerIds);
+    //        emailService.sendEmail(EmailTemplateName.WELCOME_EMAIL, producerResponse,
+    //                getAdminEmails(paymentRequest.producerId()).toArray(new String[0]));
 
-        contactContract.deleteContacts(producerIds);
+    return new ApiPaymentResponse(
+        true, paymentResponse.responseCode(), paymentResponse.responseText());
+  }
 
-        locationContract.deleteLocation(producerIds);
+  /**
+   * The purpose of this method is to clean up records corresponding to any subscriptions started
+   * but never finished or made active.
+   *
+   * @param daysOld
+   * @return
+   */
+  @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+  public String cleanUnpaidAccounts(@NotNull @NonNull Integer daysOld, String ipAddress) {
+    log.info("Removing unpaid account records and credentials");
 
-        producerContract.deleteProducers(producerIds, ipAddress);
-
-        log.info("Removed {} unpaid account subscriptions", producers.size());
-
-        return String.format(
-                "Removed %s unpaid account subscriptions over %s days old", producerIds.size(), daysOld);
+    List<ProducerResponse> producers =
+        producerContract.findLastModified(daysOld, ProducerSubscriptionType.LIVE_UNPAID);
+    if (CollectionUtils.isEmpty(producers)) {
+      return String.format("No unpaid subscribers over %s days old", daysOld);
     }
+    List<UUID> producerIds = producers.stream().map(p -> p.producerId()).toList();
 
-    private List<String> getAdminEmails(UUID accountId) {
-        List<ProducerContactResponse> contacts = contactContract.findAdminContacts(accountId);
+    producerContract.deleteCredentials(producerIds);
 
-        return contacts.stream().map(contact -> contact.emailAddress()).toList();
-    }
+    contactContract.deleteContacts(producerIds);
+
+    locationContract.deleteLocation(producerIds);
+
+    producerContract.deleteProducers(producerIds, ipAddress);
+
+    log.info("Removed {} unpaid account subscriptions", producers.size());
+
+    return String.format(
+        "Removed %s unpaid account subscriptions over %s days old", producerIds.size(), daysOld);
+  }
+
+  private List<String> getAdminEmails(UUID accountId) {
+    List<ProducerContactResponse> contacts = contactContract.findAdminContacts(accountId);
+
+    return contacts.stream().map(contact -> contact.emailAddress()).toList();
+  }
 }

@@ -5,22 +5,16 @@ import com.green.yp.api.apitype.account.AccountResponse;
 import com.green.yp.api.apitype.account.CreateAccountRequest;
 import com.green.yp.api.apitype.account.UpdateAccountRequest;
 import com.green.yp.api.apitype.enumeration.EmailTemplateName;
-import com.green.yp.api.apitype.invoice.InvoiceResponse;
-import com.green.yp.api.apitype.payment.ApiPaymentResponse;
-import com.green.yp.api.apitype.payment.ApplyPaymentMethodRequest;
-import com.green.yp.api.apitype.payment.ApplyPaymentRequest;
-import com.green.yp.api.apitype.payment.PaymentResponse;
 import com.green.yp.api.apitype.producer.*;
-import com.green.yp.api.apitype.producer.enumeration.ProducerSubscriptionType;
 import com.green.yp.api.contract.*;
 import com.green.yp.email.service.EmailService;
 import com.green.yp.exception.BusinessException;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
-import com.green.yp.payment.data.enumeration.ProducerPaymentType;
 import jakarta.validation.constraints.NotNull;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -106,19 +100,30 @@ public class AccountService {
     // create producer record
     ProducerResponse producerResponse =
         producerContract.createProducer(accountMapper.toProducer(account), ipAddress);
-    return new AccountResponse(producerResponse, null, null, null);
+    return updateAccount(
+        Optional.of(producerResponse),
+        new UpdateAccountRequest(
+            producerResponse.producerId(),
+            null,
+            account.primaryContact(),
+            account.primaryLocation(),
+            account.masterUserCredentials()),
+        ipAddress);
   }
 
   @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-  public AccountResponse updateAccount(UpdateAccountRequest account, String ipAddress)
+  public AccountResponse updateAccount(
+      Optional<ProducerResponse> producerOptional, UpdateAccountRequest account, String ipAddress)
       throws NoSuchAlgorithmException {
 
-    ProducerResponse producerResponse = null;
-    if (account.producerRequest() != null) {
-      producerResponse = producerContract.updateProducer(account.producerRequest());
-    } else {
-      producerResponse = producerContract.findProducer(account.producerId());
-    }
+    var producerResponse =
+        producerOptional.orElseGet(
+            () -> {
+              if (account.producerRequest() != null) {
+                return producerContract.updateProducer(account.producerRequest());
+              }
+              return producerContract.findProducer(account.producerId());
+            });
 
     // validate contact, must have contact type of PRIMARY or ADMIN for account creation
     if (account.primaryContact() != null) {

@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -70,7 +71,7 @@ public class AccountController {
   public ResponseApi<ApiPaymentResponse> applyInitialPayment(
       @RequestBody @Valid ApplyPaymentMethodRequest paymentRequest) {
     return new ResponseApi<>(
-            paymentService.applyInitialPayment(paymentRequest, RequestUtil.getRequestIP()), null);
+        paymentService.applyInitialPayment(paymentRequest, RequestUtil.getRequestIP()), null);
   }
 
   @Operation(summary = "Applies a payment on an existing subscription with an invoice")
@@ -81,7 +82,7 @@ public class AccountController {
   public ResponseApi<ApiPaymentResponse> applyPayment(
       @RequestBody @Valid ApplyPaymentRequest paymentRequest) {
     return new ResponseApi<>(
-            paymentService.applyPayment(paymentRequest, null, RequestUtil.getRequestIP()), null);
+        paymentService.applyPayment(paymentRequest, null, RequestUtil.getRequestIP()), null);
   }
 
   @Operation(summary = "Update the subscriber / producer account records")
@@ -94,7 +95,8 @@ public class AccountController {
       @RequestBody @Valid UpdateAccountRequest account) {
     try {
       return new ResponseApi<>(
-          accountService.updateAccount(account, RequestUtil.getRequestIP()), null);
+          accountService.updateAccount(Optional.empty(), account, RequestUtil.getRequestIP()),
+          null);
     } catch (NoSuchAlgorithmException e) {
       throw new SystemException("System error, missing configuration", e);
     }
@@ -109,7 +111,7 @@ public class AccountController {
   public ResponseApi<String> cleanUnpaidAccounts(
       @RequestParam(name = "days", defaultValue = "30", required = false) Integer daysOld) {
     return new ResponseApi<>(
-            paymentService.cleanUnpaidAccounts(daysOld, RequestUtil.getRequestIP()), null);
+        paymentService.cleanUnpaidAccounts(daysOld, RequestUtil.getRequestIP()), null);
   }
 
   @Operation(summary = "Cancels or disables an account")
