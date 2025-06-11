@@ -82,6 +82,20 @@ public class AccountService {
                 """;
   }
 
+  public AccountResponse findAccount(@NotNull @NonNull UUID accountId) {
+
+    ProducerResponse producerResponse = producerContract.findProducer(accountId);
+
+    ProducerLocationResponse locationResponse = producerContract.findPrimaryLocation(accountId);
+
+    List<ProducerContactResponse> contacts =
+            contactContract.findContacts(accountId, locationResponse.locationId());
+
+    log.info("Returning producer account information for {}", accountId);
+
+    return new AccountResponse(producerResponse, locationResponse, contacts, null);
+  }
+
   @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
   public AccountResponse createAccount(CreateAccountRequest account, String ipAddress)
       throws NoSuchAlgorithmException {
@@ -126,61 +140,26 @@ public class AccountService {
             });
 
     // validate contact, must have contact type of PRIMARY or ADMIN for account creation
-    if (account.primaryContact() != null) {
-      if (!account.primaryContact().producerContactType().isAccountCreation()) {
-        log.info(
-            "Attempt to create account with invalid contact, contact must be ADMIN or PRIMARY");
-        throw new PreconditionFailedException("ContactType must be one of ADMIN or PRIMARY");
-      }
-    }
+    isValidPrimaryContact(account);
 
-    ProducerLocationResponse locationResponse = null;
-    // create or update primary location
-    try {
-      locationResponse = locationContract.findPrimaryLocation(account.producerId());
-    } catch (NotFoundException pfe) {
-      log.info("No Primary location found for {}", account.producerId());
-    }
-    if (account.primaryLocation() != null) {
-      LocationRequest request = account.primaryLocation();
-      if (locationResponse != null) {
-        if (request.locationId() != null
-            && !request.locationId().equals(locationResponse.locationId())) {
-          throw new BusinessException(
-              "Attempting to update primary location with another location");
-        }
-        request = accountMapper.copyRequest(request, locationResponse.locationId());
-      }
-      locationResponse =
-          locationContract.updatePrimaryLocation(account.producerId(), request, ipAddress);
-    }
+    ProducerLocationResponse locationResponse = createOrUpdateLocation(account, ipAddress);
 
     // create initial contact record
     List<ProducerContactResponse> adminContacts =
         contactContract.findAdminContacts(account.producerId());
-    if (account.primaryContact() != null) {
-      ProducerContactRequest request = account.primaryContact();
-      ProducerContactResponse adminContact = getAdminContact(adminContacts, request);
-
-      if (locationResponse == null) {
-        log.info("No Primary location found for {}", account.producerId());
-        throw new PreconditionFailedException(
-            "Primary location is required before creating primary contact");
-      }
-
-      if (adminContact != null) {
-        request =
-            accountMapper.copyRequest(
-                request, adminContact.contactId(), locationResponse.locationId());
-      }
-
-      contactContract.updatePrimaryContact(
-          request, account.producerId(), locationResponse.locationId(), ipAddress);
-      adminContacts =
-          contactContract.findAdminContacts(account.producerRequest().lineOfBusinessId());
-    }
+    adminContacts = createOrUpdateContact(account, ipAddress, adminContacts, locationResponse);
 
     // create admin/master user credentials
+    var credentialsResponse = createOrUpdateCredentials(account, ipAddress, adminContacts);
+
+    return new AccountResponse(
+        producerResponse, locationResponse, adminContacts, credentialsResponse);
+  }
+
+  private ProducerCredentialsResponse createOrUpdateCredentials(UpdateAccountRequest account,
+                                                                String ipAddress,
+                                                                List<ProducerContactResponse> adminContacts)
+          throws NoSuchAlgorithmException {
     ProducerCredentialsResponse credentialsResponse = null;
     try {
       credentialsResponse = producerContract.findMasterUserCredentials(account.producerId());
@@ -209,7 +188,7 @@ public class AccountService {
                 account.masterUserCredentials().emailAddress(),
                 account.producerId(),
                 account.masterUserCredentials().producerContactId(),
-                ipAddress);
+                    ipAddress);
       } else if (isModifyingExistingCredentials(
           account.masterUserCredentials(), credentialsResponse)) {
         credentialsResponse =
@@ -217,18 +196,76 @@ public class AccountService {
                 account.masterUserCredentials(),
                 account.producerId(),
                 credentialsResponse.credentialsId(),
-                ipAddress);
+                    ipAddress);
       } else { // replacing master user credentials
         credentialsResponse =
             producerContract.replaceMasterUserCredentials(
                 account.producerId(),
                 credentialsResponse.credentialsId(),
                 account.masterUserCredentials(),
-                ipAddress);
+                    ipAddress);
       }
     }
-    return new AccountResponse(
-        producerResponse, locationResponse, adminContacts, credentialsResponse);
+    return credentialsResponse;
+  }
+
+  private List<ProducerContactResponse> createOrUpdateContact(UpdateAccountRequest account, String ipAddress, List<ProducerContactResponse> adminContacts, ProducerLocationResponse locationResponse) {
+    if (account.primaryContact() != null) {
+      ProducerContactRequest request = account.primaryContact();
+      ProducerContactResponse adminContact = getAdminContact(adminContacts, request);
+
+      if (locationResponse == null) {
+        log.info("No Primary location found for {}", account.producerId());
+        throw new PreconditionFailedException(
+            "Primary location is required before creating primary contact");
+      }
+
+      if (adminContact != null) {
+        request =
+            accountMapper.copyRequest(
+                request, adminContact.contactId(), locationResponse.locationId());
+      }
+
+      contactContract.updatePrimaryContact(
+          request, account.producerId(), locationResponse.locationId(), ipAddress);
+      adminContacts =
+          contactContract.findAdminContacts(account.producerRequest().lineOfBusinessId());
+    }
+    return adminContacts;
+  }
+
+  private ProducerLocationResponse createOrUpdateLocation(UpdateAccountRequest account, String ipAddress) {
+    // create or update primary location
+    ProducerLocationResponse locationResponse = null;
+    try {
+      locationResponse = locationContract.findPrimaryLocation(account.producerId());
+    } catch (NotFoundException pfe) {
+      log.info("No Primary location found for {}", account.producerId());
+    }
+    if (account.primaryLocation() != null) {
+      LocationRequest request = account.primaryLocation();
+      if (locationResponse != null) {
+        if (request.locationId() != null
+            && !request.locationId().equals(locationResponse.locationId())) {
+          throw new BusinessException(
+              "Attempting to update primary location with another location");
+        }
+        request = accountMapper.copyRequest(request, locationResponse.locationId());
+      }
+      locationResponse =
+          locationContract.updatePrimaryLocation(account.producerId(), request, ipAddress);
+    }
+    return locationResponse;
+  }
+
+  private static void isValidPrimaryContact(UpdateAccountRequest account) {
+    if (account.primaryContact() != null) {
+      if (!account.primaryContact().producerContactType().isAccountCreation()) {
+        log.info(
+            "Attempt to create account with invalid contact, contact must be ADMIN or PRIMARY");
+        throw new PreconditionFailedException("ContactType must be one of ADMIN or PRIMARY");
+      }
+    }
   }
 
   private boolean isModifyingExistingCredentials(
@@ -257,20 +294,6 @@ public class AccountService {
           request.emailAddress());
       return null;
     }
-  }
-
-  public AccountResponse findAccount(@NotNull @NonNull UUID accountId) {
-
-    ProducerResponse producerResponse = producerContract.findProducer(accountId);
-
-    ProducerLocationResponse locationResponse = producerContract.findPrimaryLocation(accountId);
-
-    List<ProducerContactResponse> contacts =
-        contactContract.findContacts(accountId, locationResponse.locationId());
-
-    log.info("Returning producer account information for {}", accountId);
-
-    return new AccountResponse(producerResponse, locationResponse, contacts, null);
   }
 
   private List<String> getAdminEmails(UUID accountId) {
