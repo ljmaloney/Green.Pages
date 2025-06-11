@@ -11,6 +11,7 @@ import com.green.yp.email.service.EmailService;
 import com.green.yp.exception.BusinessException;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
+import com.green.yp.exception.SystemException;
 import jakarta.validation.constraints.NotNull;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -89,7 +90,7 @@ public class AccountService {
     ProducerLocationResponse locationResponse = producerContract.findPrimaryLocation(accountId);
 
     List<ProducerContactResponse> contacts =
-            contactContract.findContacts(accountId, locationResponse.locationId());
+        contactContract.findContacts(accountId, locationResponse.locationId());
 
     log.info("Returning producer account information for {}", accountId);
 
@@ -144,105 +145,96 @@ public class AccountService {
 
     ProducerLocationResponse locationResponse = createOrUpdateLocation(account, ipAddress);
 
-    // create initial contact record
-    List<ProducerContactResponse> adminContacts =
-        contactContract.findAdminContacts(account.producerId());
-
-   adminContacts = createOrUpdateContact(producerResponse,
-              Optional.of(account.primaryContact()),
-           adminContacts,
-           locationResponse,
-           ipAddress);
+    List<ProducerContactResponse> adminContacts =  contactContract.findAdminContacts(account.producerId());
+    ProducerContactResponse contactResponse = createOrUpdateContact(
+        producerResponse,
+        Optional.of(account.primaryContact()),
+        adminContacts,
+        locationResponse,
+        ipAddress);
+    adminContacts.add(contactResponse);
 
     // create admin/master user credentials
-    var credentialsResponse = createOrUpdateCredentials(account, ipAddress, adminContacts);
+    var credentialsResponse =
+        createOrUpdateCredentials(
+            producerResponse, account.masterUserCredentials(), contactResponse, ipAddress);
 
     return new AccountResponse(
         producerResponse, locationResponse, adminContacts, credentialsResponse);
   }
 
-  private ProducerCredentialsResponse createOrUpdateCredentials(UpdateAccountRequest account,
-                                                                String ipAddress,
-                                                                List<ProducerContactResponse> adminContacts)
-          throws NoSuchAlgorithmException {
+  private ProducerCredentialsResponse createOrUpdateCredentials(
+      ProducerResponse producerResponse,
+      UserCredentialsRequest request,
+      ProducerContactResponse contactResponse,
+      String ipAddress)
+      throws NoSuchAlgorithmException {
+
     ProducerCredentialsResponse credentialsResponse = null;
     try {
-      credentialsResponse = producerContract.findMasterUserCredentials(account.producerId());
+      credentialsResponse =
+          producerContract.findMasterUserCredentials(producerResponse.producerId());
     } catch (NotFoundException nfe) {
-      log.info("Master user admin credentials not created for {}", account.producerId());
+      log.info("Master user admin credentials not created for {}", producerResponse.producerId());
     }
-    if (account.masterUserCredentials() != null) {
-      if (account.masterUserCredentials().producerContactId() == null) {
-        log.error("Master User credentials must have a producer contact, no contact was provided");
-        throw new PreconditionFailedException(
-            "Master User credentials must have a producer contact, no contact was provided");
-      }
-      adminContacts.stream()
-          .filter(c -> c.contactId().equals(account.masterUserCredentials().producerContactId()))
-          .findFirst()
-          .orElseThrow(
-              () -> {
-                log.error("Specified contact id is not a primary account contact");
-                return new PreconditionFailedException(
-                    "Specified contact id is not a primary account contact");
-              });
+    if (request != null) {
+
       if (credentialsResponse == null) {
         credentialsResponse =
             producerContract.createMasterUserCredentials(
-                account.masterUserCredentials(),
-                account.masterUserCredentials().emailAddress(),
-                account.producerId(),
-                account.masterUserCredentials().producerContactId(),
-                    ipAddress);
-      } else if (isModifyingExistingCredentials(
-          account.masterUserCredentials(), credentialsResponse)) {
+                request,
+                request.emailAddress(),
+                producerResponse.producerId(),
+                contactResponse.contactId(),
+                ipAddress);
+      } else if (isModifyingExistingCredentials(request, credentialsResponse)) {
         credentialsResponse =
             producerContract.updateMasterCredentials(
-                account.masterUserCredentials(),
-                account.producerId(),
+                request,
+                producerResponse.producerId(),
                 credentialsResponse.credentialsId(),
-                    ipAddress);
+                ipAddress);
       } else { // replacing master user credentials
         credentialsResponse =
             producerContract.replaceMasterUserCredentials(
-                account.producerId(),
+                producerResponse.producerId(),
                 credentialsResponse.credentialsId(),
-                account.masterUserCredentials(),
-                    ipAddress);
+                request,
+                ipAddress);
       }
     }
     return credentialsResponse;
   }
 
-  private List<ProducerContactResponse> createOrUpdateContact(ProducerResponse producerResponse,
-                                                              Optional<ProducerContactRequest> contactRequest,
-                                                              List<ProducerContactResponse> adminContacts,
-                                                              ProducerLocationResponse locationResponse,
-                                                              String ipAddress) {
-    contactRequest.ifPresent(request -> {
-      ProducerContactResponse adminContact = getAdminContact(adminContacts, request);
+  private ProducerContactResponse createOrUpdateContact(
+      ProducerResponse producerResponse,
+      Optional<ProducerContactRequest> contactRequest,
+      List<ProducerContactResponse> adminContacts,
+      ProducerLocationResponse locationResponse,
+      String ipAddress) {
 
-      if (locationResponse == null) {
-        log.info("No Primary location found for {}", producerResponse.producerId());
-        throw new PreconditionFailedException(
-                "Primary location is required before creating primary contact");
-      }
-
-      if (adminContact != null) {
-        request =
-                accountMapper.copyRequest(
+    return contactRequest
+        .map(
+            request -> {
+              ProducerContactResponse adminContact = getAdminContact(adminContacts, request);
+              if (locationResponse == null) {
+                log.info("No Primary location found for {}", producerResponse.producerId());
+                throw new PreconditionFailedException(
+                    "Primary location is required before creating primary contact");
+              }
+              if (adminContact != null) {
+                request =
+                    accountMapper.copyRequest(
                         request, adminContact.contactId(), locationResponse.locationId());
-      }
-
-      contactContract.updatePrimaryContact(
-              request, producerResponse.producerId(), locationResponse.locationId(), ipAddress);
-      adminContacts.clear();
-      adminContacts.addAll(contactContract.findAdminContacts(producerResponse.lineOfBusinessId()));
-    });
-    return adminContacts;
+              }
+              return contactContract.updatePrimaryContact(
+                  request, producerResponse.producerId(), locationResponse.locationId(), ipAddress);
+            })
+        .orElseThrow(() -> new SystemException("Unexpected error creating account contact", null));
   }
 
-  private ProducerLocationResponse createOrUpdateLocation(UpdateAccountRequest account, String ipAddress) {
+  private ProducerLocationResponse createOrUpdateLocation(
+      UpdateAccountRequest account, String ipAddress) {
     // create or update primary location
     ProducerLocationResponse locationResponse = null;
     try {
@@ -286,22 +278,21 @@ public class AccountService {
   }
 
   private ProducerContactResponse getAdminContact(
-      List<ProducerContactResponse> adminContacts, ProducerContactRequest request) {
-    try {
-      return adminContacts.stream()
-          .filter(
-              contact ->
-                  contact.contactId().equals(request.contactId())
-                      || contact.emailAddress().equals(request.emailAddress()))
-          .findFirst()
-          .get();
-    } catch (Exception e) {
-      log.info(
-          "No Primary contact exists for contact {} or email {} to update",
-          request.contactId(),
-          request.emailAddress());
-      return null;
-    }
+      List<ProducerContactResponse> contacts, ProducerContactRequest request) {
+    return contacts.stream()
+        .filter(
+            contact ->
+                contact.contactId().equals(request.contactId())
+                    || contact.emailAddress().equals(request.emailAddress()))
+        .findFirst()
+            .orElseGet(
+            () -> {
+              log.info(
+                  "No Primary contact exists for contact {} or email {} to update",
+                  request.contactId(),
+                  request.emailAddress());
+              return null;
+            });
   }
 
   private List<String> getAdminEmails(UUID accountId) {

@@ -43,7 +43,7 @@ fusionauth:
         id: 922748b0-1658-4880-942a-36eaca3aa185
         secret: Nso5YJaHpIl6_vNezTylWDUoeKhb7eymmn1b_76Gx74
       app:
-        id: d4381544-ea49-4445-85ba-c380e3948edc
+        id: 922748b0-1658-4880-942a-36eaca3aa185
       tenant: e5c8b6b2-ca40-4d53-c435-01e1b803db88
       connectTimeout: 2000
       readTimeout: 2000
