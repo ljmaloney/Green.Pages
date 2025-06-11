@@ -27,6 +27,7 @@ public interface ProducerContactMapper {
   @Mapping(source = "request.genericContactName", target = "genericContactName")
   @Mapping(source = "request.firstName", target = "firstName")
   @Mapping(source = "request.lastName", target = "lastName")
+  @Mapping(source = "request.title", target = "title")
   @Mapping(source = "request.phoneNumber", target = "phoneNumber")
   @Mapping(source = "request.cellPhoneNumber", target = "cellPhoneNumber")
   @Mapping(source = "request.emailAddress", target = "emailAddress")

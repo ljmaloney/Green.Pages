@@ -12,6 +12,7 @@ import com.green.yp.api.apitype.producer.enumeration.ProducerLocationType;
 import com.green.yp.common.ServiceUtils;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
+import com.green.yp.geolocation.service.GeocodingService;
 import com.green.yp.producer.data.model.ProducerLocation;
 import com.green.yp.producer.data.repository.ProducerLocationRepository;
 import com.green.yp.producer.mapper.ProducerLocationMapper;
@@ -39,16 +40,19 @@ public class ProducerLocationService {
 
   final ProducerLocationHoursService hoursService;
 
+  private final GeocodingService geocodingService;
+
   public ProducerLocationService(
       ProducerLocationMapper producerLocationMapper,
       ProducerLocationRepository locationRepository,
       ProducerOrchestrationService producerService,
       ProducerLocationHoursService hoursService,
-      ProducerLocationGeocodeService gecodeService) {
+      GeocodingService gecodeService) {
     this.producerLocationMapper = producerLocationMapper;
     this.locationRepository = locationRepository;
     this.producerService = producerService;
     this.hoursService = hoursService;
+    this.geocodingService = gecodeService;
   }
 
   @AuditRequest(
@@ -64,10 +68,16 @@ public class ProducerLocationService {
     location.setProducerId(producerId);
     location.setActive(true);
 
-    // TODO: lookup lat-long
-    ProducerLocation savedLocation = locationRepository.saveAndFlush(location);
+    if ( location.getLatitude() == null || location.getLongitude() == null){
+      var coordinates = geocodingService.getCoordinates(location.getAddressLine1(),
+              location.getCity(),
+              location.getState(),
+              location.getPostalCode());
+      location.setLatitude(coordinates.latitude());
+      location.setLongitude(coordinates.longitude());
+    }
 
-    // gecodeService.geocodeLocattion(savedLocation);
+    ProducerLocation savedLocation = locationRepository.saveAndFlush(location);
 
     log.info(
         "New producer location {} named {} created for {}",

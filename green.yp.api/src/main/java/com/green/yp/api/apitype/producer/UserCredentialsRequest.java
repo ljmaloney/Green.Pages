@@ -12,7 +12,9 @@ public record UserCredentialsRequest(
     UUID producerContactId,
     @NonNull @NotBlank String firstName,
     @NonNull @NotBlank String lastName,
+    @Pattern(regexp = "^(?:\\+1)?\\s?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}$")
     @NonNull @NotBlank String businessPhone,
+    @Pattern(regexp = "^(?:\\+1)?\\s?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}$")
     String cellPhone,
     @NonNull @NotBlank String emailAddress,
     @NotNull

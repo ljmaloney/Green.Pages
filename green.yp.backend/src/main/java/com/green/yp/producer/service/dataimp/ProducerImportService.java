@@ -71,6 +71,7 @@ public class ProducerImportService {
                             StringUtils.getIfBlank(importRecord.contact, () -> "Primary"),
                             null,
                             null,
+                            null,
                             importRecord.phone,
                             null,
                             null),

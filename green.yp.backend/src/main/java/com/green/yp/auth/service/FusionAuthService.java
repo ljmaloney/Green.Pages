@@ -62,12 +62,12 @@ public class FusionAuthService implements AuthenticationService {
 
     if (response.wasSuccessful()) {
       log.info("Created new user credentials for producer : {}", producerId);
-      return new AuthServiceResponse<>("", response.successResponse);
+      return new AuthServiceResponse<>(response.getSuccessResponse().registrationVerificationId, response.successResponse);
     } else {
       // Handle errors
       log.error(
           "Error occurred when create/Register new user credentials for producer : {}",
-          response.errorResponse.toString());
+          response.errorResponse);
       throw new UserCredentialsException(
           "Error when attempting to create user", response.exception);
     }

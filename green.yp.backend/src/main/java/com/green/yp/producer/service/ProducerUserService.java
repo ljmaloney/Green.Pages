@@ -126,6 +126,7 @@ public class ProducerUserService {
     authorizedUser.setProducerId(producerId);
     authorizedUser.setProducerContactId(contactId);
     authorizedUser.setLastChangeDate(OffsetDateTime.now());
+    authorizedUser.setEnabled(true);
     if (StringUtils.isBlank(authorizedUser.getEmailAddress())) {
       authorizedUser.setEmailAddress(emailAddress);
     }

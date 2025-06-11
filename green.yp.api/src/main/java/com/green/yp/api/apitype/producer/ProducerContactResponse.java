@@ -20,6 +20,7 @@ public record ProducerContactResponse(
     String genericContactName,
     String firstName,
     String lastName,
+    String title,
     String phoneNumber,
     String cellPhoneNumber,
     Boolean emailConfirmed,

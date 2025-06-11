@@ -2,8 +2,8 @@ package com.green.yp.api.apitype.account;
 
 public enum AccountRoleType {
   ADMIN("GreenPages-Admin"),
-  SUBSCRIBER_ADMIN("Greepages-SubscriberAdmin"),
-  SUBSCRIBER("Greepages-Subscriber"),
+  SUBSCRIBER_ADMIN("Greenpages-SubscriberAdmin"),
+  SUBSCRIBER("Greenpages-Subscriber"),
   SYS_ADMIN("SysAdmin");
   private final String role;
 
