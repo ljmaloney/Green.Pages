@@ -113,7 +113,7 @@ public class AccountService {
     }
     // create producer record
     ProducerResponse producerResponse =
-        producerContract.createProducer(accountMapper.toProducer(account), ipAddress);
+        producerContract.createProducer(account.producerRequest(), ipAddress);
     return updateAccount(
         Optional.of(producerResponse),
         new UpdateAccountRequest(
@@ -147,7 +147,12 @@ public class AccountService {
     // create initial contact record
     List<ProducerContactResponse> adminContacts =
         contactContract.findAdminContacts(account.producerId());
-    adminContacts = createOrUpdateContact(account, ipAddress, adminContacts, locationResponse);
+
+   adminContacts = createOrUpdateContact(producerResponse,
+              Optional.of(account.primaryContact()),
+           adminContacts,
+           locationResponse,
+           ipAddress);
 
     // create admin/master user credentials
     var credentialsResponse = createOrUpdateCredentials(account, ipAddress, adminContacts);
@@ -209,28 +214,31 @@ public class AccountService {
     return credentialsResponse;
   }
 
-  private List<ProducerContactResponse> createOrUpdateContact(UpdateAccountRequest account, String ipAddress, List<ProducerContactResponse> adminContacts, ProducerLocationResponse locationResponse) {
-    if (account.primaryContact() != null) {
-      ProducerContactRequest request = account.primaryContact();
+  private List<ProducerContactResponse> createOrUpdateContact(ProducerResponse producerResponse,
+                                                              Optional<ProducerContactRequest> contactRequest,
+                                                              List<ProducerContactResponse> adminContacts,
+                                                              ProducerLocationResponse locationResponse,
+                                                              String ipAddress) {
+    contactRequest.ifPresent(request -> {
       ProducerContactResponse adminContact = getAdminContact(adminContacts, request);
 
       if (locationResponse == null) {
-        log.info("No Primary location found for {}", account.producerId());
+        log.info("No Primary location found for {}", producerResponse.producerId());
         throw new PreconditionFailedException(
-            "Primary location is required before creating primary contact");
+                "Primary location is required before creating primary contact");
       }
 
       if (adminContact != null) {
         request =
-            accountMapper.copyRequest(
-                request, adminContact.contactId(), locationResponse.locationId());
+                accountMapper.copyRequest(
+                        request, adminContact.contactId(), locationResponse.locationId());
       }
 
       contactContract.updatePrimaryContact(
-          request, account.producerId(), locationResponse.locationId(), ipAddress);
-      adminContacts =
-          contactContract.findAdminContacts(account.producerRequest().lineOfBusinessId());
-    }
+              request, producerResponse.producerId(), locationResponse.locationId(), ipAddress);
+      adminContacts.clear();
+      adminContacts.addAll(contactContract.findAdminContacts(producerResponse.lineOfBusinessId()));
+    });
     return adminContacts;
   }
 
