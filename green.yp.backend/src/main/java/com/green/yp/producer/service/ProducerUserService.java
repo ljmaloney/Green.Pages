@@ -203,6 +203,18 @@ public class ProducerUserService {
     return null;
   }
 
+  public Optional<ProducerCredentialsResponse> findCredentials(String userName, String emailAddress){
+    log.debug("Find existing credentials by userName {} or emailAddress {}", userName, emailAddress);
+
+   return credentialsRepository.findCredentialsByUserName(userName, emailAddress)
+           .map(authUserMapper::fromEntity)
+           .or( () -> {
+             authenticationContract.findUser(userName, emailAddress)
+                     .ifPresent( creds -> authenticationContract.removeUser(creds.externalAuthorizationServiceRef()));
+              return Optional.empty();
+           });
+  }
+
   public ProducerCredentialsResponse findMasterUserCredentials(UUID producerId) {
     log.info("Loading master user credentials for producer {}", producerId);
     return credentialsRepository

@@ -3,12 +3,14 @@ package com.green.yp.api.apitype.producer;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.NonNull;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Builder
 public record ProducerCredentialsResponse(
     @NotNull @NonNull UUID credentialsId,
     @NotNull @NonNull OffsetDateTime createDate,

@@ -54,4 +54,12 @@ public interface ProducerUserCredentialsRepository
             """)
   List<ProducerUserCredentials> findCredentials(
       @NonNull @NotNull @Param("producerIds") List<UUID> producerIdList);
+
+  @Query(
+    """
+        SELECT auth FROM ProducerUserCredentials auth 
+        WHERE auth.userId = :userName OR auth.emailAddress = :emailAddress
+    """)
+  Optional<ProducerUserCredentials> findCredentialsByUserName(@NonNull @NotNull @Param("userName") String userName,
+                                                              @NonNull @NotNull @Param("emailAddress")String emailAddress);
 }

@@ -1,6 +1,8 @@
 package com.green.yp.auth.service;
 
 import com.green.yp.api.apitype.account.AccountRoleType;
+import com.green.yp.api.apitype.producer.AuthenticatedUserCredentialsResponse;
+import com.green.yp.api.apitype.producer.ProducerCredentialsResponse;
 import com.green.yp.api.apitype.producer.UserCredentialsRequest;
 import com.green.yp.auth.model.AuthServiceResponse;
 import com.green.yp.exception.UserCredentialsException;
@@ -13,7 +15,14 @@ import io.fusionauth.domain.api.UserRequest;
 import io.fusionauth.domain.api.UserResponse;
 import io.fusionauth.domain.api.user.RegistrationRequest;
 import io.fusionauth.domain.api.user.RegistrationResponse;
+import io.fusionauth.domain.api.user.SearchRequest;
+import io.fusionauth.domain.api.user.SearchResponse;
+import io.fusionauth.domain.search.UserSearchCriteria;
 import jakarta.validation.constraints.NotNull;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -109,6 +118,41 @@ public class FusionAuthService implements AuthenticationService {
       throw new UserCredentialsException(
           "Error when retrieving fusion auth credentials", response.exception);
     }
+  }
+
+  @Override
+  public Optional<AuthenticatedUserCredentialsResponse> findUser(@NonNull String userName,
+                                                                 @NonNull String emailAddress) {
+
+    UserSearchCriteria criteria = new UserSearchCriteria();
+    criteria.queryString = String.format("email:\"%s\" OR username:\"%s\"", emailAddress, userName);
+
+    // Build the search request, for example, search by username or email
+    SearchRequest request = new SearchRequest(criteria);
+
+    ClientResponse<SearchResponse, Errors> response = fusionAuthClient.searchUsersByQuery(request);
+
+    if ( response.wasSuccessful()){
+      log.warn("Found credentials for {} {}", userName, emailAddress);
+      return response.getSuccessResponse().users.stream()
+              .findFirst()
+              .map(user -> AuthenticatedUserCredentialsResponse.builder()
+                      .externalAuthorizationServiceRef(user.id.toString())
+                      .userName(user.username)
+                      .lastName(user.lastName)
+                      .firstName(user.firstName)
+                      .emailAddress(user.email)
+                      .build());
+    } else {
+      // Handle errors
+      log.error(
+              "Error occurred while searching for username {} emailAddress {}, error : {}",
+              userName, emailAddress, response.errorResponse.toString());
+      throw new UserCredentialsException(
+              "Error when retrieving fusion auth credentials", response.exception);
+    }
+//
+//    return Optional.empty();
   }
 
   public AuthServiceResponse<UserResponse> modifyUser(
