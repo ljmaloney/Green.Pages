@@ -2,7 +2,6 @@ package com.green.yp.auth.service;
 
 import com.green.yp.api.apitype.account.AccountRoleType;
 import com.green.yp.api.apitype.producer.AuthenticatedUserCredentialsResponse;
-import com.green.yp.api.apitype.producer.ProducerCredentialsResponse;
 import com.green.yp.api.apitype.producer.UserCredentialsRequest;
 import com.green.yp.auth.model.AuthServiceResponse;
 import com.green.yp.exception.UserCredentialsException;
@@ -19,9 +18,6 @@ import io.fusionauth.domain.api.user.SearchRequest;
 import io.fusionauth.domain.api.user.SearchResponse;
 import io.fusionauth.domain.search.UserSearchCriteria;
 import jakarta.validation.constraints.NotNull;
-
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
@@ -46,12 +42,13 @@ public class FusionAuthService implements AuthenticationService {
   @Override
   public AuthServiceResponse<RegistrationResponse> registerUser(
       @NotNull @NonNull UUID producerId,
+      @NotNull @NonNull UUID contactId,
       @NotNull @NonNull Boolean subscriberAdmin,
       @NotNull @NonNull UserCredentialsRequest userCredentialsRequest) {
 
     log.info("Create/Register new user credentials for producer : {}", producerId);
 
-    User user = createFusionAuthUser(userCredentialsRequest);
+    User user = createFusionAuthUser(producerId, contactId, userCredentialsRequest);
 
     // Instantiate the user registration and request object
     UserRegistration registration = new UserRegistration();
@@ -152,8 +149,6 @@ public class FusionAuthService implements AuthenticationService {
       throw new UserCredentialsException(
               "Error when retrieving fusion auth credentials", response.exception);
     }
-//
-//    return Optional.empty();
   }
 
   public AuthServiceResponse<UserResponse> modifyUser(
@@ -163,7 +158,7 @@ public class FusionAuthService implements AuthenticationService {
 
     AuthServiceResponse<UserResponse> userResponse = findUser(externalAuthorizationServiceRef);
 
-    User user = createFusionAuthUser(userCredentialsRequest);
+    User user = createFusionAuthUser(producerId, null, userCredentialsRequest);
 
     UserRequest userRequest = new UserRequest(user);
     userRequest.applicationId = UUID.fromString(applicationId);
@@ -201,14 +196,14 @@ public class FusionAuthService implements AuthenticationService {
     }
   }
 
-  private User createFusionAuthUser(UserCredentialsRequest userCredentialsRequest) {
+  private User createFusionAuthUser(UUID producerId, UUID contactId, UserCredentialsRequest userCredentialsRequest) {
 
     String username =
         StringUtils.isNotBlank(userCredentialsRequest.userName())
             ? userCredentialsRequest.userName()
             : userCredentialsRequest.emailAddress();
 
-    return new User()
+    var user = new User()
         .with(u -> u.email = userCredentialsRequest.emailAddress())
         .with(u -> u.tenantId = UUID.fromString(applicationId))
         .with(u -> u.firstName = userCredentialsRequest.firstName())
@@ -220,5 +215,12 @@ public class FusionAuthService implements AuthenticationService {
         .with(u -> u.mobilePhone = userCredentialsRequest.cellPhone())
         .with(u -> u.username = username)
         .with(u -> u.password = userCredentialsRequest.credentials());
+    if ( producerId != null ){
+      user = user.with(u -> u.data.put("producerId", producerId));
+    }
+    if ( contactId != null ){
+      user = user.with( u -> u.data.put("contactId", contactId));
+    }
+    return user;
   }
 }

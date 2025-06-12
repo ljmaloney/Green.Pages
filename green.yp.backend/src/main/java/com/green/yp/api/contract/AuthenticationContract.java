@@ -1,7 +1,6 @@
 package com.green.yp.api.contract;
 
 import com.green.yp.api.apitype.producer.AuthenticatedUserCredentialsResponse;
-import com.green.yp.api.apitype.producer.ProducerCredentialsResponse;
 import com.green.yp.api.apitype.producer.UserCredentialsRequest;
 import com.green.yp.auth.model.AuthServiceResponse;
 import com.green.yp.auth.service.FusionAuthService;
@@ -24,10 +23,11 @@ public class AuthenticationContract {
   }
 
   public AuthServiceResponse<RegistrationResponse> registerUser(
-      @NotNull @NonNull UUID producerId,
-      Boolean subscriberAdmin,
-      @NotNull @NonNull UserCredentialsRequest credentialsRequest) {
-    return authenticationService.registerUser(producerId, subscriberAdmin, credentialsRequest);
+          @NotNull @NonNull UUID producerId,
+          @NonNull @NotNull UUID contactId,
+          Boolean subscriberAdmin,
+          @NotNull @NonNull UserCredentialsRequest credentialsRequest) {
+    return authenticationService.registerUser(producerId, contactId, subscriberAdmin, credentialsRequest);
   }
 
   public void disableUser(String externalAuthorizationServiceRef) {
