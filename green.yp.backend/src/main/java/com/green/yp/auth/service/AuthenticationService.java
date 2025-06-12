@@ -1,10 +1,14 @@
 package com.green.yp.auth.service;
 
+import com.green.yp.api.apitype.producer.AuthenticatedUserCredentialsResponse;
+import com.green.yp.api.apitype.producer.ProducerCredentialsResponse;
 import com.green.yp.api.apitype.producer.UserCredentialsRequest;
 import com.green.yp.auth.model.AuthServiceResponse;
 import io.fusionauth.domain.api.UserResponse;
 import io.fusionauth.domain.api.user.RegistrationResponse;
 import jakarta.validation.constraints.NotNull;
+
+import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
@@ -26,4 +30,7 @@ public interface AuthenticationService {
       @NotNull @NonNull UUID producerId,
       @NonNull @NotNull String externalAuthorizationServiceRef,
       @NotNull @NonNull UserCredentialsRequest userCredentialsRequest);
+
+  Optional<AuthenticatedUserCredentialsResponse> findUser(@NotNull @NonNull String userName,
+                                                            @NotNull @NonNull String emailAddress);
 }

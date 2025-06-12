@@ -8,10 +8,7 @@ import com.green.yp.api.apitype.enumeration.EmailTemplateName;
 import com.green.yp.api.apitype.producer.*;
 import com.green.yp.api.contract.*;
 import com.green.yp.email.service.EmailService;
-import com.green.yp.exception.BusinessException;
-import com.green.yp.exception.NotFoundException;
-import com.green.yp.exception.PreconditionFailedException;
-import com.green.yp.exception.SystemException;
+import com.green.yp.exception.*;
 import jakarta.validation.constraints.NotNull;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -112,6 +109,18 @@ public class AccountService {
             account.producerRequest().businessName(), account.producerRequest().websiteUrl());
       }
     }
+
+    producerContract.findCredential(account.masterUserCredentials().userName(),
+            account.masterUserCredentials().emailAddress()).ifPresentOrElse(credentials -> {
+              log.warn("Existing user credentials found for username {} or email {}",
+                      account.masterUserCredentials().userName(),
+                      account.masterUserCredentials().emailAddress());
+              throw new UserCredentialsException(account.masterUserCredentials().userName(),
+                      account.masterUserCredentials().emailAddress());
+            }, () -> log.debug("No existing user credentials found for username {} or email {}",
+                account.masterUserCredentials().userName(),
+                account.masterUserCredentials().emailAddress()));
+
     // create producer record
     ProducerResponse producerResponse =
         producerContract.createProducer(account.producerRequest(), ipAddress);
@@ -258,7 +267,7 @@ public class AccountService {
     return locationResponse;
   }
 
-  private static void isValidPrimaryContact(UpdateAccountRequest account) {
+  private void isValidPrimaryContact(UpdateAccountRequest account) {
     if (account.primaryContact() != null) {
       if (!account.primaryContact().producerContactType().isAccountCreation()) {
         log.info(

@@ -75,7 +75,7 @@ public class AuthenticationConfig {
   public FusionAuthClient fusionAuthClient() {
     log.info(
         "configValue: fusionauth.baseUrl: {}, fusionauth.host: {}"
-            + " fusionauth.bakktConsumerTenantId: {}",
+            + " fusionauth.tenantId: {}",
         baseUrl,
         fusionHost,
         tenantId);
