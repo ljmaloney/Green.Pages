@@ -71,9 +71,11 @@ public class ProducerContract {
   }
 
   public ProducerCredentialsResponse createMasterUserCredentials(
-      UserCredentialsRequest createUserCredentialsRequest,
+      @NonNull @NotNull UserCredentialsRequest createUserCredentialsRequest,
       String emailAddress,
+      @NonNull @NotNull
       UUID producerId,
+      @NonNull @NotNull
       UUID contactId,
       String ipAddress)
       throws NoSuchAlgorithmException {

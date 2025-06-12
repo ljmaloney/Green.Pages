@@ -16,6 +16,7 @@ public interface AuthenticationService {
 
   AuthServiceResponse<RegistrationResponse> registerUser(
       @NotNull @NonNull UUID producerId,
+      UUID contactId,
       Boolean subscriberAdmin,
       UserCredentialsRequest userCredentialsRequest);
 

@@ -42,12 +42,13 @@ public class FusionAuthService implements AuthenticationService {
   @Override
   public AuthServiceResponse<RegistrationResponse> registerUser(
       @NotNull @NonNull UUID producerId,
+      @NotNull @NonNull UUID contactId,
       @NotNull @NonNull Boolean subscriberAdmin,
       @NotNull @NonNull UserCredentialsRequest userCredentialsRequest) {
 
     log.info("Create/Register new user credentials for producer : {}", producerId);
 
-    User user = createFusionAuthUser(producerId, userCredentialsRequest);
+    User user = createFusionAuthUser(producerId, contactId, userCredentialsRequest);
 
     // Instantiate the user registration and request object
     UserRegistration registration = new UserRegistration();
@@ -157,7 +158,7 @@ public class FusionAuthService implements AuthenticationService {
 
     AuthServiceResponse<UserResponse> userResponse = findUser(externalAuthorizationServiceRef);
 
-    User user = createFusionAuthUser(producerId, userCredentialsRequest);
+    User user = createFusionAuthUser(producerId, null, userCredentialsRequest);
 
     UserRequest userRequest = new UserRequest(user);
     userRequest.applicationId = UUID.fromString(applicationId);
@@ -195,14 +196,14 @@ public class FusionAuthService implements AuthenticationService {
     }
   }
 
-  private User createFusionAuthUser(UUID producerId, UserCredentialsRequest userCredentialsRequest) {
+  private User createFusionAuthUser(UUID producerId, UUID contactId, UserCredentialsRequest userCredentialsRequest) {
 
     String username =
         StringUtils.isNotBlank(userCredentialsRequest.userName())
             ? userCredentialsRequest.userName()
             : userCredentialsRequest.emailAddress();
 
-    return new User()
+    var user = new User()
         .with(u -> u.email = userCredentialsRequest.emailAddress())
         .with(u -> u.tenantId = UUID.fromString(applicationId))
         .with(u -> u.firstName = userCredentialsRequest.firstName())
@@ -213,8 +214,13 @@ public class FusionAuthService implements AuthenticationService {
                     userCredentialsRequest.firstName() + " " + userCredentialsRequest.lastName())
         .with(u -> u.mobilePhone = userCredentialsRequest.cellPhone())
         .with(u -> u.username = username)
-        .with(u -> u.password = userCredentialsRequest.credentials())
-            .with(u -> u.data.put("producerId", producerId))
-        .with(u -> u.data.put("producerContactId", userCredentialsRequest.producerContactId().toString()));
+        .with(u -> u.password = userCredentialsRequest.credentials());
+    if ( producerId != null ){
+      user = user.with(u -> u.data.put("producerId", producerId));
+    }
+    if ( contactId != null ){
+      user = user.with( u -> u.data.put("contactId", contactId));
+    }
+    return user;
   }
 }

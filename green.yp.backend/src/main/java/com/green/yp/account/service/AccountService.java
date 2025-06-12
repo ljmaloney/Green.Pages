@@ -6,6 +6,8 @@ import com.green.yp.api.apitype.account.CreateAccountRequest;
 import com.green.yp.api.apitype.account.UpdateAccountRequest;
 import com.green.yp.api.apitype.enumeration.EmailTemplateName;
 import com.green.yp.api.apitype.producer.*;
+import com.green.yp.api.apitype.producer.enumeration.ProducerContactType;
+import com.green.yp.api.apitype.producer.enumeration.ProducerDisplayContactType;
 import com.green.yp.api.contract.*;
 import com.green.yp.email.service.EmailService;
 import com.green.yp.exception.*;
@@ -42,20 +44,22 @@ public class AccountService {
   private final ProducerLocationContract locationContract;
 
   private final AccountMapper accountMapper;
+  private final ProducerContactContract producerContactContract;
 
   public AccountService(
-      EmailService emailService,
-      ProducerContract producerContract,
-      PaymentContract paymentContract,
-      ProducerContactContract contactContract,
-      ProducerLocationContract locationContract,
-      AccountMapper accountMapper) {
+          EmailService emailService,
+          ProducerContract producerContract,
+          PaymentContract paymentContract,
+          ProducerContactContract contactContract,
+          ProducerLocationContract locationContract,
+          AccountMapper accountMapper, ProducerContactContract producerContactContract) {
     this.emailService = emailService;
     this.producerContract = producerContract;
     this.paymentContract = paymentContract;
     this.contactContract = contactContract;
     this.locationContract = locationContract;
     this.accountMapper = accountMapper;
+    this.producerContactContract = producerContactContract;
   }
 
   @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
@@ -187,14 +191,32 @@ public class AccountService {
       log.info("Master user admin credentials not created for {}", producerResponse.producerId());
     }
     if (request != null) {
-
+      UUID credentialContactId = contactResponse.contactId();
       if (credentialsResponse == null) {
+        if ( createCredentialsContact(request, contactResponse)){
+          var credContact = producerContactContract.createContact(new ProducerContactRequest(null,
+                          contactResponse.producerLocationId(),
+                          ProducerContactType.ADMIN,
+                          ProducerDisplayContactType.NO_DISPLAY,
+                          null,
+                          request.firstName(),
+                          request.lastName(),
+                          null,
+                          request.businessPhone(),
+                          request.cellPhone(),
+                          request.emailAddress()),
+                  producerResponse.producerId(),
+                  contactResponse.producerLocationId(),
+                  ipAddress);
+          log.info("Created new contact for credentials as ADMIN / NO DISPLAY, contactId {}", credContact.contactId());
+          credentialContactId = credContact.contactId();
+        }
         credentialsResponse =
             producerContract.createMasterUserCredentials(
                 request,
                 request.emailAddress(),
                 producerResponse.producerId(),
-                contactResponse.contactId(),
+                credentialContactId,
                 ipAddress);
       } else if (isModifyingExistingCredentials(request, credentialsResponse)) {
         credentialsResponse =
@@ -213,6 +235,13 @@ public class AccountService {
       }
     }
     return credentialsResponse;
+  }
+
+  private boolean createCredentialsContact(UserCredentialsRequest request,
+                                           ProducerContactResponse contactResponse) {
+    return request.firstName().equals(contactResponse.firstName())
+            && request.lastName().equals(contactResponse.lastName())
+            && request.emailAddress().equals(contactResponse.emailAddress());
   }
 
   private ProducerContactResponse createOrUpdateContact(

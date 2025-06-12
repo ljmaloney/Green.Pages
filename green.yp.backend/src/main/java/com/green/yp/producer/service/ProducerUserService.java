@@ -103,10 +103,13 @@ public class ProducerUserService {
   }
 
   ProducerCredentialsResponse createCredentials(
-      UserCredentialsRequest credentialsRequest,
+          @NonNull @NotNull
+          UserCredentialsRequest credentialsRequest,
       Boolean accountMaster,
       String emailAddress,
+      @NonNull @NotNull
       UUID producerId,
+      @NonNull @NotNull
       UUID contactId,
       String ipAddress)
       throws NoSuchAlgorithmException {
@@ -119,7 +122,7 @@ public class ProducerUserService {
     }
 
     AuthServiceResponse<RegistrationResponse> response =
-        authenticationContract.registerUser(producerId, accountMaster, credentialsRequest);
+        authenticationContract.registerUser(producerId, contactId, accountMaster, credentialsRequest);
 
     ProducerUserCredentials authorizedUser = authUserMapper.toEntity(credentialsRequest);
     authorizedUser.setPassword(createPasswordHash(credentialsRequest.credentials()));
