@@ -51,7 +51,7 @@ public class FusionAuthService implements AuthenticationService {
 
     log.info("Create/Register new user credentials for producer : {}", producerId);
 
-    User user = createFusionAuthUser(userCredentialsRequest);
+    User user = createFusionAuthUser(producerId, userCredentialsRequest);
 
     // Instantiate the user registration and request object
     UserRegistration registration = new UserRegistration();
@@ -152,8 +152,6 @@ public class FusionAuthService implements AuthenticationService {
       throw new UserCredentialsException(
               "Error when retrieving fusion auth credentials", response.exception);
     }
-//
-//    return Optional.empty();
   }
 
   public AuthServiceResponse<UserResponse> modifyUser(
@@ -163,7 +161,7 @@ public class FusionAuthService implements AuthenticationService {
 
     AuthServiceResponse<UserResponse> userResponse = findUser(externalAuthorizationServiceRef);
 
-    User user = createFusionAuthUser(userCredentialsRequest);
+    User user = createFusionAuthUser(producerId, userCredentialsRequest);
 
     UserRequest userRequest = new UserRequest(user);
     userRequest.applicationId = UUID.fromString(applicationId);
@@ -201,7 +199,7 @@ public class FusionAuthService implements AuthenticationService {
     }
   }
 
-  private User createFusionAuthUser(UserCredentialsRequest userCredentialsRequest) {
+  private User createFusionAuthUser(UUID producerId, UserCredentialsRequest userCredentialsRequest) {
 
     String username =
         StringUtils.isNotBlank(userCredentialsRequest.userName())
@@ -219,6 +217,8 @@ public class FusionAuthService implements AuthenticationService {
                     userCredentialsRequest.firstName() + " " + userCredentialsRequest.lastName())
         .with(u -> u.mobilePhone = userCredentialsRequest.cellPhone())
         .with(u -> u.username = username)
-        .with(u -> u.password = userCredentialsRequest.credentials());
+        .with(u -> u.password = userCredentialsRequest.credentials())
+            .with(u -> u.data.put("producerId", producerId))
+        .with(u -> u.data.put("producerContactId", userCredentialsRequest.producerContactId().toString()));
   }
 }
