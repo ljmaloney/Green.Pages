@@ -2,7 +2,6 @@ package com.green.yp.auth.service;
 
 import com.green.yp.api.apitype.account.AccountRoleType;
 import com.green.yp.api.apitype.producer.AuthenticatedUserCredentialsResponse;
-import com.green.yp.api.apitype.producer.ProducerCredentialsResponse;
 import com.green.yp.api.apitype.producer.UserCredentialsRequest;
 import com.green.yp.auth.model.AuthServiceResponse;
 import com.green.yp.exception.UserCredentialsException;
@@ -19,9 +18,6 @@ import io.fusionauth.domain.api.user.SearchRequest;
 import io.fusionauth.domain.api.user.SearchResponse;
 import io.fusionauth.domain.search.UserSearchCriteria;
 import jakarta.validation.constraints.NotNull;
-
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
