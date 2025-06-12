@@ -133,8 +133,9 @@ public class FusionAuthService implements AuthenticationService {
     ClientResponse<SearchResponse, Errors> response = fusionAuthClient.searchUsersByQuery(request);
 
     if ( response.wasSuccessful()){
-      log.warn("Found credentials for {} {}", userName, emailAddress);
+      log.warn("Found {} credentials for {} {}", response.successResponse.total, userName, emailAddress);
       return response.getSuccessResponse().users.stream()
+              .filter( user -> user.username.equals(userName))
               .findFirst()
               .map(user -> AuthenticatedUserCredentialsResponse.builder()
                       .externalAuthorizationServiceRef(user.id.toString())
