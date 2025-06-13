@@ -62,4 +62,6 @@ public interface ProducerUserCredentialsRepository
     """)
   Optional<ProducerUserCredentials> findCredentialsByUserName(@NonNull @NotNull @Param("userName") String userName,
                                                               @NonNull @NotNull @Param("emailAddress")String emailAddress);
+
+  Optional<ProducerUserCredentials> findByExternalAuthorizationServiceRef(String externalAuthorizationServiceRef);
 }

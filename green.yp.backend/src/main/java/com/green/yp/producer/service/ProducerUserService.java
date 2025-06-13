@@ -217,6 +217,12 @@ public class ProducerUserService {
               return Optional.empty();
            });
   }
+  public Optional<ProducerCredentialsResponse> findCredentialByRef(String externalUserRef, String ipAddress) {
+    log.debug("Attempting to find credentials for ref {}", externalUserRef);
+    return credentialsRepository.findByExternalAuthorizationServiceRef(externalUserRef)
+            .map(authUserMapper::fromEntity);
+  }
+
 
   public ProducerCredentialsResponse findMasterUserCredentials(UUID producerId) {
     log.info("Loading master user credentials for producer {}", producerId);

@@ -135,4 +135,8 @@ public class ProducerContract {
                                @NonNull @NotBlank String emailAddress) {
     return producerUserService.findCredentials(userName, emailAddress);
   }
+
+  public Optional<ProducerCredentialsResponse> findCredentialByRef(String externalUserRef, String ipAddress) {
+    return producerUserService.findCredentialByRef(externalUserRef, ipAddress);
+  }
 }
