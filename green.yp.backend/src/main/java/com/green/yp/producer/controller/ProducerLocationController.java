@@ -48,13 +48,13 @@ public class ProducerLocationController {
   }
 
   @PostMapping(
-      path = "location",
+      path = "/{producerId}/location",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ProducerLocationResponse> createLocation(
-      @Valid @RequestBody LocationRequest locationRequest) {
+      @Valid @RequestBody LocationRequest locationRequest, @PathVariable("producerId") UUID producerId) {
     return new ResponseApi<>(
-        locationService.createLocation(locationRequest, null, RequestUtil.getRequestIP()), null);
+        locationService.createLocation(locationRequest, producerId, RequestUtil.getRequestIP()), null);
   }
 
   @PutMapping(

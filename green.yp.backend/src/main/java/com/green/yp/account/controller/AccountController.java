@@ -50,6 +50,16 @@ public class AccountController {
     return new ResponseApi<>(accountService.findAccount(UUID.fromString(accountId)), null);
   }
 
+  @ApiResponse(
+          responseCode = org.apache.hc.core5.http.HttpStatus.SC_OK + "",
+          description = "Returns the requested account information",
+          content = @Content(mediaType = "application/json"))
+  @GetMapping(path = "/user/{externUserRef}", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<AccountResponse> findAccountUserRef(
+          @PathVariable(name = "externUserRef") String externalUserRef) {
+    return new ResponseApi<>(accountService.findUserAccount(externalUserRef, RequestUtil.getRequestIP()), null);
+  }
+
   @PostMapping(
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)

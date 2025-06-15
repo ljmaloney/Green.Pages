@@ -61,11 +61,11 @@ public class ProducerUserController {
   }
 
   @GetMapping(path = "/{producerId}/search/users", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseApi<List<ProducerUserResponse>> findProducerUsers(
+  public ResponseApi<List<ProducerCredentialsResponse>> findProducerUsers(
       @PathVariable UUID producerId,
-      @RequestParam("firstName") String firstName,
-      @RequestParam("lastName") String lastName) {
+      @RequestParam(value = "firstName", required = false) String firstName,
+      @RequestParam(value = "lastName", required = false) String lastName) {
     log.info("Search producerUsers by firstname : {} and lastName: {}", firstName, lastName);
-    return userService.findUsers(producerId, firstName, lastName);
+    return new ResponseApi<>(userService.findUsers(producerId, firstName, lastName, RequestUtil.getRequestIP()), null);
   }
 }
