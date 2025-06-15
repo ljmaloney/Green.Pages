@@ -1,5 +1,6 @@
 package com.green.yp.producer.data.repository;
 
+import com.green.yp.api.apitype.producer.ProducerUserResponse;
 import com.green.yp.producer.data.model.ProducerUserCredentials;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -62,4 +63,17 @@ public interface ProducerUserCredentialsRepository
     """)
   Optional<ProducerUserCredentials> findCredentialsByUserName(@NonNull @NotNull @Param("userName") String userName,
                                                               @NonNull @NotNull @Param("emailAddress")String emailAddress);
+
+  Optional<ProducerUserCredentials> findByExternalAuthorizationServiceRef(String externalAuthorizationServiceRef);
+
+  @Query("""
+      SELECT auth FROM ProducerUserCredentials auth
+      WHERE auth.producerId = :producerId
+        AND (:firstName IS NULL OR auth.firstName=:firstName )
+        AND (:lastName IS NULL OR auth.lastName=:lastName )
+  """)
+  List<ProducerUserCredentials> findUsers(@NotNull @NonNull
+                                       @Param("producerId") UUID producerId,
+                                       @Param("firstName") String firstName,
+                                       @Param("lastName") String lastName);
 }

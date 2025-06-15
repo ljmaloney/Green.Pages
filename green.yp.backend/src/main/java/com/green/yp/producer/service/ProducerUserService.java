@@ -201,9 +201,15 @@ public class ProducerUserService {
     credentialsCounterRepository.saveAndFlush(counter);
   }
 
-  public ResponseApi<List<ProducerUserResponse>> findUsers(
-      UUID producerId, String firstName, String lastName) {
-    return null;
+  public List<ProducerCredentialsResponse> findUsers(@NotNull @NonNull UUID producerId,
+      String firstName, String lastName, String ipAddress) {
+    log.info("Return credentialed users for {} filtered by {} {}", producerId, firstName, lastName);
+    firstName = StringUtils.isBlank(firstName) ? null : firstName;
+    lastName = StringUtils.isBlank(lastName) ? null : lastName;
+    return credentialsRepository.findUsers(producerId, firstName, lastName)
+            .stream()
+            .map(authUserMapper::fromEntity)
+            .toList();
   }
 
   public Optional<ProducerCredentialsResponse> findCredentials(String userName, String emailAddress){
@@ -217,6 +223,12 @@ public class ProducerUserService {
               return Optional.empty();
            });
   }
+  public Optional<ProducerCredentialsResponse> findCredentialByRef(String externalUserRef, String ipAddress) {
+    log.debug("Attempting to find credentials for ref {}", externalUserRef);
+    return credentialsRepository.findByExternalAuthorizationServiceRef(externalUserRef)
+            .map(authUserMapper::fromEntity);
+  }
+
 
   public ProducerCredentialsResponse findMasterUserCredentials(UUID producerId) {
     log.info("Loading master user credentials for producer {}", producerId);

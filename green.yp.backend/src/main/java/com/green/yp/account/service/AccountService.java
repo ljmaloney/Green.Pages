@@ -45,6 +45,7 @@ public class AccountService {
 
   private final AccountMapper accountMapper;
   private final ProducerContactContract producerContactContract;
+  private final AuthenticationContract authenticationContract;
 
   public AccountService(
           EmailService emailService,
@@ -52,7 +53,7 @@ public class AccountService {
           PaymentContract paymentContract,
           ProducerContactContract contactContract,
           ProducerLocationContract locationContract,
-          AccountMapper accountMapper, ProducerContactContract producerContactContract) {
+          AccountMapper accountMapper, ProducerContactContract producerContactContract, AuthenticationContract authenticationContract) {
     this.emailService = emailService;
     this.producerContract = producerContract;
     this.paymentContract = paymentContract;
@@ -60,6 +61,7 @@ public class AccountService {
     this.locationContract = locationContract;
     this.accountMapper = accountMapper;
     this.producerContactContract = producerContactContract;
+    this.authenticationContract = authenticationContract;
   }
 
   @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
@@ -82,6 +84,18 @@ public class AccountService {
     return """
                 Your GreenYP listing subscription has been cancelled. The listing will remain active until the end of the month.
                 """;
+  }
+
+  public AccountResponse findUserAccount(String externalUserRef, String ipAddress) {
+    log.info("Loading account info for logged user by ref {}", externalUserRef);
+
+    var credsOptional = producerContract.findCredentialByRef(externalUserRef, ipAddress);
+    var producerId = credsOptional.orElseThrow(() -> {
+      log.warn("No saved record mapping externalUserRef {} to producer/subscriber", externalUserRef);
+      throw new NotFoundException(String.format("No subscribtion found for user identified by %s", externalUserRef));
+    }).producerId();
+
+    return findAccount(producerId);
   }
 
   public AccountResponse findAccount(@NotNull @NonNull UUID accountId) {
