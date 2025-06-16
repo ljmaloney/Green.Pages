@@ -5,6 +5,7 @@ import com.green.yp.api.apitype.producer.ProducerContactResponse;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.producer.service.ProducerContactOrchestrationService;
 import com.green.yp.producer.service.ProducerContactService;
+import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -67,6 +68,16 @@ public class ProducerContactController {
       @Valid @RequestBody ProducerContactRequest createContactRequest) {
     return new ResponseApi<>(
         contactOrchestrationService.createContact(locationId, createContactRequest), null);
+  }
+
+  @Operation(summary = "Updates an existing contact")
+  @PutMapping(path = "/location/{locationId}/contact",
+          consumes = MediaType.APPLICATION_JSON_VALUE,
+          produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  public ResponseApi<ProducerContactResponse> updateContact(@PathVariable("locationId") UUID locationId,
+                                                            @Valid @RequestBody ProducerContactRequest contactRequest){
+    return new ResponseApi<>(contactOrchestrationService.updateContact(contactRequest, null, locationId, RequestUtil.getRequestIP()), null);
   }
 
   @Operation(summary = "Deletes (inactivates) a contact")
