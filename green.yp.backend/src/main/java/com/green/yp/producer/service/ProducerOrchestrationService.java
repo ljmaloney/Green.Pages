@@ -162,7 +162,7 @@ public class ProducerOrchestrationService {
             : null);
 
     Producer savedProducer = producerRepository.saveAndFlush(producer);
-
+    log.info("Updated producer/subscriber record for {}", savedProducer.getId());
     return producerMapper.fromEntity(savedProducer, lobDto);
   }
 
