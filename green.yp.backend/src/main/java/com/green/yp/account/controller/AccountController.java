@@ -95,7 +95,7 @@ public class AccountController {
         paymentService.applyPayment(paymentRequest, null, RequestUtil.getRequestIP()), null);
   }
 
-  @Operation(summary = "Update the subscriber / producer account records")
+  @Operation(summary = "Update the subscriber / producer account business profile")
   @PutMapping(
       name = "/account",
       consumes = MediaType.APPLICATION_JSON_VALUE,

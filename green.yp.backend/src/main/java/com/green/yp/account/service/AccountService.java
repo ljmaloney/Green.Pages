@@ -45,7 +45,6 @@ public class AccountService {
 
   private final AccountMapper accountMapper;
   private final ProducerContactContract producerContactContract;
-  private final AuthenticationContract authenticationContract;
 
   public AccountService(
           EmailService emailService,
@@ -61,7 +60,6 @@ public class AccountService {
     this.locationContract = locationContract;
     this.accountMapper = accountMapper;
     this.producerContactContract = producerContactContract;
-    this.authenticationContract = authenticationContract;
   }
 
   @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
@@ -142,15 +140,28 @@ public class AccountService {
     // create producer record
     ProducerResponse producerResponse =
         producerContract.createProducer(account.producerRequest(), ipAddress);
-    return updateAccount(
-        Optional.of(producerResponse),
-        new UpdateAccountRequest(
-            producerResponse.producerId(),
-            null,
-            account.primaryContact(),
-            account.primaryLocation(),
-            account.masterUserCredentials()),
-        ipAddress);
+
+    // validate contact, must have contact type of PRIMARY or ADMIN for account creation
+    isValidPrimaryContact(account);
+
+    ProducerLocationResponse locationResponse = createOrUpdateLocation(account, producerResponse.producerId(), ipAddress);
+
+    List<ProducerContactResponse> adminContacts =  contactContract.findAdminContacts(producerResponse.producerId());
+    ProducerContactResponse contactResponse = createOrUpdateContact(
+            producerResponse,
+            Optional.of(account.primaryContact()),
+            adminContacts,
+            locationResponse,
+            ipAddress);
+    adminContacts.add(contactResponse);
+
+    // create admin/master user credentials
+    var credentialsResponse =
+            createOrUpdateCredentials(
+                    producerResponse, account.masterUserCredentials(), contactResponse, ipAddress);
+
+    return new AccountResponse(
+            producerResponse, locationResponse, adminContacts, credentialsResponse);
   }
 
   @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
@@ -167,27 +178,8 @@ public class AccountService {
               return producerContract.findProducer(account.producerId());
             });
 
-    // validate contact, must have contact type of PRIMARY or ADMIN for account creation
-    isValidPrimaryContact(account);
-
-    ProducerLocationResponse locationResponse = createOrUpdateLocation(account, ipAddress);
-
-    List<ProducerContactResponse> adminContacts =  contactContract.findAdminContacts(account.producerId());
-    ProducerContactResponse contactResponse = createOrUpdateContact(
-        producerResponse,
-        Optional.of(account.primaryContact()),
-        adminContacts,
-        locationResponse,
-        ipAddress);
-    adminContacts.add(contactResponse);
-
-    // create admin/master user credentials
-    var credentialsResponse =
-        createOrUpdateCredentials(
-            producerResponse, account.masterUserCredentials(), contactResponse, ipAddress);
-
     return new AccountResponse(
-        producerResponse, locationResponse, adminContacts, credentialsResponse);
+            producerResponse, null, null, null);
   }
 
   private ProducerCredentialsResponse createOrUpdateCredentials(
@@ -286,13 +278,13 @@ public class AccountService {
   }
 
   private ProducerLocationResponse createOrUpdateLocation(
-      UpdateAccountRequest account, String ipAddress) {
+          CreateAccountRequest account, @NonNull @NotNull UUID producerId, String ipAddress) {
     // create or update primary location
     ProducerLocationResponse locationResponse = null;
     try {
-      locationResponse = locationContract.findPrimaryLocation(account.producerId());
+      locationResponse = locationContract.findPrimaryLocation(producerId);
     } catch (NotFoundException pfe) {
-      log.info("No Primary location found for {}", account.producerId());
+      log.info("No Primary location found for {}", producerId);
     }
     if (account.primaryLocation() != null) {
       LocationRequest request = account.primaryLocation();
@@ -305,12 +297,12 @@ public class AccountService {
         request = accountMapper.copyRequest(request, locationResponse.locationId());
       }
       locationResponse =
-          locationContract.updatePrimaryLocation(account.producerId(), request, ipAddress);
+          locationContract.updatePrimaryLocation(producerId, request, ipAddress);
     }
     return locationResponse;
   }
 
-  private void isValidPrimaryContact(UpdateAccountRequest account) {
+  private void isValidPrimaryContact(CreateAccountRequest account) {
     if (account.primaryContact() != null) {
       if (!account.primaryContact().producerContactType().isAccountCreation()) {
         log.info(
