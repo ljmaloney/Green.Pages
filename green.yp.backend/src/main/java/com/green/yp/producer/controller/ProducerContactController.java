@@ -71,6 +71,18 @@ public class ProducerContactController {
   }
 
   @Operation(summary = "Updates an existing contact")
+  @PutMapping(path = "/contact",
+          consumes = MediaType.APPLICATION_JSON_VALUE,
+          produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  public ResponseApi<ProducerContactResponse> updateContact(@Valid @RequestBody ProducerContactRequest contactRequest){
+    return new ResponseApi<>(contactOrchestrationService.updateContact(contactRequest,
+            null,
+            contactRequest.producerLocationId(),
+            RequestUtil.getRequestIP()), null);
+  }
+
+  @Operation(summary = "Updates an existing contact")
   @PutMapping(path = "/location/{locationId}/contact",
           consumes = MediaType.APPLICATION_JSON_VALUE,
           produces = MediaType.APPLICATION_JSON_VALUE)
