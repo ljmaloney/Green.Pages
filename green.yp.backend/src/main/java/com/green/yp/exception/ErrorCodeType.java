@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ErrorCodeType {
+  PAYLOAD_VALIDATION("One or more validations failed when processing the payload", HttpStatus.BAD_REQUEST.value()),
   BUSINESS_VALIDATION_ERROR(
       "Business rule validation failed", HttpStatus.PRECONDITION_FAILED.value()),
   LINE_OF_BUSINESS_EXISTS(

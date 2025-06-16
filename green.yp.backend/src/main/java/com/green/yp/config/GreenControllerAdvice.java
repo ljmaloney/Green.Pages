@@ -6,6 +6,7 @@ import com.green.yp.exception.ErrorCodeType;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,6 +24,15 @@ public class GreenControllerAdvice {
         null,
         new ErrorMessageApi(
             ErrorCodeType.SYSTEM_ERROR, "Unexpected error has occurred", e.getMessage()));
+  }
+
+  @ExceptionHandler(ConstraintViolationException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseApi<Void> handleValidationConstraint(ConstraintViolationException e){
+    log.warn("A validation constraint on a payload was violated - {}", e.getMessage(), e);
+    return new ResponseApi<>(
+            null,
+            new ErrorMessageApi(ErrorCodeType.PAYLOAD_VALIDATION, "One or more validation rules on the request failed.", e.getMessage()));
   }
 
   @ExceptionHandler(NoResourceFoundException.class)
