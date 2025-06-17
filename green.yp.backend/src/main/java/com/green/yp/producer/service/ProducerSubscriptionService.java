@@ -63,7 +63,15 @@ public class ProducerSubscriptionService {
                     "Requested subscription is not a top-level(primary) subscription");
         }
 
-        if (producer.getSubscriptionType() == ProducerSubscriptionType.LIVE_UNPAID) {
+        if ( isSubscriptionNotChanged(producer, subscriptionId)){
+            log.info("Subscription was not changed when updating producer {}", producer.getId());
+            return;
+        }
+
+        if ( producer.getSubscriptionType() == ProducerSubscriptionType.ADMIN ||
+             producer.getSubscriptionType() == ProducerSubscriptionType.BETA_TESTER) {
+            updateUnpaidSubscription(producer, invoiceCycleType, subscriptionDto);
+        } else if (producer.getSubscriptionType() == ProducerSubscriptionType.LIVE_UNPAID) {
             updateUnpaidSubscription(producer, invoiceCycleType, subscriptionDto);
         } else {
             upgradePaidSubscription(producer, subscriptionId, invoiceCycleType, subscriptionDto);
@@ -150,5 +158,16 @@ public class ProducerSubscriptionService {
         producerRepository.saveAndFlush(producer);
 
         log.info("Cancelled producerId {} name {} on {}", producerId, producer.getName(), cancelDate);
+    }
+
+    private Boolean isSubscriptionNotChanged(Producer producer, UUID newSubscriptionId){
+        List<ProducerSubscriptionRecord> subscriptions = subscriptionRepository.findActiveSubscriptions(producer.getId(),
+                LocalDate.now(),
+                SubscriptionType.getPrimaries());
+
+        return subscriptions.stream()
+                .filter( s -> s.producerSubscription().getSubscriptionId().equals(newSubscriptionId))
+                .findFirst().map(s -> Boolean.TRUE)
+                .orElseGet( () -> Boolean.FALSE);
     }
 }
