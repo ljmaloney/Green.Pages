@@ -29,7 +29,8 @@ public interface ProducerSearchRepository extends JpaRepository<Producer, UUID> 
     FROM producer p
     JOIN producer_location pl ON p.id = pl.producer_id
     WHERE pl.active = 'Y'
-      AND ( ?3 IS NULL OR EXISTS (SELECT 1 FROM producer_line_of_business plob WHERE plob.producer_id = p.id AND plob.line_of_business_id = ?3
+      AND ( ?3 IS NULL OR EXISTS (SELECT 1 FROM producer_line_of_business plob 
+                                               WHERE plob.producer_id = p.id AND plob.line_of_business_id = ?3
       ))
       AND (?2 IS NULL OR ST_Distance_Sphere(pl.location_geo_point, ST_GeomFromText(?1, 4326)) <= ?2
       )
@@ -59,7 +60,7 @@ public interface ProducerSearchRepository extends JpaRepository<Producer, UUID> 
             producer, location, contact,
             CAST(ROUND((3959.0 * acos(cos(radians(:latitude)) * cos(radians(location.latitude)) *
                         cos(radians(location.longitude) - radians(:longitude)) +
-                       sin(radians(:latitude)) * sin(radians(location.latitude)))/ 1609.34), 2)
+                       sin(radians(:latitude)) * sin(radians(location.latitude)))), 2)
             AS java.math.BigDecimal)
     )
     FROM Producer producer
