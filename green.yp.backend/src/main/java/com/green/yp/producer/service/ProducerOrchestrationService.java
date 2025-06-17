@@ -59,19 +59,23 @@ public class ProducerOrchestrationService {
 
   final SubscriptionContract subscriptionContract;
 
+  private final ProducerSubscriptionService subscriptionService;
+
   public ProducerOrchestrationService(
       LineOfBusinessContract lobContract,
       ProducerMapper producerMapper,
       ProducerRepository producerRepository,
       ProducerLobRepository producerLobRepository,
       ProducerSubscriptionRepository subscriptionRepository,
-      SubscriptionContract subscriptionContract) {
+      SubscriptionContract subscriptionContract,
+      ProducerSubscriptionService subscriptionService) {
     this.lobContract = lobContract;
     this.producerMapper = producerMapper;
     this.producerRepository = producerRepository;
     this.producerLobRepository = producerLobRepository;
     this.subscriptionRepository = subscriptionRepository;
     this.subscriptionContract = subscriptionContract;
+    this.subscriptionService = subscriptionService;
   }
 
   public ProducerProfileResponse getProducerProfile(UUID producerLocationId) {
@@ -98,7 +102,7 @@ public class ProducerOrchestrationService {
             .primaryLob(true)
             .build());
 
-    updateSubscription(producer, newProducer.subscriptionId(), newProducer.invoiceCycleType());
+    subscriptionService.updateSubscription(producer, newProducer.subscriptionId(), newProducer.invoiceCycleType());
 
     Producer savedProducer = producerRepository.saveAndFlush(producer);
 
@@ -154,7 +158,7 @@ public class ProducerOrchestrationService {
               .build());
     }
 
-    updateSubscription(
+    subscriptionService.updateSubscription(
         producer,
         producerUpdate.subscriptionId(),
         producerUpdate.invoiceCycleType() != null
@@ -182,97 +186,7 @@ public class ProducerOrchestrationService {
     return producer;
   }
 
-  public void updateSubscription(
-      Producer producer, UUID subscriptionId, InvoiceCycleType invoiceCycleType) {
 
-    validateNotCancelled(producer);
-
-    // validate subscription
-    SubscriptionDto subscriptionDto = subscriptionContract.findSubscription(subscriptionId);
-
-    if (!subscriptionDto.subscriptionType().isPrimarySubscription()) {
-      throw new PreconditionFailedException(
-          "Requested subscription is not a top-level(primary) subscription");
-    }
-
-    if (producer.getSubscriptionType() == ProducerSubscriptionType.LIVE_UNPAID) {
-      if (CollectionUtils.isNotEmpty(producer.getSubscriptionList())) {
-        subscriptionRepository.deleteAll(producer.getSubscriptionList());
-        producer.setSubscriptionList(new ArrayList<>());
-      }
-      producer.addSubscription(
-          ProducerSubscription.builder()
-              .producerId(producer.getId())
-              .producer(producer)
-              .subscriptionId(subscriptionDto.subscriptionId())
-              .nextInvoiceDate(LocalDate.now().plusDays(1L))
-              .startDate(LocalDate.now())
-              .endDate(LocalDate.now().plusDays(1))
-              .invoiceCycleType(
-                  invoiceCycleType == null ? InvoiceCycleType.MONTHLY : invoiceCycleType)
-              .build());
-    } else {
-      List<ProducerSubscriptionRecord> subscriptions =
-          subscriptionRepository.findActiveSubscriptions(
-              producer.getId(), LocalDate.now(), SubscriptionType.getPrimaries());
-
-      // keep this simple for now .. set enddate one current active to end of billing period
-      subscriptions.stream()
-          .filter(
-              sub ->
-                  !subscriptionId.equals(sub.producerSubscription().getSubscriptionId())
-                      && sub.producerSubscription().getEndDate() == null)
-          .findFirst()
-          .ifPresent(
-              sub -> {
-                OffsetDateTime newEndDate = sub.producerSubscription().getCreateDate();
-                newEndDate =
-                    newEndDate.plusMonths(
-                        sub.producerSubscription().getInvoiceCycleType().getMonths());
-
-                if (sub.producerSubscription()
-                    .getStartDate()
-                    .isBefore(OffsetDateTime.now().toLocalDate())) {
-                  sub.producerSubscription().setEndDate(newEndDate.toLocalDate());
-                  subscriptionRepository.save(sub.producerSubscription());
-                } else {
-                  subscriptionRepository.delete(sub.producerSubscription());
-                }
-
-                producer.addSubscription(
-                    ProducerSubscription.builder()
-                        .producerId(producer.getId())
-                        .producer(producer)
-                        .subscriptionId(subscriptionDto.subscriptionId())
-                        .nextInvoiceDate(newEndDate.plusDays(1L).toLocalDate())
-                        .startDate(newEndDate.toLocalDate())
-                        .endDate(null)
-                        .invoiceCycleType(
-                            invoiceCycleType == null ? InvoiceCycleType.MONTHLY : invoiceCycleType)
-                        .build());
-              });
-    }
-  }
-
-  public void cancelSubscription(UUID producerId, String userId, String ipAddress) {
-    log.info("Cancelling account {} by {} from ipAddress {}", producerId, userId, ipAddress);
-
-    Producer producer =
-        producerRepository
-            .findById(producerId)
-            .orElseThrow(() -> new NotFoundException(PRODUCER_ID, producerId));
-
-    // the cancel date is the last day of the current month
-    // directory listing remains active and customer access remains available
-    OffsetDateTime cancelDate =
-        OffsetDateTime.now().plusMonths(1).truncatedTo(ChronoUnit.DAYS).minusSeconds(1);
-
-    producer.setCancelDate(cancelDate);
-
-    producerRepository.saveAndFlush(producer);
-
-    log.info("Cancelled producerId {} name {} on {}", producerId, producer.getName(), cancelDate);
-  }
 
   public ProducerResponse findProducer(@NonNull @NotNull UUID producerId) {
     log.info("Loading producer/account data for {}", producerId);

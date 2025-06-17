@@ -65,7 +65,7 @@ public class ProducerContactOrchestrationService {
       ProducerContactRequest createContactRequest,
       Optional<UserCredentialsRequest> credentialsRequest,
       @NotNull @NonNull UUID producerId,
-      @NotNull @NonNull UUID locationId,
+      UUID locationId,
       String ipAddress) {
     log.info(
         "Attempt to create contact {} for producerId {} and locationId {}",
@@ -119,7 +119,7 @@ public class ProducerContactOrchestrationService {
   public ProducerContactResponse createContact(
       ProducerContactRequest createContactRequest,
       @NotNull @NonNull UUID producerId,
-      @NotNull @NonNull UUID locationId,
+      UUID locationId,
       String ipAddress) {
     log.info(
         "Attempt to create contact {} for producerId {} and locationId {}",
@@ -129,14 +129,14 @@ public class ProducerContactOrchestrationService {
         producerId,
         locationId);
 
-    Producer producer = producerService.findActiveProducer(producerId);
+    producerService.findActiveProducer(producerId);
 
     ProducerLocationResponse location =
         locationId == null
             ? locationService.findPrimaryLocation(producerId)
             : locationService.findLocation(locationId, false);
 
-    return createContact(producerId, locationId, createContactRequest);
+    return createContact(producerId, location.locationId(), createContactRequest);
   }
 
   ProducerContactResponse createContact(
