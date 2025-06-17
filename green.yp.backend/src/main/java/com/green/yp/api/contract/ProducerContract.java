@@ -5,6 +5,7 @@ import com.green.yp.api.apitype.producer.enumeration.ProducerSubscriptionType;
 import com.green.yp.producer.data.model.ProducerUserCredentials;
 import com.green.yp.producer.service.ProducerLocationService;
 import com.green.yp.producer.service.ProducerOrchestrationService;
+import com.green.yp.producer.service.ProducerSubscriptionService;
 import com.green.yp.producer.service.ProducerUserService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -26,13 +27,17 @@ public class ProducerContract {
 
   private final ProducerUserService producerUserService;
 
+  private final ProducerSubscriptionService subscriptionService;
+
   public ProducerContract(
       ProducerOrchestrationService producerService,
       ProducerLocationService producerLocationService,
-      ProducerUserService producerUserService) {
+      ProducerUserService producerUserService,
+      ProducerSubscriptionService subscriptionService) {
     this.producerService = producerService;
     this.producerLocationService = producerLocationService;
     this.producerUserService = producerUserService;
+    this.subscriptionService = subscriptionService;
   }
 
   public ProducerResponse findProducer(@NonNull @NotNull UUID producerId) {
@@ -48,7 +53,7 @@ public class ProducerContract {
   }
 
   public void cancelSubscription(UUID accountId, String userId, String ipAddress) {
-    producerService.cancelSubscription(accountId, userId, ipAddress);
+    subscriptionService.cancelSubscription(accountId, userId, ipAddress);
   }
 
   public ProducerResponse createProducer(CreateProducerRequest producer, String ipAddress) {
