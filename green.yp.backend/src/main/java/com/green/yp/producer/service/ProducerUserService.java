@@ -12,16 +12,15 @@ import com.green.yp.config.CredentialsConfig;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.exception.producer.ContactAccountLockedException;
-import com.green.yp.producer.data.model.InvalidCredentialsCounter;
-import com.green.yp.producer.data.model.Producer;
-import com.green.yp.producer.data.model.ProducerContact;
-import com.green.yp.producer.data.model.ProducerUserCredentials;
+import com.green.yp.producer.data.model.*;
 import com.green.yp.producer.data.repository.InvalidCredentialsCounterRepository;
 import com.green.yp.producer.data.repository.ProducerUserCredentialsRepository;
 import com.green.yp.producer.mapper.ProducerAuthUserMapper;
+import io.fusionauth.domain.User;
 import io.fusionauth.domain.api.UserResponse;
 import io.fusionauth.domain.api.user.RegistrationResponse;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -30,10 +29,13 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import jakarta.validation.constraints.Null;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.auth.InvalidCredentialsException;
+import org.mapstruct.control.MappingControl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -42,6 +44,7 @@ import org.springframework.transaction.annotation.Propagation;
 @Service
 public class ProducerUserService {
 
+  public static final String CREATE_MASTER_ADMIN_USER_LOG_MESSAGE = "Create master admin user as {} for {}";
   final ProducerOrchestrationService producerService;
 
   final ProducerAuthUserMapper authUserMapper;
@@ -59,14 +62,14 @@ public class ProducerUserService {
   private final AuthenticationContract authenticationContract;
 
   public ProducerUserService(
-      ProducerOrchestrationService producerService,
-      ProducerAuthUserMapper authUserMapper,
-      ProducerContactService contactService,
-      ProducerUserCredentialsRepository credentialsRepository,
-      InvalidCredentialsCounterRepository credentialsCounterRepository,
-      CredentialsConfig credentialsConfig,
-      AuditContract auditContract,
-      AuthenticationContract authenticationContract) {
+          ProducerOrchestrationService producerService,
+          ProducerAuthUserMapper authUserMapper,
+          ProducerContactService contactService,
+          ProducerUserCredentialsRepository credentialsRepository,
+          InvalidCredentialsCounterRepository credentialsCounterRepository,
+          CredentialsConfig credentialsConfig,
+          AuditContract auditContract,
+          AuthenticationContract authenticationContract) {
     this.producerService = producerService;
     this.authUserMapper = authUserMapper;
     this.contactService = contactService;
@@ -84,7 +87,7 @@ public class ProducerUserService {
       UUID contactId,
       String ipAddress)
       throws NoSuchAlgorithmException {
-    log.info("Create master admin user as {} for {}", credentialsRequest.userName(), producerId);
+    log.info(CREATE_MASTER_ADMIN_USER_LOG_MESSAGE, credentialsRequest.userName(), producerId);
 
     return createCredentials(
         credentialsRequest, true, emailAddress, producerId, contactId, ipAddress);
@@ -97,7 +100,7 @@ public class ProducerUserService {
       UUID contactId,
       String ipAddress)
       throws NoSuchAlgorithmException {
-    log.info("Create master admin user as {} for {}", credentialsRequest.userName(), producerId);
+    log.info(CREATE_MASTER_ADMIN_USER_LOG_MESSAGE, credentialsRequest.userName(), producerId);
     return createCredentials(
         credentialsRequest, false, emailAddress, producerId, contactId, ipAddress);
   }
@@ -113,12 +116,12 @@ public class ProducerUserService {
       UUID contactId,
       String ipAddress)
       throws NoSuchAlgorithmException {
-    log.info("Create master admin user as {} for {}", credentialsRequest.userName(), producerId);
+    log.info(CREATE_MASTER_ADMIN_USER_LOG_MESSAGE, credentialsRequest.userName(), producerId);
 
-    Producer producer = producerService.findActiveProducer(producerId);
+    producerService.findActiveProducer(producerId);
 
     if (contactId != null) {
-      ProducerContact contact = contactService.findActiveContact(contactId);
+      contactService.findActiveContact(contactId);
     }
 
     AuthServiceResponse<RegistrationResponse> response =
@@ -142,6 +145,7 @@ public class ProducerUserService {
 
     return authUserMapper.fromEntity(savedCredentials);
   }
+
 
   public ProducerCredentialsResponse authorizeUser(
       @NonNull String userId, @NonNull String password, @NonNull String ipAddress)

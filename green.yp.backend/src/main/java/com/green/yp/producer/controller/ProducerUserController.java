@@ -1,16 +1,22 @@
 package com.green.yp.producer.controller;
 
+import com.green.yp.api.apitype.producer.ProducerContactRequest;
 import com.green.yp.api.apitype.producer.ProducerCredentialsResponse;
 import com.green.yp.api.apitype.producer.ProducerUserResponse;
 import com.green.yp.api.apitype.producer.UserCredentialsRequest;
+import com.green.yp.api.apitype.producer.enumeration.ProducerContactType;
+import com.green.yp.api.apitype.producer.enumeration.ProducerDisplayContactType;
 import com.green.yp.common.dto.ResponseApi;
+import com.green.yp.producer.service.ProducerContactOrchestrationService;
 import com.green.yp.producer.service.ProducerUserService;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.security.NoSuchAlgorithmException;
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -26,9 +32,12 @@ import org.springframework.web.bind.annotation.*;
 public class ProducerUserController {
 
   private final ProducerUserService userService;
+  private final ProducerContactOrchestrationService contactOrchestrationService;
 
-  public ProducerUserController(ProducerUserService userService) {
+  public ProducerUserController(ProducerUserService userService,
+                                ProducerContactOrchestrationService contactOrchestrationService) {
     this.userService = userService;
+    this.contactOrchestrationService = contactOrchestrationService;
   }
 
   @PostMapping(
@@ -39,9 +48,26 @@ public class ProducerUserController {
       @NotNull @NonNull @PathVariable("producerId") UUID producerId,
       @NotNull @NonNull @Valid @RequestBody UserCredentialsRequest credentialsRequest)
       throws NoSuchAlgorithmException {
-    return new ResponseApi<>(
-        userService.createUserCredentials(
-            credentialsRequest, null, producerId, null, RequestUtil.getRequestIP()),
+    contactOrchestrationService.createContact(
+            new ProducerContactRequest(
+                   null,
+                   null,
+                   ProducerContactType.ADMIN,
+                   ProducerDisplayContactType.NO_DISPLAY,null,
+                    credentialsRequest.firstName(),
+                    credentialsRequest.lastName(),
+                    null,
+                    credentialsRequest.businessPhone(),
+                    credentialsRequest.cellPhone(),
+                    credentialsRequest.emailAddress()
+            ),
+            Optional.of(credentialsRequest),
+            producerId,
+            null,
+            RequestUtil.getRequestIP());
+
+    return new ResponseApi<>(userService.findCredentials(credentialsRequest.userName()
+            , credentialsRequest.emailAddress()).get(),
         null);
   }
 
