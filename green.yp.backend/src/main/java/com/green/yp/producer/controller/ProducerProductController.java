@@ -36,7 +36,14 @@ public class ProducerProductController {
   @GetMapping(path = "/{locationId}/products", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<List<ProducerProductResponse>> getAllProducts(
       @NotNull @NonNull @PathVariable("locationId") UUID locationId) {
-    return new ResponseApi<>(productService.findAllProducts(locationId), null);
+    return new ResponseApi<>(productService.findAllProducts(null, locationId), null);
+  }
+
+  @GetMapping(path = "{producerId}/location/{locationId}/products", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<List<ProducerProductResponse>> getAllProducts(
+          @NotNull @NonNull @PathVariable("producerId") UUID producerId,
+          @NotNull @NonNull @PathVariable("locationId") UUID locationId) {
+    return new ResponseApi<>(productService.findAllProducts(producerId, locationId), null);
   }
 
   @GetMapping(path = "/product/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)

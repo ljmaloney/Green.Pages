@@ -52,7 +52,8 @@ public class ProducerProductService {
     this.mapper = mapper;
   }
 
-  public List<ProducerProductResponse> findAllProducts(@NotNull @NonNull UUID locationId) {
+  public List<ProducerProductResponse> findAllProducts(@NotNull @NonNull UUID producerId,
+                                                       @NotNull @NonNull UUID locationId) {
     log.info("Loading all products for location {}", locationId);
     return mapper.fromEntity(productRepository.findAllByProducerLocationId(locationId));
   }
