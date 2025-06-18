@@ -25,4 +25,4 @@ public record SubscriptionDto(
     @NotNull SubscriptionType subscriptionType,
     @NotNull boolean comingSoon,
     @NotNull Integer sortOrder,
-    List<String> features) {}
+    List<SubscriptionFeatureDto> features) {}

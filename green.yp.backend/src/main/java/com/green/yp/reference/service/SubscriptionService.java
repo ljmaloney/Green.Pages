@@ -129,9 +129,9 @@ public class SubscriptionService {
             .findById(updateRequest.subscriptionId())
             .orElseThrow(
                 () -> new NotFoundException("SubscriptionId", updateRequest.subscriptionId()));
-
     try {
       PropertyUtils.copyProperties(subscription, updateRequest);
+      updateRequest.features().stream().forEach(subscription::upsertFeature);
     } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
       log.error(
           "Unexpected error when attempting to update subscription id: {}",
@@ -163,14 +163,13 @@ public class SubscriptionService {
     ServiceUtils.patchEntity(
         patchRequest,
         subscription,
-        (name, value) -> {
-          return switch (name) {
+        (name, value) ->
+          switch (name) {
             case "monthlyAutopayAmount", "quarterlyAutopayAmount", "annualBillAmount" ->
                 BigDecimal.valueOf((double) value);
             case "startDate", "endDate" -> DateUtils.parseDate(value.toString(), Date.class);
             default -> value;
-          };
-        });
+          });
     return subscriptionMapper.mapToDto(subscriptionRepository.saveAndFlush(subscription));
   }
 }

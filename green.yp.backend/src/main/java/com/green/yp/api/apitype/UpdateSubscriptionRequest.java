@@ -25,4 +25,4 @@ public record UpdateSubscriptionRequest(
     @NotNull Date startDate,
     @NotNull Integer sortOrder,
     boolean comingSoon,
-    List<String> features) {}
+    List<UpdateSubscriptionFeatureRequest> features) {}

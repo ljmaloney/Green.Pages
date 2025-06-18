@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Slf4j
 @Validated
-@RequestMapping("producer/location")
+@RequestMapping("producer")
 @Tag(name = "endpoints for managing products offered for sale")
 public class ProducerProductController {
 
@@ -33,20 +33,27 @@ public class ProducerProductController {
     this.productService = productService;
   }
 
-  @GetMapping(path = "/{locationId}/products", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(path = "/location/{locationId}/products", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<List<ProducerProductResponse>> getAllProducts(
       @NotNull @NonNull @PathVariable("locationId") UUID locationId) {
-    return new ResponseApi<>(productService.findAllProducts(locationId), null);
+    return new ResponseApi<>(productService.findAllProducts(UUID.randomUUID(), locationId), null);
   }
 
-  @GetMapping(path = "/product/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(path = "{producerId}/location/{locationId}/products", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<List<ProducerProductResponse>> getAllProducts(
+          @NotNull @NonNull @PathVariable("producerId") UUID producerId,
+          @NotNull @NonNull @PathVariable("locationId") UUID locationId) {
+    return new ResponseApi<>(productService.findAllProducts(producerId, locationId), null);
+  }
+
+  @GetMapping(path = "/location/product/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ProducerProductResponse> findProduct(
       @NotNull @NonNull @PathVariable("productId") UUID productId) {
     return new ResponseApi<>(productService.findProduct(productId), null);
   }
 
   @PostMapping(
-      path = "/product",
+      path = "/location/product",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ProducerProductResponse> createProduct(
@@ -56,7 +63,7 @@ public class ProducerProductController {
   }
 
   @PutMapping(
-      path = "/product",
+      path = "/location/product",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ProducerProductResponse> updateProduct(
@@ -66,7 +73,7 @@ public class ProducerProductController {
   }
 
   @PatchMapping(
-      path = "/product/{productId}",
+      path = "/location/product/{productId}",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ProducerProductResponse> patchProduct(
@@ -77,14 +84,14 @@ public class ProducerProductController {
         null);
   }
 
-  @DeleteMapping(path = "/product/{productId}")
+  @DeleteMapping(path = "/location/product/{productId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void discontinueImmediate(@NotNull @NonNull @PathVariable("productId") UUID productId) {
     productService.discontinueImmediate(productId, null, RequestUtil.getRequestIP());
   }
 
   @DeleteMapping(
-      path = "/product/discontinue",
+      path = "/location/product/discontinue",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ProducerProductResponse> discontinue(
