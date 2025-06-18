@@ -1,10 +1,13 @@
 package com.green.yp.reference.mapper;
 
+import com.green.yp.api.apitype.CreateSubscriptionFeatureRequest;
 import com.green.yp.api.apitype.CreateSubscriptionRequest;
 import com.green.yp.reference.data.model.Subscription;
 import com.green.yp.reference.data.model.SubscriptionFeature;
 import com.green.yp.reference.dto.SubscriptionDto;
 import java.util.List;
+
+import com.green.yp.reference.dto.SubscriptionFeatureDto;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -21,6 +24,9 @@ public interface SubscriptionMapper {
   @Mapping(source = "subscription.features", target = "features")
   SubscriptionDto mapToDto(Subscription subscription);
 
+  List<SubscriptionFeatureDto> mapToDtoList(List<SubscriptionFeature> features);
+  SubscriptionFeatureDto mapToDto(SubscriptionFeature feature);
+
   List<String> toFeatureStringList(List<SubscriptionFeature> features);
 
   default String mapFeatureToString(SubscriptionFeature feature) {
@@ -28,6 +34,8 @@ public interface SubscriptionMapper {
   }
 
   Subscription mapToEntity(CreateSubscriptionRequest createRequest);
+  SubscriptionFeature mapToEntity(CreateSubscriptionFeatureRequest createRequest);
+  List<SubscriptionFeature> mapToEntityList(List<CreateSubscriptionFeatureRequest> features);
 
   default List<SubscriptionFeature> mapToEntity(List<String> features) {
     return features.stream()

@@ -1,5 +1,6 @@
 package com.green.yp.reference.data.model;
 
+import com.green.yp.api.apitype.UpdateSubscriptionFeatureRequest;
 import com.green.yp.common.data.converter.BooleanConverter;
 import com.green.yp.common.data.embedded.Mutable;
 import com.green.yp.reference.data.enumeration.SubscriptionType;
@@ -89,5 +90,23 @@ public class Subscription extends Mutable {
     @Override
     public void onPreUpdate() {
         features.forEach(feature -> feature.setSubscription(this));
+    }
+
+    public void upsertFeature(UpdateSubscriptionFeatureRequest upsertFeature) {
+        features.stream()
+                .filter(feature -> upsertFeature.feature().equals(feature.getFeature()))
+                .findFirst()
+                .ifPresentOrElse( feature -> {
+                            feature.setFeature(upsertFeature.featureName());
+                            feature.setFeatureName(upsertFeature.featureName());
+                            feature.setDisplay(upsertFeature.display());
+                            feature.setConfigMap(upsertFeature.configMap());
+                        },
+                        () -> features.add(SubscriptionFeature.builder()
+                                        .feature(upsertFeature.feature())
+                                        .featureName(upsertFeature.featureName())
+                                        .display(upsertFeature.display())
+                                        .configMap(upsertFeature.configMap())
+                                .build()));
     }
 }
