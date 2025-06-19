@@ -24,5 +24,6 @@ public record ProducerResponse(
     @NotNull @NonNull ProducerSubscriptionType subscriptionType,
     InvoiceCycleType invoiceCycleType,
     String websiteUrl,
+    String iconLink,
     List<ProducerSubscriptionResponse> subscriptions,
     String narrative) {}
