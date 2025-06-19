@@ -50,4 +50,6 @@ fusionauth:
 greenyp:
   image:
     service:
+      image:
+        host: http://localhost:8081
       filepath: /Users/luthermaloney/git/Green.Pages/green.yp.backend/build/resources/main/static
