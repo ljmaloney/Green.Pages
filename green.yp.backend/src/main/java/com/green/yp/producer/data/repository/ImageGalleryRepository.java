@@ -1,7 +1,5 @@
 package com.green.yp.producer.data.repository;
 
-
-import com.green.yp.api.apitype.producer.ProducerImageResponse;
 import com.green.yp.producer.data.model.ImageGallery;
 import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;

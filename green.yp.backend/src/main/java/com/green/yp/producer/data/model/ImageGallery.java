@@ -25,7 +25,7 @@ public class ImageGallery extends Mutable {
     @Column(name="description", length = 512)
     private String description;
 
-    @Column(name="image url_link", length = 256)
+    @Column(name="image_url_link", length = 256)
     @NotNull @NonNull
     private String url;
 

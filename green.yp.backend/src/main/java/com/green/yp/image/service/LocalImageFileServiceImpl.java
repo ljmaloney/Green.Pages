@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 @Slf4j
@@ -32,6 +33,9 @@ public class LocalImageFileServiceImpl implements ImageFileService {
 
     @Value("${greenyp.image.service.imageGallery.path:image}")
     private String imageGalleryPath;
+
+    @Value("${greenyp.image.service.image.host:}")
+    private String imageHostname;
 
     @Override
     public void deleteLogo(UUID producerId) {
@@ -60,10 +64,12 @@ public class LocalImageFileServiceImpl implements ImageFileService {
     @Override
     public String saveLogo(UUID producerId, String logoFilename, MultipartFile logoFile) {
         String pathString = createPath(fileSystemPath, urlBasePath, logoPath, producerId);
-        Path path = FileSystems.getDefault().getPath(pathString, logoFilename);
+        String fileName = logoFilename.replace(' ','-');
+        Path path = FileSystems.getDefault().getPath(pathString, fileName);
         try {
-            Files.copy(logoFile.getInputStream(), path);
-            return createUrlPath(urlBasePath, producerId, logoPath, logoFilename);
+            Files.createDirectories(path.getParent());
+            Files.copy(logoFile.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+            return createUrlPath(urlBasePath, producerId, logoPath, fileName);
         } catch (IOException e) {
             log.error("Unexpected error saving producer/subscriber logo", e);
             throw new SystemException("Unexpected error saving producer/subscriber logo", e);
@@ -72,11 +78,13 @@ public class LocalImageFileServiceImpl implements ImageFileService {
 
     @Override
     public String saveImage(UUID producerId, String imageFilename, MultipartFile imageFile) {
-        String pathString = createPath(fileSystemPath, urlBasePath, logoPath, producerId);
-        Path path = FileSystems.getDefault().getPath(pathString, imageFilename);
+        String pathString = createPath(fileSystemPath, urlBasePath, imageGalleryPath, producerId);
+        String fileName = imageFilename.replace(' ','-');
+        Path path = FileSystems.getDefault().getPath(pathString, fileName);
         try {
-            Files.copy(imageFile.getInputStream(), path);
-            return createUrlPath(urlBasePath, producerId, logoPath, imageFilename);
+            Files.createDirectories(path.getParent());
+            Files.copy(imageFile.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+            return createUrlPath(urlBasePath, producerId, imageGalleryPath, fileName);
         } catch (IOException e) {
             log.error("Unexpected error saving producer/subscriber logo", e);
             throw new SystemException("Unexpected error saving producer/subscriber logo", e);
@@ -84,7 +92,9 @@ public class LocalImageFileServiceImpl implements ImageFileService {
     }
 
     private String createUrlPath(String urlBasePath, UUID producerId, String subfolder, String logoFilename) {
-        return urlBasePath +
+        return imageHostname +
+               "/" +
+               urlBasePath +
                "/" +
                producerId.toString() +
                "/" +
@@ -95,11 +105,11 @@ public class LocalImageFileServiceImpl implements ImageFileService {
 
     private String createPath(String fileSystemPath, String urlBasePath, String subfolder, UUID producerId) {
         return new StringBuilder(fileSystemPath)
-                .append(File.pathSeparator)
+                .append(File.separator)
                 .append(urlBasePath)
-                .append(File.pathSeparator)
+                .append(File.separator)
                 .append(producerId.toString())
-                .append(File.pathSeparator)
+                .append(File.separator)
                 .append(subfolder)
                 .toString();
     }
