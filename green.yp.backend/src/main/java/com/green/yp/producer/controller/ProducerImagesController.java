@@ -3,6 +3,7 @@ package com.green.yp.producer.controller;
 import com.green.yp.api.apitype.common.ResponseApi;
 import com.green.yp.api.apitype.producer.ProducerImageResponse;
 import com.green.yp.producer.service.ProducerImageService;
+import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -62,5 +63,20 @@ public class ProducerImagesController {
             @RequestParam("file") MultipartFile file) {
         log.info("Uploading gallery image for : {}", producerId);
         imageService.uploadGalleryImage(producerId, imageDescription, file);
+    }
+
+    @DeleteMapping(path = "{producerId}/logo")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteLogo(@PathVariable("producerId") UUID producerId){
+        log.info("Deleting logo for producer {}", producerId);
+        imageService.deleteLogo(producerId, RequestUtil.getRequestIP());
+    }
+
+    @DeleteMapping(path="{producerId}/gallery")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteGalleryImage(@PathVariable("producerId") UUID producerId,
+                                   @RequestParam(name = "imageFilename", required = true) String imageFilename){
+        log.info("Deleting image {} for {} gallery", imageFilename, producerId);
+        imageService.deleteGallaryImage(producerId, imageFilename, RequestUtil.getRequestIP());
     }
 }

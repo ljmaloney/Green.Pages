@@ -46,7 +46,7 @@ public class Producer extends Mutable {
   @Column(name = "icon_link_url")
   private String iconLink;
 
-  @Column(name = "narrative", length = 512)
+  @Column(name = "narrative", length = 1024)
   private String narrative;
 
   @OneToMany(mappedBy = "producer", cascade = CascadeType.ALL)

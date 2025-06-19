@@ -26,4 +26,10 @@ public class ProducerImageService {
     public ProducerImageResponse getProducerLogo(UUID producerId) {
         return null;
     }
+
+    public void deleteLogo(UUID producerId, String requestIP) {
+    }
+
+    public void deleteGallaryImage(UUID producerId, String imageFilename, String requestIP) {
+    }
 }
