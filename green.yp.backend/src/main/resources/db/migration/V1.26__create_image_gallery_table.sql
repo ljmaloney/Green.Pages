@@ -12,7 +12,7 @@ CREATE TABLE producer_image_gallery (
         `producer_id`       binary(16)      not null,
         `image_file_name`   varchar(80)     not null,
         `image url_link`    varchar(256)    not null,
-        `description`       clob,
+        `description`       TEXT,
         PRIMARY KEY (`id`),
         CONSTRAINT `fk_image_gallery_producer`
             FOREIGN KEY (`producer_id`)

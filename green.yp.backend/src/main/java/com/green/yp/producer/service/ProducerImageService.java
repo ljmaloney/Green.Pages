@@ -3,6 +3,7 @@ package com.green.yp.producer.service;
 import com.green.yp.api.apitype.producer.ProducerImageResponse;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.image.ImageFileService;
+import com.green.yp.producer.data.model.ImageGallery;
 import com.green.yp.producer.data.model.Producer;
 import com.green.yp.producer.data.repository.ImageGalleryRepository;
 import com.green.yp.producer.data.repository.ProducerRepository;
@@ -46,9 +47,25 @@ public class ProducerImageService {
     public void uploadLogoImage(UUID producerId, String logoFileName, MultipartFile file) {
         Producer producer = producerRepository.findById(producerId)
                 .orElseThrow(() -> new NotFoundException("producer", producerId));
+
+        String urlPath = imageFileService.saveLogo(producerId, logoFileName, file);
+
+        producer.setIconLink(urlPath);
+        producerRepository.saveAndFlush(producer);
     }
 
-    public void uploadGalleryImage(UUID producerId, String imageDescription, String description, MultipartFile file) {
+    public void uploadGalleryImage(UUID producerId, String imageFilename, String description, MultipartFile file) {
+        producerRepository.findById(producerId)
+                .orElseThrow(() -> new NotFoundException("producer", producerId));
+
+        String urlPath = imageFileService.saveImage(producerId, imageFilename, file);
+
+        imageGalleryRepository.saveAndFlush(ImageGallery.builder()
+                        .producerId(producerId)
+                        .imageFilename(imageFilename)
+                        .url(urlPath)
+                        .description(description)
+                .build());
     }
 
     public ProducerImageResponse getProducerLogo(UUID producerId) {
@@ -56,9 +73,18 @@ public class ProducerImageService {
     }
 
     public void deleteLogo(UUID producerId, String requestIP) {
+        Producer producer = producerRepository.findById(producerId)
+                .orElseThrow(() -> new NotFoundException("producer", producerId));
 
+        imageFileService.deleteLogo(producerId);
+        producer.setIconLink(null);
+        producerRepository.saveAndFlush(producer);
     }
 
     public void deleteGallaryImage(UUID producerId, String imageFilename, String requestIP) {
+        producerRepository.findById(producerId)
+                .orElseThrow(() -> new NotFoundException("producer", producerId));
+        imageFileService.deleteImage(producerId, imageFilename);
+        imageGalleryRepository.deleteImageGalleryByProducerIdAndImageFilename(producerId, imageFilename);
     }
 }

@@ -12,4 +12,6 @@ import java.util.UUID;
 
 public interface ImageGalleryRepository extends JpaRepository<ImageGallery, UUID> {
     List<ImageGallery> findImageGalleriesByProducerId(@NonNull @NotNull UUID producerId);
+
+    void deleteImageGalleryByProducerIdAndImageFilename(UUID producerId, String imageFilename);
 }
