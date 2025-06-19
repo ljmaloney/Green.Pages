@@ -62,7 +62,7 @@ public class ProducerImagesController {
             @RequestParam("imageDescription") String imageDescription,
             @RequestParam("file") MultipartFile file) {
         log.info("Uploading gallery image for : {}", producerId);
-        imageService.uploadGalleryImage(producerId, imageDescription, file);
+        imageService.uploadGalleryImage(producerId, imageFilename, imageDescription, file);
     }
 
     @DeleteMapping(path = "{producerId}/logo")
