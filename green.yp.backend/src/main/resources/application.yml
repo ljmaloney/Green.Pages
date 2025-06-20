@@ -47,3 +47,13 @@ fusionauth:
       tenant: e5c8b6b2-ca40-4d53-c435-01e1b803db88
       connectTimeout: 2000
       readTimeout: 2000
+greenyp:
+  cloud:
+    aws:
+      s3:
+        enabled: false
+        region: us-east-1
+  image:
+    service:
+      host: http://localhost:8081
+      filepath: /Users/luthermaloney/git/Green.Pages/green.yp.backend/build/resources/main/static

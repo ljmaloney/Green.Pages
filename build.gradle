@@ -1,6 +1,5 @@
 plugins {
 	id 'java'
-//	id 'org.flywaydb.flyway' version '11.8.2'
 }
 
 group = 'com.green.yp'
@@ -17,19 +16,8 @@ java {
 dependencies {
 	testImplementation platform('org.junit:junit-bom:5.10.0')
 	testImplementation 'org.junit.jupiter:junit-jupiter'
-//	implementation 'com.mysql:mysql-connector-j:8.4.0'
-//	implementation 'org.flywaydb:flyway-core:11.8.2'      // ✅ Add version
-//	implementation 'org.flywaydb:flyway-mysql:11.8.2'
 }
 
 test {
 	useJUnitPlatform()
 }
-
-//flyway {
-//	url = "jdbc:mysql://localhost:3306/greenyp"
-//	user = "gypadmin"
-//	password = "gypadmin"
-//	schemas = ['greenyp']
-//	locations = ['filesystem:green.yp.backend/src/main/resources/db/migration']
-//}

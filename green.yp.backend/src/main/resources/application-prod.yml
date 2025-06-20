@@ -46,3 +46,14 @@ fusionauth:
       tenant: ${GYP_FA_TENANT_ID}
       connectTimeout: 2000
       readTimeout: 2000
+greenyp:
+  cloud:
+    aws:
+      s3:
+        enabled: true
+        region: us-east-1
+  image:
+    service:
+      impl: aws
+      host: https://greenyp-public-images.s3.amazonaws.com
+      bucket: greenyp-public-images
