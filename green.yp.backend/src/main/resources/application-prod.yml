@@ -46,3 +46,11 @@ fusionauth:
       tenant: ${GYP_FA_TENANT_ID}
       connectTimeout: 2000
       readTimeout: 2000
+greenyp:
+  image:
+    service:
+      image:
+        host: http://localhost:8081
+        service:
+          impl: aws
+      filepath: /Users/luthermaloney/git/Green.Pages/green.yp.backend/build/resources/main/static

@@ -1,5 +1,6 @@
 package com.green.yp.image.service;
 
+import com.green.yp.image.AbstractImageFileService;
 import com.green.yp.image.ImageFileService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -10,34 +11,25 @@ import java.util.UUID;
 
 @Service
 @ConditionalOnProperty(name = "greenyp.image.service.impl", havingValue = "aws")
-public class AmazonImageFileServiceImpl implements ImageFileService {
+public class AmazonImageFileServiceImpl extends AbstractImageFileService implements ImageFileService {
+    private static final String S3_PATH_SEPARATOR = "/";
 
-    @Value("${greenyp.image.service.url.base:subscriber}")
-    private String urlBasePath;
+    @Value("${greenyp.image.service.bucket}")
+    private String s3BucketName;
 
-    @Value("${greenyp.image.service.logo.path:logo}")
-    private String logoPath;
+    @Value("${greenyp.image.service.image.host:}")
+    private String imageHostname;
 
-    @Value("${greenyp.image.service.logo.path:image}")
-    private String imageGalleryPath;
-
-    @Override
-    public void deleteLogo(UUID producerId) {
-
+    public String pathSeparator(){
+        return S3_PATH_SEPARATOR;
     }
 
     @Override
-    public void deleteImage(UUID producerId, String imageFilename) {
-
-    }
-
-    @Override
-    public String saveLogo(UUID producerId, String logoFilename, MultipartFile logoFile) {
+    protected String saveImageFile(MultipartFile multipartFile, String pathString, String fileName) {
         return "";
     }
 
     @Override
-    public String saveImage(UUID producerId, String imageFilename, MultipartFile imageFile) {
-        return "";
+    protected void deleteFile(String pathKey, String fileName) {
     }
 }
