@@ -6,12 +6,15 @@ Container Services Fargate service/task. The bucket will be used to serve images
 have read-only public permissions and read-write permissions for the Fargate service
 
 ### 1. Create an AWS - S3 Bucket
-  1. Login to AWS and navigate to S3, your user id should have permissions to create buckets
+
+1. Login to AWS and navigate to S3, your user id should have permissions to create buckets
 2. Click "Create Bucket"
 3. Select "General Purpose"
 4. Give the bucket a name
+
 ### 2. Setup Bucket Policy for Read Only access
-In Bucket -> Permissions -> Bucket policy use something like the following to allow public read 
+
+In Bucket -> Permissions -> Bucket policy use something like the following to allow public read
 access to the files in the bucket
 <code>
 {
@@ -27,8 +30,11 @@ access to the files in the bucket
 ]
 }
 </code>
+
 ### 3. Setup IAM Permissions to Upload / Delete
-In order to enable access for an AWS user and ECS, a policy like below is required to be configured for the IAM user and the ECS Task Role
+
+In order to enable access for an AWS user and ECS, a policy like below is required to be configured for the IAM user and
+the ECS Task Role
 <code>
 {
 "Version": "2012-10-17",
@@ -42,5 +48,7 @@ In order to enable access for an AWS user and ECS, a policy like below is requir
 ]
 }
 </code>
+
 ### 4. Disable Access Control Lists (Optional but Recommended)
-   This is one of the options available when creating a bucket, make sure to select "ACLs Disabled"
+
+This is one of the options available when creating a bucket, make sure to select "ACLs Disabled"
