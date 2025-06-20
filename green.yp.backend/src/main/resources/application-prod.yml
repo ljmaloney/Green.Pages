@@ -54,8 +54,6 @@ greenyp:
         region: us-east-1
   image:
     service:
-      image:
-        host: http://localhost:8081
-        service:
-          impl: aws
-      filepath: /Users/luthermaloney/git/Green.Pages/green.yp.backend/build/resources/main/static
+      impl: aws
+      host: https://greenyp-public-images.s3.amazonaws.com
+      bucket: greenyp-public-images

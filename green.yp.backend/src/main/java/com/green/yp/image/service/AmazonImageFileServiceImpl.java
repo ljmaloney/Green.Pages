@@ -17,7 +17,7 @@ public class AmazonImageFileServiceImpl extends AbstractImageFileService impleme
     @Value("${greenyp.image.service.bucket}")
     private String s3BucketName;
 
-    @Value("${greenyp.image.service.image.host:}")
+    @Value("${greenyp.image.service.host:}")
     private String imageHostname;
 
     public String pathSeparator(){

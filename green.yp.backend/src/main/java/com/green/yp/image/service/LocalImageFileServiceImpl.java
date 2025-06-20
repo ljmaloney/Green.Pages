@@ -23,7 +23,7 @@ public class LocalImageFileServiceImpl extends AbstractImageFileService implemen
   @Value("${greenyp.image.service.filepath}")
   private String fileSystemPath;
 
-    @Value("${greenyp.image.service.image.host:}")
+    @Value("${greenyp.image.service.host:}")
     private String imageHostname;
 
     protected String saveImageFile( MultipartFile multipartFile, String pathString, String fileName) {
