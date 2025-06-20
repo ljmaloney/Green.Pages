@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -42,10 +43,12 @@ public class LocalImageFileServiceImpl extends AbstractImageFileService
   }
 
   protected void deleteFile(String pathKey, String fileName) {
-    Path path = FileSystems.getDefault().getPath(fileSystemPath, pathKey, fileName);
     try {
+      Path path = StringUtils.isEmpty(fileName)
+              ? FileSystems.getDefault().getPath(fileSystemPath, pathKey)
+              : FileSystems.getDefault().getPath(fileSystemPath, pathKey, fileName);
       Files.deleteIfExists(path);
-    } catch (IOException e) {
+    } catch ( Exception e) {
       log.error("Unexpected error deleting / removing producer image", e);
       throw new SystemException("Unexpected error deleting / removing producer image", e);
     }
