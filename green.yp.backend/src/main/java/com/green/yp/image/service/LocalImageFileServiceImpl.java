@@ -30,11 +30,11 @@ public class LocalImageFileServiceImpl extends AbstractImageFileService
   private String imageHostname;
 
   protected String saveImageFile(MultipartFile multipartFile, String pathString, String fileName) {
-    Path path = FileSystems.getDefault().getPath(pathString, fileName);
+    Path path = FileSystems.getDefault().getPath(fileSystemPath, pathString, fileName);
     try {
       Files.createDirectories(path.getParent());
       Files.copy(multipartFile.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-      return createUrl(imageHostname, pathString);
+      return createUrl(imageHostname, pathString, fileName);
     } catch (IOException e) {
       log.error("Unexpected error saving producer/subscriber logo", e);
       throw new SystemException("Unexpected error saving producer/subscriber logo", e);

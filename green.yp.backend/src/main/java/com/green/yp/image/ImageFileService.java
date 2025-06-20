@@ -32,7 +32,7 @@ public interface ImageFileService {
     return String.join(pathSeparator(), folder, producerId.toString(), subFolder, fileName);
   }
 
-  default String createUrl(String hostname, String fileKeyPath) {
-    return String.format("%s/%s", hostname, fileKeyPath);
+  default String createUrl(String hostname, String fileKeyPath, String filename) {
+    return String.format("%s/%s/%s", hostname, fileKeyPath, filename);
   }
 }

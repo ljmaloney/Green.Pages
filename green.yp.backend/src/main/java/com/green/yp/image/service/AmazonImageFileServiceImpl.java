@@ -50,7 +50,7 @@ public class AmazonImageFileServiceImpl extends AbstractImageFileService
               .contentType(multipartFile.getContentType())
               .build(),
           RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));
-      return createUrl(imageHostname, key);
+      return createUrl(imageHostname, pathString, fileName);
     } catch (IOException | S3Exception e) {
       log.error("Failed to upload image to S3", e);
       throw new SystemException("Unexpected error uploading image to S3", e);
