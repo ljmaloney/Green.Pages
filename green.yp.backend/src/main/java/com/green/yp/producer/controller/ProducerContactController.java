@@ -71,25 +71,32 @@ public class ProducerContactController {
   }
 
   @Operation(summary = "Updates an existing contact")
-  @PutMapping(path = "/contact",
-          consumes = MediaType.APPLICATION_JSON_VALUE,
-          produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping(
+      path = "/contact",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public ResponseApi<ProducerContactResponse> updateContact(@Valid @RequestBody ProducerContactRequest contactRequest){
-    return new ResponseApi<>(contactOrchestrationService.updateContact(contactRequest,
-            null,
-            contactRequest.producerLocationId(),
-            RequestUtil.getRequestIP()), null);
+  public ResponseApi<ProducerContactResponse> updateContact(
+      @Valid @RequestBody ProducerContactRequest contactRequest) {
+    return new ResponseApi<>(
+        contactOrchestrationService.updateContact(
+            contactRequest, null, contactRequest.producerLocationId(), RequestUtil.getRequestIP()),
+        null);
   }
 
   @Operation(summary = "Updates an existing contact")
-  @PutMapping(path = "/location/{locationId}/contact",
-          consumes = MediaType.APPLICATION_JSON_VALUE,
-          produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping(
+      path = "/location/{locationId}/contact",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public ResponseApi<ProducerContactResponse> updateContact(@PathVariable("locationId") UUID locationId,
-                                                            @Valid @RequestBody ProducerContactRequest contactRequest){
-    return new ResponseApi<>(contactOrchestrationService.updateContact(contactRequest, null, locationId, RequestUtil.getRequestIP()), null);
+  public ResponseApi<ProducerContactResponse> updateContact(
+      @PathVariable("locationId") UUID locationId,
+      @Valid @RequestBody ProducerContactRequest contactRequest) {
+    return new ResponseApi<>(
+        contactOrchestrationService.updateContact(
+            contactRequest, null, locationId, RequestUtil.getRequestIP()),
+        null);
   }
 
   @Operation(summary = "Deletes (inactivates) a contact")

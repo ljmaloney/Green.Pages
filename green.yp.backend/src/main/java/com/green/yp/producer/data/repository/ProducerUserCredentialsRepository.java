@@ -1,6 +1,5 @@
 package com.green.yp.producer.data.repository;
 
-import com.green.yp.api.apitype.producer.ProducerUserResponse;
 import com.green.yp.producer.data.model.ProducerUserCredentials;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;

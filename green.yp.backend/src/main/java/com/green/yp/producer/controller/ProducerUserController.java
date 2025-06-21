@@ -2,7 +2,6 @@ package com.green.yp.producer.controller;
 
 import com.green.yp.api.apitype.producer.ProducerContactRequest;
 import com.green.yp.api.apitype.producer.ProducerCredentialsResponse;
-import com.green.yp.api.apitype.producer.ProducerUserResponse;
 import com.green.yp.api.apitype.producer.UserCredentialsRequest;
 import com.green.yp.api.apitype.producer.enumeration.ProducerContactType;
 import com.green.yp.api.apitype.producer.enumeration.ProducerDisplayContactType;
@@ -14,7 +13,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.security.NoSuchAlgorithmException;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,8 +32,9 @@ public class ProducerUserController {
   private final ProducerUserService userService;
   private final ProducerContactOrchestrationService contactOrchestrationService;
 
-  public ProducerUserController(ProducerUserService userService,
-                                ProducerContactOrchestrationService contactOrchestrationService) {
+  public ProducerUserController(
+      ProducerUserService userService,
+      ProducerContactOrchestrationService contactOrchestrationService) {
     this.userService = userService;
     this.contactOrchestrationService = contactOrchestrationService;
   }
@@ -49,41 +48,43 @@ public class ProducerUserController {
       @NotNull @NonNull @Valid @RequestBody UserCredentialsRequest credentialsRequest)
       throws NoSuchAlgorithmException {
     contactOrchestrationService.createContact(
-            new ProducerContactRequest(
-                   null,
-                   null,
-                   ProducerContactType.ADMIN,
-                   ProducerDisplayContactType.NO_DISPLAY,null,
-                    credentialsRequest.firstName(),
-                    credentialsRequest.lastName(),
-                    null,
-                    credentialsRequest.businessPhone(),
-                    credentialsRequest.cellPhone(),
-                    credentialsRequest.emailAddress()
-            ),
-            Optional.of(credentialsRequest),
-            producerId,
+        new ProducerContactRequest(
             null,
-            RequestUtil.getRequestIP());
+            null,
+            ProducerContactType.ADMIN,
+            ProducerDisplayContactType.NO_DISPLAY,
+            null,
+            credentialsRequest.firstName(),
+            credentialsRequest.lastName(),
+            null,
+            credentialsRequest.businessPhone(),
+            credentialsRequest.cellPhone(),
+            credentialsRequest.emailAddress()),
+        Optional.of(credentialsRequest),
+        producerId,
+        null,
+        RequestUtil.getRequestIP());
 
-    return new ResponseApi<>(userService.findCredentials(credentialsRequest.userName()
-            , credentialsRequest.emailAddress()).get(),
+    return new ResponseApi<>(
+        userService
+            .findCredentials(credentialsRequest.userName(), credentialsRequest.emailAddress())
+            .get(),
         null);
   }
 
   @PutMapping(
-          path = "/{producerId}/authorize/user/{credentialsId}",
-          consumes = MediaType.APPLICATION_JSON_VALUE,
-          produces = MediaType.APPLICATION_JSON_VALUE)
+      path = "/{producerId}/authorize/user/{credentialsId}",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ProducerCredentialsResponse> updateAuthorizedUser(
-          @NotNull @NonNull @PathVariable("producerId") UUID producerId,
-          @NotNull @NonNull @PathVariable("credentialsId") UUID credentialsId,
-          @NotNull @NonNull @Valid @RequestBody UserCredentialsRequest credentialsRequest)
-          throws NoSuchAlgorithmException {
+      @NotNull @NonNull @PathVariable("producerId") UUID producerId,
+      @NotNull @NonNull @PathVariable("credentialsId") UUID credentialsId,
+      @NotNull @NonNull @Valid @RequestBody UserCredentialsRequest credentialsRequest)
+      throws NoSuchAlgorithmException {
     return new ResponseApi<>(
-            userService.updateUserCredentials(
-                    credentialsRequest,producerId, credentialsId, RequestUtil.getRequestIP()),
-            null);
+        userService.updateUserCredentials(
+            credentialsRequest, producerId, credentialsId, RequestUtil.getRequestIP()),
+        null);
   }
 
   @GetMapping(path = "/{producerId}/search/users", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -92,6 +93,7 @@ public class ProducerUserController {
       @RequestParam(value = "firstName", required = false) String firstName,
       @RequestParam(value = "lastName", required = false) String lastName) {
     log.info("Search producerUsers by firstname : {} and lastName: {}", firstName, lastName);
-    return new ResponseApi<>(userService.findUsers(producerId, firstName, lastName, RequestUtil.getRequestIP()), null);
+    return new ResponseApi<>(
+        userService.findUsers(producerId, firstName, lastName, RequestUtil.getRequestIP()), null);
   }
 }

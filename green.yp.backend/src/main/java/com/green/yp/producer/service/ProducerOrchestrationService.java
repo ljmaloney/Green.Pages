@@ -14,27 +14,20 @@ import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.producer.data.model.Producer;
 import com.green.yp.producer.data.model.ProducerLineOfBusiness;
-import com.green.yp.producer.data.model.ProducerSubscription;
 import com.green.yp.producer.data.record.ProducerSubscriptionRecord;
 import com.green.yp.producer.data.repository.ProducerLobRepository;
 import com.green.yp.producer.data.repository.ProducerRepository;
 import com.green.yp.producer.data.repository.ProducerSubscriptionRepository;
 import com.green.yp.producer.mapper.ProducerMapper;
-import com.green.yp.reference.data.enumeration.SubscriptionType;
 import com.green.yp.reference.dto.LineOfBusinessDto;
-import com.green.yp.reference.dto.SubscriptionDto;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -76,10 +69,6 @@ public class ProducerOrchestrationService {
     this.subscriptionRepository = subscriptionRepository;
     this.subscriptionContract = subscriptionContract;
     this.subscriptionService = subscriptionService;
-  }
-
-  public ProducerProfileResponse getProducerProfile(UUID producerLocationId) {
-    return null;
   }
 
   @AuditRequest(

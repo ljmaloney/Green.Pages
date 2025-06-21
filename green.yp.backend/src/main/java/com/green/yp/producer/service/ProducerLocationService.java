@@ -68,8 +68,10 @@ public class ProducerLocationService {
     location.setProducerId(producerId);
     location.setActive(true);
 
-    if ( location.getLatitude() == null || location.getLongitude() == null){
-      var coordinates = geocodingService.getCoordinates(location.getAddressLine1(),
+    if (location.getLatitude() == null || location.getLongitude() == null) {
+      var coordinates =
+          geocodingService.getCoordinates(
+              location.getAddressLine1(),
               location.getCity(),
               location.getState(),
               location.getPostalCode());

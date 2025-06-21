@@ -13,7 +13,6 @@ import com.green.yp.exception.BusinessException;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.producer.data.model.Producer;
-import com.green.yp.producer.data.model.ProducerLocation;
 import com.green.yp.producer.data.model.ProducerProduct;
 import com.green.yp.producer.data.repository.ProducerProductRepository;
 import com.green.yp.producer.mapper.ProducerProductMapper;
@@ -33,6 +32,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ProducerProductService {
 
+  public static final String PRODUCER_PRODUCT_ENTITY = "ProducerProduct";
   private final ProducerOrchestrationService producerService;
 
   private final ProducerLocationService locationService;
@@ -63,7 +63,7 @@ public class ProducerProductService {
     return productRepository
         .findById(productId)
         .map(mapper::fromEntity)
-        .orElseThrow(() -> new NotFoundException("ProducerProduct", productId));
+        .orElseThrow(() -> new NotFoundException(PRODUCER_PRODUCT_ENTITY, productId));
   }
 
   @AuditRequest(
@@ -102,7 +102,7 @@ public class ProducerProductService {
         productRepository
             .findById(productRequest.productId())
             .orElseThrow(
-                () -> new NotFoundException("ProducerProduct", productRequest.productId()));
+                () -> new NotFoundException(PRODUCER_PRODUCT_ENTITY, productRequest.productId()));
 
     return updateProduct(
         product.getProducerId(),
@@ -132,7 +132,7 @@ public class ProducerProductService {
     final ProducerProduct product =
         productRepository
             .findById(productId)
-            .orElseThrow(() -> new NotFoundException("ProducerProduct", productId));
+            .orElseThrow(() -> new NotFoundException(PRODUCER_PRODUCT_ENTITY, productId));
 
     return updateProduct(
         product.getProducerId(),
@@ -164,7 +164,7 @@ public class ProducerProductService {
         productRepository
             .findById(discontinueRequest.productId())
             .orElseThrow(
-                () -> new NotFoundException("ProducerProduct", discontinueRequest.productId()));
+                () -> new NotFoundException(PRODUCER_PRODUCT_ENTITY, discontinueRequest.productId()));
 
     if (product.isDiscontinued() && !discontinueDatesChanged(product, discontinueRequest)) {
       return mapper.fromEntity(product);

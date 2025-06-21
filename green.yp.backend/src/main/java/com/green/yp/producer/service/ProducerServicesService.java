@@ -6,19 +6,24 @@ import com.green.yp.api.apitype.ProducerServiceResponse;
 import com.green.yp.api.apitype.enumeration.AuditActionType;
 import com.green.yp.api.apitype.enumeration.AuditObjectType;
 import com.green.yp.api.apitype.producer.ProducerServiceRequest;
+import com.green.yp.api.apitype.producer.ProducerServiceUpdateRequest;
 import com.green.yp.common.ServiceUtils;
 import com.green.yp.exception.BusinessException;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
+import com.green.yp.exception.SystemException;
 import com.green.yp.producer.data.model.ProducerService;
+import com.green.yp.producer.data.repository.ProducerRepository;
 import com.green.yp.producer.data.repository.ProducerServiceRepository;
 import com.green.yp.producer.mapper.ProducerServiceMapper;
 import jakarta.validation.constraints.NotNull;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +36,8 @@ public class ProducerServicesService {
   private final ProducerServiceRepository serviceRepository;
 
   public ProducerServicesService(
-      ProducerServiceMapper serviceMapper, ProducerServiceRepository serviceRepository) {
+          ProducerServiceMapper serviceMapper,
+          ProducerServiceRepository serviceRepository) {
     this.serviceMapper = serviceMapper;
     this.serviceRepository = serviceRepository;
   }
@@ -79,6 +85,31 @@ public class ProducerServicesService {
   }
 
   @AuditRequest(
+          requestParameter = "updateRequest",
+          objectType = AuditObjectType.PRODUCER_SERVICE,
+          actionType = AuditActionType.UPDATE)
+  @Transactional
+  public ProducerServiceResponse updateService(ProducerServiceUpdateRequest updateRequest, String requestIP) {
+    log.info("Updating service {}", updateRequest.serviceId());
+
+    var service = serviceRepository.findById(updateRequest.serviceId()).orElseThrow(() -> {
+      log.warn("No producer service found for id {}",updateRequest.serviceId());
+        return new NotFoundException("ProducerService", updateRequest.serviceId());
+    });
+
+      try {
+          PropertyUtils.copyProperties(service, updateRequest);
+      } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+          log.error("Unexpected error updating producer service");
+          throw new SystemException("Unexpected error updating propducer service", e);
+      }
+
+      ProducerService producerService = serviceRepository.saveAndFlush(service);
+
+    return serviceMapper.fromEntity(producerService);
+  }
+
+  @AuditRequest(
       requestParameter = "patchRequest",
       objectType = AuditObjectType.PRODUCER_SERVICE,
       actionType = AuditActionType.UPDATE)
@@ -97,12 +128,10 @@ public class ProducerServicesService {
       ServiceUtils.patchEntity(
           patchRequest,
           producerService,
-          (name, value) -> {
-            return switch (name) {
-              case "minServicePrice" -> BigDecimal.valueOf(((Double) value).doubleValue());
-              case "maxServicePrice" -> BigDecimal.valueOf(((Double) value).doubleValue());
+          (name, value) -> switch (name) {
+              case "minServicePrice" -> BigDecimal.valueOf((Double) value);
+              case "maxServicePrice" -> BigDecimal.valueOf((Double) value);
               default -> value;
-            };
           });
       return serviceMapper.fromEntity(serviceRepository.save(producerService));
 
@@ -116,4 +145,5 @@ public class ProducerServicesService {
     log.info("Deleting service {} from {}", serviceId, requestIP);
     serviceRepository.deleteById(serviceId);
   }
+
 }
