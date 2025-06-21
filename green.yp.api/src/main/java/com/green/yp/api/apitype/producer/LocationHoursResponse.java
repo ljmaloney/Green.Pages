@@ -8,7 +8,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 public record LocationHoursResponse(
-    @NotNull @NonNull UUID locationHoursId,
+    UUID locationHoursId,
     @NotNull @NonNull OffsetDateTime createDate,
     @NotNull @NonNull OffsetDateTime lastUpdateDate,
     @NotNull @NonNull UUID producerId,

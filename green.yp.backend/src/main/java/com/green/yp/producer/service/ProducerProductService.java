@@ -195,7 +195,7 @@ public class ProducerProductService {
       UUID producerId, UUID producerLocationId, Supplier<ProducerProductResponse> updateSupplier) {
     Producer producer = producerService.findActiveProducer(producerId);
 
-    if (producer.getCancelDate() == null) {
+    if (producer.getCancelDate() != null) {
       log.warn(
           "ProducerAccount {} is being cancelled as of {}, cannot create/update product",
           producer.getId(),
@@ -205,7 +205,7 @@ public class ProducerProductService {
           producer.getId(), producer.getCancelDate());
     }
 
-    ProducerLocation location = locationService.findActiveLocation(producerLocationId);
+    locationService.findActiveLocation(producerLocationId);
 
     return updateSupplier.get();
   }
