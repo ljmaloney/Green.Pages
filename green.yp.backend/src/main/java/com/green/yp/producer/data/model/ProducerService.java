@@ -1,10 +1,12 @@
 package com.green.yp.producer.data.model;
 
 import com.green.yp.api.apitype.enumeration.ServicePriceUnitsType;
+import com.green.yp.common.data.converter.BooleanConverter;
 import com.green.yp.common.data.embedded.Mutable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 import lombok.*;
 
@@ -23,6 +25,14 @@ public class ProducerService extends Mutable {
   @NotNull
   @Column(name = "producer_location_id", nullable = false)
   private UUID producerLocationId;
+
+  @Column(name = "discontinued")
+  @Convert(converter = BooleanConverter.class)
+  private Boolean discontinued;
+
+  @Column(name = "discontinue_date")
+  @Temporal(TemporalType.DATE)
+  private LocalDate discontinueDate;
 
   @Column(name = "min_service_price")
   private BigDecimal minServicePrice;

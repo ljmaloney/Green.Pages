@@ -13,7 +13,6 @@ import com.green.yp.exception.BusinessException;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.producer.data.model.Producer;
-import com.green.yp.producer.data.model.ProducerLocation;
 import com.green.yp.producer.data.model.ProducerProduct;
 import com.green.yp.producer.data.repository.ProducerProductRepository;
 import com.green.yp.producer.mapper.ProducerProductMapper;
@@ -33,6 +32,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ProducerProductService {
 
+  public static final String PRODUCER_PRODUCT_ENTITY = "ProducerProduct";
   private final ProducerOrchestrationService producerService;
 
   private final ProducerLocationService locationService;
@@ -63,7 +63,7 @@ public class ProducerProductService {
     return productRepository
         .findById(productId)
         .map(mapper::fromEntity)
-        .orElseThrow(() -> new NotFoundException("ProducerProduct", productId));
+        .orElseThrow(() -> new NotFoundException(PRODUCER_PRODUCT_ENTITY, productId));
   }
 
   @AuditRequest(
@@ -80,13 +80,9 @@ public class ProducerProductService {
         productRequest.producerId(),
         productRequest.producerLocationId());
 
-    return updateProduct(
-        productRequest.producerId(),
-        productRequest.producerLocationId(),
-        () -> {
-          ProducerProduct product = mapper.toEntity(productRequest);
-          return mapper.fromEntity(productRepository.saveAndFlush(product));
-        });
+    validateProducerActive(productRequest.producerId(), productRequest.producerLocationId());
+
+    return mapper.fromEntity(productRepository.saveAndFlush(mapper.toEntity(productRequest)));
   }
 
   @AuditRequest(
@@ -98,49 +94,17 @@ public class ProducerProductService {
 
     log.info("Updating product {} - {}", productRequest.productId(), productRequest.name());
 
-    final ProducerProduct product =
+    var product =
         productRepository
             .findById(productRequest.productId())
             .orElseThrow(
-                () -> new NotFoundException("ProducerProduct", productRequest.productId()));
+                () -> new NotFoundException(PRODUCER_PRODUCT_ENTITY, productRequest.productId()));
 
-    return updateProduct(
-        product.getProducerId(),
-        product.getProducerLocationId(),
-        () -> {
-          try {
-            PropertyUtils.copyProperties(product, productRequest);
-            return mapper.fromEntity(productRepository.saveAndFlush(product));
-          } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            log.error("Unexpected error updating product attributes", e);
-            throw new BusinessException("Unexpected error updating product attributes", e);
-          }
-        });
-  }
+    validateProducerActive(product.getProducerId(), product.getProducerLocationId());
 
-  @AuditRequest(
-      requestParameter = "productRequest",
-      objectType = AuditObjectType.PRODUCER_PRODUCT,
-      actionType = AuditActionType.PATCH)
-  public ProducerProductResponse patchProduct(
-      @NotNull @NonNull UUID productId,
-      @NotNull @NonNull PatchRequest patchRequest,
-      String userId,
-      String requestIP) {
-    log.info("Patching product {}", productId);
+    ServiceUtils.updateFromRecord(product, productRequest, "productId");
 
-    final ProducerProduct product =
-        productRepository
-            .findById(productId)
-            .orElseThrow(() -> new NotFoundException("ProducerProduct", productId));
-
-    return updateProduct(
-        product.getProducerId(),
-        product.getProducerLocationId(),
-        () -> {
-          ServiceUtils.patchEntity(patchRequest, product);
-          return mapper.fromEntity(productRepository.saveAndFlush(product));
-        });
+    return mapper.fromEntity(productRepository.saveAndFlush(product));
   }
 
   public void discontinueImmediate(
@@ -164,22 +128,19 @@ public class ProducerProductService {
         productRepository
             .findById(discontinueRequest.productId())
             .orElseThrow(
-                () -> new NotFoundException("ProducerProduct", discontinueRequest.productId()));
+                () -> new NotFoundException(PRODUCER_PRODUCT_ENTITY, discontinueRequest.productId()));
 
     if (product.isDiscontinued() && !discontinueDatesChanged(product, discontinueRequest)) {
       return mapper.fromEntity(product);
     }
 
-    return updateProduct(
-        product.getProducerId(),
-        product.getProducerLocationId(),
-        () -> {
-          product.setDiscontinued(true);
-          product.setDiscontinueDate(discontinueRequest.discontinueDate());
-          product.setLastOrderDate(discontinueRequest.lastOrderDate());
+    validateProducerActive(product.getProducerId(), product.getProducerLocationId());
 
-          return mapper.fromEntity(productRepository.saveAndFlush(product));
-        });
+    product.setDiscontinued(true);
+    product.setDiscontinueDate(discontinueRequest.discontinueDate());
+    product.setLastOrderDate(discontinueRequest.lastOrderDate());
+
+    return mapper.fromEntity(productRepository.saveAndFlush(product));
   }
 
   private boolean discontinueDatesChanged(
@@ -191,22 +152,19 @@ public class ProducerProductService {
         && product.getLastOrderDate().equals(discontinueRequest.lastOrderDate()));
   }
 
-  private ProducerProductResponse updateProduct(
-      UUID producerId, UUID producerLocationId, Supplier<ProducerProductResponse> updateSupplier) {
+  private void validateProducerActive(UUID producerId, UUID producerLocationId) {
     Producer producer = producerService.findActiveProducer(producerId);
 
     if (producer.getCancelDate() != null) {
       log.warn(
-          "ProducerAccount {} is being cancelled as of {}, cannot create/update product",
-          producer.getId(),
-          producer.getCancelDate());
+              "ProducerAccount {} is being cancelled as of {}, cannot create/update product",
+              producer.getId(),
+              producer.getCancelDate());
       throw new PreconditionFailedException(
-          "ProducerAccount %s is being cancelled as of %s, cannot create/update products",
-          producer.getId(), producer.getCancelDate());
+              "ProducerAccount %s is being cancelled as of %s, cannot create/update products",
+              producer.getId(), producer.getCancelDate());
     }
 
     locationService.findActiveLocation(producerLocationId);
-
-    return updateSupplier.get();
   }
 }

@@ -12,7 +12,7 @@ import com.green.yp.api.apitype.producer.enumeration.ProducerContactType;
 import com.green.yp.api.contract.EmailContract;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
-import com.green.yp.producer.data.model.Producer;
+import com.green.yp.exception.SystemException;
 import com.green.yp.producer.data.model.ProducerContact;
 import com.green.yp.producer.data.model.ProducerLocation;
 import com.green.yp.producer.data.repository.ProducerContactRepository;
@@ -89,7 +89,7 @@ public class ProducerContactOrchestrationService {
                 ipAddress);
           } catch (NoSuchAlgorithmException e) {
             log.error("Unable to create credentials due to an unexpected error");
-            throw new RuntimeException(e);
+            throw new SystemException("Unable to create credentials due to an unexpected error",e);
           }
         });
 

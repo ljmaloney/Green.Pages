@@ -2,7 +2,9 @@ package com.green.yp.producer.controller;
 
 import com.green.yp.api.apitype.PatchRequest;
 import com.green.yp.api.apitype.ProducerServiceResponse;
+import com.green.yp.api.apitype.producer.ProducerServiceDeleteRequest;
 import com.green.yp.api.apitype.producer.ProducerServiceRequest;
+import com.green.yp.api.apitype.producer.ProducerServiceUpdateRequest;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.producer.service.ProducerServicesService;
 import com.green.yp.util.RequestUtil;
@@ -49,12 +51,30 @@ public class ProducerServicesController {
         servicesService.createService(serviceRequest, null, RequestUtil.getRequestIP()), null);
   }
 
+  @PutMapping(
+      path = "location/service",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<ProducerServiceResponse> updateService(
+      @RequestBody ProducerServiceUpdateRequest updateRequest) {
+    return new ResponseApi<>(
+        servicesService.updateService(updateRequest, RequestUtil.getRequestIP()), null);
+  }
+
   @PatchMapping(path = "location/service/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ProducerServiceResponse> patchService(
       @PathVariable(name = "serviceId") UUID serviceId, @RequestBody PatchRequest patchRequest) {
     return new ResponseApi<>(
         servicesService.patchService(serviceId, patchRequest, null, RequestUtil.getRequestIP()),
         null);
+  }
+
+  @DeleteMapping(path = "localtion/service/discontinue",
+  consumes = MediaType.APPLICATION_JSON_VALUE,
+  produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void discontinueService(@RequestBody ProducerServiceDeleteRequest deleteRequest){
+    servicesService.discontinueService(deleteRequest);
   }
 
   @DeleteMapping(path = "location/service/{serviceId}")

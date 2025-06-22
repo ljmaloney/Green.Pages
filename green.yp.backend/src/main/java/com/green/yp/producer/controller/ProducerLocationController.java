@@ -52,9 +52,11 @@ public class ProducerLocationController {
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ProducerLocationResponse> createLocation(
-      @Valid @RequestBody LocationRequest locationRequest, @PathVariable("producerId") UUID producerId) {
+      @Valid @RequestBody LocationRequest locationRequest,
+      @PathVariable("producerId") UUID producerId) {
     return new ResponseApi<>(
-        locationService.createLocation(locationRequest, producerId, RequestUtil.getRequestIP()), null);
+        locationService.createLocation(locationRequest, producerId, RequestUtil.getRequestIP()),
+        null);
   }
 
   @PutMapping(

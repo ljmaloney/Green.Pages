@@ -5,7 +5,9 @@ import com.green.yp.api.apitype.PatchRequest;
 import com.green.yp.api.apitype.ProducerServiceResponse;
 import com.green.yp.api.apitype.enumeration.AuditActionType;
 import com.green.yp.api.apitype.enumeration.AuditObjectType;
+import com.green.yp.api.apitype.producer.ProducerServiceDeleteRequest;
 import com.green.yp.api.apitype.producer.ProducerServiceRequest;
+import com.green.yp.api.apitype.producer.ProducerServiceUpdateRequest;
 import com.green.yp.common.ServiceUtils;
 import com.green.yp.exception.BusinessException;
 import com.green.yp.exception.NotFoundException;
@@ -31,7 +33,8 @@ public class ProducerServicesService {
   private final ProducerServiceRepository serviceRepository;
 
   public ProducerServicesService(
-      ProducerServiceMapper serviceMapper, ProducerServiceRepository serviceRepository) {
+          ProducerServiceMapper serviceMapper,
+          ProducerServiceRepository serviceRepository) {
     this.serviceMapper = serviceMapper;
     this.serviceRepository = serviceRepository;
   }
@@ -79,6 +82,26 @@ public class ProducerServicesService {
   }
 
   @AuditRequest(
+          requestParameter = "updateRequest",
+          objectType = AuditObjectType.PRODUCER_SERVICE,
+          actionType = AuditActionType.UPDATE)
+  @Transactional
+  public ProducerServiceResponse updateService(ProducerServiceUpdateRequest updateRequest, String requestIP) {
+    log.info("Updating service {}", updateRequest.serviceId());
+
+    var service = serviceRepository.findById(updateRequest.serviceId()).orElseThrow(() -> {
+      log.warn("No producer service found for id {}",updateRequest.serviceId());
+        return new NotFoundException("ProducerService", updateRequest.serviceId());
+    });
+
+    ServiceUtils.updateFromRecord(service, updateRequest, "serviceId");
+
+    ProducerService producerService = serviceRepository.saveAndFlush(service);
+
+    return serviceMapper.fromEntity(producerService);
+  }
+
+  @AuditRequest(
       requestParameter = "patchRequest",
       objectType = AuditObjectType.PRODUCER_SERVICE,
       actionType = AuditActionType.UPDATE)
@@ -97,12 +120,10 @@ public class ProducerServicesService {
       ServiceUtils.patchEntity(
           patchRequest,
           producerService,
-          (name, value) -> {
-            return switch (name) {
-              case "minServicePrice" -> BigDecimal.valueOf(((Double) value).doubleValue());
-              case "maxServicePrice" -> BigDecimal.valueOf(((Double) value).doubleValue());
+          (name, value) -> switch (name) {
+              case "minServicePrice" -> BigDecimal.valueOf((Double) value);
+              case "maxServicePrice" -> BigDecimal.valueOf((Double) value);
               default -> value;
-            };
           });
       return serviceMapper.fromEntity(serviceRepository.save(producerService));
 
@@ -115,5 +136,19 @@ public class ProducerServicesService {
   public void deleteService(@NotNull @NonNull UUID serviceId, String userId, String requestIP) {
     log.info("Deleting service {} from {}", serviceId, requestIP);
     serviceRepository.deleteById(serviceId);
+  }
+
+  @Transactional
+  public void discontinueService(ProducerServiceDeleteRequest deleteRequest) {
+    var service = serviceRepository.findById(deleteRequest.serviceId())
+            .orElseThrow(() -> {
+              log.warn("No service found for id {}", deleteRequest.serviceId());
+              throw new NotFoundException("ProducerService", deleteRequest.serviceId());
+            });
+
+    service.setDiscontinued(true);
+    service.setDiscontinueDate(deleteRequest.discontinueDate());
+    serviceRepository.saveAndFlush(service);
+    log.info("Discontinued service {} on {}", service.getId(), service.getDiscontinueDate());
   }
 }

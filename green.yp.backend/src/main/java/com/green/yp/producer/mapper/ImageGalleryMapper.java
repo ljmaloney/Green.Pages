@@ -2,11 +2,10 @@ package com.green.yp.producer.mapper;
 
 import com.green.yp.api.apitype.producer.ProducerImageResponse;
 import com.green.yp.producer.data.model.ImageGallery;
+import java.util.List;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
-
-import java.util.List;
 
 @Mapper(
         componentModel = "spring",

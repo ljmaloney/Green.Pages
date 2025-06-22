@@ -39,10 +39,12 @@ public class ProducerProductController {
     return new ResponseApi<>(productService.findAllProducts(UUID.randomUUID(), locationId), null);
   }
 
-  @GetMapping(path = "{producerId}/location/{locationId}/products", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(
+      path = "{producerId}/location/{locationId}/products",
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<List<ProducerProductResponse>> getAllProducts(
-          @NotNull @NonNull @PathVariable("producerId") UUID producerId,
-          @NotNull @NonNull @PathVariable("locationId") UUID locationId) {
+      @NotNull @NonNull @PathVariable("producerId") UUID producerId,
+      @NotNull @NonNull @PathVariable("locationId") UUID locationId) {
     return new ResponseApi<>(productService.findAllProducts(producerId, locationId), null);
   }
 
@@ -72,18 +74,6 @@ public class ProducerProductController {
         productService.updateProduct(productRequest, null, RequestUtil.getRequestIP()), null);
   }
 
-  @PatchMapping(
-      path = "/location/product/{productId}",
-      consumes = MediaType.APPLICATION_JSON_VALUE,
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseApi<ProducerProductResponse> patchProduct(
-      @NotNull @NonNull @PathVariable("productId") UUID productId,
-      @Valid @RequestBody PatchRequest patchRequest) {
-    return new ResponseApi<>(
-        productService.patchProduct(productId, patchRequest, null, RequestUtil.getRequestIP()),
-        null);
-  }
-
   @DeleteMapping(path = "/location/product/{productId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void discontinueImmediate(@NotNull @NonNull @PathVariable("productId") UUID productId) {
@@ -91,7 +81,7 @@ public class ProducerProductController {
   }
 
   @DeleteMapping(
-      path = "/location/product/discontinue",
+      path = "location/product/discontinue",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ProducerProductResponse> discontinue(
