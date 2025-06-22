@@ -2,6 +2,7 @@ package com.green.yp.producer.controller;
 
 import com.green.yp.api.apitype.PatchRequest;
 import com.green.yp.api.apitype.ProducerServiceResponse;
+import com.green.yp.api.apitype.producer.ProducerServiceDeleteRequest;
 import com.green.yp.api.apitype.producer.ProducerServiceRequest;
 import com.green.yp.api.apitype.producer.ProducerServiceUpdateRequest;
 import com.green.yp.common.dto.ResponseApi;
@@ -66,6 +67,14 @@ public class ProducerServicesController {
     return new ResponseApi<>(
         servicesService.patchService(serviceId, patchRequest, null, RequestUtil.getRequestIP()),
         null);
+  }
+
+  @DeleteMapping(path = "localtion/service/discontinue",
+  consumes = MediaType.APPLICATION_JSON_VALUE,
+  produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void discontinueService(@RequestBody ProducerServiceDeleteRequest deleteRequest){
+    servicesService.discontinueService(deleteRequest);
   }
 
   @DeleteMapping(path = "location/service/{serviceId}")

@@ -1,8 +1,10 @@
 package com.green.yp.api.apitype;
 
 import com.green.yp.api.apitype.enumeration.ServicePriceUnitsType;
+import com.green.yp.api.contract.LineOfBusinessContract;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.NonNull;
@@ -13,6 +15,8 @@ public record ProducerServiceResponse(
     @NotNull @NonNull OffsetDateTime lastUpdateDate,
     @NotNull @NonNull UUID producerId,
     @NotNull @NonNull UUID producerLocationId,
+    Boolean discontinued,
+    LocalDate discontinueDate,
     BigDecimal minServicePrice,
     BigDecimal maxServicePrice,
     ServicePriceUnitsType priceUnitsType,

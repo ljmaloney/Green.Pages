@@ -5,6 +5,7 @@ import com.green.yp.api.apitype.PatchRequest;
 import com.green.yp.api.apitype.ProducerServiceResponse;
 import com.green.yp.api.apitype.enumeration.AuditActionType;
 import com.green.yp.api.apitype.enumeration.AuditObjectType;
+import com.green.yp.api.apitype.producer.ProducerServiceDeleteRequest;
 import com.green.yp.api.apitype.producer.ProducerServiceRequest;
 import com.green.yp.api.apitype.producer.ProducerServiceUpdateRequest;
 import com.green.yp.common.ServiceUtils;
@@ -137,4 +138,17 @@ public class ProducerServicesService {
     serviceRepository.deleteById(serviceId);
   }
 
+  @Transactional
+  public void discontinueService(ProducerServiceDeleteRequest deleteRequest) {
+    var service = serviceRepository.findById(deleteRequest.serviceId())
+            .orElseThrow(() -> {
+              log.warn("No service found for id {}", deleteRequest.serviceId());
+              throw new NotFoundException("ProducerService", deleteRequest.serviceId());
+            });
+
+    service.setDiscontinued(true);
+    service.setDiscontinueDate(deleteRequest.discontinueDate());
+    serviceRepository.saveAndFlush(service);
+    log.info("Discontinued service {} on {}", service.getId(), service.getDiscontinueDate());
+  }
 }
