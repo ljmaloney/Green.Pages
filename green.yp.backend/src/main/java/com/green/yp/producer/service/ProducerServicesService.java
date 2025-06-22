@@ -11,19 +11,15 @@ import com.green.yp.common.ServiceUtils;
 import com.green.yp.exception.BusinessException;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
-import com.green.yp.exception.SystemException;
 import com.green.yp.producer.data.model.ProducerService;
-import com.green.yp.producer.data.repository.ProducerRepository;
 import com.green.yp.producer.data.repository.ProducerServiceRepository;
 import com.green.yp.producer.mapper.ProducerServiceMapper;
 import jakarta.validation.constraints.NotNull;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -97,14 +93,9 @@ public class ProducerServicesService {
         return new NotFoundException("ProducerService", updateRequest.serviceId());
     });
 
-      try {
-          PropertyUtils.copyProperties(service, updateRequest);
-      } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-          log.error("Unexpected error updating producer service");
-          throw new SystemException("Unexpected error updating propducer service", e);
-      }
+    ServiceUtils.updateFromRecord(service, updateRequest, "serviceId");
 
-      ProducerService producerService = serviceRepository.saveAndFlush(service);
+    ProducerService producerService = serviceRepository.saveAndFlush(service);
 
     return serviceMapper.fromEntity(producerService);
   }

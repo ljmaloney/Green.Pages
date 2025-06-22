@@ -74,17 +74,17 @@ public class ProducerProductController {
         productService.updateProduct(productRequest, null, RequestUtil.getRequestIP()), null);
   }
 
-  @PatchMapping(
-      path = "/location/product/{productId}",
-      consumes = MediaType.APPLICATION_JSON_VALUE,
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseApi<ProducerProductResponse> patchProduct(
-      @NotNull @NonNull @PathVariable("productId") UUID productId,
-      @Valid @RequestBody PatchRequest patchRequest) {
-    return new ResponseApi<>(
-        productService.patchProduct(productId, patchRequest, null, RequestUtil.getRequestIP()),
-        null);
-  }
+//  @PatchMapping(
+//      path = "/location/product/{productId}",
+//      consumes = MediaType.APPLICATION_JSON_VALUE,
+//      produces = MediaType.APPLICATION_JSON_VALUE)
+//  public ResponseApi<ProducerProductResponse> patchProduct(
+//      @NotNull @NonNull @PathVariable("productId") UUID productId,
+//      @Valid @RequestBody PatchRequest patchRequest) {
+//    return new ResponseApi<>(
+//        productService.patchProduct(productId, patchRequest, null, RequestUtil.getRequestIP()),
+//        null);
+//  }
 
   @DeleteMapping(path = "/location/product/{productId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
