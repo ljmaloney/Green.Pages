@@ -13,6 +13,7 @@ public record ProducerProfileResponse(
     UUID producerId,
     OffsetDateTime createDate,
     OffsetDateTime lastUpdateDate,
+    List<UUID> subscriptionIds,
     String businessName,
     String locationName,
     String locationType,

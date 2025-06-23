@@ -103,8 +103,7 @@ public interface ProducerSearchRepository extends JpaRepository<Producer, UUID> 
 
   @Query(
       """
-    SELECT new com.green.yp.producer.data.record.ProducerSearchRecord(
-        producer, location, contact, null)
+    SELECT new com.green.yp.producer.data.record.ProducerSearchRecord(producer, location, contact, null)
     FROM Producer producer
     JOIN ProducerLocation location ON producer.id = location.producerId
     JOIN ProducerContact contact ON contact.producerLocationId = location.id

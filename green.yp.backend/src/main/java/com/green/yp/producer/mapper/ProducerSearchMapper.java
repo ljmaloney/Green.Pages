@@ -5,8 +5,12 @@ import com.green.yp.api.apitype.producer.ProducerProfileResponse;
 import com.green.yp.api.apitype.search.ProducerSearchResponse;
 import com.green.yp.api.apitype.search.TruncatedProducerResponse;
 import com.green.yp.producer.data.model.ProducerLocationHours;
+import com.green.yp.producer.data.model.ProducerSubscription;
 import com.green.yp.producer.data.record.ProducerSearchRecord;
 import java.util.List;
+import java.util.UUID;
+
+import org.apache.commons.collections4.CollectionUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -73,7 +77,15 @@ public interface ProducerSearchMapper {
   @Mapping(target = "state", source = "location.state")
   @Mapping(target = "postalCode", source = "location.postalCode")
   @Mapping(target = "iconLink", source = "producer.iconLink")
+  @Mapping(target = "subscriptionIds", source ="producer.subscriptionList")
   ProducerProfileResponse toProfileResponse(ProducerSearchRecord searchRecord);
+
+  default List<UUID> toSubscriptionIds(List<ProducerSubscription> producerSubscriptions){
+    if ( CollectionUtils.isEmpty(producerSubscriptions)) {
+      return List.of();
+    }
+    return producerSubscriptions.stream().map(ProducerSubscription::getSubscriptionId).toList();
+  }
 
   List<LocationHoursResponse> toHoursResponse(List<ProducerLocationHours> locationHours);
 
