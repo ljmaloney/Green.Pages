@@ -37,6 +37,15 @@ public class CorsConfig implements WebMvcConfigurer {
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("Content-Type", "Authorization")
                 .allowCredentials(true);
+        registry.addMapping("/profile/**")
+                .allowedOrigins(
+                        "http://localhost:8080",
+                        "http://services.greenyp.com",
+                        "https://services.greenyp.com",
+                        "https://*.lovable.app")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("Content-Type", "Authorization")
+                .allowCredentials(true);
         registry.addMapping("/search/**")
                 .allowedOrigins(
                         "http://localhost:8080",
