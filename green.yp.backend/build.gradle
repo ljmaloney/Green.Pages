@@ -59,6 +59,11 @@ dependencies {
     implementation 'io.fusionauth:fusionauth-java-client:1.57.0'
     implementation("org.locationtech.jts:jts-core:1.18.2")
 
+    implementation("io.github.resilience4j:resilience4j-spring-boot3:2.2.0")
+    implementation("io.github.resilience4j:resilience4j-circuitbreaker:2.2.0")
+    implementation("io.github.resilience4j:resilience4j-ratelimiter:2.2.0")
+    implementation("io.github.resilience4j:resilience4j-retry:2.2.0")
+
     implementation 'org.cache2k:cache2k-api'
     implementation 'org.cache2k:cache2k-core'
     implementation 'org.cache2k:cache2k-spring'
@@ -96,6 +101,7 @@ dependencies {
     implementation 'software.amazon.awssdk:s3'
     implementation 'software.amazon.awssdk:auth'
     implementation 'software.amazon.awssdk:regions'
+    implementation 'software.amazon.awssdk:location:2.25.15'
 
     testImplementation 'io.github.openfeign:feign-mock'
     testImplementation "org.projectlombok:lombok:${lombokVersion}"

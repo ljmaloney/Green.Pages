@@ -5,11 +5,13 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public class BusinessException extends RuntimeException {
-  private ErrorCodeType errorCode;
-  private HttpStatus httpStatus;
+  private final ErrorCodeType errorCode;
+  private final HttpStatus httpStatus;
 
   public BusinessException(String message) {
     super(message);
+    errorCode = ErrorCodeType.SYSTEM_ERROR;
+    httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
   }
 
   public BusinessException(String message, Throwable th) {
@@ -31,6 +33,13 @@ public class BusinessException extends RuntimeException {
   public BusinessException(ErrorCodeType errorCode, Throwable th, Object... params) {
     super(String.format(errorCode.getMessageFormat(), params), th);
     this.httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+    this.errorCode = errorCode;
+  }
+
+  public BusinessException(
+          String message, HttpStatus httpStatus, ErrorCodeType errorCode) {
+    super(message);
+    this.httpStatus = httpStatus;
     this.errorCode = errorCode;
   }
 

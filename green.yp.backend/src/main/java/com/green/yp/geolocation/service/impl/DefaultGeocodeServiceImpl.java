@@ -1,17 +1,21 @@
-package com.green.yp.geolocation.service;
+package com.green.yp.geolocation.service.impl;
 
+import com.green.yp.api.apitype.common.GeocodeLocation;
 import com.green.yp.geolocation.data.model.PostalCodeGeocode;
 import com.green.yp.geolocation.data.repository.PostalCodeGeocodeRepository;
+import com.green.yp.geolocation.service.GeocodingService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Optional;
 
-@Service
+@Service("defaultGeocodeService")
 @Slf4j
+@ConditionalOnProperty(name = "greenyp.geocoder.impl", havingValue = "default", matchIfMissing = true)
 public class DefaultGeocodeServiceImpl implements GeocodingService {
 
   private final PostalCodeGeocodeRepository repository;

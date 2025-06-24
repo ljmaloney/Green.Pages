@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.location.LocationClient;
 import software.amazon.awssdk.services.s3.S3Client;
 
 @Configuration
@@ -22,4 +23,17 @@ public class CloudClientConfig {
                 .credentialsProvider(DefaultCredentialsProvider.create())
                 .build();
     }
+    @Bean
+    @ConditionalOnProperty(
+            prefix = "greenyp.geocoder",
+            name = "impl",
+            havingValue = "aws",
+            matchIfMissing = true
+    )
+    public LocationClient locationClient() {
+        return LocationClient.builder()
+                .region(Region.of("us-east-1")) // or your region
+                .build();
+    }
+
 }
