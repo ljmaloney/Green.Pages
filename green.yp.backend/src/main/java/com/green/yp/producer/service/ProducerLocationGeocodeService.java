@@ -1,21 +1,24 @@
 package com.green.yp.producer.service;
 
+import com.green.yp.geolocation.service.impl.DefaultGeocodeServiceImpl;
+import com.green.yp.geolocation.service.GeocodingService;
+import com.green.yp.geolocation.service.LiveGeocodeService;
 import com.green.yp.producer.data.model.ProducerLocation;
-import com.green.yp.producer.data.repository.ProducerLocationRepository;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ProducerLocationGeocodeService {
 
-  private final ProducerLocationRepository locationRepository;
+  private final GeocodingService defaultGeocodeService;
+  private final LiveGeocodeService liveGecodeService;
 
-  public ProducerLocationGeocodeService(ProducerLocationRepository repository) {
-    this.locationRepository = repository;
-  }
+    public ProducerLocationGeocodeService(DefaultGeocodeServiceImpl defaultGeocodeService,
+                                          LiveGeocodeService liveGecodeService) {
+        this.defaultGeocodeService = defaultGeocodeService;
+        this.liveGecodeService = liveGecodeService;
+    }
 
-  @Async
-  public void geocodeLocation(ProducerLocation location) {
+    public void geocodeLocation(ProducerLocation location) {
     // call geocode service
     // update repository
   }

@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -26,7 +27,7 @@ public class ProducerSearchService {
 
   public ProducerSearchService(
       ProducerSearchRepository searchRepository,
-      GeocodingService geocodingService,
+      @Qualifier("defaultGeocodeService") GeocodingService geocodingService,
       ProducerSearchMapper producerSearchMapper) {
     this.searchRepository = searchRepository;
     this.geocodingService = geocodingService;
@@ -60,7 +61,7 @@ public class ProducerSearchService {
         "Found {} producers near zipCode: {}, within {} miles",
         searchResults.size(),
         zipCode,
-        distanceMeters);
+        distance);
 
     return new SearchResponse(
         producerSearchMapper.toResponse(searchResults),
