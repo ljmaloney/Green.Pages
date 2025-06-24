@@ -1,5 +1,6 @@
 package com.green.yp.geolocation.service;
 
+import com.green.yp.api.apitype.common.GeocodeLocation;
 import org.springframework.stereotype.Service;
 
 @Service

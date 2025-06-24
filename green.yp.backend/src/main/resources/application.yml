@@ -24,15 +24,15 @@ spring:
     properties:
       hibernate:
         format_sql: false
-logging:
-  level:
-    org:
-      hibernate:
-        SQL: DEBUG
-        type:
-          descriptor:
-            sql:
-              BasicBinder: TRACE
+circuitbreaker:
+  instances:
+    geocode-api:
+      sliding-window-type: COUNT_BASED
+      sliding-window-size: 10
+      minimum-number-of-calls: 5
+      failure-rate-threshold: 50
+      wait-duration-in-open-state: 10s
+      permitted-number-of-calls-in-half-open-state: 3
 fusionauth:
   green:
     yp:
@@ -47,13 +47,39 @@ fusionauth:
       tenant: e5c8b6b2-ca40-4d53-c435-01e1b803db88
       connectTimeout: 2000
       readTimeout: 2000
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 3000
+        readTimeout: 5000
 greenyp:
   cloud:
     aws:
       s3:
         enabled: false
         region: us-east-1
+  geocoder:
+    url: https://api.opencagedata.com/geocode/v1/json
+    impl: opencage
+    apikey: 8a3613d6f66848d286ea647a4f813d1a
   image:
     service:
       host: http://localhost:8081
       filepath: /Users/luthermaloney/git/Green.Pages/green.yp.backend/build/resources/main/static
+resilience4j:
+  ratelimiter:
+    instances:
+      geocode-api:
+        limit-for-period: 10
+        limit-refresh-period: 1s
+        timeout-duration: 100ms

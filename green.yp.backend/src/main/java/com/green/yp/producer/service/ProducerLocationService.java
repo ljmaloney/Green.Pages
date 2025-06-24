@@ -40,14 +40,14 @@ public class ProducerLocationService {
 
   final ProducerLocationHoursService hoursService;
 
-  private final GeocodingService geocodingService;
+  private final ProducerGeocodeService geocodingService;
 
   public ProducerLocationService(
       ProducerLocationMapper producerLocationMapper,
       ProducerLocationRepository locationRepository,
       ProducerOrchestrationService producerService,
       ProducerLocationHoursService hoursService,
-      GeocodingService gecodeService) {
+      ProducerGeocodeService gecodeService) {
     this.producerLocationMapper = producerLocationMapper;
     this.locationRepository = locationRepository;
     this.producerService = producerService;
@@ -69,12 +69,7 @@ public class ProducerLocationService {
     location.setActive(true);
 
     if (location.getLatitude() == null || location.getLongitude() == null) {
-      var coordinates =
-          geocodingService.getCoordinates(
-              location.getAddressLine1(),
-              location.getCity(),
-              location.getState(),
-              location.getPostalCode());
+      var coordinates = geocodingService.geocodeLocation(location);
       location.setLatitude(coordinates.latitude());
       location.setLongitude(coordinates.longitude());
     }

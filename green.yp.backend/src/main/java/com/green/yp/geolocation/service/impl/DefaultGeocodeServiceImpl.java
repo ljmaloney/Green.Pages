@@ -1,8 +1,8 @@
 package com.green.yp.geolocation.service.impl;
 
+import com.green.yp.api.apitype.common.GeocodeLocation;
 import com.green.yp.geolocation.data.model.PostalCodeGeocode;
 import com.green.yp.geolocation.data.repository.PostalCodeGeocodeRepository;
-import com.green.yp.geolocation.service.GeocodeLocation;
 import com.green.yp.geolocation.service.GeocodingService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
