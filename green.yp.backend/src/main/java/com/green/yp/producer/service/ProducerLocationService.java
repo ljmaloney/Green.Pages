@@ -4,6 +4,7 @@ import static java.lang.Boolean.TRUE;
 
 import com.green.yp.api.AuditRequest;
 import com.green.yp.api.apitype.PatchRequest;
+import com.green.yp.api.apitype.common.GeocodeLocation;
 import com.green.yp.api.apitype.enumeration.AuditActionType;
 import com.green.yp.api.apitype.enumeration.AuditObjectType;
 import com.green.yp.api.apitype.producer.LocationRequest;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -99,6 +101,8 @@ public class ProducerLocationService {
             .findById(updateLocationRequest.locationId())
             .orElseThrow(
                 () -> new NotFoundException(PRODUCER_LOCATION, updateLocationRequest.locationId()));
+    
+   boolean addressChanged = addressChanged(location, updateLocationRequest);
 
     location.setLocationName(updateLocationRequest.locationName());
     location.setLocationType(updateLocationRequest.locationType());
@@ -110,11 +114,22 @@ public class ProducerLocationService {
     location.setCity(updateLocationRequest.city());
     location.setState(updateLocationRequest.state());
     location.setPostalCode(updateLocationRequest.postalCode());
-    location.setLatitude(updateLocationRequest.latitude());
-    location.setLongitude(updateLocationRequest.longitude());
     location.setWebsiteUrl(updateLocationRequest.websiteUrl());
-
+    if ( addressChanged ){
+      GeocodeLocation geocodeLocation = geocodingService.geocodeLocation(location);
+      location.setLatitude(geocodeLocation.latitude());
+      location.setLongitude(geocodeLocation.longitude());
+    }
     return producerLocationMapper.fromEntity(locationRepository.saveAndFlush(location));
+  }
+
+  private boolean addressChanged(ProducerLocation location, LocationRequest updateLocationRequest) {
+    return !StringUtils.equals(location.getAddressLine1(), updateLocationRequest.addressLine1())
+        || !StringUtils.equals(StringUtils.trimToEmpty(location.getAddressLine2()), 
+            StringUtils.trimToEmpty(updateLocationRequest.addressLine2()))
+        || !StringUtils.equals(location.getCity(), updateLocationRequest.city())
+        || !StringUtils.equals(location.getState(), updateLocationRequest.state())
+        || !StringUtils.equals(location.getPostalCode(), updateLocationRequest.postalCode());
   }
 
   ProducerLocation findActiveLocation(@NonNull UUID locationId) {
