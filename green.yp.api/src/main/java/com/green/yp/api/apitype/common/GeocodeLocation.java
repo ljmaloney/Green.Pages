@@ -1,4 +1,4 @@
-package com.green.yp.geolocation.service;
+package com.green.yp.api.apitype.common;
 
 import java.math.BigDecimal;
 

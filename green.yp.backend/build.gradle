@@ -59,6 +59,8 @@ dependencies {
     implementation 'io.fusionauth:fusionauth-java-client:1.57.0'
     implementation("org.locationtech.jts:jts-core:1.18.2")
 
+    implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.3.0'
+
     implementation 'org.cache2k:cache2k-api'
     implementation 'org.cache2k:cache2k-core'
     implementation 'org.cache2k:cache2k-spring'

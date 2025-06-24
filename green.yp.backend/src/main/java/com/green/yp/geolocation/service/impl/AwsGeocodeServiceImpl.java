@@ -1,6 +1,6 @@
 package com.green.yp.geolocation.service.impl;
 
-import com.green.yp.geolocation.service.GeocodeLocation;
+import com.green.yp.api.apitype.common.GeocodeLocation;
 import com.green.yp.geolocation.service.LiveGeocodeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
