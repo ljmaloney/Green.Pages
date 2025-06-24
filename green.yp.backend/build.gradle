@@ -101,6 +101,7 @@ dependencies {
     implementation 'software.amazon.awssdk:s3'
     implementation 'software.amazon.awssdk:auth'
     implementation 'software.amazon.awssdk:regions'
+    implementation 'software.amazon.awssdk:location:2.25.15'
 
     testImplementation 'io.github.openfeign:feign-mock'
     testImplementation "org.projectlombok:lombok:${lombokVersion}"
