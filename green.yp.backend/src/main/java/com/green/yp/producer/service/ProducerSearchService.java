@@ -27,7 +27,7 @@ public class ProducerSearchService {
 
   public ProducerSearchService(
       ProducerSearchRepository searchRepository,
-      @Qualifier("defaultGeocodeService") GeocodingService geocodingService,
+      @Qualifier("defaultGeocodeServiceImpl") GeocodingService geocodingService,
       ProducerSearchMapper producerSearchMapper) {
     this.searchRepository = searchRepository;
     this.geocodingService = geocodingService;

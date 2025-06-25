@@ -69,9 +69,10 @@ greenyp:
         enabled: false
         region: us-east-1
   geocoder:
-    url: https://api.opencagedata.com/geocode/v1/json
     impl: opencage
-    apikey: 8a3613d6f66848d286ea647a4f813d1a
+    opencage:
+      url: https://api.opencagedata.com
+      apikey: 8a3613d6f66848d286ea647a4f813d1a
   image:
     service:
       host: http://localhost:8081
