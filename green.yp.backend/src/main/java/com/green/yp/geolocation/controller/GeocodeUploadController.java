@@ -15,15 +15,15 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class GeocodeUploadController {
 
-    private final GeocodeUploadService geocodeUploadService;
+  private final GeocodeUploadService geocodeUploadService;
 
-    @PostMapping(path="/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> uploadGeocodeData(@RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        geocodeUploadService.importZipGeocodeFromCsv(file);
-        return ResponseEntity.ok().build();
+  @PostMapping(path = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<Void> uploadGeocodeData(@RequestParam("file") MultipartFile file) {
+    if (file.isEmpty()) {
+      return ResponseEntity.badRequest().build();
     }
+
+    geocodeUploadService.importZipGeocodeFromCsv(file);
+    return ResponseEntity.ok().build();
+  }
 }

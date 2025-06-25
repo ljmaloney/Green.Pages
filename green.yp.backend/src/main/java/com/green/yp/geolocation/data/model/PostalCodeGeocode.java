@@ -9,7 +9,6 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import lombok.Getter;
 import lombok.Setter;
-import org.locationtech.jts.geom.Point;
 
 @Getter
 @Setter

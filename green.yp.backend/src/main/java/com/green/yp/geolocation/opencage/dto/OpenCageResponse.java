@@ -1,7 +1,7 @@
 package com.green.yp.geolocation.opencage.dto;
 
-import lombok.Data;
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class OpenCageResponse {

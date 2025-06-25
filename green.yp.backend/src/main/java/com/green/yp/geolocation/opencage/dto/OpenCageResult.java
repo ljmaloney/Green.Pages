@@ -1,8 +1,7 @@
 package com.green.yp.geolocation.opencage.dto;
 
-import lombok.Data;
-
 import java.math.BigDecimal;
+import lombok.Data;
 
 @Data
 public class OpenCageResult {
