@@ -4,6 +4,7 @@ import com.green.yp.api.apitype.invoice.InvoiceResponse;
 import com.green.yp.api.apitype.producer.ProducerResponse;
 import com.green.yp.api.apitype.producer.ProducerSubscriptionResponse;
 import com.green.yp.api.contract.ProducerContract;
+import com.green.yp.api.contract.SubscriptionContract;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.invoice.data.model.Invoice;
@@ -14,12 +15,15 @@ import com.green.yp.reference.data.enumeration.SubscriptionType;
 import java.sql.Date;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,18 +33,20 @@ import org.springframework.transaction.annotation.Transactional;
 public class InvoiceService {
 
   private final ProducerContract producerContract;
-
+  private final SubscriptionContract subscriptionContract;
   private final InvoiceMapper invoiceMapper;
 
   private final InvoiceRepository invoiceRepository;
 
   public InvoiceService(
-      ProducerContract producerContract,
-      InvoiceMapper invoiceMapper,
-      InvoiceRepository invoiceRepository) {
+          ProducerContract producerContract,
+          InvoiceMapper invoiceMapper,
+          InvoiceRepository invoiceRepository,
+          SubscriptionContract subscriptionContract) {
     this.producerContract = producerContract;
     this.invoiceMapper = invoiceMapper;
     this.invoiceRepository = invoiceRepository;
+    this.subscriptionContract = subscriptionContract;
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -169,4 +175,25 @@ public class InvoiceService {
 
     return invoiceMapper.fromEntity(invoiceRepository.save(invoice));
   }
+
+  public List<InvoiceResponse> findInvoices(
+      UUID producerId, LocalDate startDate, LocalDate endDate, Boolean descending) {
+    log.info(
+        "Loading invoices for {} between start {} and end {}, sorted {}",
+        producerId,
+        startDate,
+        endDate,
+        (descending ? "descending" : "ascending"));
+
+    Sort createDateSort = Sort.by(descending ? Sort.Direction.DESC : Sort.Direction.ASC, "createDate");
+
+    return invoiceRepository
+        .findByProducerIdAndCreateDateBetween(producerId,
+                                    startDate.atStartOfDay().atOffset(ZoneOffset.UTC),
+                                    endDate.atTime(23, 59, 59).atOffset(ZoneOffset.UTC),
+                                    createDateSort)
+            .stream()
+            .map( invoice -> invoiceMapper.fromEntity(invoice, subscriptionContract.findSubscription(invoice.getSubscriptionId())))
+            .toList();
+    }
 }
