@@ -69,7 +69,9 @@ greenyp:
         enabled: false
         region: us-east-1
   geocoder:
-    impl: opencage
+    impl: aws
+    aws:
+      placeIndex: GreenypPlaceIndex
     opencage:
       url: https://api.opencagedata.com
       apikey: 8a3613d6f66848d286ea647a4f813d1a

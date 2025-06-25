@@ -16,7 +16,7 @@ import software.amazon.awssdk.services.location.model.SearchPlaceIndexForTextReq
 @Slf4j
 @ConditionalOnProperty(name = "greenyp.geocoder.impl", havingValue = "aws")
 public class AwsGeocodeServiceImpl  implements LiveGeocodeService {
-    @Value("${greenyp.geocode.impl.aws.placeIndex}")
+    @Value("${greenyp.geocoder.aws.placeIndex}")
     private String placeIndex;
     private final PostalCodeGeocodeRepository repository;
     private final LocationClient awsLocationClient;

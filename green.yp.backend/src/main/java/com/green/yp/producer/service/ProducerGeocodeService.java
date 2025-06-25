@@ -1,7 +1,6 @@
 package com.green.yp.producer.service;
 
 import com.green.yp.api.apitype.common.GeocodeLocation;
-import com.green.yp.geolocation.service.impl.DefaultGeocodeServiceImpl;
 import com.green.yp.geolocation.service.GeocodingService;
 import com.green.yp.geolocation.service.LiveGeocodeService;
 import com.green.yp.producer.data.model.ProducerLocation;
@@ -38,8 +37,7 @@ public class ProducerGeocodeService {
     }
 
     public GeocodeLocation geocodeLocation(ProducerLocation location) {
-        log.info("Geocoding location for {} - {}", location.getProducerId(), location.getId());
-
+        log.info("Geocoding location for producer {} - {}", location.getProducerId(), location.getId());
         if (liveGecodeService == null) {
             return defaultGeocodeService.getCoordinates(location.getAddressLine1(),
                     location.getCity(),

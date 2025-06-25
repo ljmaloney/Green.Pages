@@ -11,6 +11,7 @@ public record InvoiceResponse(
     @NotNull @NonNull UUID producerId,
     @NotNull @NonNull OffsetDateTime createDate,
     @NotNull @NonNull UUID subscriptionId,
+    String subscriptionName,
     OffsetDateTime paidDate,
     @NotNull @NonNull String invoiceNumber,
     @NotNull @NonNull BigDecimal invoiceTotal) {}

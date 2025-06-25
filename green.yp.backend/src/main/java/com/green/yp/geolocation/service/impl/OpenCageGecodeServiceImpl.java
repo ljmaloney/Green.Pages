@@ -39,7 +39,7 @@ public class OpenCageGecodeServiceImpl implements LiveGeocodeService {
   public GeocodeLocation getCoordinates(String address, String city, String state, String zip) {
     String addressQuery = String.join(" ", address, city, state, zip);
     OpenCageResponse response = openCageClient.geocode(addressQuery, apiKey, 1);
-    log.debug("Geolocated address for {} to {}", address, response);
+    log.debug("Geolocated address for {} to {}", addressQuery, response);
     return response.getResults().stream()
         .findFirst()
         .map(
