@@ -8,13 +8,12 @@ import com.green.yp.producer.service.ProducerLocationService;
 import com.green.yp.producer.service.ProducerOrchestrationService;
 import java.util.Optional;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class ProducerImportService {
 
   private static final String IMPORT_SUB_ID = "e0315cb5-a2e2-40e1-abb2-4ce646439730";
@@ -22,6 +21,17 @@ public class ProducerImportService {
   private final ProducerLocationService producerLocationService;
   private final ProducerContactOrchestrationService contactOrchestrationService;
   private final GeocodingService geocodingService;
+
+  public ProducerImportService(
+      ProducerOrchestrationService producerOrchestrationService,
+      ProducerLocationService producerLocationService,
+      ProducerContactOrchestrationService contactOrchestrationService,
+      @Qualifier("defaultGeocodeServiceImpl") GeocodingService geocodingService) {
+    this.producerOrchestrationService = producerOrchestrationService;
+    this.producerLocationService = producerLocationService;
+    this.contactOrchestrationService = contactOrchestrationService;
+    this.geocodingService = geocodingService;
+  }
 
   @Transactional
   public UUID importProducer(UUID lineOfBusinessId, ProducerCsvRecord importRecord) {
