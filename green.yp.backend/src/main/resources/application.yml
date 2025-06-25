@@ -24,6 +24,12 @@ spring:
     properties:
       hibernate:
         format_sql: false
+  spring:
+    security:
+      oauth2:
+        resourceserver:
+          jwt:
+            issuer-uri: http://localhost:9011
 circuitbreaker:
   instances:
     geocode-api:

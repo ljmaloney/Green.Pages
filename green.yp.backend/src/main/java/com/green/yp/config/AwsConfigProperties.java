@@ -8,12 +8,12 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "greenyp.cloud.aws")
 public class AwsConfigProperties {
-    private String impl;
-    private S3 s3 = new S3();
+  private String impl;
+  private S3 s3 = new S3();
 
-    @Data
-    public static class S3 {
-        private boolean enabled = true;
-        private String region = "us-east-1";
-    }
+  @Data
+  public static class S3 {
+    private boolean enabled = true;
+    private String region = "us-east-1";
+  }
 }
