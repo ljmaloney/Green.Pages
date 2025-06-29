@@ -28,11 +28,14 @@ public class GreenControllerAdvice {
 
   @ExceptionHandler(ConstraintViolationException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public ResponseApi<Void> handleValidationConstraint(ConstraintViolationException e){
+  public ResponseApi<Void> handleValidationConstraint(ConstraintViolationException e) {
     log.warn("A validation constraint on a payload was violated - {}", e.getMessage(), e);
     return new ResponseApi<>(
-            null,
-            new ErrorMessageApi(ErrorCodeType.PAYLOAD_VALIDATION, "One or more validation rules on the request failed.", e.getMessage()));
+        null,
+        new ErrorMessageApi(
+            ErrorCodeType.PAYLOAD_VALIDATION,
+            "One or more validation rules on the request failed.",
+            e.getMessage()));
   }
 
   @ExceptionHandler(NoResourceFoundException.class)

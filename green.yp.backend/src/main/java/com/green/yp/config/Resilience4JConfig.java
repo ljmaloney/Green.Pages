@@ -12,23 +12,23 @@ public class Resilience4JConfig {
 
   private static final String GEOCODE_API_CONFIG = "geocode-api";
 
-    @Bean
-    public RateLimiterRegistry rateLimiterRegistry() {
-        return RateLimiterRegistry.ofDefaults();
-    }
+  @Bean
+  public RateLimiterRegistry rateLimiterRegistry() {
+    return RateLimiterRegistry.ofDefaults();
+  }
 
-    @Bean
-    public CircuitBreakerRegistry circuitBreakerRegistry() {
-        return CircuitBreakerRegistry.ofDefaults();
-    }
+  @Bean
+  public CircuitBreakerRegistry circuitBreakerRegistry() {
+    return CircuitBreakerRegistry.ofDefaults();
+  }
 
-    @Bean(name = "geocodeApiRateLimiter")
-    public RateLimiter geocodeApiRateLimiter(RateLimiterRegistry registry) {
-        return registry.rateLimiter(GEOCODE_API_CONFIG);
-    }
+  @Bean(name = "geocodeApiRateLimiter")
+  public RateLimiter geocodeApiRateLimiter(RateLimiterRegistry registry) {
+    return registry.rateLimiter(GEOCODE_API_CONFIG);
+  }
 
-    @Bean(name = "geocodeApiCircuitBreaker")
-    public CircuitBreaker geocodeApiCircuitBreaker(CircuitBreakerRegistry registry) {
-        return registry.circuitBreaker(GEOCODE_API_CONFIG);
-    }
+  @Bean(name = "geocodeApiCircuitBreaker")
+  public CircuitBreaker geocodeApiCircuitBreaker(CircuitBreakerRegistry registry) {
+    return registry.circuitBreaker(GEOCODE_API_CONFIG);
+  }
 }

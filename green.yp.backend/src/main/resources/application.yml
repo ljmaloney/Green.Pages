@@ -24,6 +24,13 @@ spring:
     properties:
       hibernate:
         format_sql: false
+  spring:
+    security:
+      oauth2:
+        resourceserver:
+          jwt:
+            audiences: 922748b0-1658-4880-942a-36eaca3aa185
+            issuer-uri: http://localhost:9011
 circuitbreaker:
   instances:
     geocode-api:
@@ -86,3 +93,14 @@ resilience4j:
         limit-for-period: 10
         limit-refresh-period: 1s
         timeout-duration: 100ms
+springdoc:
+  swagger-ui:
+    oauth2-redirect-url: http://localhost:8081/swagger-ui/oauth2-redirect.html
+    oauth:
+      client-id: 922748b0-1658-4880-942a-36eaca3aa185
+      client-secret: Nso5YJaHpIl6_vNezTylWDUoeKhb7eymmn1b_76Gx74
+      scopes: openid,profile
+      use-pkce-with-authorization-code-grant: true
+  oAuthFlow:
+    authorization-url: http://localhost:9011/oauth2/authorize
+    token-url: http://localhost:9011/oauth2/token

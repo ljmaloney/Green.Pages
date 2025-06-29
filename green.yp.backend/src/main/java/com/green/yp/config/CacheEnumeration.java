@@ -1,4 +1,3 @@
-
 package com.green.yp.config;
 
 import lombok.Getter;
@@ -8,7 +7,7 @@ public enum CacheEnumeration {
   ALL_LINE_OF_BUSINESS("allLineOfBusiness", 60, 60, false, false),
   LINE_OF_BUSINESS("lineOfBusiness", 45, 60, false, false),
   LINE_OF_BUSINESS_SERVICE("lineOfBusiness.service", 30, 30, false, false),
-  ACTIVE_SUBSCRIPTIONS("activeSubscriptions", 30,  30, false, false),
+  ACTIVE_SUBSCRIPTIONS("activeSubscriptions", 30, 30, false, false),
   SUBSCRIPTION("subscription", 30, 30, false, false),
   GEOCODE_ZIP("geocodeZip", 120, 120, false, true); // Longer duration, more permanent data
 
@@ -18,8 +17,12 @@ public enum CacheEnumeration {
   public final boolean permitNullValues;
   public final boolean eternal;
 
-  CacheEnumeration(String cacheName, long defaultExpirationMinutes, long idleScanTime,
-                   boolean defaultPermitNullValues, boolean defaultEternal) {
+  CacheEnumeration(
+      String cacheName,
+      long defaultExpirationMinutes,
+      long idleScanTime,
+      boolean defaultPermitNullValues,
+      boolean defaultEternal) {
     this.cacheName = cacheName;
     this.expirationMinutes = defaultExpirationMinutes;
     this.permitNullValues = defaultPermitNullValues;
