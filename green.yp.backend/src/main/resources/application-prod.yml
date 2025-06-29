@@ -23,6 +23,12 @@ spring:
         format_sql: false
   application:
     name: Green YP Market Service APIs
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          audiences: ${GYP_FA_CLIENT_ID}
+          issuer-uri: http://auth.greenyp.com/
 logging:
   level:
     org:
@@ -52,8 +58,22 @@ greenyp:
       s3:
         enabled: true
         region: us-east-1
+  geocoder:
+    impl: aws
+    aws:
+      placeIndex: GreenypPlaceIndex
   image:
     service:
       impl: aws
       host: https://greenyp-public-images.s3.amazonaws.com
       bucket: greenyp-public-images
+springdoc:
+  swagger-ui:
+    oauth:
+      client-id: ${GYP_FA_CLIENT_ID}
+      client-secret: ${GYP_FA_CLIENT_SECRET}
+      scopes: openid,profile
+      use-pkce-with-authorization-code-grant: true
+  oAuthFlow:
+    authorization-url: http://auth.greenyp.com/oauth2/authorize
+    token-url: http://auth.greenyp.com/oauth2/token
