@@ -7,6 +7,7 @@ import com.green.yp.api.apitype.producer.ProducerProductRequest;
 import com.green.yp.api.apitype.producer.ProducerProductResponse;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.producer.service.ProducerProductService;
+import com.green.yp.security.IsAnyAuthenticatedUser;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -54,6 +55,7 @@ public class ProducerProductController {
     return new ResponseApi<>(productService.findProduct(productId), null);
   }
 
+  @IsAnyAuthenticatedUser
   @PostMapping(
       path = "/location/product",
       consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -64,6 +66,7 @@ public class ProducerProductController {
         productService.createProduct(productRequest, null, RequestUtil.getRequestIP()), null);
   }
 
+  @IsAnyAuthenticatedUser
   @PutMapping(
       path = "/location/product",
       consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -74,12 +77,14 @@ public class ProducerProductController {
         productService.updateProduct(productRequest, null, RequestUtil.getRequestIP()), null);
   }
 
+  @IsAnyAuthenticatedUser
   @DeleteMapping(path = "/location/product/{productId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void discontinueImmediate(@NotNull @NonNull @PathVariable("productId") UUID productId) {
     productService.discontinueImmediate(productId, null, RequestUtil.getRequestIP());
   }
 
+  @IsAnyAuthenticatedUser
   @DeleteMapping(
       path = "location/product/discontinue",
       consumes = MediaType.APPLICATION_JSON_VALUE,

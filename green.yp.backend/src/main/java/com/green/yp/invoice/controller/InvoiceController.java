@@ -3,6 +3,7 @@ package com.green.yp.invoice.controller;
 import com.green.yp.api.apitype.invoice.InvoiceResponse;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.invoice.service.InvoiceService;
+import com.green.yp.security.IsAnyAuthenticatedUser;
 import com.green.yp.util.DateUtils;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,11 +31,13 @@ public class InvoiceController {
         this.invoiceService = invoiceService;
     }
 
+    @IsAnyAuthenticatedUser
     @GetMapping(path="{invoiceId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseApi<InvoiceResponse> findInvoice(@PathVariable("invoiceId") UUID invoiceId){
         return new ResponseApi<>(invoiceService.findInvoice(invoiceId, RequestUtil.getRequestIP()), null);
     }
 
+    @IsAnyAuthenticatedUser
     @GetMapping(path="/producer/{producerId}/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseApi<List<InvoiceResponse>> findInvoices(@PathVariable("producerId") UUID producerId,
                                                            @RequestParam("startDate") String startDate,

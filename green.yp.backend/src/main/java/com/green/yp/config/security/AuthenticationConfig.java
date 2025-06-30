@@ -1,4 +1,4 @@
-package com.green.yp.config;
+package com.green.yp.config.security;
 
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
@@ -34,13 +34,13 @@ public class AuthenticationConfig {
         .authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(
-                                "/v3/api-docs/**",
-                                "/swagger-ui.html",
-                                "/swagger-ui/**",
-                                "/swagger-resources/**",
-                                "/webjars/**"
-                        ).permitAll()
-                        .requestMatchers(
+                        "/v3/api-docs/**",
+                        "/swagger-ui.html",
+                        "/swagger-ui/**",
+                        "/swagger-resources/**",
+                        "/webjars/**")
+                    .permitAll()
+                    .requestMatchers(
                         HttpMethod.GET,
                         "/health/**",
                         "/index.html",

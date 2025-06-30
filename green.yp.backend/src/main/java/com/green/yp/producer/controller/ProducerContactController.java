@@ -3,8 +3,11 @@ package com.green.yp.producer.controller;
 import com.green.yp.api.apitype.producer.ProducerContactRequest;
 import com.green.yp.api.apitype.producer.ProducerContactResponse;
 import com.green.yp.common.dto.ResponseApi;
+import com.green.yp.config.security.AuthUser;
+import com.green.yp.config.security.AuthenticatedUser;
 import com.green.yp.producer.service.ProducerContactOrchestrationService;
 import com.green.yp.producer.service.ProducerContactService;
+import com.green.yp.security.IsAnyAuthenticatedUser;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -58,18 +61,20 @@ public class ProducerContactController {
     return new ResponseApi<>(contactService.findContacts(producerId, locationId, activeOnly), null);
   }
 
+  @IsAnyAuthenticatedUser
   @Operation(summary = "Creates a contact for a given location")
   @PostMapping(
       path = "/location/{locationId}/contact",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ProducerContactResponse> createContact(
-      @PathVariable("locationId") UUID locationId,
+      @PathVariable("locationId") UUID locationId,@AuthUser AuthenticatedUser authenticatedUser,
       @Valid @RequestBody ProducerContactRequest createContactRequest) {
     return new ResponseApi<>(
         contactOrchestrationService.createContact(locationId, createContactRequest), null);
   }
 
+  @IsAnyAuthenticatedUser
   @Operation(summary = "Updates an existing contact")
   @PutMapping(
       path = "/contact",
@@ -84,6 +89,7 @@ public class ProducerContactController {
         null);
   }
 
+  @IsAnyAuthenticatedUser
   @Operation(summary = "Updates an existing contact")
   @PutMapping(
       path = "/location/{locationId}/contact",
@@ -99,6 +105,7 @@ public class ProducerContactController {
         null);
   }
 
+  @IsAnyAuthenticatedUser
   @Operation(summary = "Deletes (inactivates) a contact")
   @DeleteMapping(path = "/contact/{contactId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)

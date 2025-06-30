@@ -5,6 +5,7 @@ import com.green.yp.api.apitype.producer.LocationRequest;
 import com.green.yp.api.apitype.producer.ProducerLocationResponse;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.producer.service.ProducerLocationService;
+import com.green.yp.security.IsAnyAuthenticatedUser;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -47,6 +48,7 @@ public class ProducerLocationController {
         locationService.findAllLocations(producerId, activeOnly, includeHours), null);
   }
 
+  @IsAnyAuthenticatedUser
   @PostMapping(
       path = "/{producerId}/location",
       consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -59,6 +61,7 @@ public class ProducerLocationController {
         null);
   }
 
+  @IsAnyAuthenticatedUser
   @PutMapping(
       path = "location",
       consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -69,6 +72,7 @@ public class ProducerLocationController {
         locationService.updateLocation(locationRequest, null, RequestUtil.getRequestIP()), null);
   }
 
+  @IsAnyAuthenticatedUser
   @PatchMapping(path = "locations/{locationId}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ProducerLocationResponse> patchLocation(
       @PathVariable("locationId") UUID locationId, @RequestBody PatchRequest patchRequest) {
@@ -77,6 +81,7 @@ public class ProducerLocationController {
         null);
   }
 
+  @IsAnyAuthenticatedUser
   @DeleteMapping(path = "location/{locationId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteProducerLocation(@PathVariable(name = "locationId") UUID locationId) {

@@ -12,26 +12,33 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class OpenApiSwaggerConfig {
-    @Value("${springdoc.oAuthFlow.authorization-url}")
-    private String oauthUrl;
-    @Value("${springdoc.oAuthFlow.token-url}")
-    private String tokenUrl;
+  @Value("${springdoc.oAuthFlow.authorization-url}")
+  private String oauthUrl;
 
-    @Bean
-    public OpenAPI customOpenAPI() {
-        log.info("Configure swagger for OAUTH security using FusionAuth");
-        return new OpenAPI()
-                .info(new Info().title("GreenYP API").version("v1"))
-                .components(new Components()
-                        .addSecuritySchemes("OAuth2", new SecurityScheme()
-                                .type(SecurityScheme.Type.OAUTH2)
-                                .flows(new OAuthFlows()
-                                        .authorizationCode(new OAuthFlow()
-                                                .authorizationUrl(oauthUrl)
-                                                .tokenUrl(tokenUrl)
-                                                .scopes(new Scopes()
-                                                        .addString("openid", "OpenID scope")
-                                                        .addString("profile", "Profile scope"))))))
-                .addSecurityItem(new SecurityRequirement().addList("OAuth2"));
-    }
+  @Value("${springdoc.oAuthFlow.token-url}")
+  private String tokenUrl;
+
+  @Bean
+  public OpenAPI customOpenAPI() {
+    log.info("Configure swagger for OAUTH security using FusionAuth");
+    return new OpenAPI()
+        .info(new Info().title("GreenYP API").version("v1"))
+        .components(
+            new Components()
+                .addSecuritySchemes(
+                    "OAuth2",
+                    new SecurityScheme()
+                        .type(SecurityScheme.Type.OAUTH2)
+                        .flows(
+                            new OAuthFlows()
+                                .authorizationCode(
+                                    new OAuthFlow()
+                                        .authorizationUrl(oauthUrl)
+                                        .tokenUrl(tokenUrl)
+                                        .scopes(
+                                            new Scopes()
+                                                .addString("openid", "OpenID scope")
+                                                .addString("profile", "Profile scope"))))))
+        .addSecurityItem(new SecurityRequirement().addList("OAuth2"));
+  }
 }

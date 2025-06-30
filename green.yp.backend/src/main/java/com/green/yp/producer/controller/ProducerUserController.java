@@ -8,6 +8,10 @@ import com.green.yp.api.apitype.producer.enumeration.ProducerDisplayContactType;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.producer.service.ProducerContactOrchestrationService;
 import com.green.yp.producer.service.ProducerUserService;
+import com.green.yp.security.IsAdmin;
+import com.green.yp.security.IsSubscriberAdmin;
+import com.green.yp.security.IsSubscriberAdminOrAdmin;
+import com.green.yp.security.IsSubscriberOrAdmin;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -39,6 +43,7 @@ public class ProducerUserController {
     this.contactOrchestrationService = contactOrchestrationService;
   }
 
+  @IsSubscriberAdminOrAdmin
   @PostMapping(
       path = "/{producerId}/authorize/user",
       consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -72,6 +77,7 @@ public class ProducerUserController {
         null);
   }
 
+  @IsSubscriberAdminOrAdmin
   @PutMapping(
       path = "/{producerId}/authorize/user/{credentialsId}",
       consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -87,6 +93,7 @@ public class ProducerUserController {
         null);
   }
 
+  @IsSubscriberOrAdmin
   @GetMapping(path = "/{producerId}/search/users", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<List<ProducerCredentialsResponse>> findProducerUsers(
       @PathVariable UUID producerId,

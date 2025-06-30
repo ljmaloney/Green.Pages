@@ -1,4 +1,4 @@
-package com.green.yp.config;
+package com.green.yp.config.security;
 
 import java.util.List;
 import org.springframework.context.annotation.Configuration;

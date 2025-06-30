@@ -7,6 +7,7 @@ import com.green.yp.api.apitype.producer.ProducerServiceRequest;
 import com.green.yp.api.apitype.producer.ProducerServiceUpdateRequest;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.producer.service.ProducerServicesService;
+import com.green.yp.security.IsAnyAuthenticatedUser;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -41,6 +42,7 @@ public class ProducerServicesController {
         null);
   }
 
+  @IsAnyAuthenticatedUser
   @PostMapping(
       path = "location/service",
       consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -51,6 +53,7 @@ public class ProducerServicesController {
         servicesService.createService(serviceRequest, null, RequestUtil.getRequestIP()), null);
   }
 
+  @IsAnyAuthenticatedUser
   @PutMapping(
       path = "location/service",
       consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -61,6 +64,7 @@ public class ProducerServicesController {
         servicesService.updateService(updateRequest, RequestUtil.getRequestIP()), null);
   }
 
+  @IsAnyAuthenticatedUser
   @PatchMapping(path = "location/service/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ProducerServiceResponse> patchService(
       @PathVariable(name = "serviceId") UUID serviceId, @RequestBody PatchRequest patchRequest) {
@@ -69,6 +73,7 @@ public class ProducerServicesController {
         null);
   }
 
+  @IsAnyAuthenticatedUser
   @DeleteMapping(path = "localtion/service/discontinue",
   consumes = MediaType.APPLICATION_JSON_VALUE,
   produces = MediaType.APPLICATION_JSON_VALUE)
@@ -77,6 +82,7 @@ public class ProducerServicesController {
     servicesService.discontinueService(deleteRequest);
   }
 
+  @IsAnyAuthenticatedUser
   @DeleteMapping(path = "location/service/{serviceId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteService(@PathVariable(name = "serviceId") UUID serviceId) {

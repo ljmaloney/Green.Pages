@@ -1,9 +1,12 @@
 package com.green.yp.account.service;
 
 import com.green.yp.account.mapper.AccountMapper;
+import com.green.yp.api.AuditRequest;
 import com.green.yp.api.apitype.account.AccountResponse;
 import com.green.yp.api.apitype.account.CreateAccountRequest;
 import com.green.yp.api.apitype.account.UpdateAccountRequest;
+import com.green.yp.api.apitype.enumeration.AuditActionType;
+import com.green.yp.api.apitype.enumeration.AuditObjectType;
 import com.green.yp.api.apitype.enumeration.EmailTemplateName;
 import com.green.yp.api.apitype.producer.*;
 import com.green.yp.api.apitype.producer.enumeration.ProducerContactType;
@@ -52,7 +55,7 @@ public class AccountService {
           PaymentContract paymentContract,
           ProducerContactContract contactContract,
           ProducerLocationContract locationContract,
-          AccountMapper accountMapper, ProducerContactContract producerContactContract, AuthenticationContract authenticationContract) {
+          AccountMapper accountMapper, ProducerContactContract producerContactContract) {
     this.emailService = emailService;
     this.producerContract = producerContract;
     this.paymentContract = paymentContract;
@@ -62,8 +65,9 @@ public class AccountService {
     this.producerContactContract = producerContactContract;
   }
 
+  @AuditRequest(requestParameter = "accountId", actionType = AuditActionType.CANCEL_ACCOUNT, objectType = AuditObjectType.OBJECT)
   @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-  public String cancelAccount(UUID accountId, String ipAddress) {
+  public String cancelAccount(UUID accountId, String userId, String ipAddress) {
     log.info("Cancelling subscription for {} from ipAddress {}", accountId, ipAddress);
 
     contactContract.cancelAuthentication(accountId, null, ipAddress);
@@ -166,7 +170,7 @@ public class AccountService {
 
   @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
   public AccountResponse updateAccount(
-      Optional<ProducerResponse> producerOptional, UpdateAccountRequest account, String ipAddress)
+          Optional<ProducerResponse> producerOptional, UpdateAccountRequest account, String ipAddress, String requestIP)
       throws NoSuchAlgorithmException {
 
     var producerResponse =

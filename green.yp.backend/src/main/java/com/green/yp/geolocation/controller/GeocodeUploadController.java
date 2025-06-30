@@ -1,6 +1,7 @@
 package com.green.yp.geolocation.controller;
 
 import com.green.yp.geolocation.service.GeocodeUploadService;
+import com.green.yp.security.IsAdmin;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ public class GeocodeUploadController {
 
   private final GeocodeUploadService geocodeUploadService;
 
+  @IsAdmin
   @PostMapping(path = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<Void> uploadGeocodeData(@RequestParam("file") MultipartFile file) {
     if (file.isEmpty()) {
