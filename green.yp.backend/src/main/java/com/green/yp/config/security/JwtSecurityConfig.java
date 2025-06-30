@@ -1,4 +1,4 @@
-package com.green.yp.config;
+package com.green.yp.config.security;
 
 import com.green.yp.auth.service.AuthenticationService;
 import java.util.*;

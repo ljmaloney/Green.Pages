@@ -5,11 +5,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.green.yp.common.dto.ResponseApi;
+import com.green.yp.config.security.AuthenticatedUser;
 import com.green.yp.reference.data.enumeration.LineOfBusinessCreateType;
 import com.green.yp.reference.dto.LineOfBusinessDto;
 import com.green.yp.reference.service.LineOfBusinessService;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -73,7 +75,8 @@ false, "flower", null
             LineOfBusinessDto.builder()
                 .lineOfBusinessName("Lawn-care Service")
                 .description("Lawn-care service provider")
-                .build());
+                .build(),
+            new AuthenticatedUser("", "", Collections.emptyList(), null));
 
     assertThat(responseDto).isNotNull();
     assertThat(responseDto.response()).isNotNull();
@@ -99,7 +102,8 @@ false, "flower", null
             LineOfBusinessDto.builder()
                 .lineOfBusinessName("Lawn-care Service")
                 .description("Lawn-care service provider")
-                .build());
+                .build(),
+            new AuthenticatedUser("","", null, null));
 
     assertThat(responseDto).isNotNull();
     assertThat(responseDto.response()).isNotNull();

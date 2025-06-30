@@ -3,6 +3,8 @@ package com.green.yp.reference.controller;
 import com.green.yp.api.apitype.CreateLobServiceRequest;
 import com.green.yp.api.apitype.UpdateLobServiceRequest;
 import com.green.yp.common.dto.ResponseApi;
+import com.green.yp.config.security.AuthUser;
+import com.green.yp.config.security.AuthenticatedUser;
 import com.green.yp.reference.dto.LOBServiceDto;
 import com.green.yp.reference.dto.LineOfBusinessDto;
 import com.green.yp.reference.mapper.LineOfBusinessMapper;
@@ -67,9 +69,9 @@ public class LineOfBusinessController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @IsAdmin
   public ResponseApi<LineOfBusinessDto> createLineOfBusiness(
-      @RequestBody LineOfBusinessDto lineOfBusiness) {
+      @RequestBody LineOfBusinessDto lineOfBusiness, @AuthUser AuthenticatedUser user) {
     return new ResponseApi<>(
-        lobService.createLineOfBusiness(lineOfBusiness, null, RequestUtil.getRequestIP()), null);
+        lobService.createLineOfBusiness(lineOfBusiness, user.userId(), RequestUtil.getRequestIP()), null);
   }
 
   @Operation(summary = "Creates a new service of a line of business")
@@ -81,9 +83,9 @@ public class LineOfBusinessController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @IsAdmin
   public ResponseApi<LOBServiceDto> createService(
-      @RequestBody CreateLobServiceRequest serviceRequest) {
+      @RequestBody @Valid @NotNull CreateLobServiceRequest serviceRequest, @AuthUser AuthenticatedUser user) {
     return new ResponseApi<>(
-        lobService.createService(serviceRequest, null, RequestUtil.getRequestIP()), null);
+        lobService.createService(serviceRequest, user.userId(), RequestUtil.getRequestIP()), null);
   }
 
   @Operation(summary = "Updates a description for a line of business")
@@ -93,9 +95,9 @@ public class LineOfBusinessController {
       path = "/lob/description",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseApi<LineOfBusinessDto> updateDescription(LineOfBusinessDto lobDto) {
+  public ResponseApi<LineOfBusinessDto> updateDescription(@RequestBody @Valid @NotNull LineOfBusinessDto lobDto, @AuthUser AuthenticatedUser user) {
     return new ResponseApi<>(
-        lobService.updateLineOfBusinessDescription(lobDto, null, RequestUtil.getRequestIP()), null);
+        lobService.updateLineOfBusinessDescription(lobDto, user.userId(), RequestUtil.getRequestIP()), null);
   }
 
   @Operation(summary="Updates fields for an existing line of business")
@@ -103,8 +105,9 @@ public class LineOfBusinessController {
   @IsAdmin
   @PutMapping( path="/lob", consumes = MediaType.APPLICATION_JSON_VALUE,
           produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseApi<LineOfBusinessDto> updateLineOfBusiness(@RequestBody @Valid @NotNull LineOfBusinessDto lineOfBusinessDto){
-    return new ResponseApi<>(lobService.updateLineOfBusiness(lineOfBusinessDto, null, RequestUtil.getRequestIP()), null);
+  public ResponseApi<LineOfBusinessDto> updateLineOfBusiness(@RequestBody @Valid @NotNull LineOfBusinessDto lineOfBusinessDto,
+                                                             @AuthUser AuthenticatedUser user){
+    return new ResponseApi<>(lobService.updateLineOfBusiness(lineOfBusinessDto, user.userId(), RequestUtil.getRequestIP()), null);
   }
 
   @Operation(summary = "Updates a line of business")
@@ -113,9 +116,9 @@ public class LineOfBusinessController {
       value = "/lob/service",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseApi<LOBServiceDto> updateService(
+  public ResponseApi<LOBServiceDto> updateService(@AuthUser AuthenticatedUser user,
       @RequestBody UpdateLobServiceRequest serviceRequest) {
     return new ResponseApi<>(
-        lobService.updateService(serviceRequest, null, RequestUtil.getRequestIP()), null);
+        lobService.updateService(serviceRequest, user.userId(), RequestUtil.getRequestIP()), null);
   }
 }
