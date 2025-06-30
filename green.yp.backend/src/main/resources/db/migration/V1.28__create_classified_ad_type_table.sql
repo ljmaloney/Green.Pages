@@ -10,6 +10,7 @@ BEGIN
                   `create_date`       DATETIME        NOT NULL,
                   `last_update_date`  DATETIME        NOT NULL,
                   `active`            char(1)         NOT NULL,
+                  `sort_order`        int             not null,
                   `ad_type_name`      varchar(75)     NOT NULL,
                   `monthly_price`     decimal(5,2)    NOT NULL,
                   `three_month_price` decimal(5,2),
