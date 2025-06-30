@@ -6,6 +6,7 @@ import com.green.yp.api.apitype.UpdateSubscriptionRequest;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.reference.dto.SubscriptionDto;
 import com.green.yp.reference.service.SubscriptionService;
+import com.green.yp.security.IsAdmin;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -50,6 +51,7 @@ public class SubscriptionController {
 
   @Operation(summary = "Creates a new subscription")
   @ApiResponse(responseCode = "200", description = "Subscription created")
+  @IsAdmin
   @PostMapping(
       value = "/subscription",
       consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -62,6 +64,7 @@ public class SubscriptionController {
   }
 
   @Operation(summary = "updates an existing subscription")
+  @IsAdmin
   @PutMapping(
       value = "/subscription",
       consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -74,6 +77,7 @@ public class SubscriptionController {
   }
 
   @Operation(summary = "Updates one or more fields of a subscription")
+  @IsAdmin
   @PatchMapping(
       value = "/subscription/{subscriptionId}",
       consumes = MediaType.APPLICATION_JSON_VALUE,
