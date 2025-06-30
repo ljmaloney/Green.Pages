@@ -9,6 +9,8 @@ import com.green.yp.api.apitype.payment.ApiPaymentResponse;
 import com.green.yp.api.apitype.payment.ApplyPaymentMethodRequest;
 import com.green.yp.api.apitype.payment.ApplyPaymentRequest;
 import com.green.yp.common.dto.ResponseApi;
+import com.green.yp.config.security.AuthUser;
+import com.green.yp.config.security.AuthenticatedUser;
 import com.green.yp.exception.SystemException;
 import com.green.yp.security.IsAnyAuthenticatedUser;
 import com.green.yp.util.RequestUtil;
@@ -104,11 +106,11 @@ public class AccountController {
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public ResponseApi<AccountResponse> updateAccount(
-      @RequestBody @Valid UpdateAccountRequest account) {
+  public ResponseApi<AccountResponse> updateAccount(@AuthUser AuthenticatedUser authenticatedUser,
+                                                    @RequestBody @Valid UpdateAccountRequest account) {
     try {
       return new ResponseApi<>(
-          accountService.updateAccount(Optional.empty(), account, RequestUtil.getRequestIP()),
+          accountService.updateAccount(Optional.empty(), account, authenticatedUser.userId(),RequestUtil.getRequestIP()),
           null);
     } catch (NoSuchAlgorithmException e) {
       throw new SystemException("System error, missing configuration", e);
@@ -121,7 +123,7 @@ public class AccountController {
           "Removes or disables unpaid accounts where a payment has not been received in over specified number of days")
   @PostMapping(path = "/clean/unpaid", produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public ResponseApi<String> cleanUnpaidAccounts(
+  public ResponseApi<String> cleanUnpaidAccounts(@AuthUser AuthenticatedUser authenticatedUser,
       @RequestParam(name = "days", defaultValue = "30", required = false) Integer daysOld) {
     return new ResponseApi<>(
         paymentService.cleanUnpaidAccounts(daysOld, RequestUtil.getRequestIP()), null);
@@ -131,8 +133,8 @@ public class AccountController {
   @Operation(summary = "Cancels or disables an account")
   @DeleteMapping(path = "/{accountId}", produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public ResponseApi<String> cancelAccount(@PathVariable UUID accountId) {
+  public ResponseApi<String> cancelAccount(@AuthUser AuthenticatedUser authenticatedUser, @PathVariable UUID accountId) {
     return new ResponseApi<>(
-        accountService.cancelAccount(accountId, RequestUtil.getRequestIP()), null);
+        accountService.cancelAccount(accountId, authenticatedUser.userId(), RequestUtil.getRequestIP()), null);
   }
 }
