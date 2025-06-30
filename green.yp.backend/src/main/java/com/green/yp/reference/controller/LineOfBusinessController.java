@@ -7,6 +7,7 @@ import com.green.yp.reference.dto.LOBServiceDto;
 import com.green.yp.reference.dto.LineOfBusinessDto;
 import com.green.yp.reference.mapper.LineOfBusinessMapper;
 import com.green.yp.reference.service.LineOfBusinessService;
+import com.green.yp.security.IsAdmin;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -64,6 +65,7 @@ public class LineOfBusinessController {
       path = "/lob",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
+  @IsAdmin
   public ResponseApi<LineOfBusinessDto> createLineOfBusiness(
       @RequestBody LineOfBusinessDto lineOfBusiness) {
     return new ResponseApi<>(
@@ -77,6 +79,7 @@ public class LineOfBusinessController {
       value = "/lob/service",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
+  @IsAdmin
   public ResponseApi<LOBServiceDto> createService(
       @RequestBody CreateLobServiceRequest serviceRequest) {
     return new ResponseApi<>(
@@ -85,6 +88,7 @@ public class LineOfBusinessController {
 
   @Operation(summary = "Updates a description for a line of business")
   @ApiResponse(responseCode = "200")
+  @IsAdmin
   @PutMapping(
       path = "/lob/description",
       consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -96,6 +100,7 @@ public class LineOfBusinessController {
 
   @Operation(summary="Updates fields for an existing line of business")
   @ApiResponse(responseCode="200")
+  @IsAdmin
   @PutMapping( path="/lob", consumes = MediaType.APPLICATION_JSON_VALUE,
           produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<LineOfBusinessDto> updateLineOfBusiness(@RequestBody @Valid @NotNull LineOfBusinessDto lineOfBusinessDto){
@@ -103,6 +108,7 @@ public class LineOfBusinessController {
   }
 
   @Operation(summary = "Updates a line of business")
+  @IsAdmin
   @PutMapping(
       value = "/lob/service",
       consumes = MediaType.APPLICATION_JSON_VALUE,
