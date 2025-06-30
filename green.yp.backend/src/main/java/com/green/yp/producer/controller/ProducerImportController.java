@@ -2,6 +2,7 @@ package com.green.yp.producer.controller;
 
 import com.green.yp.api.apitype.common.ResponseApi;
 import com.green.yp.producer.service.ProducerCsvImportService;
+import com.green.yp.security.IsAdmin;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
@@ -22,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ProducerImportController {
   private final ProducerCsvImportService importService;
 
+  @IsAdmin
   @PostMapping(
       path = "/uploadCSV",
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE,

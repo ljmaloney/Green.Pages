@@ -5,6 +5,7 @@ import com.green.yp.api.apitype.producer.ProducerContactResponse;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.producer.service.ProducerContactOrchestrationService;
 import com.green.yp.producer.service.ProducerContactService;
+import com.green.yp.security.IsAnyAuthenticatedUser;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -58,6 +59,7 @@ public class ProducerContactController {
     return new ResponseApi<>(contactService.findContacts(producerId, locationId, activeOnly), null);
   }
 
+  @IsAnyAuthenticatedUser
   @Operation(summary = "Creates a contact for a given location")
   @PostMapping(
       path = "/location/{locationId}/contact",
@@ -70,6 +72,7 @@ public class ProducerContactController {
         contactOrchestrationService.createContact(locationId, createContactRequest), null);
   }
 
+  @IsAnyAuthenticatedUser
   @Operation(summary = "Updates an existing contact")
   @PutMapping(
       path = "/contact",
@@ -84,6 +87,7 @@ public class ProducerContactController {
         null);
   }
 
+  @IsAnyAuthenticatedUser
   @Operation(summary = "Updates an existing contact")
   @PutMapping(
       path = "/location/{locationId}/contact",
@@ -99,6 +103,7 @@ public class ProducerContactController {
         null);
   }
 
+  @IsAnyAuthenticatedUser
   @Operation(summary = "Deletes (inactivates) a contact")
   @DeleteMapping(path = "/contact/{contactId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)

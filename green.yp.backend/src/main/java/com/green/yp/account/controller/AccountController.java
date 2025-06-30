@@ -10,6 +10,7 @@ import com.green.yp.api.apitype.payment.ApplyPaymentMethodRequest;
 import com.green.yp.api.apitype.payment.ApplyPaymentRequest;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.exception.SystemException;
+import com.green.yp.security.IsAnyAuthenticatedUser;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -50,6 +51,7 @@ public class AccountController {
     return new ResponseApi<>(accountService.findAccount(UUID.fromString(accountId)), null);
   }
 
+  @IsAnyAuthenticatedUser
   @ApiResponse(
           responseCode = org.apache.hc.core5.http.HttpStatus.SC_OK + "",
           description = "Returns the requested account information",
@@ -95,6 +97,7 @@ public class AccountController {
         paymentService.applyPayment(paymentRequest, null, RequestUtil.getRequestIP()), null);
   }
 
+  @IsAnyAuthenticatedUser
   @Operation(summary = "Update the subscriber / producer account business profile")
   @PutMapping(
       name = "/account",
@@ -124,6 +127,7 @@ public class AccountController {
         paymentService.cleanUnpaidAccounts(daysOld, RequestUtil.getRequestIP()), null);
   }
 
+  @IsAnyAuthenticatedUser
   @Operation(summary = "Cancels or disables an account")
   @DeleteMapping(path = "/{accountId}", produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)

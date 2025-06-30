@@ -3,6 +3,7 @@ package com.green.yp.producer.controller;
 import com.green.yp.api.apitype.common.ResponseApi;
 import com.green.yp.api.apitype.producer.ProducerImageResponse;
 import com.green.yp.producer.service.ProducerImageService;
+import com.green.yp.security.IsAnyAuthenticatedUser;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -38,6 +39,7 @@ public class ProducerImagesController {
     return new ResponseApi<>(imageService.getProducerLogo(producerId), null);
   }
 
+  @IsAnyAuthenticatedUser
   @PostMapping(
       path = "{producerId}/logo",
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
@@ -51,6 +53,7 @@ public class ProducerImagesController {
     imageService.uploadLogoImage(producerId, logoFileName, file);
   }
 
+  @IsAnyAuthenticatedUser
   @PostMapping(
       path = "{producerId}/gallery",
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
@@ -65,6 +68,7 @@ public class ProducerImagesController {
     imageService.uploadGalleryImage(producerId, imageFilename, imageDescription, file);
   }
 
+  @IsAnyAuthenticatedUser
   @DeleteMapping(path = "{producerId}/logo")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteLogo(@PathVariable("producerId") UUID producerId) {
@@ -72,6 +76,7 @@ public class ProducerImagesController {
     imageService.deleteLogo(producerId, RequestUtil.getRequestIP());
   }
 
+  @IsAnyAuthenticatedUser
   @DeleteMapping(path = "{producerId}/gallery")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteGalleryImage(
