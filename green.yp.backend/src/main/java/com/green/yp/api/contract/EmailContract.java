@@ -1,6 +1,6 @@
 package com.green.yp.api.contract;
 
-import com.green.yp.api.apitype.contact.ContactRequest;
+import com.green.yp.api.apitype.contact.ContactMessageRequest;
 import com.green.yp.api.apitype.enumeration.EmailTemplateName;
 import com.green.yp.api.apitype.producer.ProducerResponse;
 import com.green.yp.email.service.EmailService;
@@ -26,7 +26,7 @@ public class EmailContract {
     emailService.sendEmail(emailTemplateName, contact, emailAddress);
   }
 
-  public void sendEmail(EmailTemplateName emailTemplateName, ContactRequest contactRequest, String emailAddress){
-    emailService.sendEmail(emailTemplateName, contactRequest, emailAddress);
+  public void sendEmail(EmailTemplateName emailTemplateName, ContactMessageRequest contactMessageRequest, String emailAddress){
+    emailService.sendEmail(emailTemplateName, contactMessageRequest, emailAddress);
   }
 }

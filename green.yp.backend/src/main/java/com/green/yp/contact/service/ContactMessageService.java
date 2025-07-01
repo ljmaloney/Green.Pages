@@ -1,6 +1,6 @@
 package com.green.yp.contact.service;
 
-import com.green.yp.api.apitype.contact.ContactRequest;
+import com.green.yp.api.apitype.contact.ContactMessageRequest;
 import com.green.yp.api.contract.EmailContract;
 import com.green.yp.api.contract.ProducerContactContract;
 import com.green.yp.api.contract.ProducerContract;
@@ -24,6 +24,6 @@ public class ContactMessageService {
         this.contactContract = producerContactContract;
         this.producerContract = producerContract;
     }
-    public void sendMessage(ContactRequest contactRequest, String requestIP) {
+    public void sendMessage(ContactMessageRequest contactMessageRequest, String requestIP) {
     }
 }

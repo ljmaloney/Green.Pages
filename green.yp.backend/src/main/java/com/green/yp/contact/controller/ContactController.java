@@ -1,6 +1,6 @@
 package com.green.yp.contact.controller;
 
-import com.green.yp.api.apitype.contact.ContactRequest;
+import com.green.yp.api.apitype.contact.ContactMessageRequest;
 import com.green.yp.contact.service.ContactMessageService;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,7 +24,7 @@ public class ContactController {
 
     @PostMapping( consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void processContactRequest(@RequestBody ContactRequest contactRequest){
-        service.sendMessage(contactRequest, RequestUtil.getRequestIP());
+    public void processContactRequest(@RequestBody ContactMessageRequest contactMessageRequest){
+        service.sendMessage(contactMessageRequest, RequestUtil.getRequestIP());
     }
 }

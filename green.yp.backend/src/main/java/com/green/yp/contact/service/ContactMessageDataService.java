@@ -1,7 +1,7 @@
 package com.green.yp.contact.service;
 
 import com.green.yp.api.apitype.contact.ContactMessageResponse;
-import com.green.yp.api.apitype.contact.ContactRequest;
+import com.green.yp.api.apitype.contact.ContactMessageRequest;
 import com.green.yp.contact.data.model.ContactMessage;
 import com.green.yp.contact.data.repository.ContactMessageRepository;
 import jakarta.validation.constraints.NotNull;
@@ -24,7 +24,7 @@ public class ContactMessageDataService {
         return repository.findByCreateDateBetweenSortedByCreatedDateDesc(startDate, endDate);
     }
 
-    public ContactMessage createContact(ContactRequest contactRequest){
+    public ContactMessage createContact(ContactMessageRequest contactMessageRequest){
         return null;
     }
 }
