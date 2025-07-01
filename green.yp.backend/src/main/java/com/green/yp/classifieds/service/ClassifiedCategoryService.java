@@ -1,6 +1,6 @@
 package com.green.yp.classifieds.service;
 
-import com.green.yp.classifieds.apitype.ClassifiedCategoryResponse;
+import com.green.yp.api.apitype.classified.ClassifiedCategoryResponse;
 import com.green.yp.classifieds.data.repository.ClassifiedCategoryRepository;
 import com.green.yp.classifieds.mapper.ClassifiedCategtoryMapper;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package com.green.yp.classifieds.apitype;
+package com.green.yp.api.apitype.classified;
 
 import com.green.yp.classifieds.data.model.ClassifiedAdFeature;
 import java.math.BigDecimal;

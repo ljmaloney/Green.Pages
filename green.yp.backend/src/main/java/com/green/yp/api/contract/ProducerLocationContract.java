@@ -36,4 +36,8 @@ public class ProducerLocationContract {
   public void deleteLocation(@NotNull @NonNull List<UUID> producerIds) {
     locationService.deleteLocations(producerIds);
   }
+
+  public ProducerLocationResponse findLocation(@NotNull @NonNull UUID locationId) {
+    return locationService.findLocation(locationId, false);
+  }
 }
