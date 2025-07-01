@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class ClassifiedAdService {
+public class ClassifiedAdTypeService {
   private final ClassifiedAdTypeRepository repository;
   private final ClassifiedAdTypeMapper mapper;
 
-  public ClassifiedAdService(ClassifiedAdTypeRepository repository, ClassifiedAdTypeMapper mapper) {
+  public ClassifiedAdTypeService(ClassifiedAdTypeRepository repository, ClassifiedAdTypeMapper mapper) {
     this.repository = repository;
     this.mapper = mapper;
   }

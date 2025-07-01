@@ -1,7 +1,7 @@
 package com.green.yp.classifieds.controller;
 
 import com.green.yp.classifieds.apitype.ClassifiedAdTypeResponse;
-import com.green.yp.classifieds.service.ClassifiedAdService;
+import com.green.yp.classifieds.service.ClassifiedAdTypeService;
 import com.green.yp.common.dto.ResponseApi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,9 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "REST endpoint types of adds for classifieds")
 public class ClassifiedAdTypeController {
 
-  private final ClassifiedAdService service;
+  private final ClassifiedAdTypeService service;
 
-  public ClassifiedAdTypeController(ClassifiedAdService service) {
+  public ClassifiedAdTypeController(ClassifiedAdTypeService service) {
     this.service = service;
   }
 
