@@ -18,8 +18,9 @@ public class ClassifiedAdService {
   }
 
   public List<ClassifiedAdTypeResponse> getActiveAdTypes() {
-    return repository.findClassifiedAdTypeByActive(Boolean.TRUE).stream()
-        .map(mapper::fromEntity)
-        .toList();
+    return repository.findClassifiedAdTypeByActiveOrderBySortOrderAsc(Boolean.TRUE)
+            .stream()
+            .map(mapper::fromEntity)
+            .toList();
   }
 }
