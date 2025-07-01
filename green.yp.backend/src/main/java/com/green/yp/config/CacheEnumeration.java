@@ -5,6 +5,8 @@ import lombok.Getter;
 @Getter
 public enum CacheEnumeration {
   ALL_LINE_OF_BUSINESS("allLineOfBusiness", 60, 60, false, false),
+  CLASSIFIED_AD_TYPE("classifiedAdTypes", 60, 60, false, false),
+  CLASSIFIED_CATEGORY("classifiedCategory", 60, 60, false, false),
   LINE_OF_BUSINESS("lineOfBusiness", 45, 60, false, false),
   LINE_OF_BUSINESS_SERVICE("lineOfBusiness.service", 30, 30, false, false),
   ACTIVE_SUBSCRIPTIONS("activeSubscriptions", 30, 30, false, false),
