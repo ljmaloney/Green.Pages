@@ -3,9 +3,11 @@ package com.green.yp.config.security;
 import com.green.yp.auth.service.AuthenticationService;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -20,8 +22,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 public class JwtSecurityConfig {
 
   @Bean
-  public JwtDecoder jwtDecoder() {
-    return NimbusJwtDecoder.withJwkSetUri("http://localhost:9011/.well-known/jwks.json").build();
+  public JwtDecoder jwtDecoder( @Value("${greenyp.jwt.decoderUrl}") String wellKnownJwtDecoderUrl) {
+    return NimbusJwtDecoder.withJwkSetUri(wellKnownJwtDecoderUrl).build();
   }
 
   @Bean

@@ -67,8 +67,11 @@ greenyp:
       impl: aws
       host: https://greenyp-public-images.s3.amazonaws.com
       bucket: greenyp-public-images
+  jwt:
+    decoderUrl: http://auth.greenyp.com/.well-known/jwks.json
 springdoc:
   swagger-ui:
+#    oauth2-redirect-url: http://localhost:8081/swagger-ui/oauth2-redirect.html
     oauth:
       client-id: ${GYP_FA_CLIENT_ID}
       client-secret: ${GYP_FA_CLIENT_SECRET}
