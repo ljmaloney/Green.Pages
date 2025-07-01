@@ -7,4 +7,5 @@ import java.util.UUID;
 
 public record ProducerLeadContactRequest(@NotNull @NonNull UUID producerId,
                                          @NotNull @NonNull UUID locationId,
+                                         ProducerContactRequestType contactType,
                                          UUID productServiceRef) {}

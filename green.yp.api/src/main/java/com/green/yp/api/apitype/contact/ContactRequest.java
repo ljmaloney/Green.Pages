@@ -1,6 +1,5 @@
 package com.green.yp.api.apitype.contact;
 
-import com.green.yp.api.apitype.enumeration.ContactRequestType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -8,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.NonNull;
 
 public record ContactRequest(ContactRequestType requestType,
+                             ClassifiedContactRequest classifiedRequest,
                              ProducerLeadContactRequest leadContactRequest,
                              String companyName,
                              @NotNull @NonNull
