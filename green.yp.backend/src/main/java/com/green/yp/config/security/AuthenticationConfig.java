@@ -34,6 +34,9 @@ public class AuthenticationConfig {
         .authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(
+                        "/",
+                        "/index.html",
+                        "/favicon.ico",
                         "/v3/api-docs/**",
                         "/swagger-ui.html",
                         "/swagger-ui/**",
