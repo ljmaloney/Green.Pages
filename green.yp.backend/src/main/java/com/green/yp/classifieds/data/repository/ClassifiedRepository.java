@@ -10,12 +10,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ClassifiedRepository extends JpaRepository<Classified, UUID> {
-  @Query("""
+  @Query(
+      """
             SELECT new com.green.yp.classifieds.data.model.ClassifiedCustomerProjection(classified, customer)
             FROM Classified AS classified
                  INNER JOIN ClassifiedCustomer AS customer ON customer.id = classified.classifiedCustomerId
-            WHERE 
+            WHERE
                  classified.id = :classifiedId
          """)
-  Optional<ClassifiedCustomerProjection> findClassifiedAndCustomer(@NotNull @Param("classifiedId") UUID classifiedId);
+  Optional<ClassifiedCustomerProjection> findClassifiedAndCustomer(
+      @NotNull @Param("classifiedId") UUID classifiedId);
 }
