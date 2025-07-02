@@ -49,7 +49,7 @@ public class ContactMessageService {
 
             messageResponse = messageDataService.createContactMessage(contactMessageRequest, producer, location, contact, requestIP);
         } else if ( contactMessageRequest.classifiedRequest() != null ) {
-            var classified = classifiedContract.findClassified(contactMessageRequest.classifiedRequest().classifiedId());
+            var classified = classifiedContract.findClassifiedAd(contactMessageRequest.classifiedRequest().classifiedId());
             messageResponse = messageDataService.createContactMessage(contactMessageRequest, classified, requestIP);
         } else {
             var emailAddress = "";

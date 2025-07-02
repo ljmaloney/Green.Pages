@@ -1,11 +1,13 @@
 package com.green.yp.classifieds.data.model;
 
+import com.green.yp.common.data.embedded.Mutable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDate;
+import java.util.UUID;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -14,28 +16,18 @@ import org.hibernate.annotations.ColumnDefault;
 @Setter
 @Entity
 @Table(name = "classified", schema = "greenyp")
-public class Classified {
-  @Id
-  @Size(max = 16)
-  @Column(name = "id", nullable = false, length = 16)
-  private String id;
+public class Classified extends Mutable {
 
-  @Size(max = 45)
-  @NotNull
-  @Column(name = "version", nullable = false, length = 45)
-  private String version;
+  @Column(name = "active_date", nullable = true)
+  @Temporal(TemporalType.DATE)
+  private LocalDate activeDate;
 
-  @NotNull
-  @Column(name = "create_date", nullable = false)
-  private Instant createDate;
-
-  @NotNull
-  @Column(name = "last_update_date", nullable = false)
-  private Instant lastUpdateDate;
-
-  @NotNull
-  @Column(name = "last_active_date", nullable = false)
+  @Column(name = "last_active_date", nullable = true)
+  @Temporal(TemporalType.DATE)
   private LocalDate lastActiveDate;
+
+  @Column(name = "classified_customer_id")
+  private UUID classifiedCustomerId;
 
   @ColumnDefault("0")
   @Column(name = "renewal_count")
@@ -64,6 +56,11 @@ public class Classified {
   @NotNull
   @Column(name = "city", nullable = false, length = 100)
   private String city;
+
+  @Size(max = 100)
+  @NotNull
+  @Column(name = "state", nullable = false, length = 100)
+  private String state;
 
   @Size(max = 12)
   @NotNull

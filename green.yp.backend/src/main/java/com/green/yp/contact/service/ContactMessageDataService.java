@@ -1,12 +1,11 @@
 package com.green.yp.contact.service;
 
-import com.green.yp.api.apitype.classified.ClassifiedResponse;
+import com.green.yp.api.apitype.classified.ClassifiedAdCustomerResponse;
 import com.green.yp.api.apitype.contact.ContactMessageResponse;
 import com.green.yp.api.apitype.contact.ContactMessageRequest;
 import com.green.yp.api.apitype.producer.ProducerContactResponse;
 import com.green.yp.api.apitype.producer.ProducerLocationResponse;
 import com.green.yp.api.apitype.producer.ProducerResponse;
-import com.green.yp.contact.data.model.ContactMessage;
 import com.green.yp.contact.data.repository.ContactMessageRepository;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +36,7 @@ public class ContactMessageDataService {
     }
 
     public ContactMessageResponse createContactMessage(ContactMessageRequest contactMessageRequest,
-                                                       ClassifiedResponse classified,
+                                                       ClassifiedAdCustomerResponse classified,
                                                        String requestIP) {
         return null;
     }
