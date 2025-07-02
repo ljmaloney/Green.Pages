@@ -14,6 +14,6 @@ public class ClassifiedContract {
     }
 
     public ClassifiedAdCustomerResponse findClassifiedAd(UUID classifiedId) {
-        return classifiedService.findClassified(classifiedId);
+        return classifiedService.findClassifiedAndCustomer(classifiedId);
     }
 }

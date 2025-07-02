@@ -35,6 +35,7 @@ public class AuthenticationConfig {
             auth ->
                 auth.requestMatchers(
                         "/",
+                        "/classified/*",
                         "/index.html",
                         "/favicon.ico",
                         "/v3/api-docs/**",

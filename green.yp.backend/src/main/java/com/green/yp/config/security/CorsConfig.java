@@ -12,6 +12,7 @@ public class CorsConfig implements WebMvcConfigurer {
   public void addCorsMappings(CorsRegistry registry) {
     var endpoints =
         List.of(
+            "/classified/**",
             "/reference/**",
             "/account/**",
             "/invoice/**",
