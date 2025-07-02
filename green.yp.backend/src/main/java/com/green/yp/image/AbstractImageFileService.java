@@ -21,8 +21,8 @@ public abstract class AbstractImageFileService implements ImageFileService {
   }
 
   @Override
-  public void deleteImage(UUID producerId, String imageFilename) {
-    String pathString = createFileKeyPath(urlBasePath, producerId, imageGalleryPath, null);
+  public void deleteImage(UUID producerId, String overrideBase, String imageFilename) {
+    String pathString = createFileKeyPath(getBasePath(urlBasePath, overrideBase), producerId, imageGalleryPath, null);
     deleteFile(pathString, imageFilename);
   }
 
@@ -34,8 +34,8 @@ public abstract class AbstractImageFileService implements ImageFileService {
   }
 
   @Override
-  public String saveImage(UUID producerId, String imageFilename, MultipartFile imageFile) {
-    String pathString = createFileKeyPath(urlBasePath, producerId, imageGalleryPath, null);
+  public String saveImage(UUID producerId, String overrideBase, String imageFilename, MultipartFile imageFile) {
+    String pathString = createFileKeyPath(getBasePath(urlBasePath, overrideBase), producerId, imageGalleryPath, null);
     String fileName = imageFilename.replace(' ', '-');
     return saveImageFile(imageFile, pathString, fileName);
   }
