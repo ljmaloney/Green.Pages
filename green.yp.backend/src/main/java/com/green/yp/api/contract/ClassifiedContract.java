@@ -1,7 +1,6 @@
 package com.green.yp.api.contract;
 
 import com.green.yp.api.apitype.classified.ClassifiedAdCustomerResponse;
-import com.green.yp.api.apitype.classified.ClassifiedResponse;
 import com.green.yp.classifieds.service.ClassifiedService;
 import org.springframework.stereotype.Component;
 
