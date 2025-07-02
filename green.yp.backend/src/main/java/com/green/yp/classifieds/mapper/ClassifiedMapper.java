@@ -2,10 +2,12 @@ package com.green.yp.classifieds.mapper;
 
 import com.green.yp.api.apitype.classified.ClassifiedAdCustomerResponse;
 import com.green.yp.api.apitype.classified.ClassifiedCustomerResponse;
+import com.green.yp.api.apitype.classified.ClassifiedRequest;
 import com.green.yp.api.apitype.classified.ClassifiedResponse;
 import com.green.yp.classifieds.data.model.Classified;
 import com.green.yp.classifieds.data.model.ClassifiedCustomer;
 import com.green.yp.classifieds.data.model.ClassifiedCustomerProjection;
+import jakarta.validation.Valid;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -25,4 +27,8 @@ public interface ClassifiedMapper {
 
   ClassifiedAdCustomerResponse fromProjection(
       ClassifiedCustomerProjection classifiedCustomerProjection);
+
+  ClassifiedCustomer customterFromClassified(ClassifiedRequest request);
+
+  Classified toEntity(@Valid ClassifiedRequest request);
 }

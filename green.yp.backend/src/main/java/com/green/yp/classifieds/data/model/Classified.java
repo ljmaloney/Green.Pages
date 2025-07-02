@@ -78,9 +78,9 @@ public class Classified extends Mutable {
 
   @NotNull
   @Column(name = "longitude", nullable = false)
-  private Double longitude;
+  private BigDecimal longitude;
 
   @NotNull
   @Column(name = "latitude", nullable = false)
-  private Double latitude;
+  private BigDecimal latitude;
 }

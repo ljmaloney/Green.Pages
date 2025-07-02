@@ -20,16 +20,15 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "REST endpoint types of adds for classifieds")
 public class ClassifiedCategoryController {
 
-    private final ClassifiedCategoryService service;
+  private final ClassifiedCategoryService service;
 
-    public ClassifiedCategoryController(ClassifiedCategoryService service){
-        this.service = service;
-    }
+  public ClassifiedCategoryController(ClassifiedCategoryService service) {
+    this.service = service;
+  }
 
-    @Operation(summary = "Returns the list of available ad types")
-    @GetMapping(value = "/categories", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseApi<List<ClassifiedCategoryResponse>> getClassifiedCategories(){
-        return new ResponseApi<List<ClassifiedCategoryResponse>>(service.getCategoryList(), null);
-    }
-
+  @Operation(summary = "Returns the list of available ad types")
+  @GetMapping(value = "/categories", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<List<ClassifiedCategoryResponse>> getClassifiedCategories() {
+    return new ResponseApi<List<ClassifiedCategoryResponse>>(service.getCategoryList(), null);
+  }
 }

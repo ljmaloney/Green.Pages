@@ -21,39 +21,38 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 public class ClassifiedImageController {
 
-    private final ClassifiedImageService imageService;
+  private final ClassifiedImageService imageService;
 
-    public ClassifiedImageController(ClassifiedImageService imageService) {
-        this.imageService = imageService;
-    }
+  public ClassifiedImageController(ClassifiedImageService imageService) {
+    this.imageService = imageService;
+  }
 
-    @GetMapping(path = "{classifiedId}/gallery", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseApi<List< ClassifiedImageResponse>> getImages(
-            @PathVariable("classifiedId") UUID producerId) {
-        return new ResponseApi<>(imageService.getGalleryImages(producerId), null);
-    }
+  @GetMapping(path = "{classifiedId}/gallery", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<List<ClassifiedImageResponse>> getImages(
+      @PathVariable("classifiedId") UUID producerId) {
+    return new ResponseApi<>(imageService.getGalleryImages(producerId), null);
+  }
 
-    @PostMapping(
-            path = "{classifiedId}/gallery",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public void uploadGalleryImage(
-            @PathVariable("classifiedId") UUID classifiedId,
-            @RequestParam("imageFilename") String imageFilename,
-            @RequestParam("imageDescription") String imageDescription,
-            @RequestParam("file") MultipartFile file) {
-        log.info("Uploading gallery image for : {}", classifiedId);
-        imageService.uploadGalleryImage(classifiedId, imageFilename, imageDescription, file);
-    }
+  @PostMapping(
+      path = "{classifiedId}/gallery",
+      consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public void uploadGalleryImage(
+      @PathVariable("classifiedId") UUID classifiedId,
+      @RequestParam("imageFilename") String imageFilename,
+      @RequestParam("imageDescription") String imageDescription,
+      @RequestParam("file") MultipartFile file) {
+    log.info("Uploading gallery image for : {}", classifiedId);
+    imageService.uploadGalleryImage(classifiedId, imageFilename, imageDescription, file);
+  }
 
-    @DeleteMapping(path = "{classifiedId}/gallery")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteGalleryImage(
-            @PathVariable("classifiedId") UUID classifiedId,
-            @RequestParam(name = "imageFilename", required = true) String imageFilename) {
-        log.info("Deleting image {} for {} gallery", imageFilename, classifiedId);
-        imageService.deleteGallaryImage(classifiedId, imageFilename, RequestUtil.getRequestIP());
-    }
+  @DeleteMapping(path = "{classifiedId}/gallery")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteGalleryImage(
+      @PathVariable("classifiedId") UUID classifiedId,
+      @RequestParam(name = "imageFilename", required = true) String imageFilename) {
+    log.info("Deleting image {} for {} gallery", imageFilename, classifiedId);
+    imageService.deleteGallaryImage(classifiedId, imageFilename, RequestUtil.getRequestIP());
+  }
 }
-

@@ -8,10 +8,11 @@ import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(
-        componentModel = "spring",
-        unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        injectionStrategy = InjectionStrategy.CONSTRUCTOR)
+    componentModel = "spring",
+    unmappedTargetPolicy = ReportingPolicy.IGNORE,
+    injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface ClassifiedImageGalleryMapper {
-    List<ClassifiedImageResponse> mapToResponse(List<ClassifiedImageGallery> images);
-    ClassifiedImageResponse mapToResponse(ClassifiedImageGallery image);
+  List<ClassifiedImageResponse> mapToResponse(List<ClassifiedImageGallery> images);
+
+  ClassifiedImageResponse mapToResponse(ClassifiedImageGallery image);
 }
