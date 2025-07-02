@@ -37,24 +37,21 @@ public class ContactMessage extends Mutable {
   @Column(name = "contact_request_type", nullable = false, length = 50)
   private ProducerContactRequestType contactRequestType;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "producer_id")
-  private Producer producer;
+  @Column (name = "producer_id")
+  private UUID producerId;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "location_id")
-  private ProducerLocation location;
+  @Column(name = "location_id")
+  private UUID locationId;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "classified_id")
-  private Classified classified;
+  @Column(name = "classified_id")
+  private UUID classifiedId;
 
   @Size(max = 16)
   @Column(name = "product_service_ref", length = 16)
   private UUID productServiceRef;
 
   @Column(name="addressee_name")
-  private String addressName;
+  private String addresseeName;
 
   @Size(max = 150)
   @NotNull
