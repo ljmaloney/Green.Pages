@@ -23,5 +23,6 @@ public interface ClassifiedMapper {
   @Mapping(source = "id", target = "classifiedId")
   ClassifiedResponse fromEntity(Classified classified);
 
-  ClassifiedAdCustomerResponse fromProjection(ClassifiedCustomerProjection classifiedCustomerProjection);
+  ClassifiedAdCustomerResponse fromProjection(
+      ClassifiedCustomerProjection classifiedCustomerProjection);
 }

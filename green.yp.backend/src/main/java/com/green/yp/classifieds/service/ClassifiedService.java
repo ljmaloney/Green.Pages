@@ -14,21 +14,22 @@ import java.util.UUID;
 @Service
 public class ClassifiedService {
 
-    private final ClassifiedRepository repository;
-    private final ClassifiedMapper mapper;
+  private final ClassifiedRepository repository;
+  private final ClassifiedMapper mapper;
 
-    public ClassifiedService(ClassifiedRepository repository,
-                             ClassifiedMapper mapper){
-        this.repository = repository;
-        this.mapper = mapper;
-    }
+  public ClassifiedService(ClassifiedRepository repository, ClassifiedMapper mapper) {
+    this.repository = repository;
+    this.mapper = mapper;
+  }
 
-    public ClassifiedAdCustomerResponse findClassified(UUID classifiedId) {
-        return repository.findClassifiedAndCustomer(classifiedId)
-                .map(mapper::fromProjection)
-                .orElseThrow( () -> {
-                    log.warn("No classified ad found for id {}", classifiedId);
-                    return new NotFoundException("Classified", classifiedId);
-                });
-    }
+  public ClassifiedAdCustomerResponse findClassified(UUID classifiedId) {
+    return repository
+        .findClassifiedAndCustomer(classifiedId)
+        .map(mapper::fromProjection)
+        .orElseThrow(
+            () -> {
+              log.warn("No classified ad found for id {}", classifiedId);
+              return new NotFoundException("Classified", classifiedId);
+            });
+  }
 }

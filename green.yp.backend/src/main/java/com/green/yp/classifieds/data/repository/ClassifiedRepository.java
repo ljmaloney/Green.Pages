@@ -3,12 +3,11 @@ package com.green.yp.classifieds.data.repository;
 import com.green.yp.classifieds.data.model.Classified;
 import com.green.yp.classifieds.data.model.ClassifiedCustomerProjection;
 import jakarta.validation.constraints.NotNull;
+import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import java.util.Optional;
-import java.util.UUID;
 
 public interface ClassifiedRepository extends JpaRepository<Classified, UUID> {
   @Query("""

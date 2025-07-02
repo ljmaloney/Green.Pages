@@ -28,7 +28,7 @@ public class ClassifiedAdType extends Mutable {
   private Boolean active;
 
   @NotNull
-  @Column(name="sort_order", nullable = false)
+  @Column(name = "sort_order", nullable = false)
   private Integer sortOrder;
 
   @Size(max = 75)

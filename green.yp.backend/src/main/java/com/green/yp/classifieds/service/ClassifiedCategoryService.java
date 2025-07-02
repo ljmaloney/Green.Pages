@@ -3,11 +3,10 @@ package com.green.yp.classifieds.service;
 import com.green.yp.api.apitype.classified.ClassifiedCategoryResponse;
 import com.green.yp.classifieds.data.repository.ClassifiedCategoryRepository;
 import com.green.yp.classifieds.mapper.ClassifiedCategtoryMapper;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Slf4j
 @Service
