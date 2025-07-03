@@ -47,12 +47,28 @@
                             Dear ${customer.firstName} ${customer.lastName},
                         </p>
                         <p>
-                            You recently requested access to update or renew your classified ad on our website. Your authorization token is ${token}.
-                            Copy and past this token into the "Authorization Token" field on the form.
+                            Thank you for placing your classified ad
+                            <span style="text-decoration-style: double; text-decoration: #15803d">${classifiedTitle}</span> with us.
+                            <br/>
+                            The direct link to the classified ad is
+                            <a href="${link}" target="_blank">${link}</a>.
                         </p>
-                        <p>If your token as not been used within the next 15 minutes, it will expire.</p>
+                        <table style="width: 80%;">
+                            <tr>
+                                <td style="text-align: right; width: 20%">Classified Ad Package :</td>
+                                <td style="text-align: left">${adTypeName}</td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; width: 20%">Classified Category :</td>
+                                <td style="text-align: left">${category.name}</td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; width: 20%">Amount Charged :</td>
+                                <td style="text-align: left">${paymentAmount}</td>
+                            </tr>
+                        </table>
                         <p>
-                            The classified ad authentication token request was received from ip address ${ipAddress} at ${timestamp}.
+                            The classified ad was placed from ip address ${ipAddress} at ${timestamp}.
                         </p>
                     </td>
                 </tr>
