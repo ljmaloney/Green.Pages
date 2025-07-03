@@ -10,6 +10,8 @@ import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+
+import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -39,7 +41,7 @@ public class ClassifiedController {
   @GetMapping(path="{classifiedId}/requestAuthCode")
   public void requestAuthCode(@PathVariable("classifiedId") UUID classifiedId,
                               @RequestParam(name="tokenDestination")  String tokenDestination,
-                              @RequestParam(name="tokenType") ClassifiedTokenType tokenType) {
+                              @RequestParam(name="tokenType") ClassifiedTokenType tokenType) throws NoSuchAlgorithmException {
     service.requestAuthCode(classifiedId, tokenDestination, tokenType, RequestUtil.getRequestIP());
   }
 

@@ -1,6 +1,6 @@
 package com.green.yp.account.service;
 
-import com.green.yp.api.apitype.enumeration.EmailTemplateName;
+import com.green.yp.api.apitype.enumeration.EmailTemplateType;
 import com.green.yp.api.apitype.invoice.InvoiceResponse;
 import com.green.yp.api.apitype.payment.ApiPaymentResponse;
 import com.green.yp.api.apitype.payment.ApplyPaymentMethodRequest;
@@ -105,7 +105,7 @@ public class AccountPaymentService {
             requestIP);
 
     emailService.sendEmail(
-        EmailTemplateName.WELCOME_EMAIL,
+        EmailTemplateType.WELCOME_EMAIL,
         producerResponse,
         getAdminEmails(paymentRequest.producerId()).toArray(new String[0]));
 

@@ -3,7 +3,7 @@ package com.green.yp.producer.service;
 import com.green.yp.api.AuditRequest;
 import com.green.yp.api.apitype.enumeration.AuditActionType;
 import com.green.yp.api.apitype.enumeration.AuditObjectType;
-import com.green.yp.api.apitype.enumeration.EmailTemplateName;
+import com.green.yp.api.apitype.enumeration.EmailTemplateType;
 import com.green.yp.api.apitype.producer.ProducerContactRequest;
 import com.green.yp.api.apitype.producer.ProducerContactResponse;
 import com.green.yp.api.apitype.producer.ProducerLocationResponse;
@@ -163,7 +163,7 @@ public class ProducerContactOrchestrationService {
 
     if (StringUtils.isNotBlank(contact.getEmailAddress())) {
       emailContract.sendEmail(
-          EmailTemplateName.EMAIL_CONFIRMATION, contact, contact.getEmailAddress());
+          EmailTemplateType.EMAIL_CONFIRMATION, contact, contact.getEmailAddress());
     }
 
     log.info(
