@@ -30,6 +30,7 @@ public class ClassifiedCategoryService {
     return repository.findAll().stream().map(mapper::fromEntity).toList();
   }
 
+  @Cacheable("classifiedCategory")
   public ClassifiedCategoryResponse findCategory(@NotNull @NonNull UUID categoryId) {
     return repository
         .findById(categoryId)
