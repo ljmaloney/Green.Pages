@@ -46,7 +46,7 @@ public class ClassifiedController {
   }
 
   @Operation(summary = "Creates the initial classified ad record")
-  @PostMapping(
+  @PostMapping( path="create-ad",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ClassifiedResponse> createClassified(

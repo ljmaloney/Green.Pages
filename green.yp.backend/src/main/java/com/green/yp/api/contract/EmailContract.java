@@ -16,11 +16,11 @@ public class EmailContract {
   }
 
   public void sendEmail(
-          EmailTemplateType emailTemplateType, ProducerContact contact, String emailAddress) {
+          EmailTemplateType emailTemplateType, ProducerContact contact, String emailAddress)  {
     emailService.sendEmail(emailTemplateType, contact, emailAddress);
   }
 
-  public void sendEmail(EmailTemplateType emailTemplateType, ContactMessageRequest contactMessageRequest, String emailAddress){
+  public void sendEmail(EmailTemplateType emailTemplateType, ContactMessageRequest contactMessageRequest, String emailAddress) {
     emailService.sendEmail(emailTemplateType, contactMessageRequest, emailAddress);
   }
 }

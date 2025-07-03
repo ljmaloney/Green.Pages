@@ -69,7 +69,7 @@ public class ProducerContactController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ProducerContactResponse> createContact(
       @PathVariable("locationId") UUID locationId,@AuthUser AuthenticatedUser authenticatedUser,
-      @Valid @RequestBody ProducerContactRequest createContactRequest) {
+      @Valid @RequestBody ProducerContactRequest createContactRequest) throws Exception {
     return new ResponseApi<>(
         contactOrchestrationService.createContact(locationId, createContactRequest), null);
   }

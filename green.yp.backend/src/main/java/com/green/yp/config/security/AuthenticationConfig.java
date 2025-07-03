@@ -35,7 +35,8 @@ public class AuthenticationConfig {
             auth ->
                 auth.requestMatchers(
                         "/",
-                        "/classified/*",
+                        "/classified/create-ad",
+                        "/classified/**",
                         "/index.html",
                         "/favicon.ico",
                         "/v3/api-docs/**",
@@ -59,7 +60,7 @@ public class AuthenticationConfig {
                         "/producer/location/product/**",
                         "/search")
                     .permitAll()
-                    .requestMatchers(HttpMethod.POST, "/account", "/contact")
+                    .requestMatchers(HttpMethod.POST, "/account", "/contact", "/classified/create-ad")
                     .permitAll()
                     .anyRequest()
                     .authenticated())

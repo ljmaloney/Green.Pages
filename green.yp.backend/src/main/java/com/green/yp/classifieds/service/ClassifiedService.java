@@ -5,11 +5,13 @@ import com.green.yp.api.apitype.classified.ClassifiedRequest;
 import com.green.yp.api.apitype.classified.ClassifiedResponse;
 import com.green.yp.api.apitype.classified.ClassifiedUpdateRequest;
 import com.green.yp.api.apitype.enumeration.ClassifiedTokenType;
+import com.green.yp.api.apitype.enumeration.EmailTemplateType;
 import com.green.yp.classifieds.data.model.ClassifiedToken;
 import com.green.yp.classifieds.data.repository.ClassifedTokenRepository;
 import com.green.yp.classifieds.data.repository.ClassifiedCustomerRepository;
 import com.green.yp.classifieds.data.repository.ClassifiedRepository;
 import com.green.yp.classifieds.mapper.ClassifiedMapper;
+import com.green.yp.email.service.EmailService;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.util.TokenUtils;
@@ -17,6 +19,8 @@ import jakarta.validation.Valid;
 
 import java.security.NoSuchAlgorithmException;
 import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
@@ -27,7 +31,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ClassifiedService {
 
-  @Value("${green.yp.classified.token.timeout:15")
+  @Value("${green.yp.classified.token.timeout:15}")
   private Integer tokenTimeoutMinutes;
 
   private final ClassifiedRepository repository;
@@ -36,6 +40,7 @@ public class ClassifiedService {
   private final ClassifiedAdTypeService adTypeService;
   private final ClassifiedCategoryService categoryService;
   private final ClassifiedGeocodeService geocodeService;
+  private final EmailService emailService;
   private final ClassifiedMapper mapper;
 
   public ClassifiedService(
@@ -45,6 +50,7 @@ public class ClassifiedService {
       ClassifiedAdTypeService adTypeService,
       ClassifiedCategoryService categoryService,
       ClassifiedGeocodeService geocodeService,
+      EmailService emailService,
       ClassifiedMapper mapper) {
     this.repository = repository;
     this.tokenRepository = tokenRepository;
@@ -52,6 +58,7 @@ public class ClassifiedService {
     this.adTypeService = adTypeService;
     this.categoryService = categoryService;
     this.geocodeService = geocodeService;
+    this.emailService = emailService;
     this.mapper = mapper;
   }
 
@@ -135,7 +142,12 @@ public class ClassifiedService {
                 .tokenExpiryDate(OffsetDateTime.now().plusMinutes(tokenTimeoutMinutes))
                 .build());
 
-    //send token via chosen method
+    List<String> toList = List.of(classified.customer().getEmailAddress());
+
+    emailService.sendEmailAsync(EmailTemplateType.CLASSIFIED_AUTH_TOKEN,
+            toList,
+            EmailTemplateType.CLASSIFIED_AUTH_TOKEN.getSubjectFormat(),
+            () -> Map.of("token", classifiedToken, "ipAddress", requestIP, "timestamp", OffsetDateTime.now()));
 
   }
 }

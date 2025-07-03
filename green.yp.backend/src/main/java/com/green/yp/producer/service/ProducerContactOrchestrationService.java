@@ -101,7 +101,7 @@ public class ProducerContactOrchestrationService {
       objectType = AuditObjectType.PRODUCER_CONTACT,
       actionType = AuditActionType.CREATE)
   public ProducerContactResponse createContact(
-      @NotNull @NonNull UUID locationId, ProducerContactRequest createContactRequest) {
+      @NotNull @NonNull UUID locationId, ProducerContactRequest createContactRequest) throws Exception {
     log.info(
         "Attempt to create contact {} for locationId {}",
         StringUtils.isNotBlank(createContactRequest.genericContactName())
@@ -142,7 +142,7 @@ public class ProducerContactOrchestrationService {
   ProducerContactResponse createContact(
       @NotNull @NonNull UUID producerId,
       @NotNull @NonNull UUID locationId,
-      @NotNull @NonNull ProducerContactRequest createContactRequest) {
+      @NotNull @NonNull ProducerContactRequest createContactRequest)  {
 
     if (StringUtils.isBlank(createContactRequest.genericContactName())
         && StringUtils.isBlank(createContactRequest.firstName())
