@@ -10,15 +10,6 @@ public class CorsConfig implements WebMvcConfigurer {
 
   @Override
   public void addCorsMappings(CorsRegistry registry) {
-    var endpoints =
-        List.of(
-            "/classified/**",
-            "/reference/**",
-            "/account/**",
-            "/invoice/**",
-            "/producer/**",
-            "/profile/**",
-            "/search/**");
 
     var allowedOrigins =
         new String[] {
@@ -28,17 +19,15 @@ public class CorsConfig implements WebMvcConfigurer {
           "https://*.lovable.app"
         };
 
-    var allowedMethods = new String[] {"GET", "POST", "PUT", "DELETE", "OPTIONS"};
+    var allowedMethods = new String[] {"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"};
 
     var allowedHeaders = new String[] {"Content-Type", "Authorization"};
 
-    endpoints.forEach(
-        endpoint ->
             registry
-                .addMapping(endpoint)
-                .allowedOrigins(allowedOrigins)
+                .addMapping("/**")
+                .allowedOriginPatterns(allowedOrigins)
                 .allowedMethods(allowedMethods)
                 .allowedHeaders(allowedHeaders)
-                .allowCredentials(true));
+                .allowCredentials(true);
   }
 }
