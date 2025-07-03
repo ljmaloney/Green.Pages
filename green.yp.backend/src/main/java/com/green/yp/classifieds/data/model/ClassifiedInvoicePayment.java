@@ -4,7 +4,6 @@ import com.green.yp.common.data.embedded.Immutable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-
 import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.Getter;

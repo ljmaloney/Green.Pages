@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Getter
 @Setter
@@ -30,4 +32,34 @@ public class ClassifiedCategory extends Mutable {
 
   @Column(name = "description", length = 512)
   private String description;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    ClassifiedCategory that = (ClassifiedCategory) o;
+
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(active, that.active)
+        .append(name, that.name)
+        .append(urlName, that.urlName)
+        .append(shortDescription, that.shortDescription)
+        .append(description, that.description)
+        .isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(active)
+        .append(name)
+        .append(urlName)
+        .append(shortDescription)
+        .append(description)
+        .toHashCode();
+  }
 }

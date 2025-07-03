@@ -7,11 +7,15 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @NoArgsConstructor
 @Entity
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Builder
+@AllArgsConstructor
+@Getter
+@Setter
 @Table(name = "classified_customer")
 public class ClassifiedCustomer extends Mutable {
   @NotNull
@@ -56,4 +60,40 @@ public class ClassifiedCustomer extends Mutable {
   @Size(max = 100)
   @Column(name = "email_address", nullable = false, length = 100)
   private String emailAddress;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    ClassifiedCustomer that = (ClassifiedCustomer) o;
+
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(firstName, that.firstName)
+        .append(lastName, that.lastName)
+        .append(address, that.address)
+        .append(city, that.city)
+        .append(state, that.state)
+        .append(postalCode, that.postalCode)
+        .append(phoneNumber, that.phoneNumber)
+        .append(emailAddress, that.emailAddress)
+        .isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(firstName)
+        .append(lastName)
+        .append(address)
+        .append(city)
+        .append(state)
+        .append(postalCode)
+        .append(phoneNumber)
+        .append(emailAddress)
+        .toHashCode();
+  }
 }

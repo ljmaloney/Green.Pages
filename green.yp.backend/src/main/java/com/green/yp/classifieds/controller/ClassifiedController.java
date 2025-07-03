@@ -2,6 +2,8 @@ package com.green.yp.classifieds.controller;
 
 import com.green.yp.api.apitype.classified.ClassifiedRequest;
 import com.green.yp.api.apitype.classified.ClassifiedResponse;
+import com.green.yp.api.apitype.classified.ClassifiedUpdateRequest;
+import com.green.yp.api.apitype.enumeration.ClassifiedTokenType;
 import com.green.yp.classifieds.service.ClassifiedService;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.util.RequestUtil;
@@ -33,6 +35,14 @@ public class ClassifiedController {
         service.findClassified(classifiedId, RequestUtil.getRequestIP()), null);
   }
 
+  @Operation(summary = "Requests sending authenticate messsage so classified customer can edit the ad")
+  @GetMapping(path="{classifiedId}/requestAuthCode")
+  public void requestAuthCode(@PathVariable("classifiedId") UUID classifiedId,
+                              @RequestParam(name="tokenDestination")  String tokenDestination,
+                              @RequestParam(name="tokenType") ClassifiedTokenType tokenType) {
+    service.requestAuthCode(classifiedId, tokenDestination, tokenType, RequestUtil.getRequestIP());
+  }
+
   @Operation(summary = "Creates the initial classified ad record")
   @PostMapping(
       consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -40,5 +50,11 @@ public class ClassifiedController {
   public ResponseApi<ClassifiedResponse> createClassified(
       @RequestBody @Valid ClassifiedRequest classifiedRequest) {
     return new ResponseApi<>(service.createClassified(classifiedRequest), null);
+  }
+
+  @Operation(summary = "Updates a classified ad")
+  @PutMapping(path="{classifiedId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<ClassifiedResponse> updateClassified(@RequestBody @Valid ClassifiedUpdateRequest classifiedRequest) {
+    return new ResponseApi<>(service.updateClassified(classifiedRequest, RequestUtil.getRequestIP()), null);
   }
 }
