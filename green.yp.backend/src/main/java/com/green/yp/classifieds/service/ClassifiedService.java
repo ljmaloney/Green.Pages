@@ -64,7 +64,7 @@ public class ClassifiedService {
     // upsert customer record if not already found
     var customer =
         customerRepository
-            .findClassifiedCustomerByEmailAddress(request.emailAddress())
+            .findClassifiedCustomerByEmailAddressOrPhoneNumber(request.emailAddress(), request.phoneNumber())
             .orElseGet(
                 () -> {
                   return customerRepository.saveAndFlush(mapper.customterFromClassified(request));
