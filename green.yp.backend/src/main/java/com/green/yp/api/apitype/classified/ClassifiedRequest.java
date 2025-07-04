@@ -41,11 +41,7 @@ public record ClassifiedRequest(@NotNull @NonNull UUID adType,
                                 String phoneNumber,
                                 @Email
                                 String emailAddress,
-                                @Pattern(regexp = "^[\\p{Alpha} ]*$", message = "Title should contain only alphabets and space")
-                                @Pattern(regexp = "^[A-Za-z\\s\\-.']+$", message = "Title should contain only alphabets, spaces, or hyphens")
                                 @NotBlank(message = "Please enter ad title")
-                                @Pattern(regexp = "^[\\p{Alpha} ]*$", message = "Title should contain only alphabets and space")
-                                @Pattern(regexp = "^[A-Za-z\\s\\-.']+$", message = "Title should contain only alphabets, spaces, or hyphens")
                                 String title,
                                 @NotBlank(message = "Please enter a classified ad description")
                                 String description) {}
