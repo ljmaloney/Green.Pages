@@ -30,5 +30,8 @@ public interface ClassifiedMapper {
 
   ClassifiedCustomer customterFromClassified(ClassifiedRequest request);
 
+  @Mapping(source = "pricePerUnitType", target = "perUnitType")
+  @Mapping(source = "adType", target = "adTypeId")
+  @Mapping(source = "categoryId", target = "categoryId")
   Classified toEntity(@Valid ClassifiedRequest request);
 }

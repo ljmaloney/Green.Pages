@@ -105,6 +105,7 @@ public class ClassifiedService {
     classified.setActiveDate(null);
     classified.setLastActiveDate(null);
     classified.setRenewalCount(0);
+    classified.setPerUnitType(request.pricePerUnitType());
     classified.setLatitude(geoLocation.latitude());
     classified.setLongitude(geoLocation.longitude());
 

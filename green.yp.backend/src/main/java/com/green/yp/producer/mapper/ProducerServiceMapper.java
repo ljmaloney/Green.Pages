@@ -16,7 +16,7 @@ import org.mapstruct.ReportingPolicy;
 public interface ProducerServiceMapper {
   ProducerService toEntity(ProducerServiceRequest serviceRequest);
 
-  @Mapping(source = "producerService.id", target = "producerServiceId")
+  @Mapping(source = "id", target = "producerServiceId")
   ProducerServiceResponse fromEntity(ProducerService producerService);
 
   List<ProducerServiceResponse> fromEntity(List<ProducerService> services);

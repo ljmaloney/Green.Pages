@@ -12,6 +12,7 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.stereotype.Component;
@@ -31,9 +32,11 @@ public class AuthenticationConfig {
       HttpSecurity http, Converter<Jwt, AbstractAuthenticationToken> authenticationConverter)
       throws Exception {
     http.cors(Customizer.withDefaults())
+            .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers(
+                auth.requestMatchers(HttpMethod.POST, "/account", "/contact", "/classified/create-ad").permitAll()
+                    .requestMatchers(
                         "/",
                         "/classified/create-ad",
                         "/classified/**",
@@ -60,8 +63,6 @@ public class AuthenticationConfig {
                         "/producer/location/product/**",
                         "/search")
                     .permitAll()
-                    .requestMatchers(HttpMethod.POST, "/account", "/contact", "/classified/create-ad")
-                    .permitAll()
                     .anyRequest()
                     .authenticated())
         .oauth2ResourceServer(
@@ -72,7 +73,7 @@ public class AuthenticationConfig {
   @Bean
   CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(
+    configuration.setAllowedOriginPatterns(
         Arrays.asList(
             "http://localhost:8080",
             "http://localhost:8081",

@@ -25,6 +25,12 @@ public class Classified extends Mutable {
   @Temporal(TemporalType.DATE)
   private LocalDate lastActiveDate;
 
+  @Column(name = "classified_ad_type")
+  private UUID adTypeId;
+
+  @Column(name = "classified_category_id")
+  private UUID categoryId;
+
   @Column(name = "classified_customer_id")
   private UUID classifiedCustomerId;
 
