@@ -29,6 +29,10 @@ public class ClassifiedInvoicePayment extends Immutable {
   @Column(name = "classified_customer_id", nullable = false)
   private UUID classifiedCustomerId;
 
+  @NotNull
+  @Column(name="ip_address", nullable = false)
+  private String ipAddress;
+
   @Size(max = 20)
   @NotNull
   @Column(name = "invoice_number", nullable = false, length = 20)
