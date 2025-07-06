@@ -55,7 +55,7 @@ public class ClassifiedController {
   }
 
   @Operation(summary = "Updates a classified ad")
-  @PutMapping(path="{classifiedId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping( consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ClassifiedResponse> updateClassified(@RequestBody @Valid ClassifiedUpdateRequest classifiedRequest) {
     return new ResponseApi<>(service.updateClassified(classifiedRequest, RequestUtil.getRequestIP()), null);
   }
