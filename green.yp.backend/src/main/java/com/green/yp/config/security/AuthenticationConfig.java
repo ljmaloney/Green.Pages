@@ -35,7 +35,9 @@ public class AuthenticationConfig {
             .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers(HttpMethod.POST, "/account", "/contact", "/classified/create-ad").permitAll()
+                auth.requestMatchers(HttpMethod.POST, "/account",
+                                "/account/applyPayment",
+                                "/contact", "/classified/create-ad").permitAll()
                     .requestMatchers(
                         "/",
                         "/classified/create-ad",
