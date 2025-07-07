@@ -1,0 +1,11 @@
+DROP PROCEDURE IF EXISTS `?`;
+DELIMITER //
+CREATE PROCEDURE `?`()
+BEGIN
+    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION BEGIN
+    END;
+    ALTER TABLE classified_ad_type ADD COLUMN default_package char(1)  default 'N' after active;
+END //
+DELIMITER ;
+CALL `?`();
+DROP PROCEDURE `?`;

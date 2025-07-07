@@ -28,6 +28,11 @@ public class ClassifiedAdType extends Mutable {
   private Boolean active;
 
   @NotNull
+  @Convert(converter = BooleanConverter.class)
+  @Column(name = "default_package", nullable = false)
+  private Boolean defaultPackage;
+
+  @NotNull
   @Column(name = "sort_order", nullable = false)
   private Integer sortOrder;
 
