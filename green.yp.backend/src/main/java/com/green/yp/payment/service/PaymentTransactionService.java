@@ -3,7 +3,7 @@ package com.green.yp.payment.service;
 import com.green.yp.api.apitype.invoice.InvoiceResponse;
 import com.green.yp.api.apitype.payment.PaymentMethodResponse;
 import com.green.yp.payment.data.enumeration.*;
-import com.green.yp.payment.data.model.PaymentTransaction;
+import com.green.yp.payment.data.model.ProducerPaymentTransaction;
 import com.green.yp.payment.data.repository.PaymentTransactionRepository;
 import com.green.yp.payment.integration.PaymentIntegrationResponse;
 import java.util.Optional;
@@ -21,14 +21,14 @@ public class PaymentTransactionService {
     this.paymentTransactionRepository = paymentTransactionRepository;
   }
 
-  public PaymentTransaction createTransaction(
+  public ProducerPaymentTransaction createTransaction(
       InvoiceResponse invoiceResponse,
       PaymentMethodResponse paymentMethod,
       ProducerPaymentType paymentType,
       PaymentIntegrationResponse response) {
 
-    PaymentTransaction transaction =
-        PaymentTransaction.builder()
+    ProducerPaymentTransaction transaction =
+        ProducerPaymentTransaction.builder()
             .paymentMethodId(paymentMethod.paymentMethodId())
             .producerId(invoiceResponse.producerId())
             .invoiceId(invoiceResponse.invoiceId())
@@ -47,16 +47,16 @@ public class PaymentTransactionService {
             .responseText(response.responseText())
             .build();
 
-    PaymentTransaction savedTransaction = paymentTransactionRepository.saveAndFlush(transaction);
+    ProducerPaymentTransaction savedTransaction = paymentTransactionRepository.saveAndFlush(transaction);
 
     return savedTransaction;
   }
 
-  public Optional<PaymentTransaction> findTransaction(
+  public Optional<ProducerPaymentTransaction> findTransaction(
       UUID invoiceId,
       ProducerPaymentType paymentType,
       PaymentTransactionStatus paymentTransactionStatus) {
-    Optional<PaymentTransaction> existingTransaction =
+    Optional<ProducerPaymentTransaction> existingTransaction =
         paymentTransactionRepository.findTransaction(
             invoiceId, paymentType, PaymentTransactionStatus.SUCCESS);
     return existingTransaction;

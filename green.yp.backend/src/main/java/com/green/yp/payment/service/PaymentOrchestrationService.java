@@ -9,7 +9,7 @@ import com.green.yp.api.contract.InvoiceContract;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.payment.data.enumeration.PaymentTransactionStatus;
 import com.green.yp.payment.data.enumeration.ProducerPaymentType;
-import com.green.yp.payment.data.model.PaymentTransaction;
+import com.green.yp.payment.data.model.ProducerPaymentTransaction;
 import com.green.yp.payment.data.repository.PaymentTransactionRepository;
 import com.green.yp.payment.integration.PaymentIntegrationInterface;
 import com.green.yp.payment.integration.PaymentIntegrationRequest;
@@ -59,7 +59,7 @@ public class PaymentOrchestrationService {
       @NotNull @NonNull ProducerPaymentType paymentType,
       String requestIP) {
 
-    Optional<PaymentTransaction> transaction =
+    Optional<ProducerPaymentTransaction> transaction =
         transactionService
             .findTransaction(invoiceId, paymentType, PaymentTransactionStatus.SUCCESS)
             .or(
@@ -79,7 +79,7 @@ public class PaymentOrchestrationService {
   public PaymentResponse applyPayment(
       ApplyPaymentRequest paymentRequest, String userId, String requestIP) {
 
-    Optional<PaymentTransaction> transaction =
+    Optional<ProducerPaymentTransaction> transaction =
         transactionService
             .findTransaction(
                 paymentRequest.invoiceId(),
@@ -108,7 +108,7 @@ public class PaymentOrchestrationService {
     return paymentMapper.fromTransaction(transaction.get());
   }
 
-  private PaymentTransaction applyPayment(
+  private ProducerPaymentTransaction applyPayment(
       InvoiceResponse invoiceResponse,
       PaymentMethodResponse paymentMethod,
       ProducerPaymentType paymentType,
@@ -128,7 +128,7 @@ public class PaymentOrchestrationService {
 
     PaymentIntegrationResponse response = paymentIntegration.applyPayment(request, requestIP);
 
-    PaymentTransaction transaction =
+    ProducerPaymentTransaction transaction =
         transactionService.createTransaction(invoiceResponse, paymentMethod, paymentType, response);
 
     if (response.isFailed()) {

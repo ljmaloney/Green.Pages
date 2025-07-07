@@ -4,7 +4,7 @@ import com.green.yp.api.apitype.payment.PaymentMethodRequest;
 import com.green.yp.api.apitype.payment.PaymentMethodResponse;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.payment.data.enumeration.PaymentMethodType;
-import com.green.yp.payment.data.model.PaymentMethod;
+import com.green.yp.payment.data.model.ProducerPaymentMethod;
 import com.green.yp.payment.data.repository.PaymentMethodRepository;
 import com.green.yp.payment.mapper.PaymentMapper;
 import jakarta.validation.constraints.NotNull;
@@ -48,7 +48,7 @@ public class PaymentMethodService {
               repository.saveAndFlush(method);
             });
 
-    PaymentMethod method = paymentMapper.toEntity(paymentRequest);
+    ProducerPaymentMethod method = paymentMapper.toEntity(paymentRequest);
     method.setPaymentType(PaymentMethodType.CREDIT_CARD);
     method.setActive(true);
     if (StringUtils.isBlank(method.getPanLastFour())) {
@@ -64,17 +64,17 @@ public class PaymentMethodService {
       @NotNull @NonNull UUID producerId, String userId, @NotNull @NonNull String ipAddress) {
     log.info("Cancelling Billing for {} by {} from {}", producerId);
 
-    Optional<PaymentMethod> optionalPaymentMethod = repository.findActiveMethod(producerId);
+    Optional<ProducerPaymentMethod> optionalPaymentMethod = repository.findActiveMethod(producerId);
 
     if (optionalPaymentMethod.isEmpty()) {
       log.info("No currently active payment method for cancellation by producerId: {}", producerId);
       return;
     }
-    PaymentMethod paymentMethod = optionalPaymentMethod.get();
+    ProducerPaymentMethod producerPaymentMethod = optionalPaymentMethod.get();
 
-    paymentMethod.setCancelDate(OffsetDateTime.now());
+    producerPaymentMethod.setCancelDate(OffsetDateTime.now());
 
-    repository.saveAndFlush(paymentMethod);
+    repository.saveAndFlush(producerPaymentMethod);
 
     log.info("Marked payment method is being cancelled / inactive for {}", producerId);
   }

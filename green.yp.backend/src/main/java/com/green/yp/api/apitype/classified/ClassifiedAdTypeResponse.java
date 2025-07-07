@@ -9,6 +9,7 @@ public record ClassifiedAdTypeResponse(
     UUID adTypeId,
     OffsetDateTime createDate,
     boolean active,
+    boolean defaultPackage,
     String adTypeName,
     BigDecimal monthlyPrice,
     BigDecimal threeMonthPrice,
