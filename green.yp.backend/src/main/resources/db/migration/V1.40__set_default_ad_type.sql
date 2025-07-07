@@ -1,0 +1,1 @@
+update classified_ad_type set default_package ='Y' where id = uuid_to_bin('03eaa115-89ec-4af6-8dee-2e6e516ed279');
