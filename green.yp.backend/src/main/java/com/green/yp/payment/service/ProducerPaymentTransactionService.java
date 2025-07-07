@@ -4,7 +4,7 @@ import com.green.yp.api.apitype.invoice.InvoiceResponse;
 import com.green.yp.api.apitype.payment.PaymentMethodResponse;
 import com.green.yp.payment.data.enumeration.*;
 import com.green.yp.payment.data.model.ProducerPaymentTransaction;
-import com.green.yp.payment.data.repository.PaymentTransactionRepository;
+import com.green.yp.payment.data.repository.ProducerPaymentTransactionRepository;
 import com.green.yp.payment.integration.PaymentIntegrationResponse;
 import java.util.Optional;
 import java.util.UUID;
@@ -13,12 +13,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class PaymentTransactionService {
+public class ProducerPaymentTransactionService {
 
-  private final PaymentTransactionRepository paymentTransactionRepository;
+  private final ProducerPaymentTransactionRepository producerPaymentTransactionRepository;
 
-  public PaymentTransactionService(PaymentTransactionRepository paymentTransactionRepository) {
-    this.paymentTransactionRepository = paymentTransactionRepository;
+  public ProducerPaymentTransactionService(ProducerPaymentTransactionRepository producerPaymentTransactionRepository) {
+    this.producerPaymentTransactionRepository = producerPaymentTransactionRepository;
   }
 
   public ProducerPaymentTransaction createTransaction(
@@ -47,7 +47,7 @@ public class PaymentTransactionService {
             .responseText(response.responseText())
             .build();
 
-    ProducerPaymentTransaction savedTransaction = paymentTransactionRepository.saveAndFlush(transaction);
+    ProducerPaymentTransaction savedTransaction = producerPaymentTransactionRepository.saveAndFlush(transaction);
 
     return savedTransaction;
   }
@@ -57,7 +57,7 @@ public class PaymentTransactionService {
       ProducerPaymentType paymentType,
       PaymentTransactionStatus paymentTransactionStatus) {
     Optional<ProducerPaymentTransaction> existingTransaction =
-        paymentTransactionRepository.findTransaction(
+        producerPaymentTransactionRepository.findTransaction(
             invoiceId, paymentType, PaymentTransactionStatus.SUCCESS);
     return existingTransaction;
   }

@@ -5,7 +5,7 @@ import com.green.yp.api.apitype.payment.PaymentMethodResponse;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.payment.data.enumeration.PaymentMethodType;
 import com.green.yp.payment.data.model.ProducerPaymentMethod;
-import com.green.yp.payment.data.repository.PaymentMethodRepository;
+import com.green.yp.payment.data.repository.ProducerPaymentMethodRepository;
 import com.green.yp.payment.mapper.PaymentMapper;
 import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
@@ -19,13 +19,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
-public class PaymentMethodService {
+public class ProducerPaymentMethodService {
 
-  private final PaymentMethodRepository repository;
+  private final ProducerPaymentMethodRepository repository;
 
   private final PaymentMapper paymentMapper;
 
-  public PaymentMethodService(PaymentMethodRepository repository, PaymentMapper paymentMapper) {
+  public ProducerPaymentMethodService(ProducerPaymentMethodRepository repository, PaymentMapper paymentMapper) {
     this.repository = repository;
     this.paymentMapper = paymentMapper;
   }

@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface PaymentTransactionRepository extends JpaRepository<ProducerPaymentTransaction, UUID> {
+public interface ProducerPaymentTransactionRepository extends JpaRepository<ProducerPaymentTransaction, UUID> {
   @Query(
       """
                       SELECT trans

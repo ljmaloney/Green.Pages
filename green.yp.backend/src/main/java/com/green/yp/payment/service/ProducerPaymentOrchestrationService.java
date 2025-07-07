@@ -10,7 +10,7 @@ import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.payment.data.enumeration.PaymentTransactionStatus;
 import com.green.yp.payment.data.enumeration.ProducerPaymentType;
 import com.green.yp.payment.data.model.ProducerPaymentTransaction;
-import com.green.yp.payment.data.repository.PaymentTransactionRepository;
+import com.green.yp.payment.data.repository.ProducerPaymentTransactionRepository;
 import com.green.yp.payment.integration.PaymentIntegrationInterface;
 import com.green.yp.payment.integration.PaymentIntegrationRequest;
 import com.green.yp.payment.integration.PaymentIntegrationResponse;
@@ -24,30 +24,30 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class PaymentOrchestrationService {
+public class ProducerPaymentOrchestrationService {
 
   private final InvoiceContract invoiceContract;
 
-  private final PaymentTransactionRepository paymentTransactionRepository;
+  private final ProducerPaymentTransactionRepository producerPaymentTransactionRepository;
 
-  private final PaymentMethodService paymentMethodService;
+  private final ProducerPaymentMethodService producerPaymentMethodService;
 
-  private final PaymentTransactionService transactionService;
+  private final ProducerPaymentTransactionService transactionService;
 
   private final PaymentIntegrationInterface paymentIntegration;
 
   private final PaymentMapper paymentMapper;
 
-  public PaymentOrchestrationService(
+  public ProducerPaymentOrchestrationService(
       InvoiceContract invoiceContract,
-      PaymentTransactionRepository paymentTransactionRepository,
-      PaymentMethodService paymentMethodService,
-      PaymentTransactionService transactionService,
+      ProducerPaymentTransactionRepository producerPaymentTransactionRepository,
+      ProducerPaymentMethodService producerPaymentMethodService,
+      ProducerPaymentTransactionService transactionService,
       PaymentIntegrationInterface paymentIntegration,
       PaymentMapper paymentMapper) {
     this.invoiceContract = invoiceContract;
-    this.paymentTransactionRepository = paymentTransactionRepository;
-    this.paymentMethodService = paymentMethodService;
+    this.producerPaymentTransactionRepository = producerPaymentTransactionRepository;
+    this.producerPaymentMethodService = producerPaymentMethodService;
     this.transactionService = transactionService;
     this.paymentIntegration = paymentIntegration;
     this.paymentMapper = paymentMapper;
@@ -67,7 +67,7 @@ public class PaymentOrchestrationService {
                   InvoiceResponse invoiceResponse =
                       invoiceContract.findInvoice(invoiceId, requestIP);
                   PaymentMethodResponse paymentMethod =
-                      paymentMethodService.createPaymentMethod(
+                      producerPaymentMethodService.createPaymentMethod(
                           paymentMapper.toPaymentRequest(paymentRequest));
                   return Optional.ofNullable(
                       applyPayment(invoiceResponse, paymentMethod, paymentType, requestIP));
@@ -92,11 +92,11 @@ public class PaymentOrchestrationService {
                   PaymentMethodResponse paymentMethod = null;
                   if (paymentRequest.savedPaymentMethodId() != null) {
                     paymentMethod =
-                        paymentMethodService.findPaymentMethod(
+                        producerPaymentMethodService.findPaymentMethod(
                             paymentRequest.savedPaymentMethodId());
                   } else if (paymentRequest.newPaymentMethod() != null) {
                     paymentMethod =
-                        paymentMethodService.createPaymentMethod(paymentRequest.newPaymentMethod());
+                        producerPaymentMethodService.createPaymentMethod(paymentRequest.newPaymentMethod());
                   } else {
                     throw new PreconditionFailedException("Payment must be either saved or new");
                   }
