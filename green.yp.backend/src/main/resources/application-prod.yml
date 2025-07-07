@@ -75,6 +75,8 @@ greenyp:
     decoderUrl: http://auth.greenyp.com/.well-known/jwks.json
 springdoc:
   swagger-ui:
+    urls:
+      - name: GreenYP APIs
 #    oauth2-redirect-url: http://localhost:8081/swagger-ui/oauth2-redirect.html
     oauth:
       client-id: ${GYP_FA_CLIENT_ID}
@@ -82,5 +84,5 @@ springdoc:
       scopes: openid,profile
       use-pkce-with-authorization-code-grant: true
   oAuthFlow:
-    authorization-url: http://auth.greenyp.com/oauth2/authorize
-    token-url: http://auth.greenyp.com/oauth2/token
+    authorization-url: https://auth.greenyp.com/oauth2/authorize
+    token-url: https://auth.greenyp.com/oauth2/token

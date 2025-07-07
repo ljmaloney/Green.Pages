@@ -80,8 +80,8 @@ public class AuthenticationConfig {
         Arrays.asList(
             "http://localhost:8080",
             "http://localhost:8081",
-            "http://services.greenyp.com",
             "https://services.greenyp.com",
+            "https://greenyp-service-api-lb-1807917553.us-east-1.elb.amazonaws.com/",
             "https://*.lovable.app"));
     configuration.setAllowedMethods(
         Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
