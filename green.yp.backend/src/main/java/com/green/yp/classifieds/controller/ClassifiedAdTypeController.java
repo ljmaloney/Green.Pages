@@ -1,6 +1,6 @@
 package com.green.yp.classifieds.controller;
 
-import com.green.yp.classifieds.apitype.ClassifiedAdTypeResponse;
+import com.green.yp.api.apitype.classified.ClassifiedAdTypeResponse;
 import com.green.yp.classifieds.service.ClassifiedAdTypeService;
 import com.green.yp.common.dto.ResponseApi;
 import io.swagger.v3.oas.annotations.Operation;

@@ -7,12 +7,22 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface ImageFileService {
   void deleteLogo(UUID producerId);
-
-  void deleteImage(UUID producerId, String imageFilename);
+  default void deleteImage(UUID producerId, String imageFilename) {
+    deleteImage(producerId, null, imageFilename);
+  }
+  void deleteImage(UUID producerId, String overrideBase, String imageFilename);
 
   String saveLogo(UUID producerId, String logoFilename, MultipartFile logoFile);
 
-  String saveImage(UUID producerId, String imageFilename, MultipartFile imageFile);
+  default String saveImage(UUID producerId, String imageFilename, MultipartFile imageFile){
+    return saveImage(producerId, null, imageFilename, imageFile);
+  }
+
+  String saveImage(UUID producerId, String overrideBase, String imageFilename, MultipartFile imageFile);
+
+  default String getBasePath(String basePath, String override){
+    return StringUtils.isBlank(override) ? basePath : override;
+  }
 
   /**
    * Specifies path separator for construction of path(s) or keys. By default this is the

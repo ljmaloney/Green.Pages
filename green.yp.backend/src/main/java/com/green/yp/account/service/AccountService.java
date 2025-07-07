@@ -7,7 +7,7 @@ import com.green.yp.api.apitype.account.CreateAccountRequest;
 import com.green.yp.api.apitype.account.UpdateAccountRequest;
 import com.green.yp.api.apitype.enumeration.AuditActionType;
 import com.green.yp.api.apitype.enumeration.AuditObjectType;
-import com.green.yp.api.apitype.enumeration.EmailTemplateName;
+import com.green.yp.api.apitype.enumeration.EmailTemplateType;
 import com.green.yp.api.apitype.producer.*;
 import com.green.yp.api.apitype.producer.enumeration.ProducerContactType;
 import com.green.yp.api.apitype.producer.enumeration.ProducerDisplayContactType;
@@ -79,7 +79,7 @@ public class AccountService {
     List<String> adminEmails = getAdminEmails(accountId);
 
     emailService.sendEmail(
-        EmailTemplateName.ACCOUNT_CANCELLATION,
+        EmailTemplateType.ACCOUNT_CANCELLATION,
         producerContract.findProducer(accountId),
         adminEmails.toArray(new String[0]));
 

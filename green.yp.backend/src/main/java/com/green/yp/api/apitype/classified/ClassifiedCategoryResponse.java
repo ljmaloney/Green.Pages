@@ -1,4 +1,4 @@
-package com.green.yp.classifieds.apitype;
+package com.green.yp.api.apitype.classified;
 
 import java.util.UUID;
 

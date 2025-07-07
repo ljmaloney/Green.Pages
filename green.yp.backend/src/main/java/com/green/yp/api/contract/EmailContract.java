@@ -1,7 +1,7 @@
 package com.green.yp.api.contract;
 
-import com.green.yp.api.apitype.enumeration.EmailTemplateName;
-import com.green.yp.api.apitype.producer.ProducerResponse;
+import com.green.yp.api.apitype.contact.ContactMessageRequest;
+import com.green.yp.api.apitype.enumeration.EmailTemplateType;
 import com.green.yp.email.service.EmailService;
 import com.green.yp.producer.data.model.ProducerContact;
 import org.springframework.stereotype.Service;
@@ -16,12 +16,11 @@ public class EmailContract {
   }
 
   public void sendEmail(
-      EmailTemplateName emailTemplateName, ProducerResponse producer, String... adminEmails) {
-    emailService.sendEmail(emailTemplateName, producer, adminEmails);
+          EmailTemplateType emailTemplateType, ProducerContact contact, String emailAddress)  {
+    emailService.sendEmail(emailTemplateType, contact, emailAddress);
   }
 
-  public void sendEmail(
-      EmailTemplateName emailTemplateName, ProducerContact contact, String emailAddress) {
-    emailService.sendEmail(emailTemplateName, contact, emailAddress);
+  public void sendEmail(EmailTemplateType emailTemplateType, ContactMessageRequest contactMessageRequest, String emailAddress) {
+    emailService.sendEmail(emailTemplateType, contactMessageRequest, emailAddress);
   }
 }

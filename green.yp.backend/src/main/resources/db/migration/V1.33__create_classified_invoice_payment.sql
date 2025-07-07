@@ -13,6 +13,7 @@ BEGIN
                              `invoice_number`           varchar(20)     not null,
                              `payment_customer_ref`     varchar(50)     not null,
                              `payment_ref`              varchar(50)     not null,
+                             `payment_amount`           DECIMAL(12,2)   NOT NULL,
                              PRIMARY KEY (`id`),
                              CONSTRAINT `fk_invoice_classified_ad_typ` FOREIGN KEY (`classified_ad_type`)
                                  REFERENCES `greenyp`.`classified_ad_type` (`id`)

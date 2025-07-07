@@ -3,7 +3,7 @@ package com.green.yp.producer.service;
 import com.green.yp.api.AuditRequest;
 import com.green.yp.api.apitype.enumeration.AuditActionType;
 import com.green.yp.api.apitype.enumeration.AuditObjectType;
-import com.green.yp.api.apitype.enumeration.EmailTemplateName;
+import com.green.yp.api.apitype.enumeration.EmailTemplateType;
 import com.green.yp.api.apitype.producer.ProducerContactRequest;
 import com.green.yp.api.apitype.producer.ProducerContactResponse;
 import com.green.yp.api.apitype.producer.ProducerLocationResponse;
@@ -101,7 +101,7 @@ public class ProducerContactOrchestrationService {
       objectType = AuditObjectType.PRODUCER_CONTACT,
       actionType = AuditActionType.CREATE)
   public ProducerContactResponse createContact(
-      @NotNull @NonNull UUID locationId, ProducerContactRequest createContactRequest) {
+      @NotNull @NonNull UUID locationId, ProducerContactRequest createContactRequest) throws Exception {
     log.info(
         "Attempt to create contact {} for locationId {}",
         StringUtils.isNotBlank(createContactRequest.genericContactName())
@@ -142,7 +142,7 @@ public class ProducerContactOrchestrationService {
   ProducerContactResponse createContact(
       @NotNull @NonNull UUID producerId,
       @NotNull @NonNull UUID locationId,
-      @NotNull @NonNull ProducerContactRequest createContactRequest) {
+      @NotNull @NonNull ProducerContactRequest createContactRequest)  {
 
     if (StringUtils.isBlank(createContactRequest.genericContactName())
         && StringUtils.isBlank(createContactRequest.firstName())
@@ -163,7 +163,7 @@ public class ProducerContactOrchestrationService {
 
     if (StringUtils.isNotBlank(contact.getEmailAddress())) {
       emailContract.sendEmail(
-          EmailTemplateName.EMAIL_CONFIRMATION, contact, contact.getEmailAddress());
+          EmailTemplateType.EMAIL_CONFIRMATION, contact, contact.getEmailAddress());
     }
 
     log.info(

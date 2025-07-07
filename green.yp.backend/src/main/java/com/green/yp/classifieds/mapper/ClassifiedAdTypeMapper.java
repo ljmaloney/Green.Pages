@@ -1,6 +1,6 @@
 package com.green.yp.classifieds.mapper;
 
-import com.green.yp.classifieds.apitype.ClassifiedAdTypeResponse;
+import com.green.yp.api.apitype.classified.ClassifiedAdTypeResponse;
 import com.green.yp.classifieds.data.model.ClassifiedAdType;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
