@@ -17,7 +17,8 @@ public class ProducerPaymentTransactionService {
 
   private final ProducerPaymentTransactionRepository producerPaymentTransactionRepository;
 
-  public ProducerPaymentTransactionService(ProducerPaymentTransactionRepository producerPaymentTransactionRepository) {
+  public ProducerPaymentTransactionService(
+      ProducerPaymentTransactionRepository producerPaymentTransactionRepository) {
     this.producerPaymentTransactionRepository = producerPaymentTransactionRepository;
   }
 
@@ -47,7 +48,8 @@ public class ProducerPaymentTransactionService {
             .responseText(response.responseText())
             .build();
 
-    ProducerPaymentTransaction savedTransaction = producerPaymentTransactionRepository.saveAndFlush(transaction);
+    ProducerPaymentTransaction savedTransaction =
+        producerPaymentTransactionRepository.saveAndFlush(transaction);
 
     return savedTransaction;
   }

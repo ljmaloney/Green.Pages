@@ -25,7 +25,8 @@ public class ProducerPaymentMethodService {
 
   private final PaymentMapper paymentMapper;
 
-  public ProducerPaymentMethodService(ProducerPaymentMethodRepository repository, PaymentMapper paymentMapper) {
+  public ProducerPaymentMethodService(
+      ProducerPaymentMethodRepository repository, PaymentMapper paymentMapper) {
     this.repository = repository;
     this.paymentMapper = paymentMapper;
   }

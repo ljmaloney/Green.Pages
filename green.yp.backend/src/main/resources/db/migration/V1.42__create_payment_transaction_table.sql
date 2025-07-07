@@ -15,6 +15,8 @@ BEGIN
                                       `receipt_number`      varchar(10),
                                       `status`              varchar(50),
                                       `source_type`         varchar(50),
+                                      `ip_address`          varchar(20),
+                                      `note`                text,
                                       `amount`              decimal(12,2),
                                       `app_fee_amount`      decimal(12,2),
                                       `approved_amount`     decimal(12,2),

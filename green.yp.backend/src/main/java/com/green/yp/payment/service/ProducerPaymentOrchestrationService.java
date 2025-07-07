@@ -4,7 +4,7 @@ import com.green.yp.api.apitype.invoice.InvoiceResponse;
 import com.green.yp.api.apitype.payment.ApplyPaymentMethodRequest;
 import com.green.yp.api.apitype.payment.ApplyPaymentRequest;
 import com.green.yp.api.apitype.payment.PaymentMethodResponse;
-import com.green.yp.api.apitype.payment.PaymentResponse;
+import com.green.yp.api.apitype.payment.ProducerPaymentResponse;
 import com.green.yp.api.contract.InvoiceContract;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.payment.data.enumeration.PaymentTransactionStatus;
@@ -53,7 +53,7 @@ public class ProducerPaymentOrchestrationService {
     this.paymentMapper = paymentMapper;
   }
 
-  public PaymentResponse applyPayment(
+  public ProducerPaymentResponse applyPayment(
       @NotNull @NonNull ApplyPaymentMethodRequest paymentRequest,
       @NotNull @NonNull UUID invoiceId,
       @NotNull @NonNull ProducerPaymentType paymentType,
@@ -76,7 +76,7 @@ public class ProducerPaymentOrchestrationService {
     return paymentMapper.fromTransaction(transaction.get());
   }
 
-  public PaymentResponse applyPayment(
+  public ProducerPaymentResponse applyPayment(
       ApplyPaymentRequest paymentRequest, String userId, String requestIP) {
 
     Optional<ProducerPaymentTransaction> transaction =
@@ -96,7 +96,8 @@ public class ProducerPaymentOrchestrationService {
                             paymentRequest.savedPaymentMethodId());
                   } else if (paymentRequest.newPaymentMethod() != null) {
                     paymentMethod =
-                        producerPaymentMethodService.createPaymentMethod(paymentRequest.newPaymentMethod());
+                        producerPaymentMethodService.createPaymentMethod(
+                            paymentRequest.newPaymentMethod());
                   } else {
                     throw new PreconditionFailedException("Payment must be either saved or new");
                   }

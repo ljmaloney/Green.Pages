@@ -40,6 +40,9 @@ public class PaymentTransaction extends Mutable {
   @Column(name = "receipt_number", length = 10)
   private String receiptNumber;
 
+  @Column(name="ip_address")
+  private String ipAddress;
+
   @Size(max = 50)
   @Column(name = "status", length = 50)
   private String status;
@@ -126,6 +129,11 @@ public class PaymentTransaction extends Mutable {
   @Column(name = "payment_details")
   @Convert(converter = JsonCardDetailsConvertor.class)
   private CardDetails paymentDetails;
+
+  @NotNull
+  @Lob
+  @Column(name = "note", nullable = false)
+  private String note;
 
   @Override
   public boolean equals(Object o) {

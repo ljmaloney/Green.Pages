@@ -12,7 +12,7 @@ import java.util.UUID;
 import lombok.NonNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record PaymentResponse(
+public record ProducerPaymentResponse(
     @NotNull @NonNull UUID transactionId,
     @NotNull @NonNull UUID producerId,
     @NotNull @NonNull UUID paymentMethodId,

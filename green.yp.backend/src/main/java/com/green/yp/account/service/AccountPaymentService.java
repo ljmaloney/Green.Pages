@@ -5,7 +5,7 @@ import com.green.yp.api.apitype.invoice.InvoiceResponse;
 import com.green.yp.api.apitype.payment.ApiPaymentResponse;
 import com.green.yp.api.apitype.payment.ApplyPaymentMethodRequest;
 import com.green.yp.api.apitype.payment.ApplyPaymentRequest;
-import com.green.yp.api.apitype.payment.PaymentResponse;
+import com.green.yp.api.apitype.payment.ProducerPaymentResponse;
 import com.green.yp.api.apitype.producer.ProducerContactResponse;
 import com.green.yp.api.apitype.producer.ProducerResponse;
 import com.green.yp.api.apitype.producer.enumeration.ProducerSubscriptionType;
@@ -77,30 +77,30 @@ public class AccountPaymentService {
     InvoiceResponse invoiceResponse =
         invoiceContract.createInvoice(paymentRequest.producerId(), requestIP);
 
-    PaymentResponse paymentResponse =
+    ProducerPaymentResponse producerPaymentResponse =
         paymentContract.applyPayment(
             paymentRequest,
             invoiceResponse.invoiceId(),
             ProducerPaymentType.INITIAL_PAYMENT,
             requestIP);
 
-    if (!paymentResponse.isSuccess()) {
+    if (!producerPaymentResponse.isSuccess()) {
       log.info(
           "Subscription payment was not successful for {} reasonCode {}",
           paymentRequest.producerId(),
-          paymentResponse.responseCode());
+          producerPaymentResponse.responseCode());
 
       return new ApiPaymentResponse(
-          paymentResponse.isSuccess(),
-          paymentResponse.responseCode(),
-          paymentResponse.responseText());
+          producerPaymentResponse.isSuccess(),
+          producerPaymentResponse.responseCode(),
+          producerPaymentResponse.responseText());
     }
 
     producerResponse =
         producerContract.activateProducer(
             paymentRequest.producerId(),
             invoiceResponse.createDate(),
-            paymentResponse.createDate(),
+            producerPaymentResponse.createDate(),
             null,
             requestIP);
 
@@ -110,7 +110,7 @@ public class AccountPaymentService {
         getAdminEmails(paymentRequest.producerId()).toArray(new String[0]));
 
     return new ApiPaymentResponse(
-        true, paymentResponse.responseCode(), paymentResponse.responseText());
+        true, producerPaymentResponse.responseCode(), producerPaymentResponse.responseText());
   }
 
   public ApiPaymentResponse applyPayment(
@@ -128,14 +128,14 @@ public class AccountPaymentService {
 
     invoiceContract.findInvoice(paymentRequest.invoiceId(), requestIP);
 
-    PaymentResponse paymentResponse =
+    ProducerPaymentResponse producerPaymentResponse =
         paymentContract.applyPayment(paymentRequest, userId, requestIP);
 
     //        emailService.sendEmail(EmailTemplateName.WELCOME_EMAIL, producerResponse,
     //                getAdminEmails(paymentRequest.producerId()).toArray(new String[0]));
 
     return new ApiPaymentResponse(
-        true, paymentResponse.responseCode(), paymentResponse.responseText());
+        true, producerPaymentResponse.responseCode(), producerPaymentResponse.responseText());
   }
 
   /**
