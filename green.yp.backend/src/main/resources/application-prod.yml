@@ -1,5 +1,6 @@
 server:
   port: 8080
+  forward-headers-strategy: framework
 spring:
   datasource:
     url: jdbc:mysql://${GYP_DB_HOSTNAME}:${GYP_DB_PORT}/greenyp
@@ -72,12 +73,12 @@ greenyp:
       host: https://greenyp-public-images.s3.amazonaws.com
       bucket: greenyp-public-images
   jwt:
-    decoderUrl: http://auth.greenyp.com/.well-known/jwks.json
+    decoderUrl: https://auth.greenyp.com/.well-known/jwks.json
 springdoc:
   swagger-ui:
     urls:
       - name: GreenYP APIs
-#    oauth2-redirect-url: http://localhost:8081/swagger-ui/oauth2-redirect.html
+    oauth2-redirect-url: https://services.greenyp.com/swagger-ui/oauth2-redirect.html
     oauth:
       client-id: ${GYP_FA_CLIENT_ID}
       client-secret: ${GYP_FA_CLIENT_SECRET}

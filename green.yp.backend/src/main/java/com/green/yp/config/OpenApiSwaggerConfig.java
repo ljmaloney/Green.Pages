@@ -1,5 +1,7 @@
 package com.green.yp.config;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.*;
@@ -11,6 +13,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
+@OpenAPIDefinition(
+        info = @io.swagger.v3.oas.annotations.info.Info(title = "Greenyp API", version = "v1"),
+        servers = {
+                @Server(url = "http://localhost:8081", description = "Local"),
+                @Server(url = "https://services.greenyp.com", description = "Production"),
+                @Server(url = "https://greenyp-service-api-lb-1807917553.us-east-1.elb.amazonaws.com", description = "AWS Load Balancer")
+        }
+)
 public class OpenApiSwaggerConfig {
   @Value("${springdoc.oAuthFlow.authorization-url}")
   private String oauthUrl;
