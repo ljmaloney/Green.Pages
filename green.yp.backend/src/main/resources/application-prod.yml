@@ -76,8 +76,8 @@ greenyp:
     decoderUrl: https://auth.greenyp.com/.well-known/jwks.json
 springdoc:
   swagger-ui:
-    urls:
-      - name: GreenYP APIs
+#    urls:
+#      - name: GreenYP APIs
     oauth2-redirect-url: https://services.greenyp.com/swagger-ui/oauth2-redirect.html
     oauth:
       client-id: ${GYP_FA_CLIENT_ID}
