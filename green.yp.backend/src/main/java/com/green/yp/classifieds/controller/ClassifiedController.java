@@ -1,5 +1,6 @@
 package com.green.yp.classifieds.controller;
 
+import com.green.yp.api.apitype.classified.ClassifiedAdCustomerResponse;
 import com.green.yp.api.apitype.classified.ClassifiedRequest;
 import com.green.yp.api.apitype.classified.ClassifiedResponse;
 import com.green.yp.api.apitype.classified.ClassifiedUpdateRequest;
@@ -43,6 +44,12 @@ public class ClassifiedController {
                               @RequestParam(name="tokenDestination")  String tokenDestination,
                               @RequestParam(name="tokenType") ClassifiedTokenType tokenType) throws NoSuchAlgorithmException {
     service.requestAuthCode(classifiedId, tokenDestination, tokenType, RequestUtil.getRequestIP());
+  }
+
+  @Operation(summary = "Retrieves classified and customer data together")
+  @GetMapping(path="{classifiedId}/customer")
+  public ResponseApi<ClassifiedAdCustomerResponse> findClassifiedAndCustomer(@PathVariable("classifiedId") UUID classifiedId) throws NoSuchAlgorithmException {
+    return new ResponseApi<>(service.findClassifiedAndCustomer(classifiedId), null);
   }
 
   @Operation(summary = "Creates the initial classified ad record")
