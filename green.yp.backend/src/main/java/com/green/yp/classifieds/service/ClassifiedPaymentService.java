@@ -88,10 +88,11 @@ public class ClassifiedPaymentService {
             Collections.singletonList(classified.classified().getEmailAddress()),
             subject,
             () -> Map.of("customer", classified.customer(),
-                    "category", category,
+                    "categoryName", category.name(),
                     "classifiedTitle", classified.classified().getTitle(),
                     "link", directLink,
                     "adTypeName", adType.adTypeName(),
+                    "paymentAmount", adType.monthlyPrice(),
                     "ipAddress", requestIP,
                     "timestamp", classified.classified().getCreateDate()));
 

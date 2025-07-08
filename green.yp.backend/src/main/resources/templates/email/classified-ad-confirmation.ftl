@@ -15,7 +15,7 @@
 <table role="presentation" style="width: 100%; background-color: #f9fafb; margin: 0; padding: 40px 0;">
     <tr>
         <td align="center">
-            <table role="presentation" style="width: 100%; max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); overflow: hidden;">
+            <table role="presentation" style="width: 100%; max-width: 800px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); overflow: hidden;">
                 <!-- Header -->
                 <tr>
                     <td style="background-color: #ffffff; padding: 32px 40px 24px 40px; border-bottom: 1px solid #e5e7eb;">
@@ -60,7 +60,7 @@
                             </tr>
                             <tr>
                                 <td style="text-align: right; width: 20%">Classified Category :</td>
-                                <td style="text-align: left">${category.name}</td>
+                                <td style="text-align: left">${categoryName}</td>
                             </tr>
                             <tr>
                                 <td style="text-align: right; width: 20%">Amount Charged :</td>
