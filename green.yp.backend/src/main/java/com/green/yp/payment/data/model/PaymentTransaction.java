@@ -20,7 +20,6 @@ import org.hibernate.annotations.ColumnDefault;
 public class PaymentTransaction extends Mutable {
 
   @Size(max = 255)
-  @NotNull
   @Column(name = "payment_ref", nullable = false)
   private String paymentRef;
 
@@ -104,7 +103,7 @@ public class PaymentTransaction extends Mutable {
   @Column(name = "postal_code", nullable = false, length = 10)
   private String postalCode;
 
-  @Size(max = 15)
+  @Size(max = 20)
   @NotNull
   @Column(name = "phone_number", nullable = false, length = 15)
   private String phoneNumber;
