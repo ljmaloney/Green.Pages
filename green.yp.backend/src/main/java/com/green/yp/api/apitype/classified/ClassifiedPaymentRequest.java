@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public record ClassifiedPaymentRequest(@NotNull @NonNull UUID classifiedId,
                                        @NotNull @NonNull String paymentToken,
+                                       @NotNull @NonNull String verificationToken,
                                        @Pattern(regexp = "^[\\p{Alpha} ]*$", message = "First Name should contain only alphabets and space")
                                        @Pattern(regexp = "^[A-Za-z\\s\\-.']+$", message = "First Name should contain only alphabets, spaces, or hyphens")
                                        @Pattern(regexp = "^[^\\s].*$", message = "First Name should not start with space")

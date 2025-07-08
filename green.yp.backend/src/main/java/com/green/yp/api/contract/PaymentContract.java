@@ -2,7 +2,7 @@ package com.green.yp.api.contract;
 
 import com.green.yp.api.apitype.payment.*;
 import com.green.yp.payment.data.enumeration.ProducerPaymentType;
-import com.green.yp.payment.service.PaymentTransactionService;
+import com.green.yp.payment.service.PaymentOrchestrationService;
 import com.green.yp.payment.service.ProducerPaymentMethodService;
 import com.green.yp.payment.service.ProducerPaymentOrchestrationService;
 
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PaymentContract {
 
-  private final PaymentTransactionService transactionService;
+  private final PaymentOrchestrationService transactionService;
 
   private final ProducerPaymentOrchestrationService paymentService;
 
@@ -21,7 +21,7 @@ public class PaymentContract {
 
   public PaymentContract(
           ProducerPaymentOrchestrationService paymentService,
-          PaymentTransactionService transactionService,
+          PaymentOrchestrationService transactionService,
           ProducerPaymentMethodService methodService) {
     this.paymentService = paymentService;
     this.transactionService = transactionService;
