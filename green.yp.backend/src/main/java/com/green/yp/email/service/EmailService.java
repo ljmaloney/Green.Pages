@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -50,7 +51,7 @@ public class EmailService {
       helper.setSubject(subject);
       helper.setFrom(defaultFromEmail);
 
-      var model = mappingSupplier.get();
+        var model = new HashMap<String, Object>(mappingSupplier.get());
       model.put(
           "subject", StringUtils.isBlank(subject) ? emailTemplate.getSubjectFormat() : subject);
 

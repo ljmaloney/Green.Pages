@@ -75,7 +75,7 @@ public class ClassifiedPaymentService {
 
     var paymentResponse =
         paymentContract.applyPayment(
-            paymentMapper.toPaymentRequest(paymentRequest, note, requestIP),
+            paymentMapper.toPaymentRequest(paymentRequest, adType.monthlyPrice(), adType.monthlyPrice(), note, requestIP),
             Optional.empty());
 
     var directLink = "";

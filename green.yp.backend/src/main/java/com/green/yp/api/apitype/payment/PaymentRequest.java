@@ -3,10 +3,16 @@ package com.green.yp.api.apitype.payment;
 import jakarta.validation.constraints.*;
 import lombok.NonNull;
 
+import java.math.BigDecimal;
+
 public record PaymentRequest(@NotNull @NonNull String paymentToken,
+                             @NotNull String verificationToken,
                              String referenceId,
                              String ipAddress,
                              String note,
+                             BigDecimal paymentAmount,
+                             BigDecimal appFeeAmount,
+                             BigDecimal totalAmount,
                              @Pattern(regexp = "^[\\p{Alpha} ]*$", message = "First Name should contain only alphabets and space")
                              @Pattern(regexp = "^[A-Za-z\\s\\-.']+$", message = "First Name should contain only alphabets, spaces, or hyphens")
                              @Pattern(regexp = "^[^\\s].*$", message = "First Name should not start with space")
