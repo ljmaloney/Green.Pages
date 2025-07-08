@@ -90,7 +90,7 @@ public class ClassifiedPaymentService {
             () -> Map.of("customer", classified.customer(),
                     "category", category,
                     "classifiedTitle", classified.classified().getTitle(),
-                    "directLink", directLink,
+                    "link", directLink,
                     "adTypeName", adType.adTypeName(),
                     "ipAddress", requestIP,
                     "timestamp", classified.classified().getCreateDate()));
