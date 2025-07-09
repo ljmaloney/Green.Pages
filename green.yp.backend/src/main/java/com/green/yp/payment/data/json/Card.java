@@ -1,14 +1,24 @@
 package com.green.yp.payment.data.json;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Map;
 
 public record Card(
-        @JsonProperty("card_brand") String cardBrand,
-        @JsonProperty("last_4") String last4,
-        @JsonProperty("exp_month") int expMonth,
-        @JsonProperty("exp_year") int expYear,
-        String fingerprint,
-        @JsonProperty("card_type") String cardType,
-        @JsonProperty("prepaid_type") String prepaidType,
-        String bin
-) {}
+    String id,
+    String cardBrand,
+    String last4,
+    Long expMonth,
+    Long expYear,
+    String cardholderName,
+    String fingerprint,
+    String customerId,
+    String merchantId,
+    String referenceId,
+    Boolean enabled,
+    String cardType,
+    String prepaidType,
+    String bin,
+    Long version,
+    String issuerAlert,
+    String issuerAlertAt,
+    Boolean hsaFsa,
+    Map<String, Object> additionalProperties) {}

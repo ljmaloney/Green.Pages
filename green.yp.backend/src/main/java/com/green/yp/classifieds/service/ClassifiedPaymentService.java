@@ -75,7 +75,7 @@ public class ClassifiedPaymentService {
 
     var paymentResponse =
         paymentContract.applyPayment(
-            paymentMapper.toPaymentRequest(paymentRequest, adType.monthlyPrice(), adType.monthlyPrice(), note, requestIP),
+            paymentMapper.toPaymentRequest(paymentRequest, "GrnPgs-Classifieds", adType.monthlyPrice(), adType.monthlyPrice(), note, requestIP),
             Optional.empty());
 
     var directLink = "";

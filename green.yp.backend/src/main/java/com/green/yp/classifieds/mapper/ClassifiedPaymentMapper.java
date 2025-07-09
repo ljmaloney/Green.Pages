@@ -15,13 +15,15 @@ import java.math.BigDecimal;
         injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface ClassifiedPaymentMapper {
 
+    @Mapping(target = "referenceId", source = "request.classifiedId")
     @Mapping(target="city", source="request.city")
     @Mapping(target = "state", source = "request.state")
     @Mapping(target = "postalCode", source = "request.postalCode")
     @Mapping(target = "emailAddress", source = "request.emailAddress")
     @Mapping(target = "phoneNumber", source = "request.phoneNumber")
     PaymentRequest toPaymentRequest(ClassifiedPaymentRequest request,
-                                    BigDecimal amount,
+                                    String statementDescription,
+                                    BigDecimal paymentAmount,
                                     BigDecimal totalAmount,
                                     String note,
                                     String ipAddress);

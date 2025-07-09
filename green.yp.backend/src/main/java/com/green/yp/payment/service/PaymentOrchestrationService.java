@@ -14,9 +14,12 @@ import org.springframework.stereotype.Service;
 public class PaymentOrchestrationService {
 
     private PaymentTransactionService transactionService;
+    private PaymentService paymentService;
 
-    public PaymentOrchestrationService(PaymentTransactionService transactionService) {
+    public PaymentOrchestrationService(PaymentTransactionService transactionService,
+                                       PaymentService paymentService) {
         this.transactionService =  transactionService;
+        this.paymentService = paymentService;
     }
 
     public PaymentTransactionResponse applyPayment(PaymentRequest paymentRequest, Optional<String> customerRef) {
@@ -24,9 +27,9 @@ public class PaymentOrchestrationService {
         var paymentResponse = transactionService.createPaymentRecord(paymentRequest);
 
         //call payment partner API
+        var cardResponse = paymentService.processPayment(paymentRequest, paymentResponse.getId(), customerRef);
 
         //update payment record
-
-        return null;
+        return transactionService.updatePayment(paymentResponse.getId(), cardResponse);
     }
 }

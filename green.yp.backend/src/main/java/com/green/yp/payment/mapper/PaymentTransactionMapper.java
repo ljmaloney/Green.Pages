@@ -1,9 +1,11 @@
 package com.green.yp.payment.mapper;
 
 import com.green.yp.api.apitype.payment.PaymentRequest;
+import com.green.yp.api.apitype.payment.PaymentTransactionResponse;
 import com.green.yp.payment.data.model.PaymentTransaction;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(
@@ -11,5 +13,8 @@ import org.mapstruct.ReportingPolicy;
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface PaymentTransactionMapper {
+
     PaymentTransaction toEntity(PaymentRequest paymentRequest);
+
+    PaymentTransactionResponse fromEntity(PaymentTransaction save);
 }
