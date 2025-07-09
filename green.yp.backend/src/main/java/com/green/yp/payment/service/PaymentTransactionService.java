@@ -8,18 +8,17 @@ import com.green.yp.exception.SystemException;
 import com.green.yp.payment.data.model.PaymentTransaction;
 import com.green.yp.payment.data.repository.PaymentTransactionRepository;
 import com.green.yp.payment.mapper.PaymentTransactionMapper;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Slf4j
 @Service
 public class PaymentTransactionService {
-    private PaymentTransactionRepository repository;
-    private PaymentTransactionMapper mapper;
+    private final PaymentTransactionRepository repository;
+    private final PaymentTransactionMapper mapper;
 
     public PaymentTransactionService(PaymentTransactionRepository repository,
                                      PaymentTransactionMapper mapper) {

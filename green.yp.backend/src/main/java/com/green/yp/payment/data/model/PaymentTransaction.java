@@ -39,7 +39,7 @@ public class PaymentTransaction extends Mutable {
   @Column(name = "receipt_number", length = 10)
   private String receiptNumber;
 
-  @Column(name="ip_address")
+  @Column(name = "ip_address")
   private String ipAddress;
 
   @Size(max = 50)
@@ -142,11 +142,67 @@ public class PaymentTransaction extends Mutable {
 
     PaymentTransaction that = (PaymentTransaction) o;
 
-    return new EqualsBuilder().appendSuper(super.equals(o)).append(paymentRef, that.paymentRef).append(locationRef, that.locationRef).append(orderRef, that.orderRef).append(customerRef, that.customerRef).append(receiptNumber, that.receiptNumber).append(status, that.status).append(sourceType, that.sourceType).append(amount, that.amount).append(appFeeAmount, that.appFeeAmount).append(approvedAmount, that.approvedAmount).append(processingFee, that.processingFee).append(refundAmount, that.refundAmount).append(totalAmount, that.totalAmount).append(currencyCode, that.currencyCode).append(firstName, that.firstName).append(lastName, that.lastName).append(address, that.address).append(city, that.city).append(state, that.state).append(postalCode, that.postalCode).append(phoneNumber, that.phoneNumber).append(emailAddress, that.emailAddress).append(statementDescriptionIdentifier, that.statementDescriptionIdentifier).append(receiptUrl, that.receiptUrl).append(versionToken, that.versionToken).append(paymentDetails, that.paymentDetails).isEquals();
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(paymentRef, that.paymentRef)
+        .append(locationRef, that.locationRef)
+        .append(orderRef, that.orderRef)
+        .append(customerRef, that.customerRef)
+        .append(receiptNumber, that.receiptNumber)
+        .append(status, that.status)
+        .append(sourceType, that.sourceType)
+        .append(amount, that.amount)
+        .append(appFeeAmount, that.appFeeAmount)
+        .append(approvedAmount, that.approvedAmount)
+        .append(processingFee, that.processingFee)
+        .append(refundAmount, that.refundAmount)
+        .append(totalAmount, that.totalAmount)
+        .append(currencyCode, that.currencyCode)
+        .append(firstName, that.firstName)
+        .append(lastName, that.lastName)
+        .append(address, that.address)
+        .append(city, that.city)
+        .append(state, that.state)
+        .append(postalCode, that.postalCode)
+        .append(phoneNumber, that.phoneNumber)
+        .append(emailAddress, that.emailAddress)
+        .append(statementDescriptionIdentifier, that.statementDescriptionIdentifier)
+        .append(receiptUrl, that.receiptUrl)
+        .append(versionToken, that.versionToken)
+        .append(paymentDetails, that.paymentDetails)
+        .isEquals();
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(paymentRef).append(locationRef).append(orderRef).append(customerRef).append(receiptNumber).append(status).append(sourceType).append(amount).append(appFeeAmount).append(approvedAmount).append(processingFee).append(refundAmount).append(totalAmount).append(currencyCode).append(firstName).append(lastName).append(address).append(city).append(state).append(postalCode).append(phoneNumber).append(emailAddress).append(statementDescriptionIdentifier).append(receiptUrl).append(versionToken).append(paymentDetails).toHashCode();
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(paymentRef)
+        .append(locationRef)
+        .append(orderRef)
+        .append(customerRef)
+        .append(receiptNumber)
+        .append(status)
+        .append(sourceType)
+        .append(amount)
+        .append(appFeeAmount)
+        .append(approvedAmount)
+        .append(processingFee)
+        .append(refundAmount)
+        .append(totalAmount)
+        .append(currencyCode)
+        .append(firstName)
+        .append(lastName)
+        .append(address)
+        .append(city)
+        .append(state)
+        .append(postalCode)
+        .append(phoneNumber)
+        .append(emailAddress)
+        .append(statementDescriptionIdentifier)
+        .append(receiptUrl)
+        .append(versionToken)
+        .append(paymentDetails)
+        .toHashCode();
   }
 }

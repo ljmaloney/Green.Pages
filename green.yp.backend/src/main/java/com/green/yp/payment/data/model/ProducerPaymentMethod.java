@@ -89,11 +89,41 @@ public class ProducerPaymentMethod extends Mutable {
 
     ProducerPaymentMethod that = (ProducerPaymentMethod) o;
 
-    return new EqualsBuilder().appendSuper(super.equals(o)).append(active, that.active).append(captureMethod, that.captureMethod).append(cancelDate, that.cancelDate).append(producerId, that.producerId).append(paymentType, that.paymentType).append(panLastFour, that.panLastFour).append(paymentMethod, that.paymentMethod).append(payorName, that.payorName).append(payorAddress1, that.payorAddress1).append(payorAddress2, that.payorAddress2).append(payorCity, that.payorCity).append(payorState, that.payorState).append(payorPostalCode, that.payorPostalCode).isEquals();
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(active, that.active)
+        .append(captureMethod, that.captureMethod)
+        .append(cancelDate, that.cancelDate)
+        .append(producerId, that.producerId)
+        .append(paymentType, that.paymentType)
+        .append(panLastFour, that.panLastFour)
+        .append(paymentMethod, that.paymentMethod)
+        .append(payorName, that.payorName)
+        .append(payorAddress1, that.payorAddress1)
+        .append(payorAddress2, that.payorAddress2)
+        .append(payorCity, that.payorCity)
+        .append(payorState, that.payorState)
+        .append(payorPostalCode, that.payorPostalCode)
+        .isEquals();
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(active).append(captureMethod).append(cancelDate).append(producerId).append(paymentType).append(panLastFour).append(paymentMethod).append(payorName).append(payorAddress1).append(payorAddress2).append(payorCity).append(payorState).append(payorPostalCode).toHashCode();
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(active)
+        .append(captureMethod)
+        .append(cancelDate)
+        .append(producerId)
+        .append(paymentType)
+        .append(panLastFour)
+        .append(paymentMethod)
+        .append(payorName)
+        .append(payorAddress1)
+        .append(payorAddress2)
+        .append(payorCity)
+        .append(payorState)
+        .append(payorPostalCode)
+        .toHashCode();
   }
 }

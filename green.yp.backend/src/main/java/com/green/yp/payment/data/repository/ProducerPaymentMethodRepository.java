@@ -9,7 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface ProducerPaymentMethodRepository extends JpaRepository<ProducerPaymentMethod, UUID> {
+public interface ProducerPaymentMethodRepository
+    extends JpaRepository<ProducerPaymentMethod, UUID> {
 
   @Query(
       """
@@ -19,5 +20,6 @@ public interface ProducerPaymentMethodRepository extends JpaRepository<ProducerP
                        WHERE pm.producerId=:producerId and pm.cancelDate IS NULL
                             and pm.active=TRUE
                     """)
-  Optional<ProducerPaymentMethod> findActiveMethod(@NotNull @NonNull @Param("producerId") UUID producerId);
+  Optional<ProducerPaymentMethod> findActiveMethod(
+      @NotNull @NonNull @Param("producerId") UUID producerId);
 }

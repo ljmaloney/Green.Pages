@@ -80,12 +80,41 @@ public class ProducerPaymentTransaction extends Immutable {
 
     ProducerPaymentTransaction that = (ProducerPaymentTransaction) o;
 
-    return new EqualsBuilder().appendSuper(super.equals(o)).append(producerId, that.producerId).append(paymentMethodId, that.paymentMethodId).append(invoiceId, that.invoiceId).append(paymentType, that.paymentType).append(amount, that.amount).append(status, that.status).append(acquirerReferenceNumber, that.acquirerReferenceNumber).append(avsErrorResponseCode, that.avsErrorResponseCode).append(avsPostalCodeResponseCode, that.avsPostalCodeResponseCode).append(avsStreetAddressResponseCode, that.avsStreetAddressResponseCode).append(cvvResponseCode, that.cvvResponseCode).append(responseCode, that.responseCode).append(responseText, that.responseText).isEquals();
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(producerId, that.producerId)
+        .append(paymentMethodId, that.paymentMethodId)
+        .append(invoiceId, that.invoiceId)
+        .append(paymentType, that.paymentType)
+        .append(amount, that.amount)
+        .append(status, that.status)
+        .append(acquirerReferenceNumber, that.acquirerReferenceNumber)
+        .append(avsErrorResponseCode, that.avsErrorResponseCode)
+        .append(avsPostalCodeResponseCode, that.avsPostalCodeResponseCode)
+        .append(avsStreetAddressResponseCode, that.avsStreetAddressResponseCode)
+        .append(cvvResponseCode, that.cvvResponseCode)
+        .append(responseCode, that.responseCode)
+        .append(responseText, that.responseText)
+        .isEquals();
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(producerId).append(paymentMethodId).append(invoiceId).append(paymentType).append(amount).append(status).append(acquirerReferenceNumber).append(avsErrorResponseCode).append(avsPostalCodeResponseCode).append(avsStreetAddressResponseCode).append(cvvResponseCode).append(responseCode).append(responseText).toHashCode();
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(producerId)
+        .append(paymentMethodId)
+        .append(invoiceId)
+        .append(paymentType)
+        .append(amount)
+        .append(status)
+        .append(acquirerReferenceNumber)
+        .append(avsErrorResponseCode)
+        .append(avsPostalCodeResponseCode)
+        .append(avsStreetAddressResponseCode)
+        .append(cvvResponseCode)
+        .append(responseCode)
+        .append(responseText)
+        .toHashCode();
   }
-
 }

@@ -5,17 +5,13 @@ import com.green.yp.api.apitype.payment.PaymentResponse;
 import com.green.yp.payment.service.PaymentService;
 import com.squareup.square.SquareClient;
 import com.squareup.square.types.*;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.mapstruct.InjectionStrategy;
-import org.mapstruct.Mapper;
-import org.mapstruct.ReportingPolicy;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -23,8 +19,8 @@ import java.util.UUID;
         matchIfMissing = true)
 public class SquarePaymentService implements PaymentService {
 
-    private SquareClient squareClient;
-    private SquareResponseMapper responseMapper;
+    private final SquareClient squareClient;
+    private final SquareResponseMapper responseMapper;
 
     public SquarePaymentService(SquareClient squareClient, SquareResponseMapper responseMapper) {
         this.squareClient = squareClient;
