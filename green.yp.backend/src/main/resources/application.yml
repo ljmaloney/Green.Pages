@@ -108,8 +108,8 @@ greenyp:
       host: http://localhost:8081
       filepath: /Users/luthermaloney/git/Green.Pages/green.yp.backend/build/resources/main/static
   payment:
-    access-token: EAAAEAEKCckk-ngfXdFqeD4MYQU2Q76T1PkWTHM8pHk3oW9VY19z6L1V-8lE0g9R
-    environment: SANDBOX
+    access-token: ${GYP_TEST_ACCESS_TOKEN}
+    environment: ${GYP_SQR_ENVIRONMENT}
     service:
       impl: square
 resilience4j:

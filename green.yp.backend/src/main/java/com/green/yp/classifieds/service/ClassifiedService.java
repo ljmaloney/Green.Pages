@@ -18,6 +18,7 @@ import com.green.yp.util.TokenUtils;
 import jakarta.validation.Valid;
 import java.security.NoSuchAlgorithmException;
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -82,21 +83,38 @@ public class ClassifiedService {
             });
   }
 
-  public ClassifiedResponse createClassified(@Valid ClassifiedRequest request) {
+  public ClassifiedResponse createClassified(@Valid ClassifiedRequest request, String requestIP) {
+    log.info("Creating new classified ad {} in {} for {} from {}", request.title(), request.categoryId(), request.emailAddress(), requestIP);
     // upsert customer record if not already found
     var customer =
         customerRepository
             .findClassifiedCustomerByEmailAddressOrPhoneNumber(request.emailAddress(), request.phoneNumber())
-            .orElseGet(
+                .map( cust -> {
+                  if ( !cust.getEmailAddress().equals(request.emailAddress())) {
+                    log.debug("customer {} email address has been changed, found with phone", cust.getId());
+                    cust.setEmailAddress(request.emailAddress());
+                    cust.setEmailValidationDate(null);
+                    cust.setEmailAddressValidationToken(TokenUtils.generateCode(8));
+                    return customerRepository.save(cust);
+                  }
+                  return cust;
+                })
+                .orElseGet(
                 () -> {
-                  return customerRepository.saveAndFlush(mapper.customterFromClassified(request));
+                  var newCustomer = mapper.customterFromClassified(request);
+                  newCustomer.setEmailAddressValidationToken(TokenUtils.generateCode(8));
+                  return customerRepository.saveAndFlush(newCustomer);
                 });
 
-    adTypeService.findAdType(request.adType());
-    categoryService.findCategory(request.categoryId());
+    log.debug("Validate adType for {}", request.address());
+    var adType = adTypeService.findAdType(request.adType());
+
+    log.debug("Validate category for {}", request.categoryId());
+    var category = categoryService.findCategory(request.categoryId());
 
     var classified = mapper.toEntity(request);
 
+    log.debug("Generate geo-location for classified ad for {}", request.title());
     var geoLocation = geocodeService.geocodeLocation(classified, request.address());
 
     classified.setClassifiedCustomerId(customer.getId());
@@ -107,7 +125,24 @@ public class ClassifiedService {
     classified.setLatitude(geoLocation.latitude());
     classified.setLongitude(geoLocation.longitude());
 
-    return mapper.fromEntity(repository.saveAndFlush(classified));
+    var classifiedResponse = mapper.fromEntity(repository.saveAndFlush(classified));
+
+    // send confirmation email
+    String subject = String.format("Greenyp - %s classified ad confirmation", adType.adTypeName());
+    emailService.sendEmailAsync(EmailTemplateType.CLASSIFIED_EMAIL_VALIDATION,
+            Collections.singletonList(classified.getEmailAddress()),
+            subject,
+            () -> Map.of("lastName", request.lastName(),
+                    "firstName", request.firstName(),
+                    "classifiedTitle",request.title(),
+                    "categoryName", category.name(),
+                    "emailValidationToken", customer.getEmailAddressValidationToken(),
+                    "adTypeName", adType.adTypeName(),
+                    "paymentAmount", adType.monthlyPrice(),
+                    "ipAddress", requestIP,
+                    "timestamp", classified.getCreateDate()));
+
+    return classifiedResponse;
   }
 
   public ClassifiedResponse updateClassified(@Valid ClassifiedUpdateRequest classifiedRequest, String requestIP) {

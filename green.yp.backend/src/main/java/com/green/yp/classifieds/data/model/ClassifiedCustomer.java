@@ -1,14 +1,14 @@
 package com.green.yp.classifieds.data.model;
 
 import com.green.yp.common.data.embedded.Mutable;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.time.OffsetDateTime;
 
 @NoArgsConstructor
 @Entity
@@ -60,6 +60,14 @@ public class ClassifiedCustomer extends Mutable {
   @Size(max = 100)
   @Column(name = "email_address", nullable = false, length = 100)
   private String emailAddress;
+
+  @Size(max = 25)
+  @Column(name="email_validatiom_token", nullable = false, length = 25)
+  private String emailAddressValidationToken;
+
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name="email_validation_date")
+  private OffsetDateTime emailValidationDate;
 
   @Override
   public boolean equals(Object o) {

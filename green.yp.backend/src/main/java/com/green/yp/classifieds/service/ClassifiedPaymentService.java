@@ -4,15 +4,20 @@ import com.green.yp.api.apitype.classified.ClassifiedPaymentRequest;
 import com.green.yp.api.apitype.classified.ClassifiedPaymentResponse;
 import com.green.yp.api.apitype.enumeration.EmailTemplateType;
 import com.green.yp.api.contract.PaymentContract;
+import com.green.yp.classifieds.data.model.ClassifiedCustomer;
+import com.green.yp.classifieds.data.repository.ClassifiedCustomerRepository;
 import com.green.yp.classifieds.data.repository.ClassifiedRepository;
 import com.green.yp.classifieds.mapper.ClassifiedPaymentMapper;
 import com.green.yp.email.service.EmailService;
 import com.green.yp.exception.NotFoundException;
+import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.util.TokenUtils;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.*;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +31,7 @@ public class ClassifiedPaymentService {
   private final ClassifiedRepository classifedRepository;
   private final ClassifiedAdTypeService adTypeService;
   private final ClassifiedCategoryService classifiedCategoryService;
+  private final ClassifiedCustomerRepository customerRepository;
   private final EmailService emailService;
 
   private String paymentNoteFormat = """
@@ -43,6 +49,7 @@ public class ClassifiedPaymentService {
   public ClassifiedPaymentService(
       PaymentContract paymentContract,
       ClassifiedRepository classifiedRepository,
+      ClassifiedCustomerRepository customerRepository,
       ClassifiedAdTypeService adTypeService,
       ClassifiedCategoryService classifiedCategoryService,
       EmailService emailService,
@@ -53,6 +60,7 @@ public class ClassifiedPaymentService {
     this.classifiedCategoryService = classifiedCategoryService;
     this.classifedRepository = classifiedRepository;
     this.emailService = emailService;
+    this.customerRepository = customerRepository;
   }
 
   public ClassifiedPaymentResponse processPayment(
@@ -67,6 +75,11 @@ public class ClassifiedPaymentService {
                       String.format("Classified not found for %s", paymentRequest.classifiedId()));
                   return new NotFoundException("Classified", paymentRequest.classifiedId());
                 });
+
+    if ( invalidEmailToken(classified.customer(), paymentRequest.emailValidationToken())){
+       log.warn("Attempt to create an ad using an invalid email token for customer {}", classified.customer().getId());
+      throw new PreconditionFailedException("Invalid email address token %s",paymentRequest.emailValidationToken());
+    }
 
     var adType = adTypeService.findAdType(classified.classified().getAdTypeId());
 
@@ -122,5 +135,16 @@ public class ClassifiedPaymentService {
             paymentResponse.status(),
             paymentResponse.paymentRef(),
             paymentResponse.orderRef(), paymentResponse.receiptNumber());
+  }
+
+  private boolean invalidEmailToken(ClassifiedCustomer customer, @NotBlank String emailToken) {
+    if ( customer.getEmailValidationDate()  != null) {
+      return false;
+    } else if ( emailToken.equals(customer.getEmailAddressValidationToken()) ) {
+      customer.setEmailValidationDate(OffsetDateTime.now());
+      customerRepository.save(customer);
+      return false;
+    }
+    return true;
   }
 }

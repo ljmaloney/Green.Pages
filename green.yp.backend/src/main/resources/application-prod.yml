@@ -103,8 +103,8 @@ greenyp:
   jwt:
     decoderUrl: https://auth.greenyp.com/.well-known/jwks.json
   payment:
-    access-token: ${QYP_TEST_ACCESS_TOKEN}
-    environment: SANDBOX
+    access-token: ${GYP_SQR_ACCESS_TOKEN}
+    environment: ${GYP_SQR_ENVIRONMENT}
     service:
       impl: square
 resilience4j:

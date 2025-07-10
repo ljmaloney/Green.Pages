@@ -10,11 +10,13 @@ import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -57,8 +59,9 @@ public class ClassifiedController {
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ClassifiedResponse> createClassified(
-      @RequestBody @Valid ClassifiedRequest classifiedRequest) {
-    return new ResponseApi<>(service.createClassified(classifiedRequest), null);
+          @RequestBody @Valid ClassifiedRequest classifiedRequest,
+          HttpServletRequest httpRequest) {
+    return new ResponseApi<>(service.createClassified(classifiedRequest, RequestUtil.getRequestIP(httpRequest)), null);
   }
 
   @Operation(summary = "Updates a classified ad")
