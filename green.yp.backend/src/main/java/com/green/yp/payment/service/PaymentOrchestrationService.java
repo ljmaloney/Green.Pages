@@ -28,10 +28,10 @@ public class PaymentOrchestrationService {
         try{
             //call payment partner API
             var cardResponse = paymentService.processPayment(paymentRequest, paymentResponse.getId(), customerRef);
-
             //update payment record
             return transactionService.updatePayment(paymentResponse.getId(), cardResponse);
         } catch (SquareApiException e){
+            log.warn(e.getMessage(), e);
             return transactionService.updatePaymentError(paymentResponse.getId(), e.getMessage(), e.statusCode(), e.body().toString());
         }
     }
