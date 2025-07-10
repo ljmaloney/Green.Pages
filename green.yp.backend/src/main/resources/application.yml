@@ -32,21 +32,20 @@ spring:
   mail:
     host: email-smtp.us-east-1.amazonaws.com
     port: 587
-    username: AKIAYDWHTBKKSTP5KN62
-    password: BJOPg6J3zZwsns6BGAH6odIXMyiwoyRnSz57ND7jfNQ7
+    username: ${GYP_AWS_SES_USERNAME}
+    password: ${GYP_AWS_SES_TOKEN}
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
-  spring:
-    security:
-      oauth2:
-        resourceserver:
-          jwt:
-            audiences: 922748b0-1658-4880-942a-36eaca3aa185
-            issuer-uri: http://localhost:9011
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          audiences: 922748b0-1658-4880-942a-36eaca3aa185
+          issuer-uri: http://localhost:9011
 circuitbreaker:
   instances:
     geocode-api:
@@ -89,7 +88,7 @@ feign:
         readTimeout: 5000
 greenyp:
   classified:
-    baseUrl: http://localhost:8080/
+    baseUrl: http://localhost:8080
   jwt:
     decoderUrl: http://localhost:9011/.well-known/jwks.json
   cloud:
