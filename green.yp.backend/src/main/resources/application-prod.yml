@@ -26,6 +26,17 @@ spring:
     properties:
       hibernate:
         format_sql: false
+  mail:
+    host: email-smtp.us-east-1.amazonaws.com
+    port: 587
+    username: ${GYP_AWS_SES_USERNAME}
+    password: ${GYP_AWS_SES_TOKEN}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   application:
     name: Green YP Market Service APIs
   security:
@@ -43,6 +54,15 @@ logging:
           descriptor:
             sql:
               BasicBinder: TRACE
+circuitbreaker:
+  instances:
+    geocode-api:
+      sliding-window-type: COUNT_BASED
+      sliding-window-size: 10
+      minimum-number-of-calls: 5
+      failure-rate-threshold: 50
+      wait-duration-in-open-state: 10s
+      permitted-number-of-calls-in-half-open-state: 3
 fusionauth:
   green:
     yp:
@@ -57,7 +77,15 @@ fusionauth:
       tenant: ${GYP_FA_TENANT_ID}
       connectTimeout: 2000
       readTimeout: 2000
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 3000
+        readTimeout: 5000
 greenyp:
+  classified:
+    baseUrl: https://www.greenyp.com
   cloud:
     aws:
       s3:
@@ -74,10 +102,20 @@ greenyp:
       bucket: greenyp-public-images
   jwt:
     decoderUrl: https://auth.greenyp.com/.well-known/jwks.json
+  payment:
+    access-token: ${QYP_TEST_ACCESS_TOKEN}
+    environment: SANDBOX
+    service:
+      impl: square
+resilience4j:
+  ratelimiter:
+    instances:
+      geocode-api:
+        limit-for-period: 10
+        limit-refresh-period: 1s
+        timeout-duration: 100ms
 springdoc:
   swagger-ui:
-#    urls:
-#      - name: GreenYP APIs
     oauth2-redirect-url: https://services.greenyp.com/swagger-ui/oauth2-redirect.html
     oauth:
       client-id: ${GYP_FA_CLIENT_ID}
