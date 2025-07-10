@@ -47,6 +47,9 @@ public class Classified extends Mutable {
   @Column(name = "per_unit_type", nullable = false, length = 50)
   private String perUnitType;
 
+  @Column(name="id_token")
+  private String idToken;
+
   @Size(max = 200)
   @NotNull
   @Column(name = "title", nullable = false, length = 200)

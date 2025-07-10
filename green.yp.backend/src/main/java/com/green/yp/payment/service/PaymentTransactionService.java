@@ -49,7 +49,10 @@ public class PaymentTransactionService {
          transaction.setLocationRef(cardResponse.locationRef());
          transaction.setStatus(cardResponse.status());
          transaction.setSourceType(cardResponse.sourceType());
+         transaction.setReceiptUrl(cardResponse.receiptUrl());
+         transaction.setReceiptNumber(cardResponse.receiptNumber());
          transaction.setStatementDescriptionIdentifier(cardResponse.descriptionId());
+         transaction.setCurrencyCode("USD");
          transaction.setOrderRef(cardResponse.orderRef());
          transaction.setPaymentDetails(cardResponse.cardDetails());
 

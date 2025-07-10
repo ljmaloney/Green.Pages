@@ -8,12 +8,14 @@ import com.green.yp.classifieds.data.repository.ClassifiedRepository;
 import com.green.yp.classifieds.mapper.ClassifiedPaymentMapper;
 import com.green.yp.email.service.EmailService;
 import com.green.yp.exception.NotFoundException;
+import com.green.yp.util.TokenUtils;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -34,6 +36,9 @@ public class ClassifiedPaymentService {
                        Term : 1 month
                        Cost : $%s
   """;
+
+  @Value("${greenyp.classified.baseUrl}")
+  private String classifiedUrl;
 
   public ClassifiedPaymentService(
       PaymentContract paymentContract,
@@ -67,18 +72,28 @@ public class ClassifiedPaymentService {
 
     var category = classifiedCategoryService.findCategory(classified.classified().getCategoryId());
 
-    var note = String.format(paymentNoteFormat, adType.adTypeName(),
+    var note = StringUtils.trim(String.format(paymentNoteFormat, adType.adTypeName(),
             category.name(),
             classified.classified().getTitle(),
             StringUtils.truncate(classified.classified().getDescription(), 100),
-            adType.monthlyPrice());
+            adType.monthlyPrice()));
 
     var paymentResponse =
         paymentContract.applyPayment(
             paymentMapper.toPaymentRequest(paymentRequest, "GrnPgs-Classifieds", adType.monthlyPrice(), adType.monthlyPrice(), note, requestIP),
             Optional.empty());
 
-    var directLink = "";
+    if ( !"COMPLETED".equals(paymentResponse.status()) ) {
+      log.warn("Attempted to process payment of classified ad {} failed", classified.classified().getId());
+      return new ClassifiedPaymentResponse(classified.classified().getId(),
+              classified.classified().getTitle(),
+              paymentResponse.status(),null,null, null);
+    }
+
+    var token = TokenUtils.generateCode(10);
+    classified.classified().setIdToken(token);
+
+    var directLink = String.format("{}classifieds/%s?secret=%s", classifiedUrl, classified.classified().getId(), token);
 
     // create invoice record for classified ad
 
@@ -94,12 +109,18 @@ public class ClassifiedPaymentService {
                     "adTypeName", adType.adTypeName(),
                     "paymentAmount", adType.monthlyPrice(),
                     "ipAddress", requestIP,
+                    "classifiedId", classified.classified().getId().toString(),
+                    "transactionRef", paymentResponse.paymentRef(),
                     "timestamp", classified.classified().getCreateDate()));
 
     classified.classified().setActiveDate(LocalDate.now());
     classified.classified().setLastActiveDate(LocalDate.now().plusMonths(1));
     classifedRepository.save(classified.classified());
 
-    return new ClassifiedPaymentResponse();
+    return new ClassifiedPaymentResponse(classified.classified().getId(),
+            classified.classified().getTitle(),
+            paymentResponse.status(),
+            paymentResponse.paymentRef(),
+            paymentResponse.orderRef(), paymentResponse.receiptNumber());
   }
 }
