@@ -88,6 +88,8 @@ feign:
         connectTimeout: 3000
         readTimeout: 5000
 greenyp:
+  classified:
+    baseUrl: http://localhost:8080/
   jwt:
     decoderUrl: http://localhost:9011/.well-known/jwks.json
   cloud:
@@ -106,6 +108,11 @@ greenyp:
     service:
       host: http://localhost:8081
       filepath: /Users/luthermaloney/git/Green.Pages/green.yp.backend/build/resources/main/static
+  payment:
+    access-token: EAAAEAEKCckk-ngfXdFqeD4MYQU2Q76T1PkWTHM8pHk3oW9VY19z6L1V-8lE0g9R
+    environment: SANDBOX
+    service:
+      impl: square
 resilience4j:
   ratelimiter:
     instances:

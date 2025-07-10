@@ -1,72 +1,217 @@
 package com.green.yp.payment.data.model;
 
-import com.green.yp.common.data.embedded.Immutable;
-import com.green.yp.payment.data.enumeration.*;
+import com.green.yp.common.data.embedded.Mutable;
+import com.green.yp.payment.data.converter.JsonCardDetailsConvertor;
+import com.green.yp.payment.data.json.CardDetails;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
-import java.util.UUID;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.hibernate.annotations.ColumnDefault;
 
+@Getter
+@Setter
 @Entity
-@Data
-@EqualsAndHashCode(callSuper = true)
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Table(name = "producer_payment_transaction", schema = "greenyp")
-public class PaymentTransaction extends Immutable {
+@Table(name = "payment_transaction", schema = "greenyp")
+public class PaymentTransaction extends Mutable {
 
-  @NotNull
-  @NonNull
-  @Column(name = "producer_id", nullable = false, updatable = false)
-  private UUID producerId;
+  @Size(max = 255)
+  @Column(name = "payment_ref", nullable = false)
+  private String paymentRef;
 
-  @NotNull
-  @NonNull
-  @Column(name = "payment_method_id", nullable = false, updatable = false)
-  private UUID paymentMethodId;
+  @Size(max = 50)
+  @Column(name = "location_ref", length = 50)
+  private String locationRef;
 
-  @NotNull
-  @NonNull
-  @Column(name = "producer_invoice_id", nullable = false, updatable = false)
-  private UUID invoiceId;
+  @Size(max = 50)
+  @Column(name = "order_ref", length = 50)
+  private String orderRef;
 
-  @NotNull
-  @NonNull
-  @Column(name = "payment_type", nullable = false, updatable = false)
-  @Enumerated(EnumType.STRING)
-  private ProducerPaymentType paymentType;
+  @Size(max = 50)
+  @Column(name = "customer_ref", length = 50)
+  private String customerRef;
 
-  @NotNull
-  @NonNull
-  @Column(name = "amount", nullable = false, updatable = false)
+  @Size(max = 10)
+  @Column(name = "receipt_number", length = 10)
+  private String receiptNumber;
+
+  @Column(name = "ip_address")
+  private String ipAddress;
+
+  @Size(max = 50)
+  @Column(name = "status", length = 50)
+  private String status;
+
+  @Column(name="error_message")
+  private String errorMessage;
+
+  @Column(name="error_code")
+  private Integer errorCode;
+
+  @Size(max = 50)
+  @Column(name = "source_type", length = 50)
+  private String sourceType;
+
+  @Column(name = "amount", precision = 12, scale = 2)
   private BigDecimal amount;
 
-  @Column(name = "status")
-  @Enumerated(EnumType.STRING)
-  private PaymentTransactionStatus status;
+  @Column(name = "app_fee_amount", precision = 12, scale = 2)
+  private BigDecimal appFeeAmount;
 
-  @Column(name = "reference_number", updatable = false)
-  private String acquirerReferenceNumber;
+  @Column(name = "approved_amount", precision = 12, scale = 2)
+  private BigDecimal approvedAmount;
 
-  @Convert(converter = AvsErrorResponseCode.AvsErrorResponseCodeConverter.class)
-  @Column(name = "avs_error_code", length = 1, updatable = false)
-  private AvsErrorResponseCode avsErrorResponseCode;
+  @Column(name = "processing_fee", precision = 12, scale = 2)
+  private BigDecimal processingFee;
 
-  @Convert(converter = AvsResponseCode.AvsResponseCodeConverter.class)
-  @Column(name = "avs_postal_response_code", length = 1, updatable = false)
-  private AvsResponseCode avsPostalCodeResponseCode;
+  @Column(name = "refund_amount", precision = 12, scale = 2)
+  private BigDecimal refundAmount;
 
-  @Convert(converter = AvsResponseCode.AvsResponseCodeConverter.class)
-  @Column(name = "avs_street_addr_response_code", length = 1, updatable = false)
-  private AvsResponseCode avsStreetAddressResponseCode;
+  @Column(name = "total_amount", precision = 12, scale = 2)
+  private BigDecimal totalAmount;
 
-  @Convert(converter = CvvResponseCode.CvvResponseCodeConverter.class)
-  @Column(name = "cvv_response_code", length = 1, updatable = false)
-  private CvvResponseCode cvvResponseCode;
+  @Size(max = 5)
+  @ColumnDefault("'USD'")
+  @Column(name = "currency_code", length = 5)
+  private String currencyCode;
 
-  @Column private String responseCode;
+  @Size(max = 100)
+  @NotNull
+  @Column(name = "first_name", nullable = false, length = 100)
+  private String firstName;
 
-  @Column private String responseText;
+  @Size(max = 100)
+  @NotNull
+  @Column(name = "last_name", nullable = false, length = 100)
+  private String lastName;
+
+  @Size(max = 100)
+  @NotNull
+  @Column(name = "address", nullable = false, length = 100)
+  private String address;
+
+  @Size(max = 100)
+  @NotNull
+  @Column(name = "city", nullable = false, length = 100)
+  private String city;
+
+  @Size(max = 2)
+  @NotNull
+  @Column(name = "state", nullable = false, length = 2)
+  private String state;
+
+  @Size(max = 10)
+  @NotNull
+  @Column(name = "postal_code", nullable = false, length = 10)
+  private String postalCode;
+
+  @Size(max = 20)
+  @NotNull
+  @Column(name = "phone_number", nullable = false, length = 15)
+  private String phoneNumber;
+
+  @Size(max = 100)
+  @NotNull
+  @Column(name = "email_address", nullable = false, length = 100)
+  private String emailAddress;
+
+  @Lob
+  @Column(name = "statement_description_identifier")
+  private String statementDescriptionIdentifier;
+
+  @Size(max = 255)
+  @Column(name = "receipt_url")
+  private String receiptUrl;
+
+  @Size(max = 255)
+  @Column(name = "version_token")
+  private String versionToken;
+
+  @Column(name="error_body")
+  private String errorBody;
+
+  @Column(name = "payment_details")
+  @Convert(converter = JsonCardDetailsConvertor.class)
+  private CardDetails paymentDetails;
+
+  @NotNull
+  @Lob
+  @Column(name = "note", nullable = false)
+  private String note;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    PaymentTransaction that = (PaymentTransaction) o;
+
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(paymentRef, that.paymentRef)
+        .append(locationRef, that.locationRef)
+        .append(orderRef, that.orderRef)
+        .append(customerRef, that.customerRef)
+        .append(receiptNumber, that.receiptNumber)
+        .append(status, that.status)
+        .append(sourceType, that.sourceType)
+        .append(amount, that.amount)
+        .append(appFeeAmount, that.appFeeAmount)
+        .append(approvedAmount, that.approvedAmount)
+        .append(processingFee, that.processingFee)
+        .append(refundAmount, that.refundAmount)
+        .append(totalAmount, that.totalAmount)
+        .append(currencyCode, that.currencyCode)
+        .append(firstName, that.firstName)
+        .append(lastName, that.lastName)
+        .append(address, that.address)
+        .append(city, that.city)
+        .append(state, that.state)
+        .append(postalCode, that.postalCode)
+        .append(phoneNumber, that.phoneNumber)
+        .append(emailAddress, that.emailAddress)
+        .append(statementDescriptionIdentifier, that.statementDescriptionIdentifier)
+        .append(receiptUrl, that.receiptUrl)
+        .append(versionToken, that.versionToken)
+        .append(paymentDetails, that.paymentDetails)
+        .isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(paymentRef)
+        .append(locationRef)
+        .append(orderRef)
+        .append(customerRef)
+        .append(receiptNumber)
+        .append(status)
+        .append(sourceType)
+        .append(amount)
+        .append(appFeeAmount)
+        .append(approvedAmount)
+        .append(processingFee)
+        .append(refundAmount)
+        .append(totalAmount)
+        .append(currencyCode)
+        .append(firstName)
+        .append(lastName)
+        .append(address)
+        .append(city)
+        .append(state)
+        .append(postalCode)
+        .append(phoneNumber)
+        .append(emailAddress)
+        .append(statementDescriptionIdentifier)
+        .append(receiptUrl)
+        .append(versionToken)
+        .append(paymentDetails)
+        .toHashCode();
+  }
 }

@@ -9,15 +9,17 @@ import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Table(name = "producer_payment_method", schema = "greenyp")
-public class PaymentMethod extends Mutable {
+public class ProducerPaymentMethod extends Mutable {
 
   @Column(name = "active", nullable = false)
   @Convert(converter = BooleanConverter.class)
@@ -78,4 +80,50 @@ public class PaymentMethod extends Mutable {
   @Column(name = "payor_postal_code", nullable = false)
   @Convert(converter = PaymentCryptoConverter.class)
   private String payorPostalCode;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    ProducerPaymentMethod that = (ProducerPaymentMethod) o;
+
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(active, that.active)
+        .append(captureMethod, that.captureMethod)
+        .append(cancelDate, that.cancelDate)
+        .append(producerId, that.producerId)
+        .append(paymentType, that.paymentType)
+        .append(panLastFour, that.panLastFour)
+        .append(paymentMethod, that.paymentMethod)
+        .append(payorName, that.payorName)
+        .append(payorAddress1, that.payorAddress1)
+        .append(payorAddress2, that.payorAddress2)
+        .append(payorCity, that.payorCity)
+        .append(payorState, that.payorState)
+        .append(payorPostalCode, that.payorPostalCode)
+        .isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(active)
+        .append(captureMethod)
+        .append(cancelDate)
+        .append(producerId)
+        .append(paymentType)
+        .append(panLastFour)
+        .append(paymentMethod)
+        .append(payorName)
+        .append(payorAddress1)
+        .append(payorAddress2)
+        .append(payorCity)
+        .append(payorState)
+        .append(payorPostalCode)
+        .toHashCode();
+  }
 }

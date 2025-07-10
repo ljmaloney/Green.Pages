@@ -16,49 +16,59 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-@Tag( name="ClassifiedGeocodeService",
-        description = "Geocoding service supporting rate-limiting and fallback when rate limit exceeded")
+@Tag(
+    name = "ClassifiedGeocodeService",
+    description =
+        "Geocoding service supporting rate-limiting and fallback when rate limit exceeded")
 public class ClassifiedGeocodeService {
 
-    private final LiveGeocodeService liveGecodeService;
-    private final GeocodingService defaultGeocodeService;
-    private final RateLimiter rateLimiter;
-    private final CircuitBreaker circuitBreaker;
+  private final LiveGeocodeService liveGecodeService;
+  private final GeocodingService defaultGeocodeService;
+  private final RateLimiter rateLimiter;
+  private final CircuitBreaker circuitBreaker;
 
-    public ClassifiedGeocodeService(Optional<LiveGeocodeService> liveService,
-                                  @Qualifier("defaultGeocodeServiceImpl") GeocodingService fallbackService,
-                                  @Qualifier("geocodeApiRateLimiter") RateLimiter rateLimiter,
-                                  @Qualifier("geocodeApiCircuitBreaker") CircuitBreaker circuitBreaker) {
-        this.liveGecodeService = liveService.orElse(null);  // only available if one is enabled
-        this.defaultGeocodeService = fallbackService;
-        this.rateLimiter = rateLimiter;
-        this.circuitBreaker = circuitBreaker;
+  public ClassifiedGeocodeService(
+      Optional<LiveGeocodeService> liveService,
+      @Qualifier("defaultGeocodeServiceImpl") GeocodingService fallbackService,
+      @Qualifier("geocodeApiRateLimiter") RateLimiter rateLimiter,
+      @Qualifier("geocodeApiCircuitBreaker") CircuitBreaker circuitBreaker) {
+    this.liveGecodeService = liveService.orElse(null); // only available if one is enabled
+    this.defaultGeocodeService = fallbackService;
+    this.rateLimiter = rateLimiter;
+    this.circuitBreaker = circuitBreaker;
+  }
+
+  public GeocodeLocation geocodeLocation(Classified classified, String streetAddress) {
+    log.info("Geocoding location for classified ad {}", classified.getId());
+    if (liveGecodeService == null) {
+      return defaultGeocodeService.getCoordinates(
+          streetAddress, classified.getCity(), classified.getState(), classified.getPostalCode());
     }
 
-    public GeocodeLocation geocodeLocation(Classified classified, String streetAddress) {
-        log.info("Geocoding location for classified ad {}", classified.getId());
-        if (liveGecodeService == null) {
-            return defaultGeocodeService.getCoordinates(streetAddress,
-                    classified.getCity(),
-                    classified.getState(),
-                    classified.getPostalCode());
-        }
-
-        Supplier<GeocodeLocation> decorated = CircuitBreaker.decorateSupplier(circuitBreaker,
-                RateLimiter.decorateSupplier( rateLimiter,
-                        () -> liveGecodeService.getCoordinates(streetAddress,
-                                classified.getCity(),
-                                classified.getState(),
-                                classified.getPostalCode())));
-        try{
-            return decorated.get();
-        } catch (CallNotPermittedException cnpe){
-            log.warn("CircuitBreaker or Rate Limimter tripped, falling back to postal code mapping from db : {}", cnpe.toString());
-            return defaultGeocodeService.getCoordinates(streetAddress, classified.getCity(), classified.getState(), classified.getPostalCode());
-        } catch (Exception e){
-            log.error("Unexpected exception {}, falling back to postal code mapping from db ",  e.toString());
-            return defaultGeocodeService.getCoordinates(streetAddress, classified.getCity(), classified.getState(), classified.getPostalCode());
-        }
+    Supplier<GeocodeLocation> decorated =
+        CircuitBreaker.decorateSupplier(
+            circuitBreaker,
+            RateLimiter.decorateSupplier(
+                rateLimiter,
+                () ->
+                    liveGecodeService.getCoordinates(
+                        streetAddress,
+                        classified.getCity(),
+                        classified.getState(),
+                        classified.getPostalCode())));
+    try {
+      return decorated.get();
+    } catch (CallNotPermittedException cnpe) {
+      log.warn(
+          "CircuitBreaker or Rate Limimter tripped, falling back to postal code mapping from db : {}",
+          cnpe.toString());
+      return defaultGeocodeService.getCoordinates(
+          streetAddress, classified.getCity(), classified.getState(), classified.getPostalCode());
+    } catch (Exception e) {
+      log.error(
+          "Unexpected exception {}, falling back to postal code mapping from db ", e.toString());
+      return defaultGeocodeService.getCoordinates(
+          streetAddress, classified.getCity(), classified.getState(), classified.getPostalCode());
     }
+  }
 }
-

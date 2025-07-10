@@ -1,3 +1,12 @@
 package com.green.yp.api.apitype.classified;
 
-public record ClassifiedPaymentResponse() {}
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
+import java.util.UUID;
+
+public record ClassifiedPaymentResponse(UUID classifiedId,
+                                     @Size(max = 200) @NotNull String classifiedTitle,
+                                     String paymentStatus,
+                                     String paymentRef, String orderRef, String receiptNumber) {
+}

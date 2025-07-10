@@ -1,64 +1,78 @@
 package com.green.yp.payment.service;
 
-import com.green.yp.api.apitype.invoice.InvoiceResponse;
-import com.green.yp.api.apitype.payment.PaymentMethodResponse;
-import com.green.yp.payment.data.enumeration.*;
+import com.green.yp.api.apitype.payment.PaymentRequest;
+import com.green.yp.api.apitype.payment.PaymentResponse;
+import com.green.yp.api.apitype.payment.PaymentTransactionResponse;
+import com.green.yp.exception.ErrorCodeType;
+import com.green.yp.exception.SystemException;
 import com.green.yp.payment.data.model.PaymentTransaction;
 import com.green.yp.payment.data.repository.PaymentTransactionRepository;
-import com.green.yp.payment.integration.PaymentIntegrationResponse;
-import java.util.Optional;
+import com.green.yp.payment.mapper.PaymentTransactionMapper;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-@Service
 @Slf4j
+@Service
 public class PaymentTransactionService {
+    private final PaymentTransactionRepository repository;
+    private final PaymentTransactionMapper mapper;
 
-  private final PaymentTransactionRepository paymentTransactionRepository;
+    public PaymentTransactionService(PaymentTransactionRepository repository,
+                                     PaymentTransactionMapper mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
+    }
 
-  public PaymentTransactionService(PaymentTransactionRepository paymentTransactionRepository) {
-    this.paymentTransactionRepository = paymentTransactionRepository;
-  }
 
-  public PaymentTransaction createTransaction(
-      InvoiceResponse invoiceResponse,
-      PaymentMethodResponse paymentMethod,
-      ProducerPaymentType paymentType,
-      PaymentIntegrationResponse response) {
+    @Transactional
+    public PaymentTransaction createPaymentRecord(PaymentRequest paymentRequest) {
+        log.info("creating new payment record for token");
+        var  transaction = mapper.toEntity(paymentRequest);
+        return repository.save(transaction);
+    }
 
-    PaymentTransaction transaction =
-        PaymentTransaction.builder()
-            .paymentMethodId(paymentMethod.paymentMethodId())
-            .producerId(invoiceResponse.producerId())
-            .invoiceId(invoiceResponse.invoiceId())
-            .amount(invoiceResponse.invoiceTotal())
-            .paymentType(paymentType)
-            .status(PaymentTransactionStatus.SUCCESS)
-            .acquirerReferenceNumber(response.acquirerReferenceNumber().toString())
-            .avsErrorResponseCode(
-                AvsErrorResponseCode.fromErrorCode(response.avsErrorResponseCode()))
-            .avsPostalCodeResponseCode(
-                AvsResponseCode.fromResponseCode(response.avsPostalCodeResponseCode()))
-            .avsStreetAddressResponseCode(
-                AvsResponseCode.fromResponseCode(response.avsStreetAddressResponseCode()))
-            .cvvResponseCode(CvvResponseCode.fromResponseCode(response.cvvResponseCode()))
-            .responseCode(response.responseCode())
-            .responseText(response.responseText())
-            .build();
+    @Transactional
+    public PaymentTransactionResponse updatePayment(UUID transactionId, PaymentResponse cardResponse) {
+        log.info("updating payment record {} for completion with response", transactionId);
 
-    PaymentTransaction savedTransaction = paymentTransactionRepository.saveAndFlush(transaction);
+        var  transaction = repository.findById(transactionId).orElseThrow(() -> {
+            log.error("transaction not found for {}", transactionId);
+            return new SystemException("Missing payment transaction record",
+                    HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodeType.SYSTEM_ERROR);
+        });
 
-    return savedTransaction;
-  }
+         transaction.setPaymentRef(cardResponse.paymentRef());
+         transaction.setCustomerRef(cardResponse.customerRef());
+         transaction.setLocationRef(cardResponse.locationRef());
+         transaction.setStatus(cardResponse.status());
+         transaction.setSourceType(cardResponse.sourceType());
+         transaction.setReceiptUrl(cardResponse.receiptUrl());
+         transaction.setReceiptNumber(cardResponse.receiptNumber());
+         transaction.setStatementDescriptionIdentifier(cardResponse.descriptionId());
+         transaction.setCurrencyCode("USD");
+         transaction.setOrderRef(cardResponse.orderRef());
+         transaction.setPaymentDetails(cardResponse.cardDetails());
 
-  public Optional<PaymentTransaction> findTransaction(
-      UUID invoiceId,
-      ProducerPaymentType paymentType,
-      PaymentTransactionStatus paymentTransactionStatus) {
-    Optional<PaymentTransaction> existingTransaction =
-        paymentTransactionRepository.findTransaction(
-            invoiceId, paymentType, PaymentTransactionStatus.SUCCESS);
-    return existingTransaction;
-  }
+        return mapper.fromEntity(repository.save(transaction));
+    }
+
+    public PaymentTransactionResponse updatePaymentError(UUID transactionId, String errorMessage, int errorCode, String errorBody) {
+        log.info("updating payment record {} for completion with response", transactionId);
+
+        var  transaction = repository.findById(transactionId).orElseThrow(() -> {
+            log.error("transaction not found for {}", transactionId);
+            return new SystemException("Missing payment transaction record",
+                    HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodeType.SYSTEM_ERROR);
+        });
+
+        transaction.setStatus("PAYMENT_ERROR");
+        transaction.setErrorCode(errorCode);
+        transaction.setErrorMessage(errorMessage);
+        transaction.setErrorBody(errorBody);
+
+        return mapper.fromEntity(repository.save(transaction));
+    }
 }

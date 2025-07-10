@@ -15,7 +15,7 @@
 <table role="presentation" style="width: 100%; background-color: #f9fafb; margin: 0; padding: 40px 0;">
     <tr>
         <td align="center">
-            <table role="presentation" style="width: 100%; max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); overflow: hidden;">
+            <table role="presentation" style="width: 100%; max-width: 800px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); overflow: hidden;">
                 <!-- Header -->
                 <tr>
                     <td style="background-color: #ffffff; padding: 32px 40px 24px 40px; border-bottom: 1px solid #e5e7eb;">
@@ -43,31 +43,46 @@
                 <!-- Main Content -->
                 <tr>
                     <td style="padding: 40px;">
-                        <p>
+                        <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
                             Dear ${customer.firstName} ${customer.lastName},
                         </p>
-                        <p>
+                        <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
                             Thank you for placing your classified ad
                             <span style="text-decoration-style: double; text-decoration: #15803d">${classifiedTitle}</span> with us.
                             <br/>
                             The direct link to the classified ad is
                             <a href="${link}" target="_blank">${link}</a>.
                         </p>
-                        <table style="width: 80%;">
+                        <table style="width: 95%; font-size: 14px; color: #6b7280; line-height: 1.4;">
                             <tr>
-                                <td style="text-align: right; width: 20%">Classified Ad Package :</td>
+                                <td style="text-align: right; width: 20%">Ad Package :</td>
                                 <td style="text-align: left">${adTypeName}</td>
                             </tr>
                             <tr>
-                                <td style="text-align: right; width: 20%">Classified Category :</td>
-                                <td style="text-align: left">${category.name}</td>
+                                <td style="text-align: right; width: 20%">Category :</td>
+                                <td style="text-align: left">${categoryName}</td>
                             </tr>
                             <tr>
                                 <td style="text-align: right; width: 20%">Amount Charged :</td>
                                 <td style="text-align: left">${paymentAmount}</td>
                             </tr>
+                            <tr>
+                                <td colspan="2"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">Please note the following reference numbers for this transaction</td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; width: 20%">Classified Ad ID :</td>
+                                <td style="text-align: left">${classifiedId}</td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; width: 20%">Transaction Ref :</td>
+                                <td style="text-align: left">${transactionRef}</td>
+                            </tr>
                         </table>
-                        <p>
+                        <br/><br/>
+                        <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
                             The classified ad was placed from ip address ${ipAddress} at ${timestamp}.
                         </p>
                     </td>

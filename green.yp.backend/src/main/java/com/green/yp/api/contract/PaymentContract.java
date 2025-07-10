@@ -1,24 +1,30 @@
 package com.green.yp.api.contract;
 
-import com.green.yp.api.apitype.payment.ApplyPaymentMethodRequest;
-import com.green.yp.api.apitype.payment.ApplyPaymentRequest;
-import com.green.yp.api.apitype.payment.PaymentResponse;
+import com.green.yp.api.apitype.payment.*;
 import com.green.yp.payment.data.enumeration.ProducerPaymentType;
-import com.green.yp.payment.service.PaymentMethodService;
 import com.green.yp.payment.service.PaymentOrchestrationService;
+import com.green.yp.payment.service.ProducerPaymentMethodService;
+import com.green.yp.payment.service.ProducerPaymentOrchestrationService;
+
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PaymentContract {
 
-  private final PaymentOrchestrationService paymentService;
+  private final PaymentOrchestrationService transactionService;
 
-  private final PaymentMethodService methodService;
+  private final ProducerPaymentOrchestrationService paymentService;
+
+  private final ProducerPaymentMethodService methodService;
 
   public PaymentContract(
-      PaymentOrchestrationService paymentService, PaymentMethodService methodService) {
+          ProducerPaymentOrchestrationService paymentService,
+          PaymentOrchestrationService transactionService,
+          ProducerPaymentMethodService methodService) {
     this.paymentService = paymentService;
+    this.transactionService = transactionService;
     this.methodService = methodService;
   }
 
@@ -26,7 +32,7 @@ public class PaymentContract {
     methodService.cancelBilling(accountId, userId, ipAddress);
   }
 
-  public PaymentResponse applyPayment(
+  public ProducerPaymentResponse applyPayment(
       ApplyPaymentMethodRequest paymentRequest,
       UUID invoiceId,
       ProducerPaymentType paymentType,
@@ -34,8 +40,13 @@ public class PaymentContract {
     return paymentService.applyPayment(paymentRequest, invoiceId, paymentType, requestIP);
   }
 
-  public PaymentResponse applyPayment(
+  public ProducerPaymentResponse applyPayment(
       ApplyPaymentRequest paymentRequest, String userId, String requestIP) {
     return paymentService.applyPayment(paymentRequest, userId, requestIP);
   }
+
+    public PaymentTransactionResponse applyPayment(PaymentRequest paymentRequest, Optional<String> customerRef) {
+      return transactionService.applyPayment(paymentRequest, customerRef);
+    }
+
 }
