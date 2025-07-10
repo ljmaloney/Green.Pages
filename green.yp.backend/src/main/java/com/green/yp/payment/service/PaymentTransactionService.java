@@ -58,4 +58,21 @@ public class PaymentTransactionService {
 
         return mapper.fromEntity(repository.save(transaction));
     }
+
+    public PaymentTransactionResponse updatePaymentError(UUID transactionId, String errorMessage, int errorCode, String errorBody) {
+        log.info("updating payment record {} for completion with response", transactionId);
+
+        var  transaction = repository.findById(transactionId).orElseThrow(() -> {
+            log.error("transaction not found for {}", transactionId);
+            return new SystemException("Missing payment transaction record",
+                    HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodeType.SYSTEM_ERROR);
+        });
+
+        transaction.setStatus("PAYMENT_ERROR");
+        transaction.setErrorCode(errorCode);
+        transaction.setErrorMessage(errorMessage);
+        transaction.setErrorBody(errorBody);
+
+        return mapper.fromEntity(repository.save(transaction));
+    }
 }

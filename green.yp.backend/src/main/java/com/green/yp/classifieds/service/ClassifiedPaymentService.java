@@ -93,7 +93,7 @@ public class ClassifiedPaymentService {
     var token = TokenUtils.generateCode(10);
     classified.classified().setIdToken(token);
 
-    var directLink = String.format("{}classifieds/%s?secret=%s", classifiedUrl, classified.classified().getId(), token);
+    var directLink = String.format("%s/classifieds/%s?secret=%s", classifiedUrl, classified.classified().getId(), token);
 
     // create invoice record for classified ad
 

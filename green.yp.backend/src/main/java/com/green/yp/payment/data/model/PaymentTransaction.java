@@ -46,6 +46,12 @@ public class PaymentTransaction extends Mutable {
   @Column(name = "status", length = 50)
   private String status;
 
+  @Column(name="error_message")
+  private String errorMessage;
+
+  @Column(name="error_code")
+  private Integer errorCode;
+
   @Size(max = 50)
   @Column(name = "source_type", length = 50)
   private String sourceType;
@@ -124,6 +130,9 @@ public class PaymentTransaction extends Mutable {
   @Size(max = 255)
   @Column(name = "version_token")
   private String versionToken;
+
+  @Column(name="error_body")
+  private String errorBody;
 
   @Column(name = "payment_details")
   @Convert(converter = JsonCardDetailsConvertor.class)

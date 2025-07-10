@@ -3,6 +3,8 @@ package com.green.yp.payment.service;
 import com.green.yp.api.apitype.payment.PaymentRequest;
 import com.green.yp.api.apitype.payment.PaymentTransactionResponse;
 import java.util.Optional;
+
+import com.squareup.square.core.SquareApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -23,10 +25,14 @@ public class PaymentOrchestrationService {
         //first create payment record
         var paymentResponse = transactionService.createPaymentRecord(paymentRequest);
 
-        //call payment partner API
-        var cardResponse = paymentService.processPayment(paymentRequest, paymentResponse.getId(), customerRef);
+        try{
+            //call payment partner API
+            var cardResponse = paymentService.processPayment(paymentRequest, paymentResponse.getId(), customerRef);
 
-        //update payment record
-        return transactionService.updatePayment(paymentResponse.getId(), cardResponse);
+            //update payment record
+            return transactionService.updatePayment(paymentResponse.getId(), cardResponse);
+        } catch (SquareApiException e){
+            return transactionService.updatePaymentError(paymentResponse.getId(), e.getMessage(), e.statusCode(), e.body().toString());
+        }
     }
 }
