@@ -9,7 +9,8 @@ public enum EmailTemplateType {
   ACCOUNT_CANCELLATION(
       "green.yp.account.cancel", "email/base-email.ftl", "Account Cancellation"),
   CLASSIFIED_CONFIRMATION("","email/classified-ad-confirmation.ftl", "Classified Ad Confirmation"),
-  CLASSIFIED_AUTH_TOKEN("green.yp.classified.token", "email/classified-token.ftl", "Classified Authentication Token");
+  CLASSIFIED_AUTH_TOKEN("green.yp.classified.token", "email/classified-token.ftl", "Classified Authentication Token"),
+  CLASSIFIED_EMAIL_VALIDATION("green.yp.classified.token","email/classified-token.ftl" , "GreenMarket - Classified Ad Email Validation");
 
   private final String templateName;
   private final String templateFileName;
