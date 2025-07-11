@@ -12,11 +12,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -50,7 +48,7 @@ public class ClassifiedController {
 
   @Operation(summary = "Retrieves classified and customer data together")
   @GetMapping(path="{classifiedId}/customer")
-  public ResponseApi<ClassifiedAdCustomerResponse> findClassifiedAndCustomer(@PathVariable("classifiedId") UUID classifiedId) throws NoSuchAlgorithmException {
+  public ResponseApi<ClassifiedAdCustomerResponse> findClassifiedAndCustomer(@PathVariable("classifiedId") UUID classifiedId) {
     return new ResponseApi<>(service.findClassifiedAndCustomer(classifiedId), null);
   }
 

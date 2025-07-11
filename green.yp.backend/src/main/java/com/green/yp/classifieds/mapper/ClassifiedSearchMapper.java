@@ -2,9 +2,8 @@ package com.green.yp.classifieds.mapper;
 
 import com.green.yp.api.apitype.classified.ClassifiedSearchResponse;
 import com.green.yp.classifieds.data.model.*;
-import org.mapstruct.*;
-
 import java.util.Optional;
+import org.mapstruct.*;
 
 @Mapper(
         componentModel = "spring",

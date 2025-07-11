@@ -4,11 +4,9 @@ import com.green.yp.classifieds.data.model.Classified;
 import com.green.yp.classifieds.data.model.ClassifiedCustomerProjection;
 import com.green.yp.classifieds.data.model.ClassifiedSearchProjection;
 import jakarta.validation.constraints.NotNull;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

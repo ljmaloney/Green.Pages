@@ -7,13 +7,12 @@ import com.green.yp.classifieds.data.model.ClassifiedSearchProjection;
 import com.green.yp.classifieds.data.repository.ClassifiedImageGalleryRepository;
 import com.green.yp.classifieds.data.repository.ClassifiedRepository;
 import com.green.yp.classifieds.mapper.ClassifiedSearchMapper;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Limit;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Limit;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service

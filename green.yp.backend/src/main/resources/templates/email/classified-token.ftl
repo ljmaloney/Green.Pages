@@ -44,7 +44,7 @@
                 <tr>
                     <td style="padding: 40px;">
                         <p>
-                            Dear ${customer.firstName} ${customer.lastName},
+                            Dear ${firstName} ${lastName},
                         </p>
                         <p>
                             You recently requested access to update or renew your classified ad on our website. Your authorization token is ${token}.
