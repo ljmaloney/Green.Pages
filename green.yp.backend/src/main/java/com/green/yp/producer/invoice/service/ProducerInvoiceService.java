@@ -10,7 +10,7 @@ import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.producer.invoice.data.model.ProducerInvoice;
 import com.green.yp.producer.invoice.data.model.ProducerInvoiceLineItem;
 import com.green.yp.producer.invoice.data.repository.ProducerInvoiceRepository;
-import com.green.yp.producer.invoice.mapper.InvoiceMapper;
+import com.green.yp.producer.invoice.mapper.ProducerInvoiceMapper;
 import com.green.yp.reference.data.enumeration.SubscriptionType;
 import java.sql.Date;
 import java.text.DecimalFormat;
@@ -30,21 +30,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
-public class InvoiceService {
+public class ProducerInvoiceService {
 
   private final ProducerContract producerContract;
   private final SubscriptionContract subscriptionContract;
-  private final InvoiceMapper invoiceMapper;
+  private final ProducerInvoiceMapper producerInvoiceMapper;
 
   private final ProducerInvoiceRepository invoiceRepository;
 
-  public InvoiceService(
+  public ProducerInvoiceService(
           ProducerContract producerContract,
-          InvoiceMapper invoiceMapper,
+          ProducerInvoiceMapper producerInvoiceMapper,
           ProducerInvoiceRepository producerInvoiceRepository,
           SubscriptionContract subscriptionContract) {
     this.producerContract = producerContract;
-    this.invoiceMapper = invoiceMapper;
+    this.producerInvoiceMapper = producerInvoiceMapper;
     this.invoiceRepository = producerInvoiceRepository;
     this.subscriptionContract = subscriptionContract;
   }
@@ -99,7 +99,7 @@ public class InvoiceService {
         producerId,
         savedProducerInvoice.getInvoiceTotal());
 
-    return invoiceMapper.fromEntity(invoiceRepository.findById(savedProducerInvoice.getId()).get());
+    return producerInvoiceMapper.fromEntity(invoiceRepository.findById(savedProducerInvoice.getId()).get());
   }
 
   private String getNextInvoiceNumber() {
@@ -122,7 +122,7 @@ public class InvoiceService {
                 () ->
                     new NotFoundException(
                         String.format("No unpaid invoices found for producer %s", producerId)));
-    return invoiceMapper.fromEntity(unpaidProducerInvoice);
+    return producerInvoiceMapper.fromEntity(unpaidProducerInvoice);
   }
 
   private void createLineItem(
@@ -155,7 +155,7 @@ public class InvoiceService {
   }
 
   public ProducerInvoiceResponse findInvoice(UUID invoiceId, String requestIp) {
-    return invoiceMapper.fromEntity(
+    return producerInvoiceMapper.fromEntity(
         invoiceRepository
             .findById(invoiceId)
             .orElseThrow(() -> new NotFoundException("Invoice", invoiceId)));
@@ -173,7 +173,7 @@ public class InvoiceService {
     producerInvoice.setPaidDate(OffsetDateTime.now());
     //        paymentTransactionId.ifPresent(() -> invoice.set);
 
-    return invoiceMapper.fromEntity(invoiceRepository.save(producerInvoice));
+    return producerInvoiceMapper.fromEntity(invoiceRepository.save(producerInvoice));
   }
 
   public List<ProducerInvoiceResponse> findInvoices(
@@ -193,7 +193,7 @@ public class InvoiceService {
                                     endDate.atTime(23, 59, 59).atOffset(ZoneOffset.UTC),
                                     createDateSort)
             .stream()
-            .map( invoice -> invoiceMapper.fromEntity(invoice, subscriptionContract.findSubscription(invoice.getSubscriptionId())))
+            .map( invoice -> producerInvoiceMapper.fromEntity(invoice, subscriptionContract.findSubscription(invoice.getSubscriptionId())))
             .toList();
     }
 }

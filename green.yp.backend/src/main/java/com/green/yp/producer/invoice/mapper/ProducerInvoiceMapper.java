@@ -16,7 +16,7 @@ import java.util.List;
     componentModel = "spring",
     unmappedTargetPolicy = ReportingPolicy.IGNORE,
     injectionStrategy = InjectionStrategy.CONSTRUCTOR)
-public interface InvoiceMapper {
+public interface ProducerInvoiceMapper {
 
   List<ProducerInvoiceResponse> fromEntityList(List<ProducerInvoice> producerInvoice);
 

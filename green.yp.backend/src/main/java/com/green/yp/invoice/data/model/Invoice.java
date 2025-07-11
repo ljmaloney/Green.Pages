@@ -35,7 +35,7 @@ public class Invoice extends Mutable {
     private InvoiceType invoiceType;
 
     @Column(name = "paid_date")
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private OffsetDateTime paidDate;
 
     @Size(max = 100)
