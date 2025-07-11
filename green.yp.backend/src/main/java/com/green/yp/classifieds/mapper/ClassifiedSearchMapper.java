@@ -15,6 +15,7 @@ public interface ClassifiedSearchMapper {
     @Mapping(target="categoryName", source = "category.name")
     @Mapping(target="classifiedId", source="classified.id")
     @Mapping(target = "description", source = "classified.description")
+    @Mapping(target = "obscureContactInfo", source = "adType.features.protectContact")
     @Mapping(target = "url", expression = "java(getImageUrl(image))")
     @Mapping(target = "imageName", expression = "java(getImageName(image))")
     ClassifiedSearchResponse fromProjection(Classified classified,
