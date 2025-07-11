@@ -1,6 +1,7 @@
 package com.green.yp.classifieds.service;
 
 import com.green.yp.api.apitype.classified.ClassifiedAdTypeResponse;
+import com.green.yp.api.apitype.classified.ClassifiedCategoryResponse;
 import com.green.yp.api.apitype.classified.ClassifiedPaymentRequest;
 import com.green.yp.api.apitype.classified.ClassifiedPaymentResponse;
 import com.green.yp.api.apitype.enumeration.EmailTemplateType;
@@ -123,6 +124,20 @@ public class ClassifiedPaymentService {
     createInvoice(classified, adType, paymentResponse);
 
     // send confirmation email
+    sendConfirmationEmail(requestIP, adType, classified, category, directLink, paymentResponse);
+
+    classified.classified().setActiveDate(LocalDate.now());
+    classified.classified().setLastActiveDate(LocalDate.now().plusMonths(1));
+    classifiedRepository.save(classified.classified());
+
+    return new ClassifiedPaymentResponse(classified.classified().getId(),
+            classified.classified().getTitle(),
+            paymentResponse.status(),
+            paymentResponse.paymentRef(),
+            paymentResponse.orderRef(), paymentResponse.receiptNumber());
+  }
+
+  private void sendConfirmationEmail(String requestIP, ClassifiedAdTypeResponse adType, ClassifiedCustomerProjection classified, ClassifiedCategoryResponse category, String directLink, PaymentTransactionResponse paymentResponse) {
     String subject = String.format("Greenyp - %s classified ad confirmation", adType.adTypeName());
     emailService.sendEmailAsync(EmailTemplateType.CLASSIFIED_CONFIRMATION,
             Collections.singletonList(classified.classified().getEmailAddress()),
@@ -137,16 +152,6 @@ public class ClassifiedPaymentService {
                     "classifiedId", classified.classified().getId().toString(),
                     "transactionRef", paymentResponse.paymentRef(),
                     "timestamp", classified.classified().getCreateDate()));
-
-    classified.classified().setActiveDate(LocalDate.now());
-    classified.classified().setLastActiveDate(LocalDate.now().plusMonths(1));
-    classifiedRepository.save(classified.classified());
-
-    return new ClassifiedPaymentResponse(classified.classified().getId(),
-            classified.classified().getTitle(),
-            paymentResponse.status(),
-            paymentResponse.paymentRef(),
-            paymentResponse.orderRef(), paymentResponse.receiptNumber());
   }
 
   private void createInvoice(ClassifiedCustomerProjection classified,
