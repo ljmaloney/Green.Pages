@@ -71,8 +71,7 @@ public class ClassifiedController {
     return new ResponseApi<>(service.updateClassified(classifiedRequest, RequestUtil.getRequestIP()), null);
   }
 
-  @Scheduled(fixedDelayString="${greenyp.classified.unpaid.clean.fixedDelay:15}",
-          fixedRateString = "${greenyp.classified.unpaid.clean.fixedRate:180}",
+  @Scheduled(fixedDelayString="${greenyp.classified.unpaid.clean.fixedDelay:180}",
           timeUnit = TimeUnit.MINUTES)
   public void cleanupUnpaidClassifieds(){
     log.info("Starting process to clean up unpaid classifieds");

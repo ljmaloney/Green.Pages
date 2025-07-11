@@ -219,11 +219,14 @@ public class ClassifiedService {
   }
 
     public void cleanUnpaid() {
-      List<Classified> classifieds = repository.findUnpaidAds(OffsetDateTime.now().minusMinutes(unpaidTimeoutMinutes.longValue()));
+      var deleteDate = OffsetDateTime.now().minusMinutes(unpaidTimeoutMinutes.longValue());
+      List<Classified> classifieds = repository.findUnpaidAds(deleteDate);
       classifieds.forEach(classified -> {
           imageService.deleteGalleryImages(classified.getId());
           repository.delete(classified);
           log.info("Deleted unpaid classified: {} - {}", classified.getId(), classified.getTitle());
       });
+      //delete customer records not associated with an ad that have email_validation_date null
+//        customerRepository.deleteInvalidCustomers(deleteDate);
     }
 }
