@@ -62,7 +62,7 @@ public class ClassifiedCustomer extends Mutable {
   private String emailAddress;
 
   @Size(max = 25)
-  @Column(name="email_validatiom_token", nullable = false, length = 25)
+  @Column(name="email_validation_token", nullable = false, length = 25)
   private String emailAddressValidationToken;
 
   @Temporal(TemporalType.TIMESTAMP)
