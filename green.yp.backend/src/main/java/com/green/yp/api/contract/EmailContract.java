@@ -4,7 +4,12 @@ import com.green.yp.api.apitype.contact.ContactMessageRequest;
 import com.green.yp.api.apitype.enumeration.EmailTemplateType;
 import com.green.yp.email.service.EmailService;
 import com.green.yp.producer.data.model.ProducerContact;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
 @Service
 public class EmailContract {
@@ -22,5 +27,10 @@ public class EmailContract {
 
   public void sendEmail(EmailTemplateType emailTemplateType, ContactMessageRequest contactMessageRequest, String emailAddress) {
     emailService.sendEmail(emailTemplateType, contactMessageRequest, emailAddress);
+  }
+
+  public void sendEmail(EmailTemplateType emailTemplateType, List<String> emailsAddress,
+                        String subject, @NotNull Supplier<Map<String, Object>> mappingSupplier){
+    emailService.sendEmailAsync(emailTemplateType, emailsAddress, subject, mappingSupplier);
   }
 }

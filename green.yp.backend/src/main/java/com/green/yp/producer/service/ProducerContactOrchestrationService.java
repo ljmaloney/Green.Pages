@@ -17,11 +17,12 @@ import com.green.yp.producer.data.model.ProducerContact;
 import com.green.yp.producer.data.model.ProducerLocation;
 import com.green.yp.producer.data.repository.ProducerContactRepository;
 import com.green.yp.producer.mapper.ProducerContactMapper;
+import com.green.yp.util.RequestUtil;
+import com.green.yp.util.TokenUtils;
 import jakarta.validation.constraints.NotNull;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -101,7 +102,7 @@ public class ProducerContactOrchestrationService {
       objectType = AuditObjectType.PRODUCER_CONTACT,
       actionType = AuditActionType.CREATE)
   public ProducerContactResponse createContact(
-      @NotNull @NonNull UUID locationId, ProducerContactRequest createContactRequest) throws Exception {
+      @NotNull @NonNull UUID locationId, ProducerContactRequest createContactRequest) {
     log.info(
         "Attempt to create contact {} for locationId {}",
         StringUtils.isNotBlank(createContactRequest.genericContactName())
@@ -155,7 +156,7 @@ public class ProducerContactOrchestrationService {
     contact.setProducerId(producerId);
     contact.setProducerLocationId(locationId);
     if (StringUtils.isNotBlank(contact.getEmailAddress())) {
-      contact.setEmailConfirmationToken(UUID.randomUUID().toString());
+      contact.setEmailConfirmationToken(TokenUtils.generateCode(8));
       contact.setEmailConfirmed(false);
     }
 
@@ -163,7 +164,21 @@ public class ProducerContactOrchestrationService {
 
     if (StringUtils.isNotBlank(contact.getEmailAddress())) {
       emailContract.sendEmail(
-          EmailTemplateType.EMAIL_CONFIRMATION, contact, contact.getEmailAddress());
+              EmailTemplateType.CONTACT_EMAIL_CONFIRMATION,
+              Collections.singletonList(contact.getEmailAddress()),
+              EmailTemplateType.CONTACT_EMAIL_CONFIRMATION.getSubjectFormat(),
+              () -> {
+                Map<String, Object> templateData = new HashMap<>();
+                templateData.put("lastName", createContactRequest.lastName());
+                templateData.put("firstName", createContactRequest.firstName());
+                templateData.put("title", "Subscriber Contact Created");
+                templateData.put("emailValidationToken", contact.getEmailConfirmationToken());
+                templateData.put("ipAddress", RequestUtil.getRequestIP());
+                templateData.put("timestamp", contact.getCreateDate());
+                return templateData;
+              });
+      emailContract.sendEmail(
+          EmailTemplateType.CONTACT_EMAIL_CONFIRMATION, contact, contact.getEmailAddress());
     }
 
     log.info(
