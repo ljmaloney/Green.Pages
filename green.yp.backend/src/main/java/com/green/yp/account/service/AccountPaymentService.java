@@ -1,7 +1,7 @@
 package com.green.yp.account.service;
 
 import com.green.yp.api.apitype.enumeration.EmailTemplateType;
-import com.green.yp.api.apitype.invoice.InvoiceResponse;
+import com.green.yp.api.apitype.invoice.ProducerInvoiceResponse;
 import com.green.yp.api.apitype.payment.ApiPaymentResponse;
 import com.green.yp.api.apitype.payment.ApplyPaymentMethodRequest;
 import com.green.yp.api.apitype.payment.ApplyPaymentRequest;
@@ -30,7 +30,7 @@ public class AccountPaymentService {
 
   private final EmailService emailService;
 
-  private final InvoiceContract invoiceContract;
+  private final ProducerInvoiceContract producerInvoiceContract;
 
   private final ProducerContract producerContract;
 
@@ -41,13 +41,13 @@ public class AccountPaymentService {
 
   public AccountPaymentService(
       EmailService emailService,
-      InvoiceContract invoiceContract,
+      ProducerInvoiceContract producerInvoiceContract,
       ProducerContract producerContract,
       PaymentContract paymentContract,
       ProducerContactContract contactContract,
       ProducerLocationContract locationContract) {
     this.emailService = emailService;
-    this.invoiceContract = invoiceContract;
+    this.producerInvoiceContract = producerInvoiceContract;
     this.producerContract = producerContract;
     this.paymentContract = paymentContract;
     this.contactContract = contactContract;
@@ -74,13 +74,13 @@ public class AccountPaymentService {
 
     // create invoice record for initial payment, as this is the first payment on a
     // new subscriber, no invoice is created until this point
-    InvoiceResponse invoiceResponse =
-        invoiceContract.createInvoice(paymentRequest.producerId(), requestIP);
+    ProducerInvoiceResponse producerInvoiceResponse =
+        producerInvoiceContract.createInvoice(paymentRequest.producerId(), requestIP);
 
     ProducerPaymentResponse producerPaymentResponse =
         paymentContract.applyPayment(
             paymentRequest,
-            invoiceResponse.invoiceId(),
+            producerInvoiceResponse.invoiceId(),
             ProducerPaymentType.INITIAL_PAYMENT,
             requestIP);
 
@@ -99,7 +99,7 @@ public class AccountPaymentService {
     producerResponse =
         producerContract.activateProducer(
             paymentRequest.producerId(),
-            invoiceResponse.createDate(),
+            producerInvoiceResponse.createDate(),
             producerPaymentResponse.createDate(),
             null,
             requestIP);
@@ -126,7 +126,7 @@ public class AccountPaymentService {
           "Existing payment method not provided or new payment method specified");
     }
 
-    invoiceContract.findInvoice(paymentRequest.invoiceId(), requestIP);
+    producerInvoiceContract.findInvoice(paymentRequest.invoiceId(), requestIP);
 
     ProducerPaymentResponse producerPaymentResponse =
         paymentContract.applyPayment(paymentRequest, userId, requestIP);

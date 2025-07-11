@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Builder
 @Table(name = "producer_invoice_lineitem", schema = "greenyp")
-public class InvoiceLineItem extends Immutable {
+public class ProducerInvoiceLineItem extends Immutable {
 
   @NotNull
   @NonNull
@@ -51,7 +51,7 @@ public class InvoiceLineItem extends Immutable {
 
   @ManyToOne
   @JoinColumn(name = "producer_invoice_id")
-  private Invoice invoice;
+  private ProducerInvoice producerInvoice;
 
   @Override
   public boolean equals(Object o) {
@@ -59,13 +59,13 @@ public class InvoiceLineItem extends Immutable {
 
     if (o == null || getClass() != o.getClass()) return false;
 
-    InvoiceLineItem that = (InvoiceLineItem) o;
+    ProducerInvoiceLineItem that = (ProducerInvoiceLineItem) o;
 
-    return new EqualsBuilder().appendSuper(super.equals(o)).append(lineItem, that.lineItem).append(producerId, that.producerId).append(subscriptionId, that.subscriptionId).append(producerInvoiceId, that.producerInvoiceId).append(description, that.description).append(amount, that.amount).append(invoice, that.invoice).isEquals();
+    return new EqualsBuilder().appendSuper(super.equals(o)).append(lineItem, that.lineItem).append(producerId, that.producerId).append(subscriptionId, that.subscriptionId).append(producerInvoiceId, that.producerInvoiceId).append(description, that.description).append(amount, that.amount).append(producerInvoice, that.producerInvoice).isEquals();
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(lineItem).append(producerId).append(subscriptionId).append(producerInvoiceId).append(description).append(amount).append(invoice).toHashCode();
+    return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(lineItem).append(producerId).append(subscriptionId).append(producerInvoiceId).append(description).append(amount).append(producerInvoice).toHashCode();
   }
 }

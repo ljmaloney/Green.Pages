@@ -14,6 +14,7 @@ import com.green.yp.api.apitype.producer.enumeration.ProducerDisplayContactType;
 import com.green.yp.api.contract.*;
 import com.green.yp.email.service.EmailService;
 import com.green.yp.exception.*;
+import com.green.yp.util.TokenUtils;
 import jakarta.validation.constraints.NotNull;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -94,7 +95,7 @@ public class AccountService {
     var credsOptional = producerContract.findCredentialByRef(externalUserRef, ipAddress);
     var producerId = credsOptional.orElseThrow(() -> {
       log.warn("No saved record mapping externalUserRef {} to producer/subscriber", externalUserRef);
-      throw new NotFoundException(String.format("No subscribtion found for user identified by %s", externalUserRef));
+      return new NotFoundException(String.format("No subscribtion found for user identified by %s", externalUserRef));
     }).producerId();
 
     return findAccount(producerId);
@@ -275,6 +276,7 @@ public class AccountService {
                     accountMapper.copyRequest(
                         request, adminContact.contactId(), locationResponse.locationId());
               }
+
               return contactContract.updatePrimaryContact(
                   request, producerResponse.producerId(), locationResponse.locationId(), ipAddress);
             })
@@ -346,6 +348,6 @@ public class AccountService {
   private List<String> getAdminEmails(UUID accountId) {
     List<ProducerContactResponse> contacts = contactContract.findAdminContacts(accountId);
 
-    return contacts.stream().map(contact -> contact.emailAddress()).toList();
+    return contacts.stream().map(ProducerContactResponse::emailAddress).toList();
   }
 }
