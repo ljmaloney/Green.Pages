@@ -7,9 +7,9 @@ import com.green.yp.api.contract.ProducerContract;
 import com.green.yp.api.contract.SubscriptionContract;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
-import com.green.yp.producer.invoice.data.model.Invoice;
-import com.green.yp.producer.invoice.data.model.InvoiceLineItem;
-import com.green.yp.producer.invoice.data.repository.InvoiceRepository;
+import com.green.yp.producer.invoice.data.model.ProducerInvoice;
+import com.green.yp.producer.invoice.data.model.ProducerInvoiceLineItem;
+import com.green.yp.producer.invoice.data.repository.ProducerInvoiceRepository;
 import com.green.yp.producer.invoice.mapper.InvoiceMapper;
 import com.green.yp.reference.data.enumeration.SubscriptionType;
 import java.sql.Date;
@@ -36,16 +36,16 @@ public class InvoiceService {
   private final SubscriptionContract subscriptionContract;
   private final InvoiceMapper invoiceMapper;
 
-  private final InvoiceRepository invoiceRepository;
+  private final ProducerInvoiceRepository invoiceRepository;
 
   public InvoiceService(
           ProducerContract producerContract,
           InvoiceMapper invoiceMapper,
-          InvoiceRepository invoiceRepository,
+          ProducerInvoiceRepository producerInvoiceRepository,
           SubscriptionContract subscriptionContract) {
     this.producerContract = producerContract;
     this.invoiceMapper = invoiceMapper;
-    this.invoiceRepository = invoiceRepository;
+    this.invoiceRepository = producerInvoiceRepository;
     this.subscriptionContract = subscriptionContract;
   }
 
@@ -71,8 +71,8 @@ public class InvoiceService {
                     new PreconditionFailedException(
                         "No primary subscription found for %s", producerId));
 
-    Invoice invoice =
-        Invoice.builder()
+    ProducerInvoice producerInvoice =
+        ProducerInvoice.builder()
             .producerId(producerId)
             .producerSubscriptionId(primarySubscription.producerSubscriptionId())
             .subscriptionId(primarySubscription.subscriptionId())
@@ -81,7 +81,7 @@ public class InvoiceService {
 
     int lineItemNumber = 1;
 
-    createLineItem(invoice, primarySubscription, lineItemNumber);
+    createLineItem(producerInvoice, primarySubscription, lineItemNumber);
 
     List<ProducerSubscriptionResponse> addOnSubscriptions =
         producerResponse.subscriptions().stream()
@@ -89,17 +89,17 @@ public class InvoiceService {
             .toList();
 
     addOnSubscriptions.stream()
-        .forEach(addOn -> createLineItem(invoice, addOn, invoice.getLineItems().size() + 1));
+        .forEach(addOn -> createLineItem(producerInvoice, addOn, producerInvoice.getLineItems().size() + 1));
 
-    final Invoice savedInvoice = invoiceRepository.saveAndFlush(invoice);
+    final ProducerInvoice savedProducerInvoice = invoiceRepository.saveAndFlush(producerInvoice);
 
     log.info(
         "Created new invoice {} for producerId {}, total amount: {}",
-        savedInvoice.getPrintedInvoiceId(),
+        savedProducerInvoice.getPrintedInvoiceId(),
         producerId,
-        savedInvoice.getInvoiceTotal());
+        savedProducerInvoice.getInvoiceTotal());
 
-    return invoiceMapper.fromEntity(invoiceRepository.findById(savedInvoice.getId()).get());
+    return invoiceMapper.fromEntity(invoiceRepository.findById(savedProducerInvoice.getId()).get());
   }
 
   private String getNextInvoiceNumber() {
@@ -114,7 +114,7 @@ public class InvoiceService {
   }
 
   public InvoiceResponse findUnpaidInvoice(UUID producerId, String requestIP) {
-    Invoice unpaidInvoice =
+    ProducerInvoice unpaidProducerInvoice =
         invoiceRepository
             .findUnpaidSubscriptionInvoice(
                 producerId, SubscriptionType.TOP_LEVEL, SubscriptionType.LINE_OF_BUSINESS)
@@ -122,20 +122,20 @@ public class InvoiceService {
                 () ->
                     new NotFoundException(
                         String.format("No unpaid invoices found for producer %s", producerId)));
-    return invoiceMapper.fromEntity(unpaidInvoice);
+    return invoiceMapper.fromEntity(unpaidProducerInvoice);
   }
 
   private void createLineItem(
-      Invoice invoice, ProducerSubscriptionResponse subscription, int lineItemNumber) {
-    invoice.addLineItem(
-        InvoiceLineItem.builder()
-            .producerId(invoice.getProducerId())
-            .producerInvoiceId(invoice.getId())
+          ProducerInvoice producerInvoice, ProducerSubscriptionResponse subscription, int lineItemNumber) {
+    producerInvoice.addLineItem(
+        ProducerInvoiceLineItem.builder()
+            .producerId(producerInvoice.getProducerId())
+            .producerInvoiceId(producerInvoice.getId())
             .subscriptionId(subscription.subscriptionId())
             .lineItem(lineItemNumber)
             .description(getLineItemDescription(subscription))
             .amount(subscription.subscriptionAmount())
-            .invoice(invoice)
+            .producerInvoice(producerInvoice)
             .build());
   }
 
@@ -165,15 +165,15 @@ public class InvoiceService {
       UUID invoiceId, Optional<UUID> paymentTransactionId, String requestIP) {
     log.info("Marking invoice {} as being paid from {}", invoiceId, requestIP);
 
-    final Invoice invoice =
+    final ProducerInvoice producerInvoice =
         invoiceRepository
             .findById(invoiceId)
             .orElseThrow(() -> new NotFoundException("Invoice", invoiceId));
 
-    invoice.setPaidDate(OffsetDateTime.now());
+    producerInvoice.setPaidDate(OffsetDateTime.now());
     //        paymentTransactionId.ifPresent(() -> invoice.set);
 
-    return invoiceMapper.fromEntity(invoiceRepository.save(invoice));
+    return invoiceMapper.fromEntity(invoiceRepository.save(producerInvoice));
   }
 
   public List<InvoiceResponse> findInvoices(
