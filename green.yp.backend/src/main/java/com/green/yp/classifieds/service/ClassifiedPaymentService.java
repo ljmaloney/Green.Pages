@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
 public class ClassifiedPaymentService {
   private final PaymentContract paymentContract;
   private final ClassifiedPaymentMapper paymentMapper;
-  private final ClassifiedRepository classifedRepository;
+  private final ClassifiedRepository classifiedRepository;
   private final ClassifiedAdTypeService adTypeService;
   private final ClassifiedCategoryService classifiedCategoryService;
   private final ClassifiedCustomerRepository customerRepository;
@@ -57,7 +57,7 @@ public class ClassifiedPaymentService {
     this.paymentMapper = paymentMapper;
     this.adTypeService = adTypeService;
     this.classifiedCategoryService = classifiedCategoryService;
-    this.classifedRepository = classifiedRepository;
+    this.classifiedRepository = classifiedRepository;
     this.emailService = emailService;
     this.customerRepository = customerRepository;
   }
@@ -66,7 +66,7 @@ public class ClassifiedPaymentService {
       @Valid ClassifiedPaymentRequest paymentRequest, String requestIP) {
 
     var classified =
-        classifedRepository
+        classifiedRepository
             .findClassifiedAndCustomer(paymentRequest.classifiedId())
             .orElseThrow(
                 () -> {
@@ -127,7 +127,7 @@ public class ClassifiedPaymentService {
 
     classified.classified().setActiveDate(LocalDate.now());
     classified.classified().setLastActiveDate(LocalDate.now().plusMonths(1));
-    classifedRepository.save(classified.classified());
+    classifiedRepository.save(classified.classified());
 
     return new ClassifiedPaymentResponse(classified.classified().getId(),
             classified.classified().getTitle(),

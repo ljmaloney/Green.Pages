@@ -66,12 +66,23 @@ public class ClassifiedImageService {
   }
 
   public void deleteGallaryImage(UUID classifiedId, String imageFilename, String requestIP) {
-    log.info("Deleting gallery image for classifiedId: {} - {}", classifiedId, requestIP);
+    log.info("Deleting gallery image {} for classifiedId: {} - {}",imageFilename, classifiedId, requestIP);
     classifedRepository
         .findById(classifiedId)
         .orElseThrow(() -> new NotFoundException("producer", classifiedId));
     imageFileService.deleteImage(classifiedId, basePath, imageFilename);
     imageGalleryRepository.deleteClassifiedImageGalleriesByClassifiedIdAndImageFilename(
         classifiedId, imageFilename);
+  }
+
+  public void deleteGalleryImages(UUID classifiedId) {
+    log.info("Deleting all gallery images for classifiedId: {}", classifiedId);
+    var images = imageGalleryRepository.findClassifiedImageGalleriesByClassifiedId(classifiedId);
+    images.forEach(
+        image -> {
+          imageFileService.deleteImage(classifiedId, basePath, image.getImageFilename());
+          imageGalleryRepository.deleteClassifiedImageGalleriesByClassifiedIdAndImageFilename(
+              classifiedId, image.getImageFilename());
+        });
   }
 }
