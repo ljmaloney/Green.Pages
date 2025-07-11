@@ -1,9 +1,9 @@
-package com.green.yp.invoice.mapper;
+package com.green.yp.producer.invoice.mapper;
 
 import com.green.yp.api.apitype.invoice.InvoiceLineItemResponse;
 import com.green.yp.api.apitype.invoice.InvoiceResponse;
-import com.green.yp.invoice.data.model.Invoice;
-import com.green.yp.invoice.data.model.InvoiceLineItem;
+import com.green.yp.producer.invoice.data.model.Invoice;
+import com.green.yp.producer.invoice.data.model.InvoiceLineItem;
 import com.green.yp.reference.dto.SubscriptionDto;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;

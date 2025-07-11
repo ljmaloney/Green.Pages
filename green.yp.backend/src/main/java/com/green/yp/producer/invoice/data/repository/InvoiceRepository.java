@@ -1,10 +1,9 @@
-package com.green.yp.invoice.data.repository;
+package com.green.yp.producer.invoice.data.repository;
 
-import com.green.yp.invoice.data.model.Invoice;
+import com.green.yp.producer.invoice.data.model.Invoice;
 import com.green.yp.reference.data.enumeration.SubscriptionType;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;

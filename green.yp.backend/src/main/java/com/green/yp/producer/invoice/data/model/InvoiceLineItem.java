@@ -1,4 +1,4 @@
-package com.green.yp.invoice.data.model;
+package com.green.yp.producer.invoice.data.model;
 
 import com.green.yp.common.data.embedded.Immutable;
 import jakarta.persistence.*;
@@ -6,10 +6,13 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.springframework.stereotype.Service;
 
 @Entity
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Service
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -49,4 +52,20 @@ public class InvoiceLineItem extends Immutable {
   @ManyToOne
   @JoinColumn(name = "producer_invoice_id")
   private Invoice invoice;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    InvoiceLineItem that = (InvoiceLineItem) o;
+
+    return new EqualsBuilder().appendSuper(super.equals(o)).append(lineItem, that.lineItem).append(producerId, that.producerId).append(subscriptionId, that.subscriptionId).append(producerInvoiceId, that.producerInvoiceId).append(description, that.description).append(amount, that.amount).append(invoice, that.invoice).isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(lineItem).append(producerId).append(subscriptionId).append(producerInvoiceId).append(description).append(amount).append(invoice).toHashCode();
+  }
 }
