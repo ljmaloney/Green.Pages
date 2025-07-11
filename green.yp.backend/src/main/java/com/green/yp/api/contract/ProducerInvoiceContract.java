@@ -8,10 +8,10 @@ import com.green.yp.producer.invoice.service.InvoiceService;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InvoiceContract {
+public class ProducerInvoiceContract {
   final InvoiceService invoiceService;
 
-  public InvoiceContract(InvoiceService invoiceService) {
+  public ProducerInvoiceContract(InvoiceService invoiceService) {
     this.invoiceService = invoiceService;
   }
 

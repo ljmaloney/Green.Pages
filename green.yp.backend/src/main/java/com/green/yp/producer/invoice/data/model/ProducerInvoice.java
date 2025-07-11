@@ -18,7 +18,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @AllArgsConstructor
 @Builder
 @Table(name = "producer_invoice", schema = "greenyp")
-public class Invoice extends Mutable {
+public class ProducerInvoice extends Mutable {
 
   @Column(name = "producer_id", updatable = false, nullable = false)
   private UUID producerId;
@@ -39,10 +39,10 @@ public class Invoice extends Mutable {
   @Column(name = "invoice_total")
   private BigDecimal invoiceTotal;
 
-  @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL)
-  private List<InvoiceLineItem> lineItems;
+  @OneToMany(mappedBy = "producerInvoice", cascade = CascadeType.ALL)
+  private List<ProducerInvoiceLineItem> lineItems;
 
-  public void addLineItem(InvoiceLineItem lineItem) {
+  public void addLineItem(ProducerInvoiceLineItem lineItem) {
     if (lineItems == null) {
       lineItems = new ArrayList<>();
     }
@@ -59,9 +59,9 @@ public class Invoice extends Mutable {
 
     if (o == null || getClass() != o.getClass()) return false;
 
-    Invoice invoice = (Invoice) o;
+    ProducerInvoice producerInvoice = (ProducerInvoice) o;
 
-    return new EqualsBuilder().appendSuper(super.equals(o)).append(producerId, invoice.producerId).append(subscriptionId, invoice.subscriptionId).append(producerSubscriptionId, invoice.producerSubscriptionId).append(paidDate, invoice.paidDate).append(printedInvoiceId, invoice.printedInvoiceId).append(invoiceTotal, invoice.invoiceTotal).append(lineItems, invoice.lineItems).isEquals();
+    return new EqualsBuilder().appendSuper(super.equals(o)).append(producerId, producerInvoice.producerId).append(subscriptionId, producerInvoice.subscriptionId).append(producerSubscriptionId, producerInvoice.producerSubscriptionId).append(paidDate, producerInvoice.paidDate).append(printedInvoiceId, producerInvoice.printedInvoiceId).append(invoiceTotal, producerInvoice.invoiceTotal).append(lineItems, producerInvoice.lineItems).isEquals();
   }
 
   @Override

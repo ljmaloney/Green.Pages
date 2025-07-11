@@ -1,6 +1,6 @@
 package com.green.yp.producer.invoice.data.repository;
 
-import com.green.yp.producer.invoice.data.model.Invoice;
+import com.green.yp.producer.invoice.data.model.ProducerInvoice;
 import com.green.yp.reference.data.enumeration.SubscriptionType;
 import jakarta.validation.constraints.NotNull;
 
@@ -14,19 +14,19 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface InvoiceRepository extends JpaRepository<Invoice, UUID> {
+public interface ProducerInvoiceRepository extends JpaRepository<ProducerInvoice, UUID> {
   @Query(
       """
-                        SELECT invoice
+                        SELECT producerInvoice
                         FROM
-                           Invoice invoice
-                           INNER JOIN Subscription sub ON sub.id = invoice.subscriptionId
+                           ProducerInvoice producerInvoice
+                           INNER JOIN Subscription sub ON sub.id = producerInvoice.subscriptionId
                         WHERE
-                            invoice.producerId=:producerId
+                            producerInvoice.producerId=:producerId
                             AND sub.subscriptionType IN (:types)
-                            AND invoice.paidDate IS NULL
+                            AND producerInvoice.paidDate IS NULL
                     """)
-  Optional<Invoice> findUnpaidSubscriptionInvoice(
+  Optional<ProducerInvoice> findUnpaidSubscriptionInvoice(
       @NotNull @NonNull @Param("producerId") UUID producerId,
       @NonNull @Param("types") SubscriptionType... types);
 
@@ -41,5 +41,5 @@ public interface InvoiceRepository extends JpaRepository<Invoice, UUID> {
   Integer getCountByDate(
       @Param("startDate") OffsetDateTime startDate, @Param("endDate") OffsetDateTime endDate);
 
-    List<Invoice> findByProducerIdAndCreateDateBetween(UUID producerId, OffsetDateTime startDate, OffsetDateTime endDate, Sort createDateSort);
+    List<ProducerInvoice> findByProducerIdAndCreateDateBetween(UUID producerId, OffsetDateTime startDate, OffsetDateTime endDate, Sort createDateSort);
 }

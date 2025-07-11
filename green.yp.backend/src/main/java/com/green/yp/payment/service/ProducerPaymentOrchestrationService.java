@@ -5,7 +5,7 @@ import com.green.yp.api.apitype.payment.ApplyPaymentMethodRequest;
 import com.green.yp.api.apitype.payment.ApplyPaymentRequest;
 import com.green.yp.api.apitype.payment.PaymentMethodResponse;
 import com.green.yp.api.apitype.payment.ProducerPaymentResponse;
-import com.green.yp.api.contract.InvoiceContract;
+import com.green.yp.api.contract.ProducerInvoiceContract;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.payment.data.enumeration.PaymentTransactionStatus;
 import com.green.yp.payment.data.enumeration.ProducerPaymentType;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ProducerPaymentOrchestrationService {
 
-  private final InvoiceContract invoiceContract;
+  private final ProducerInvoiceContract producerInvoiceContract;
 
   private final ProducerPaymentTransactionRepository producerPaymentTransactionRepository;
 
@@ -39,13 +39,13 @@ public class ProducerPaymentOrchestrationService {
   private final PaymentMapper paymentMapper;
 
   public ProducerPaymentOrchestrationService(
-      InvoiceContract invoiceContract,
+      ProducerInvoiceContract producerInvoiceContract,
       ProducerPaymentTransactionRepository producerPaymentTransactionRepository,
       ProducerPaymentMethodService producerPaymentMethodService,
       ProducerPaymentTransactionService transactionService,
       PaymentIntegrationInterface paymentIntegration,
       PaymentMapper paymentMapper) {
-    this.invoiceContract = invoiceContract;
+    this.producerInvoiceContract = producerInvoiceContract;
     this.producerPaymentTransactionRepository = producerPaymentTransactionRepository;
     this.producerPaymentMethodService = producerPaymentMethodService;
     this.transactionService = transactionService;
@@ -65,7 +65,7 @@ public class ProducerPaymentOrchestrationService {
             .or(
                 () -> {
                   InvoiceResponse invoiceResponse =
-                      invoiceContract.findInvoice(invoiceId, requestIP);
+                      producerInvoiceContract.findInvoice(invoiceId, requestIP);
                   PaymentMethodResponse paymentMethod =
                       producerPaymentMethodService.createPaymentMethod(
                           paymentMapper.toPaymentRequest(paymentRequest));
@@ -88,7 +88,7 @@ public class ProducerPaymentOrchestrationService {
             .or(
                 () -> {
                   InvoiceResponse invoiceResponse =
-                      invoiceContract.findInvoice(paymentRequest.invoiceId(), requestIP);
+                      producerInvoiceContract.findInvoice(paymentRequest.invoiceId(), requestIP);
                   PaymentMethodResponse paymentMethod = null;
                   if (paymentRequest.savedPaymentMethodId() != null) {
                     paymentMethod =
@@ -136,7 +136,7 @@ public class ProducerPaymentOrchestrationService {
 
     } else {
       InvoiceResponse paidInvoice =
-          invoiceContract.markInvoicePaid(invoiceResponse.invoiceId(), requestIP);
+          producerInvoiceContract.markInvoicePaid(invoiceResponse.invoiceId(), requestIP);
       // invoiceContract.sendPaidInvoiceEmail(paidInvoice.invoiceId(), paymentMethod.)
     }
     return transaction;
