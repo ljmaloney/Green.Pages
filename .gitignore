@@ -40,3 +40,6 @@ out
 pnpmfile.js
 .npmrc
 src/main/frontend/generated
+
+application-local.yml
+/green.yp.backend/src/main/resources/application-local.yml

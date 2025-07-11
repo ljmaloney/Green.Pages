@@ -8,7 +8,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.OffsetDateTime;
 import java.util.UUID;
-
 import lombok.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -32,7 +31,7 @@ public class ClassifiedToken extends Mutable {
 
   @Size(max = 255)
   @NotNull
-  @Column(name = "token_value", nullable = false, length = 255)
+  @Column(name = "token_value", nullable = false)
   private String tokenValue;
 
   @Convert(converter = BooleanConverter.class)

@@ -18,10 +18,7 @@ import com.green.yp.util.TokenUtils;
 import jakarta.validation.Valid;
 import java.security.NoSuchAlgorithmException;
 import java.time.OffsetDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -29,6 +26,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class ClassifiedService {
+
+    private static final String CLASSIFIED = "Classified";
 
   @Value("${green.yp.classified.token.timeout:15}")
   private Integer tokenTimeoutMinutes;
@@ -68,7 +67,7 @@ public class ClassifiedService {
         .orElseThrow(
             () -> {
               log.warn("No classified ad and customer found for id {}", classifiedId);
-              return new NotFoundException("Classified", classifiedId);
+              return new NotFoundException(CLASSIFIED, classifiedId);
             });
   }
 
@@ -79,19 +78,28 @@ public class ClassifiedService {
         .orElseThrow(
             () -> {
               log.warn("No classified found for id {}", classifiedId);
-              return new NotFoundException("Classified", classifiedId);
+              return new NotFoundException(CLASSIFIED, classifiedId);
             });
   }
 
   public ClassifiedResponse createClassified(@Valid ClassifiedRequest request, String requestIP) {
-    log.info("Creating new classified ad {} in {} for {} from {}", request.title(), request.categoryId(), request.emailAddress(), requestIP);
+    log.info(
+        "Creating new classified ad {} in {} for {} from {}",
+        request.title(),
+        request.categoryId(),
+        request.emailAddress(),
+        requestIP);
     // upsert customer record if not already found
     var customer =
         customerRepository
-            .findClassifiedCustomerByEmailAddressOrPhoneNumber(request.emailAddress(), request.phoneNumber())
-                .map( cust -> {
-                  if ( !cust.getEmailAddress().equals(request.emailAddress())) {
-                    log.debug("customer {} email address has been changed, found with phone", cust.getId());
+            .findClassifiedCustomerByEmailAddressOrPhoneNumber(
+                request.emailAddress(), request.phoneNumber())
+            .map(
+                cust -> {
+                  if (!cust.getEmailAddress().equals(request.emailAddress())) {
+                    log.debug(
+                        "customer {} email address has been changed, found with phone",
+                        cust.getId());
                     cust.setEmailAddress(request.emailAddress());
                     cust.setEmailValidationDate(null);
                     cust.setEmailAddressValidationToken(TokenUtils.generateCode(8));
@@ -99,7 +107,7 @@ public class ClassifiedService {
                   }
                   return cust;
                 })
-                .orElseGet(
+            .orElseGet(
                 () -> {
                   var newCustomer = mapper.customterFromClassified(request);
                   newCustomer.setEmailAddressValidationToken(TokenUtils.generateCode(8));
@@ -129,40 +137,51 @@ public class ClassifiedService {
 
     // send confirmation email
     String subject = String.format("Greenyp - %s classified ad confirmation", adType.adTypeName());
-    emailService.sendEmailAsync(EmailTemplateType.CLASSIFIED_EMAIL_VALIDATION,
-            Collections.singletonList(classified.getEmailAddress()),
-            subject,
-            () -> Map.of("lastName", request.lastName(),
-                    "firstName", request.firstName(),
-                    "classifiedTitle",request.title(),
-                    "categoryName", category.name(),
-                    "emailValidationToken", customer.getEmailAddressValidationToken(),
-                    "adTypeName", adType.adTypeName(),
-                    "paymentAmount", adType.monthlyPrice(),
-                    "ipAddress", requestIP,
-                    "timestamp", classified.getCreateDate()));
+    emailService.sendEmailAsync(
+        EmailTemplateType.CLASSIFIED_EMAIL_VALIDATION,
+        Collections.singletonList(classified.getEmailAddress()),
+        subject,
+        () -> {
+          Map<String, Object> templateData = new HashMap<>();
+          templateData.put("lastName", request.lastName());
+          templateData.put("firstName", request.firstName());
+          templateData.put("classifiedTitle", request.title());
+          templateData.put("categoryName", category.name());
+          templateData.put("emailValidationToken", customer.getEmailAddressValidationToken());
+          templateData.put("adTypeName", adType.adTypeName());
+          templateData.put("paymentAmount", adType.monthlyPrice());
+          templateData.put("ipAddress", requestIP);
+          templateData.put("timestamp", classified.getCreateDate());
+          return templateData;
+        });
 
     return classifiedResponse;
   }
 
-  public ClassifiedResponse updateClassified(@Valid ClassifiedUpdateRequest classifiedRequest, String requestIP) {
+  public ClassifiedResponse updateClassified(
+      @Valid ClassifiedUpdateRequest classifiedRequest, String requestIP) {
     return null;
   }
 
-  public void requestAuthCode(UUID classifiedId, String tokenDestination, ClassifiedTokenType tokenType, String requestIP) throws NoSuchAlgorithmException {
-    var classified = repository.findClassifiedAndCustomer(classifiedId)
-            .orElseThrow(() -> {
-              log.warn("No classified found for id {}", classifiedId);
-              return new NotFoundException("Classified", classifiedId);
-            });
+  public void requestAuthCode(
+      UUID classifiedId, String tokenDestination, ClassifiedTokenType tokenType, String requestIP)
+      throws NoSuchAlgorithmException {
+    var classified =
+        repository
+            .findClassifiedAndCustomer(classifiedId)
+            .orElseThrow(
+                () -> {
+                  log.warn("No classified found for id {}", classifiedId);
+                  return new NotFoundException("Classified", classifiedId);
+                });
 
-    if ( !classified.customer().getEmailAddress().equals(tokenDestination) &&
-         !classified.customer().getPhoneNumber().equals(requestIP)) {
+    if (!classified.customer().getEmailAddress().equals(tokenDestination)
+        && !classified.customer().getPhoneNumber().equals(requestIP)) {
       log.error("Invalid email address or phone number attempting to generate a token auth code");
       throw new PreconditionFailedException("Invalid email address or phone number");
     }
 
-    //create token record
+    // create token record
     var token = TokenUtils.generateCode(8);
 
     var classifiedToken =
@@ -178,10 +197,17 @@ public class ClassifiedService {
 
     List<String> toList = List.of(classified.customer().getEmailAddress());
 
-    emailService.sendEmailAsync(EmailTemplateType.CLASSIFIED_AUTH_TOKEN,
-            toList,
-            EmailTemplateType.CLASSIFIED_AUTH_TOKEN.getSubjectFormat(),
-            () -> Map.of("token", classifiedToken, "ipAddress", requestIP, "timestamp", OffsetDateTime.now()));
-
+    emailService.sendEmailAsync(
+        EmailTemplateType.CLASSIFIED_AUTH_TOKEN,
+        toList,
+        EmailTemplateType.CLASSIFIED_AUTH_TOKEN.getSubjectFormat(),
+        () ->
+            Map.of(
+                "token",
+                classifiedToken,
+                "ipAddress",
+                requestIP,
+                "timestamp",
+                OffsetDateTime.now()));
   }
 }

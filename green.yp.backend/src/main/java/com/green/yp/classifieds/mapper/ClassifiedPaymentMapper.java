@@ -2,12 +2,11 @@ package com.green.yp.classifieds.mapper;
 
 import com.green.yp.api.apitype.classified.ClassifiedPaymentRequest;
 import com.green.yp.api.apitype.payment.PaymentRequest;
+import java.math.BigDecimal;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
-
-import java.math.BigDecimal;
 
 @Mapper(
         componentModel = "spring",

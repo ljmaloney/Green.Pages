@@ -13,11 +13,10 @@ import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.util.TokenUtils;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.*;
-
-import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,7 +33,7 @@ public class ClassifiedPaymentService {
   private final ClassifiedCustomerRepository customerRepository;
   private final EmailService emailService;
 
-  private String paymentNoteFormat = """
+  private final String paymentNoteFormat = """
                        Classified Ad Package: %s
                        Classified Category : %s
                        Classified Title : %s

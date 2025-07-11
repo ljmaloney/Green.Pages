@@ -4,11 +4,10 @@ import com.green.yp.common.data.embedded.Mutable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.time.OffsetDateTime;
 import lombok.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import java.time.OffsetDateTime;
 
 @NoArgsConstructor
 @Entity
@@ -62,7 +61,7 @@ public class ClassifiedCustomer extends Mutable {
   private String emailAddress;
 
   @Size(max = 25)
-  @Column(name="email_validatiom_token", nullable = false, length = 25)
+  @Column(name="email_validation_token", nullable = false, length = 25)
   private String emailAddressValidationToken;
 
   @Temporal(TemporalType.TIMESTAMP)
