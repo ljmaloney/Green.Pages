@@ -1,10 +1,17 @@
 package com.green.yp.classifieds.service;
 
+import com.green.yp.api.apitype.classified.ClassifiedAdTypeResponse;
 import com.green.yp.api.apitype.classified.ClassifiedPaymentRequest;
 import com.green.yp.api.apitype.classified.ClassifiedPaymentResponse;
 import com.green.yp.api.apitype.enumeration.EmailTemplateType;
+import com.green.yp.api.apitype.invoice.InvoiceLineItemRequest;
+import com.green.yp.api.apitype.invoice.InvoiceRequest;
+import com.green.yp.api.apitype.invoice.InvoiceType;
+import com.green.yp.api.apitype.payment.PaymentTransactionResponse;
+import com.green.yp.api.contract.InvoiceContract;
 import com.green.yp.api.contract.PaymentContract;
 import com.green.yp.classifieds.data.model.ClassifiedCustomer;
+import com.green.yp.classifieds.data.model.ClassifiedCustomerProjection;
 import com.green.yp.classifieds.data.repository.ClassifiedCustomerRepository;
 import com.green.yp.classifieds.data.repository.ClassifiedRepository;
 import com.green.yp.classifieds.mapper.ClassifiedPaymentMapper;
@@ -14,6 +21,8 @@ import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.util.TokenUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -31,6 +40,7 @@ public class ClassifiedPaymentService {
   private final ClassifiedAdTypeService adTypeService;
   private final ClassifiedCategoryService classifiedCategoryService;
   private final ClassifiedCustomerRepository customerRepository;
+  private final InvoiceContract invoiceContract;
   private final EmailService emailService;
 
   private final String paymentNoteFormat = """
@@ -52,6 +62,7 @@ public class ClassifiedPaymentService {
       ClassifiedAdTypeService adTypeService,
       ClassifiedCategoryService classifiedCategoryService,
       EmailService emailService,
+      InvoiceContract invoiceContract,
       ClassifiedPaymentMapper paymentMapper) {
     this.paymentContract = paymentContract;
     this.paymentMapper = paymentMapper;
@@ -60,6 +71,7 @@ public class ClassifiedPaymentService {
     this.classifiedRepository = classifiedRepository;
     this.emailService = emailService;
     this.customerRepository = customerRepository;
+    this.invoiceContract = invoiceContract;
   }
 
   public ClassifiedPaymentResponse processPayment(
@@ -108,6 +120,7 @@ public class ClassifiedPaymentService {
     var directLink = String.format("%s/classifieds/%s?secret=%s", classifiedUrl, classified.classified().getId(), token);
 
     // create invoice record for classified ad
+    createInvoice(classified, adType, paymentResponse);
 
     // send confirmation email
     String subject = String.format("Greenyp - %s classified ad confirmation", adType.adTypeName());
@@ -134,6 +147,24 @@ public class ClassifiedPaymentService {
             paymentResponse.status(),
             paymentResponse.paymentRef(),
             paymentResponse.orderRef(), paymentResponse.receiptNumber());
+  }
+
+  private void createInvoice(ClassifiedCustomerProjection classified,
+                             ClassifiedAdTypeResponse adType, PaymentTransactionResponse paymentResponse) {
+
+    invoiceContract.createInvoice(new InvoiceRequest(classified.classified().getId().toString(),
+            paymentResponse.transactionId(),
+            InvoiceType.CLASSIFIED,
+            String.format("%s Classified Ad", adType.adTypeName()),
+            paymentResponse.createDate(),
+            paymentResponse.receiptNumber(),
+            paymentResponse.receiptUrl(),
+            paymentResponse.totalAmount(),
+            List.of(new InvoiceLineItemRequest(1,
+                    classified.classified().getId().toString(),
+                    null,
+                    String.format("%s : Ad Package %s", classified.classified().getTitle(), adType.adTypeName()),
+                    paymentResponse.totalAmount()))));
   }
 
   private boolean invalidEmailToken(ClassifiedCustomer customer, @NotBlank String emailToken) {

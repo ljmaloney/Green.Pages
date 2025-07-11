@@ -1,7 +1,7 @@
 package com.green.yp.producer.invoice.mapper;
 
-import com.green.yp.api.apitype.invoice.InvoiceLineItemResponse;
-import com.green.yp.api.apitype.invoice.InvoiceResponse;
+import com.green.yp.api.apitype.invoice.ProducerInvoiceLineItemResponse;
+import com.green.yp.api.apitype.invoice.ProducerInvoiceResponse;
 import com.green.yp.producer.invoice.data.model.ProducerInvoice;
 import com.green.yp.producer.invoice.data.model.ProducerInvoiceLineItem;
 import com.green.yp.reference.dto.SubscriptionDto;
@@ -18,17 +18,17 @@ import java.util.List;
     injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface InvoiceMapper {
 
-  List<InvoiceResponse> fromEntityList(List<ProducerInvoice> producerInvoice);
+  List<ProducerInvoiceResponse> fromEntityList(List<ProducerInvoice> producerInvoice);
 
   @Mapping(source = "id", target = "invoiceId")
   @Mapping(source = "printedInvoiceId", target = "invoiceNumber")
-  InvoiceResponse fromEntity(ProducerInvoice producerInvoice);
+  ProducerInvoiceResponse fromEntity(ProducerInvoice producerInvoice);
 
   @Mapping(source = "id", target = "lineItemId")
-  InvoiceLineItemResponse fromEntity(ProducerInvoiceLineItem lineItem);
+  ProducerInvoiceLineItemResponse fromEntity(ProducerInvoiceLineItem lineItem);
 
   @Mapping( target = "subscriptionName", source = "subscription.displayName")
   @Mapping(target = "createDate", source = "invoice.createDate")
   @Mapping( target= "subscriptionId", source="invoice.subscriptionId")
-  InvoiceResponse fromEntity(ProducerInvoice invoice, SubscriptionDto subscription);
+  ProducerInvoiceResponse fromEntity(ProducerInvoice invoice, SubscriptionDto subscription);
 }

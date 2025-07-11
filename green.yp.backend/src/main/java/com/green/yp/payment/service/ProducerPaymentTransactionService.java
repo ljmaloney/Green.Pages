@@ -1,6 +1,6 @@
 package com.green.yp.payment.service;
 
-import com.green.yp.api.apitype.invoice.InvoiceResponse;
+import com.green.yp.api.apitype.invoice.ProducerInvoiceResponse;
 import com.green.yp.api.apitype.payment.PaymentMethodResponse;
 import com.green.yp.payment.data.enumeration.*;
 import com.green.yp.payment.data.model.ProducerPaymentTransaction;
@@ -23,7 +23,7 @@ public class ProducerPaymentTransactionService {
   }
 
   public ProducerPaymentTransaction createTransaction(
-      InvoiceResponse invoiceResponse,
+      ProducerInvoiceResponse producerInvoiceResponse,
       PaymentMethodResponse paymentMethod,
       ProducerPaymentType paymentType,
       PaymentIntegrationResponse response) {
@@ -31,9 +31,9 @@ public class ProducerPaymentTransactionService {
     ProducerPaymentTransaction transaction =
         ProducerPaymentTransaction.builder()
             .paymentMethodId(paymentMethod.paymentMethodId())
-            .producerId(invoiceResponse.producerId())
-            .invoiceId(invoiceResponse.invoiceId())
-            .amount(invoiceResponse.invoiceTotal())
+            .producerId(producerInvoiceResponse.producerId())
+            .invoiceId(producerInvoiceResponse.invoiceId())
+            .amount(producerInvoiceResponse.invoiceTotal())
             .paymentType(paymentType)
             .status(PaymentTransactionStatus.SUCCESS)
             .acquirerReferenceNumber(response.acquirerReferenceNumber().toString())

@@ -1,6 +1,7 @@
 package com.green.yp.api.apitype.payment;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 public record PaymentTransactionResponse(UUID transactionId,
@@ -17,10 +18,11 @@ public record PaymentTransactionResponse(UUID transactionId,
                                          BigDecimal totalAmount,
                                          String currencyCode,
                                          String firstName,
-                                         String lastName,String address,String city,
+                                         String lastName, String address, String city,
                                          String state,
                                          String postalCode,
                                          String phoneNumber,
                                          String emailAddress,
                                          String statementDescriptionIdentifier,
-                                         String receiptUrl){}
+                                         String receiptUrl,
+                                         OffsetDateTime createDate){}

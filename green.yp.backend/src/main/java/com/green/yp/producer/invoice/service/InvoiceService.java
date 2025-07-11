@@ -1,6 +1,6 @@
 package com.green.yp.producer.invoice.service;
 
-import com.green.yp.api.apitype.invoice.InvoiceResponse;
+import com.green.yp.api.apitype.invoice.ProducerInvoiceResponse;
 import com.green.yp.api.apitype.producer.ProducerResponse;
 import com.green.yp.api.apitype.producer.ProducerSubscriptionResponse;
 import com.green.yp.api.contract.ProducerContract;
@@ -50,7 +50,7 @@ public class InvoiceService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public InvoiceResponse createInvoice(UUID producerId, String requestIP) {
+  public ProducerInvoiceResponse createInvoice(UUID producerId, String requestIP) {
     log.info("Creating new invoice for {} from {}", producerId, requestIP);
     try {
       return findUnpaidInvoice(producerId, requestIP);
@@ -59,7 +59,7 @@ public class InvoiceService {
     }
   }
 
-  private InvoiceResponse createNewInvoice(UUID producerId, String requestIp) {
+  private ProducerInvoiceResponse createNewInvoice(UUID producerId, String requestIp) {
     ProducerResponse producerResponse = producerContract.findProducer(producerId);
 
     ProducerSubscriptionResponse primarySubscription =
@@ -113,7 +113,7 @@ public class InvoiceService {
         "%s-%s", prefix, new DecimalFormat("000000").format(counter.doubleValue() + 1));
   }
 
-  public InvoiceResponse findUnpaidInvoice(UUID producerId, String requestIP) {
+  public ProducerInvoiceResponse findUnpaidInvoice(UUID producerId, String requestIP) {
     ProducerInvoice unpaidProducerInvoice =
         invoiceRepository
             .findUnpaidSubscriptionInvoice(
@@ -154,14 +154,14 @@ public class InvoiceService {
     };
   }
 
-  public InvoiceResponse findInvoice(UUID invoiceId, String requestIp) {
+  public ProducerInvoiceResponse findInvoice(UUID invoiceId, String requestIp) {
     return invoiceMapper.fromEntity(
         invoiceRepository
             .findById(invoiceId)
             .orElseThrow(() -> new NotFoundException("Invoice", invoiceId)));
   }
 
-  public InvoiceResponse markInvoicePaid(
+  public ProducerInvoiceResponse markInvoicePaid(
       UUID invoiceId, Optional<UUID> paymentTransactionId, String requestIP) {
     log.info("Marking invoice {} as being paid from {}", invoiceId, requestIP);
 
@@ -176,7 +176,7 @@ public class InvoiceService {
     return invoiceMapper.fromEntity(invoiceRepository.save(producerInvoice));
   }
 
-  public List<InvoiceResponse> findInvoices(
+  public List<ProducerInvoiceResponse> findInvoices(
       UUID producerId, LocalDate startDate, LocalDate endDate, Boolean descending) {
     log.info(
         "Loading invoices for {} between start {} and end {}, sorted {}",

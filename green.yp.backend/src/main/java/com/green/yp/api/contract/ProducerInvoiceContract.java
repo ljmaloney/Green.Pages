@@ -1,6 +1,6 @@
 package com.green.yp.api.contract;
 
-import com.green.yp.api.apitype.invoice.InvoiceResponse;
+import com.green.yp.api.apitype.invoice.ProducerInvoiceResponse;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -15,15 +15,15 @@ public class ProducerInvoiceContract {
     this.invoiceService = invoiceService;
   }
 
-  public InvoiceResponse findInvoice(UUID invoiceId, String requestIP) {
+  public ProducerInvoiceResponse findInvoice(UUID invoiceId, String requestIP) {
     return invoiceService.findInvoice(invoiceId, requestIP);
   }
 
-  public InvoiceResponse markInvoicePaid(UUID invoiceId, String requestIP) {
+  public ProducerInvoiceResponse markInvoicePaid(UUID invoiceId, String requestIP) {
     return invoiceService.markInvoicePaid(invoiceId, Optional.empty(), requestIP);
   }
 
-  public InvoiceResponse createInvoice(UUID accountId, String requestIP) {
+  public ProducerInvoiceResponse createInvoice(UUID accountId, String requestIP) {
     return invoiceService.createInvoice(accountId, requestIP);
   }
 }

@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -35,7 +36,7 @@ public class Invoice extends Mutable {
 
     @Column(name = "paid_date")
     @Temporal(TemporalType.DATE)
-    private LocalDate paidDate;
+    private OffsetDateTime paidDate;
 
     @Size(max = 100)
     @NotNull

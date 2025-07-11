@@ -1,7 +1,7 @@
 package com.green.yp.account.service;
 
 import com.green.yp.api.apitype.enumeration.EmailTemplateType;
-import com.green.yp.api.apitype.invoice.InvoiceResponse;
+import com.green.yp.api.apitype.invoice.ProducerInvoiceResponse;
 import com.green.yp.api.apitype.payment.ApiPaymentResponse;
 import com.green.yp.api.apitype.payment.ApplyPaymentMethodRequest;
 import com.green.yp.api.apitype.payment.ApplyPaymentRequest;
@@ -74,13 +74,13 @@ public class AccountPaymentService {
 
     // create invoice record for initial payment, as this is the first payment on a
     // new subscriber, no invoice is created until this point
-    InvoiceResponse invoiceResponse =
+    ProducerInvoiceResponse producerInvoiceResponse =
         producerInvoiceContract.createInvoice(paymentRequest.producerId(), requestIP);
 
     ProducerPaymentResponse producerPaymentResponse =
         paymentContract.applyPayment(
             paymentRequest,
-            invoiceResponse.invoiceId(),
+            producerInvoiceResponse.invoiceId(),
             ProducerPaymentType.INITIAL_PAYMENT,
             requestIP);
 
@@ -99,7 +99,7 @@ public class AccountPaymentService {
     producerResponse =
         producerContract.activateProducer(
             paymentRequest.producerId(),
-            invoiceResponse.createDate(),
+            producerInvoiceResponse.createDate(),
             producerPaymentResponse.createDate(),
             null,
             requestIP);
