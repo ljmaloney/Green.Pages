@@ -6,6 +6,7 @@ import com.green.yp.api.apitype.classified.ClassifiedResponse;
 import com.green.yp.api.apitype.classified.ClassifiedUpdateRequest;
 import com.green.yp.api.apitype.enumeration.ClassifiedTokenType;
 import com.green.yp.api.apitype.enumeration.EmailTemplateType;
+import com.green.yp.classifieds.data.model.Classified;
 import com.green.yp.classifieds.data.model.ClassifiedToken;
 import com.green.yp.classifieds.data.repository.ClassifedTokenRepository;
 import com.green.yp.classifieds.data.repository.ClassifiedCustomerRepository;
@@ -32,6 +33,9 @@ public class ClassifiedService {
   @Value("${green.yp.classified.token.timeout:15}")
   private Integer tokenTimeoutMinutes;
 
+    @Value("${green.yp.classified.unpaid.timeout:30}")
+    private Integer unpaidTimeoutMinutes;
+
   private final ClassifiedRepository repository;
   private final ClassifedTokenRepository tokenRepository;
   private final ClassifiedCustomerRepository customerRepository;
@@ -39,17 +43,18 @@ public class ClassifiedService {
   private final ClassifiedCategoryService categoryService;
   private final ClassifiedGeocodeService geocodeService;
   private final EmailService emailService;
+  private final ClassifiedImageService imageService;
   private final ClassifiedMapper mapper;
 
   public ClassifiedService(
-      ClassifiedRepository repository,
-      ClassifedTokenRepository tokenRepository,
-      ClassifiedCustomerRepository customerRepository,
-      ClassifiedAdTypeService adTypeService,
-      ClassifiedCategoryService categoryService,
-      ClassifiedGeocodeService geocodeService,
-      EmailService emailService,
-      ClassifiedMapper mapper) {
+          ClassifiedRepository repository,
+          ClassifedTokenRepository tokenRepository,
+          ClassifiedCustomerRepository customerRepository,
+          ClassifiedAdTypeService adTypeService,
+          ClassifiedCategoryService categoryService,
+          ClassifiedGeocodeService geocodeService,
+          EmailService emailService, ClassifiedImageService imageService,
+          ClassifiedMapper mapper) {
     this.repository = repository;
     this.tokenRepository = tokenRepository;
     this.customerRepository = customerRepository;
@@ -57,7 +62,8 @@ public class ClassifiedService {
     this.categoryService = categoryService;
     this.geocodeService = geocodeService;
     this.emailService = emailService;
-    this.mapper = mapper;
+      this.imageService = imageService;
+      this.mapper = mapper;
   }
 
   public ClassifiedAdCustomerResponse findClassifiedAndCustomer(UUID classifiedId) {
@@ -136,24 +142,25 @@ public class ClassifiedService {
     var classifiedResponse = mapper.fromEntity(repository.saveAndFlush(classified));
 
     // send confirmation email
-    String subject = String.format("Greenyp - %s classified ad confirmation", adType.adTypeName());
-    emailService.sendEmailAsync(
-        EmailTemplateType.CLASSIFIED_EMAIL_VALIDATION,
-        Collections.singletonList(classified.getEmailAddress()),
-        subject,
-        () -> {
-          Map<String, Object> templateData = new HashMap<>();
-          templateData.put("lastName", request.lastName());
-          templateData.put("firstName", request.firstName());
-          templateData.put("classifiedTitle", request.title());
-          templateData.put("categoryName", category.name());
-          templateData.put("emailValidationToken", customer.getEmailAddressValidationToken());
-          templateData.put("adTypeName", adType.adTypeName());
-          templateData.put("paymentAmount", adType.monthlyPrice());
-          templateData.put("ipAddress", requestIP);
-          templateData.put("timestamp", classified.getCreateDate());
-          return templateData;
-        });
+    if( customer.getEmailValidationDate() == null ){
+        emailService.sendEmailAsync(
+                  EmailTemplateType.CLASSIFIED_EMAIL_VALIDATION,
+                  Collections.singletonList(classified.getEmailAddress()),
+                  EmailTemplateType.CLASSIFIED_EMAIL_VALIDATION.getSubjectFormat(),
+                  () -> {
+                      Map<String, Object> templateData = new HashMap<>();
+                      templateData.put("lastName", request.lastName());
+                      templateData.put("firstName", request.firstName());
+                      templateData.put("classifiedTitle", request.title());
+                      templateData.put("categoryName", category.name());
+                      templateData.put("emailValidationToken", customer.getEmailAddressValidationToken());
+                      templateData.put("adTypeName", adType.adTypeName());
+                      templateData.put("paymentAmount", adType.monthlyPrice());
+                      templateData.put("ipAddress", requestIP);
+                      templateData.put("timestamp", classified.getCreateDate());
+                      return templateData;
+                  });
+      }
 
     return classifiedResponse;
   }
@@ -210,4 +217,16 @@ public class ClassifiedService {
                 "timestamp",
                 OffsetDateTime.now()));
   }
+
+    public void cleanUnpaid() {
+      var deleteDate = OffsetDateTime.now().minusMinutes(unpaidTimeoutMinutes.longValue());
+      List<Classified> classifieds = repository.findUnpaidAds(deleteDate);
+      classifieds.forEach(classified -> {
+          imageService.deleteGalleryImages(classified.getId());
+          repository.delete(classified);
+          log.info("Deleted unpaid classified: {} - {}", classified.getId(), classified.getTitle());
+      });
+      //delete customer records not associated with an ad that have email_validation_date null
+//        customerRepository.deleteInvalidCustomers(deleteDate);
+    }
 }

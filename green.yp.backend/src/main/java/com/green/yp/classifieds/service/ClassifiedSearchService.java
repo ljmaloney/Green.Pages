@@ -7,6 +7,8 @@ import com.green.yp.classifieds.data.model.ClassifiedSearchProjection;
 import com.green.yp.classifieds.data.repository.ClassifiedImageGalleryRepository;
 import com.green.yp.classifieds.data.repository.ClassifiedRepository;
 import com.green.yp.classifieds.mapper.ClassifiedSearchMapper;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,7 +35,7 @@ public class ClassifiedSearchService {
     public List<ClassifiedSearchResponse> mostRecent(Integer maxCount, UUID categoryId) {
         log.debug("Loading most {} recent classifieds for categoryId: {}", maxCount, categoryId );
 
-        List<ClassifiedSearchProjection> classifieds = repository.getMostRecent(categoryId, Limit.of(maxCount));
+        List<ClassifiedSearchProjection> classifieds = repository.getMostRecent(LocalDate.now(), categoryId, Limit.of(maxCount));
 
         return classifieds.stream()
                 .map(ad -> mapper.fromProjection(ad.classified(),

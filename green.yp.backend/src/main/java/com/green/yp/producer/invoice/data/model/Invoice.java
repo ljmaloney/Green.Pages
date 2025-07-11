@@ -1,4 +1,4 @@
-package com.green.yp.invoice.data.model;
+package com.green.yp.producer.invoice.data.model;
 
 import com.green.yp.common.data.embedded.Mutable;
 import jakarta.persistence.*;
@@ -8,10 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -49,5 +51,21 @@ public class Invoice extends Mutable {
       setInvoiceTotal(BigDecimal.ZERO);
     }
     setInvoiceTotal(getInvoiceTotal().add(lineItem.getAmount()));
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    Invoice invoice = (Invoice) o;
+
+    return new EqualsBuilder().appendSuper(super.equals(o)).append(producerId, invoice.producerId).append(subscriptionId, invoice.subscriptionId).append(producerSubscriptionId, invoice.producerSubscriptionId).append(paidDate, invoice.paidDate).append(printedInvoiceId, invoice.printedInvoiceId).append(invoiceTotal, invoice.invoiceTotal).append(lineItems, invoice.lineItems).isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(producerId).append(subscriptionId).append(producerSubscriptionId).append(paidDate).append(printedInvoiceId).append(invoiceTotal).append(lineItems).toHashCode();
   }
 }

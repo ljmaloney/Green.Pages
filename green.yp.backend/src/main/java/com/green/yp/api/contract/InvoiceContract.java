@@ -1,9 +1,10 @@
 package com.green.yp.api.contract;
 
 import com.green.yp.api.apitype.invoice.InvoiceResponse;
-import com.green.yp.invoice.service.InvoiceService;
 import java.util.Optional;
 import java.util.UUID;
+
+import com.green.yp.producer.invoice.service.InvoiceService;
 import org.springframework.stereotype.Component;
 
 @Component

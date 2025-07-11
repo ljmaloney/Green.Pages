@@ -1,4 +1,4 @@
-package com.green.yp.invoice.service;
+package com.green.yp.producer.invoice.service;
 
 import com.green.yp.api.apitype.invoice.InvoiceResponse;
 import com.green.yp.api.apitype.producer.ProducerResponse;
@@ -7,10 +7,10 @@ import com.green.yp.api.contract.ProducerContract;
 import com.green.yp.api.contract.SubscriptionContract;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
-import com.green.yp.invoice.data.model.Invoice;
-import com.green.yp.invoice.data.model.InvoiceLineItem;
-import com.green.yp.invoice.data.repository.InvoiceRepository;
-import com.green.yp.invoice.mapper.InvoiceMapper;
+import com.green.yp.producer.invoice.data.model.Invoice;
+import com.green.yp.producer.invoice.data.model.InvoiceLineItem;
+import com.green.yp.producer.invoice.data.repository.InvoiceRepository;
+import com.green.yp.producer.invoice.mapper.InvoiceMapper;
 import com.green.yp.reference.data.enumeration.SubscriptionType;
 import java.sql.Date;
 import java.text.DecimalFormat;

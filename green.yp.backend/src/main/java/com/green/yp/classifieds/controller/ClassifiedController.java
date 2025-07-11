@@ -14,8 +14,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -66,5 +69,13 @@ public class ClassifiedController {
   @PutMapping( consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ClassifiedResponse> updateClassified(@RequestBody @Valid ClassifiedUpdateRequest classifiedRequest) {
     return new ResponseApi<>(service.updateClassified(classifiedRequest, RequestUtil.getRequestIP()), null);
+  }
+
+  @Scheduled(fixedDelayString="${greenyp.classified.unpaid.clean.fixedDelay:180}",
+          timeUnit = TimeUnit.MINUTES)
+  public void cleanupUnpaidClassifieds(){
+    log.info("Starting process to clean up unpaid classifieds");
+    service.cleanUnpaid();
+    log.info("Finished process to clean up unpaid classifieds");
   }
 }

@@ -4,6 +4,9 @@ import com.green.yp.classifieds.data.model.Classified;
 import com.green.yp.classifieds.data.model.ClassifiedCustomerProjection;
 import com.green.yp.classifieds.data.model.ClassifiedSearchProjection;
 import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,6 +34,19 @@ public interface ClassifiedRepository extends JpaRepository<Classified, UUID> {
         INNER JOIN ClassifiedCategory AS category on category.id = classified.categoryId
     WHERE
        (:classifiedId IS NULL OR classified.id=:classifiedId)
+       AND classified.lastActiveDate IS NOT NULL
+       AND :currentDate BETWEEN classified.activeDate AND classified.lastActiveDate
+     ORDER BY classified.createDate
 """)
-  List<ClassifiedSearchProjection> getMostRecent(@NotNull @Param("classifiedId") UUID categoryId, Limit limit);
+  List<ClassifiedSearchProjection> getMostRecent(@NotNull @Param("currentDate") LocalDate currentDate,
+                                                 @Param("classifiedId") UUID categoryId, Limit limit);
+
+
+  @Query("""
+        SELECT classified
+        FROM Classified classified
+        WHERE classified.activeDate IS NULL AND classified.lastActiveDate IS NULL
+            AND classified.createDate <= :olderThan
+    """)
+  List<Classified> findUnpaidAds(@Param("olderThan") OffsetDateTime olderThan);
 }
