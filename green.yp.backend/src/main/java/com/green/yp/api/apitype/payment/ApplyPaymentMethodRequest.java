@@ -9,7 +9,7 @@ import lombok.NonNull;
 
 public record ApplyPaymentMethodRequest(
         @NotNull @NonNull UUID producerId,
-        @NotNull @NonNull String paymentMethod,
+        String paymentMethod,
         @NotNull @NonNull String payorName,
         @NotNull @NonNull String payorAddress1,
         String payorAddress2,

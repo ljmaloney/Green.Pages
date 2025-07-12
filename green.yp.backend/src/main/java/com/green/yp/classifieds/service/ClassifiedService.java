@@ -102,7 +102,8 @@ public class ClassifiedService {
                 request.emailAddress(), request.phoneNumber())
             .map(
                 cust -> {
-                  if (!cust.getEmailAddress().equals(request.emailAddress())) {
+                  if (!cust.getEmailAddress().equals(request.emailAddress())
+                      || cust.getEmailValidationDate() == null) {
                     log.debug(
                         "customer {} email address has been changed, found with phone",
                         cust.getId());
