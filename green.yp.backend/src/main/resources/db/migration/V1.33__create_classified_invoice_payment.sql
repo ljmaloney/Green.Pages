@@ -10,6 +10,7 @@ BEGIN
                              `classified_id`            binary(16)      not null,
                              `classified_ad_type`       binary(16)      not null,
                              `classified_customer_id`   binary(16)      not null,
+                             `ip_address`               varchar(20)     not null,
                              `invoice_number`           varchar(20)     not null,
                              `payment_customer_ref`     varchar(50)     not null,
                              `payment_ref`              varchar(50)     not null,
