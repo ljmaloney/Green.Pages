@@ -4,7 +4,7 @@ CREATE PROCEDURE `?`()
 BEGIN
     DECLARE CONTINUE HANDLER FOR SQLEXCEPTION BEGIN
     END;
-    CREATE TABLE producerInvoice (`id`                      binary(16)          not null,
+    CREATE TABLE invoice (`id`                      binary(16)          not null,
                           `version`                 int                 not null,
                           `create_date`             timestamp           not null,
                           `last_update_date`        timestamp           not null,
@@ -22,10 +22,10 @@ BEGIN
                               REFERENCES `greenyp`.`payment_transaction` (`id`)
                               ON DELETE NO ACTION
                               ON UPDATE NO ACTION);
-    CREATE INDEX `invoice_paid_date_idx` ON `greenyp`.`producerInvoice` (paid_date);
-    CREATE INDEX `invoice_extern_ref_idx` ON `greenyp`.`producerInvoice` (external_ref);
-    CREATE INDEX `invoice_type_idx` ON `greenyp`.`producerInvoice` (invoice_type);
-    CREATE INDEX `invoice_paid_date_type_idx` ON `greenyp`.`producerInvoice` (paid_date, invoice_type);
+    CREATE INDEX `invoice_paid_date_idx` ON `greenyp`.`invoice` (paid_date);
+    CREATE INDEX `invoice_extern_ref_idx` ON `greenyp`.`invoice` (external_ref);
+    CREATE INDEX `invoice_type_idx` ON `greenyp`.`invoice` (invoice_type);
+    CREATE INDEX `invoice_paid_date_type_idx` ON `greenyp`.`invoice` (paid_date, invoice_type);
 END //
 DELIMITER ;
 CALL `?`();
