@@ -1,12 +1,5 @@
 package com.green.yp.api.apitype.classified;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Lob;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -31,4 +24,5 @@ public record ClassifiedSearchResponse(UUID classifiedId,
                                        String imageName,
                                        String url,
                                        BigDecimal longitude,
-                                       BigDecimal latitude) {}
+                                       BigDecimal latitude,
+                                       BigDecimal distance) {}

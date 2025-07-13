@@ -7,6 +7,7 @@ import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -31,8 +32,10 @@ public class ClassifiedPaymentController {
 
     @Operation(summary = "Proceses payment for a classified ad")
     @PostMapping(path = "payment", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseApi<ClassifiedPaymentResponse> processPayment(@RequestBody @Valid ClassifiedPaymentRequest paymentRequest){
-        return new ResponseApi<>(paymentService.processPayment(paymentRequest, RequestUtil.getRequestIP()), null);
+    public ResponseApi<ClassifiedPaymentResponse> processPayment(@RequestBody @Valid ClassifiedPaymentRequest paymentRequest,
+                                                                 HttpServletRequest httpServletRequest){
+        return new ResponseApi<>(paymentService.processPayment(paymentRequest,
+                RequestUtil.getRequestIP(httpServletRequest)), null);
     }
 
 }

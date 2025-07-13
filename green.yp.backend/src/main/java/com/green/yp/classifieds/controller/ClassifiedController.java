@@ -36,17 +36,18 @@ public class ClassifiedController {
 
   @GetMapping(path = "{classifiedId}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ClassifiedResponse> findClassified(
-      @PathVariable("classifiedId") UUID classifiedId) {
+      @PathVariable("classifiedId") UUID classifiedId, HttpServletRequest request) {
     return new ResponseApi<>(
-        service.findClassified(classifiedId, RequestUtil.getRequestIP()), null);
+        service.findClassified(classifiedId, RequestUtil.getRequestIP(request)), null);
   }
 
   @Operation(summary = "Requests sending authenticate messsage so classified customer can edit the ad")
   @GetMapping(path="{classifiedId}/requestAuthCode")
   public void requestAuthCode(@PathVariable("classifiedId") UUID classifiedId,
                               @RequestParam(name="tokenDestination")  String tokenDestination,
-                              @RequestParam(name="tokenType") ClassifiedTokenType tokenType) throws NoSuchAlgorithmException {
-    service.requestAuthCode(classifiedId, tokenDestination, tokenType, RequestUtil.getRequestIP());
+                              @RequestParam(name="tokenType") ClassifiedTokenType tokenType,
+                              HttpServletRequest request) throws NoSuchAlgorithmException {
+    service.requestAuthCode(classifiedId, tokenDestination, tokenType, RequestUtil.getRequestIP(request));
   }
 
   @Operation(summary = "Retrieves classified and customer data together")
@@ -67,8 +68,9 @@ public class ClassifiedController {
 
   @Operation(summary = "Updates a classified ad")
   @PutMapping( consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseApi<ClassifiedResponse> updateClassified(@RequestBody @Valid ClassifiedUpdateRequest classifiedRequest) {
-    return new ResponseApi<>(service.updateClassified(classifiedRequest, RequestUtil.getRequestIP()), null);
+  public ResponseApi<ClassifiedResponse> updateClassified(@RequestBody @Valid ClassifiedUpdateRequest classifiedRequest,
+                                                          HttpServletRequest httpRequest) {
+    return new ResponseApi<>(service.updateClassified(classifiedRequest, RequestUtil.getRequestIP(httpRequest)), null);
   }
 
   @Scheduled(fixedDelayString="${greenyp.classified.unpaid.clean.fixedDelay:180}",
