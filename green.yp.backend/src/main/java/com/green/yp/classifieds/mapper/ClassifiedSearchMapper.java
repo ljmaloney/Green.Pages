@@ -2,6 +2,8 @@ package com.green.yp.classifieds.mapper;
 
 import com.green.yp.api.apitype.classified.ClassifiedSearchResponse;
 import com.green.yp.classifieds.data.model.*;
+
+import java.util.List;
 import java.util.Optional;
 import org.mapstruct.*;
 
@@ -28,4 +30,6 @@ public interface ClassifiedSearchMapper {
     default String getImageName(Optional<ClassifiedImageGallery> image) {
         return image.map(ClassifiedImageGallery::getImageFilename).orElse(null);
     }
+
+    List<ClassifiedSearchResponse> fromProjection(List<ClassifiedSearchProjection> searchProjections);
 }

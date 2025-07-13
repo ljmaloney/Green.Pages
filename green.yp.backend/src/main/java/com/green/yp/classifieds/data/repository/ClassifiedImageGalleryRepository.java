@@ -7,6 +7,8 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface ClassifiedImageGalleryRepository
     extends JpaRepository<ClassifiedImageGallery, UUID> {
@@ -17,4 +19,11 @@ public interface ClassifiedImageGalleryRepository
       UUID classifiedId, String imageFilename);
 
   Optional<ClassifiedImageGallery> findFirstByClassifiedId(UUID classifiedId);
+
+  @Query("""
+            SELECT image
+            FROM ClassifiedImageGallery image
+            WHERE image.classifiedId IN :classifiedIds
+        """)
+  List<ClassifiedImageGallery> findImagesByClassifiedIds(@Param("classifiedIds") List<UUID> classifiedIds);
 }
