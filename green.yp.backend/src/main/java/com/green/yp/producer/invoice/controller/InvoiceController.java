@@ -2,7 +2,7 @@ package com.green.yp.producer.invoice.controller;
 
 import com.green.yp.api.apitype.invoice.ProducerInvoiceResponse;
 import com.green.yp.common.dto.ResponseApi;
-import com.green.yp.producer.invoice.service.InvoiceService;
+import com.green.yp.producer.invoice.service.ProducerInvoiceService;
 import com.green.yp.security.IsAnyAuthenticatedUser;
 import com.green.yp.util.DateUtils;
 import com.green.yp.util.RequestUtil;
@@ -22,16 +22,16 @@ import java.util.UUID;
 @Tag(name = "For retrieval of subscriber invoices")
 @RequestMapping("invoice")
 public class InvoiceController {
-    private final InvoiceService invoiceService;
+    private final ProducerInvoiceService producerInvoiceService;
 
-    public InvoiceController(InvoiceService invoiceService){
-        this.invoiceService = invoiceService;
+    public InvoiceController(ProducerInvoiceService producerInvoiceService){
+        this.producerInvoiceService = producerInvoiceService;
     }
 
     @IsAnyAuthenticatedUser
     @GetMapping(path="{invoiceId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseApi<ProducerInvoiceResponse> findInvoice(@PathVariable("invoiceId") UUID invoiceId){
-        return new ResponseApi<>(invoiceService.findInvoice(invoiceId, RequestUtil.getRequestIP()), null);
+        return new ResponseApi<>(producerInvoiceService.findInvoice(invoiceId, RequestUtil.getRequestIP()), null);
     }
 
     @IsAnyAuthenticatedUser
@@ -40,7 +40,7 @@ public class InvoiceController {
                                                                    @RequestParam("startDate") String startDate,
                                                                    @RequestParam("endDate") String endDate,
                                                                    @RequestParam(value = "descending", defaultValue = "true") Boolean descending){
-        return new ResponseApi<>(invoiceService.findInvoices(producerId,
+        return new ResponseApi<>(producerInvoiceService.findInvoices(producerId,
                 DateUtils.parseDate(startDate, LocalDate.class), DateUtils.parseDate(endDate, LocalDate.class), descending), null);
     }
 }

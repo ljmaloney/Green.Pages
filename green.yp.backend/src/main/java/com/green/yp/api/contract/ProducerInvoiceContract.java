@@ -4,26 +4,26 @@ import com.green.yp.api.apitype.invoice.ProducerInvoiceResponse;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.green.yp.producer.invoice.service.InvoiceService;
+import com.green.yp.producer.invoice.service.ProducerInvoiceService;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ProducerInvoiceContract {
-  final InvoiceService invoiceService;
+  final ProducerInvoiceService producerInvoiceService;
 
-  public ProducerInvoiceContract(InvoiceService invoiceService) {
-    this.invoiceService = invoiceService;
+  public ProducerInvoiceContract(ProducerInvoiceService producerInvoiceService) {
+    this.producerInvoiceService = producerInvoiceService;
   }
 
   public ProducerInvoiceResponse findInvoice(UUID invoiceId, String requestIP) {
-    return invoiceService.findInvoice(invoiceId, requestIP);
+    return producerInvoiceService.findInvoice(invoiceId, requestIP);
   }
 
   public ProducerInvoiceResponse markInvoicePaid(UUID invoiceId, String requestIP) {
-    return invoiceService.markInvoicePaid(invoiceId, Optional.empty(), requestIP);
+    return producerInvoiceService.markInvoicePaid(invoiceId, Optional.empty(), requestIP);
   }
 
   public ProducerInvoiceResponse createInvoice(UUID accountId, String requestIP) {
-    return invoiceService.createInvoice(accountId, requestIP);
+    return producerInvoiceService.createInvoice(accountId, requestIP);
   }
 }
