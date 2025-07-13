@@ -47,7 +47,7 @@
                             Dear ${firstName} ${lastName},
                         </p>
                         <p>
-                            You recently requested access to update or renew your classified ad on our website. Your authorization token is ${token}.
+                            You recently requested access to update or renew your classified ad on our website. Your authorization token is ${emailValidationToken}.
                             Copy and past this token into the "Authorization Token" field on the form.
                         </p>
                         <p>If your token as not been used within the next 15 minutes, it will expire.</p>
