@@ -88,7 +88,8 @@ public class ClassifiedSearchService {
 
         var responses = searchProjections
                 .stream()
-                .map( sp -> mapper.fromProjection(sp.classified(), sp.adType(), sp.category(), findImage(images, sp.classified().getId())))
+                .map( sp -> mapper.fromProjection(sp.classified(),
+                        sp.adType(), sp.category(), findImage(images, sp.classified().getId()), sp.distance()))
                 .toList();
 
         return new GenericPageableResponse<>(

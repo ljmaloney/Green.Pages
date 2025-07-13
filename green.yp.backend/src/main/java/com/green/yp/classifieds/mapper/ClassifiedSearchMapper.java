@@ -3,6 +3,7 @@ package com.green.yp.classifieds.mapper;
 import com.green.yp.api.apitype.classified.ClassifiedSearchResponse;
 import com.green.yp.classifieds.data.model.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import org.mapstruct.*;
@@ -32,4 +33,16 @@ public interface ClassifiedSearchMapper {
     }
 
     List<ClassifiedSearchResponse> fromProjection(List<ClassifiedSearchProjection> searchProjections);
+
+    @Mapping(target="categoryName", source = "category.name")
+    @Mapping(target="classifiedId", source="classified.id")
+    @Mapping(target = "description", source = "classified.description")
+    @Mapping(target = "obscureContactInfo", source = "adType.features.protectContact")
+    @Mapping(target = "url", expression = "java(getImageUrl(image))")
+    @Mapping(target = "imageName", expression = "java(getImageName(image))")
+    ClassifiedSearchResponse fromProjection(Classified classified,
+                                            ClassifiedAdType classifiedAdType,
+                                            ClassifiedCategory category,
+                                            Optional<ClassifiedImageGallery> image,
+                                            BigDecimal distance);
 }
