@@ -21,6 +21,7 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class ProducerSearchService {
 
+  private static final double MILES_IN_METERS = 1609.34d;
   private final ProducerSearchRepository searchRepository;
   private final GeocodingService geocodingService;
   private final ProducerSearchMapper producerSearchMapper;
@@ -42,7 +43,7 @@ public class ProducerSearchService {
     var coordinates = geocodingService.getCoordinates(zipCode);
     var wktPoint = String.format("POINT(%f %f)", coordinates.latitude(), coordinates.longitude());
 
-    BigDecimal distanceMeters = BigDecimal.valueOf(distance).multiply(BigDecimal.valueOf(1609.34d));
+    BigDecimal distanceMeters = BigDecimal.valueOf(distance).multiply(BigDecimal.valueOf(MILES_IN_METERS));
 
     var searchLocations =
         searchRepository.findProducersWithinDistance(
