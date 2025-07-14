@@ -6,11 +6,10 @@ import com.green.yp.api.apitype.invoice.InvoiceRequest;
 import com.green.yp.api.apitype.invoice.InvoiceResponse;
 import com.green.yp.invoice.data.model.Invoice;
 import com.green.yp.invoice.data.model.InvoiceLineItem;
+import java.util.List;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
-
-import java.util.List;
 
 @Mapper(
         componentModel = "spring",
