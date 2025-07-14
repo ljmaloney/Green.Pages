@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ClassifiedSearchService {
 
+    private static final double MILES_TO_METERS_RATIO = 1609.34d;
     private final ClassifiedRepository repository;
     private final ClassifiedSearchMapper mapper;
     private final ClassifiedImageGalleryRepository imageGalleryRepository;
@@ -66,7 +67,7 @@ public class ClassifiedSearchService {
         var coordinates = geocodingService.getCoordinates(postalCode);
         var wktPoint = String.format("POINT(%f %f)", coordinates.latitude(), coordinates.longitude());
 
-        BigDecimal distanceMeters = BigDecimal.valueOf(distanceMiles).multiply(BigDecimal.valueOf(1609.34d));
+        BigDecimal distanceMeters = BigDecimal.valueOf(distanceMiles).multiply(BigDecimal.valueOf(MILES_TO_METERS_RATIO));
 
         keywords = StringUtils.isBlank(keywords) ? null : keywords;
 

@@ -1,12 +1,11 @@
 package com.green.yp.invoice.data.repository;
 
 import com.green.yp.invoice.data.model.Invoice;
+import java.time.OffsetDateTime;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import java.time.OffsetDateTime;
-import java.util.UUID;
 
 public interface InvoiceRepository extends JpaRepository<Invoice, UUID> {
 

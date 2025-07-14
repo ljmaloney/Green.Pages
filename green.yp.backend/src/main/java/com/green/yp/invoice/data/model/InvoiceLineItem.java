@@ -20,17 +20,17 @@ public class InvoiceLineItem extends Immutable {
   private Invoice invoice;
 
   @Size(max = 50)
-  @NotNull
   @Column(name = "external_ref_1", nullable = false, length = 50)
   private String externalRef1;
 
-  @Size(max = 50)
-  @NotNull
   @Column(name = "external_ref_2", nullable = false, length = 50)
   private String externalRef2;
 
-  @Column(name = "line_item")
-  private Integer lineItem;
+  @Column(name = "line_item_number")
+  private Integer lineNumber;
+
+  @Column(name = "quantity")
+  private Integer quantity;
 
   @Size(max = 255)
   @NotNull
