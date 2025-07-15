@@ -97,8 +97,8 @@ public class SquarePaymentService implements PaymentService {
 
 
     @Override
-    public PaymentSavedCardResponse createPaymentMethod(PaymentMethodRequest methodRequest,
-                                                        String externCustId, UUID paymentMethodId) {
+    public PaymentSavedCardResponse createCardOnFile(PaymentMethodRequest methodRequest,
+                                                     String externCustId, UUID paymentMethodId) {
         log.debug("Creating new card on file for customer {}", externCustId);
 
         var squareCard = CreateCardRequest.builder()

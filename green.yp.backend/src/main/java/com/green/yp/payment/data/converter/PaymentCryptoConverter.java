@@ -11,8 +11,11 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+
+import jakarta.persistence.Converter;
 import org.apache.commons.lang3.StringUtils;
 
+@Converter
 public class PaymentCryptoConverter implements AttributeConverter<String, byte[]> {
   private static final String AES = "AES/CBC/PKCS5Padding";
   private static final String SECRET = "BZUMvZK7y5ktMEn3w";
@@ -64,7 +67,6 @@ public class PaymentCryptoConverter implements AttributeConverter<String, byte[]
 
     SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
     KeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 65536, 256);
-    SecretKey secret = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
-    return secret;
+    return new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
   }
 }

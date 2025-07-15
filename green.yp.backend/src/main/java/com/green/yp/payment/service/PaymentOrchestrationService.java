@@ -29,7 +29,7 @@ public class PaymentOrchestrationService {
 
         var newCustomer = paymentService.createCustomer(methodRequest, paymentMethodId);
 
-        var savedPayment = paymentService.createPaymentMethod(methodRequest, newCustomer.externCustRef(), newCustomer.idempotencyId());
+        var savedPayment = paymentService.createCardOnFile(methodRequest, newCustomer.externCustRef(), newCustomer.idempotencyId());
 
         //returned ssaved customer
         return null;

@@ -21,5 +21,5 @@ public interface PaymentService {
 
   PaymentCustomerResponse createCustomer(PaymentMethodRequest methodRequest, UUID paymentMethodId);
 
-  PaymentSavedCardResponse createPaymentMethod(PaymentMethodRequest methodRequest, String  externCustId, UUID paymentMethodId);
+  PaymentSavedCardResponse createCardOnFile(PaymentMethodRequest methodRequest, String  externCustId, UUID paymentMethodId);
 }
