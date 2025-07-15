@@ -1,6 +1,6 @@
 package com.green.yp.payment.service;
 
-import com.green.yp.api.apitype.classified.PaymentMethodResponse;
+import com.green.yp.api.apitype.payment.PaymentMethodResponse;
 import com.green.yp.api.apitype.payment.*;
 import com.green.yp.exception.PreconditionFailedException;
 import com.squareup.square.core.SquareApiException;

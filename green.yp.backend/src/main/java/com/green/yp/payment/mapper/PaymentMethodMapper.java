@@ -1,6 +1,6 @@
 package com.green.yp.payment.mapper;
 
-import com.green.yp.api.apitype.classified.PaymentMethodResponse;
+import com.green.yp.api.apitype.payment.PaymentMethodResponse;
 import com.green.yp.api.apitype.payment.PaymentCustomerResponse;
 import com.green.yp.api.apitype.payment.PaymentMethodRequest;
 import com.green.yp.api.apitype.payment.PaymentSavedCardResponse;

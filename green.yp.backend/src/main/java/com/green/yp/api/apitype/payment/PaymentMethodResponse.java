@@ -1,6 +1,5 @@
-package com.green.yp.api.apitype.classified;
+package com.green.yp.api.apitype.payment;
 
-import java.lang.foreign.ValueLayout;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
