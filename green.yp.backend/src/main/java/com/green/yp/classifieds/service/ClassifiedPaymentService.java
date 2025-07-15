@@ -49,8 +49,7 @@ public class ClassifiedPaymentService {
                        Classified Title : %s
                        Classified Description : %s
                        Term : 1 month
-                       Cost : $%s
-  """;
+                       Cost : $%s""";
 
   @Value("${greenyp.classified.baseUrl}")
   private String classifiedUrl;

@@ -40,7 +40,7 @@ public class AccountService {
 
   private final ProducerContract producerContract;
 
-  private final ProducerPaymentContract producerPaymentContract;
+  private final PaymentContract paymentContract;
 
   private final ProducerContactContract contactContract;
 
@@ -52,13 +52,13 @@ public class AccountService {
   public AccountService(
           EmailService emailService,
           ProducerContract producerContract,
-          ProducerPaymentContract producerPaymentContract,
+          PaymentContract paymentContract,
           ProducerContactContract contactContract,
           ProducerLocationContract locationContract,
           AccountMapper accountMapper, ProducerContactContract producerContactContract) {
     this.emailService = emailService;
     this.producerContract = producerContract;
-    this.producerPaymentContract = producerPaymentContract;
+    this.paymentContract = paymentContract;
     this.contactContract = contactContract;
     this.locationContract = locationContract;
     this.accountMapper = accountMapper;
@@ -74,7 +74,7 @@ public class AccountService {
 
     producerContract.cancelSubscription(accountId, null, ipAddress);
 
-    producerPaymentContract.cancelBilling(accountId, null, ipAddress);
+    paymentContract.cancelCardOnFile(accountId.toString());
 
     List<String> adminEmails = getAdminEmails(accountId);
 

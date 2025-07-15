@@ -1,8 +1,10 @@
 package com.green.yp.api.apitype.payment;
 
 import jakarta.validation.constraints.*;
+import lombok.Builder;
 import lombok.NonNull;
 
+@Builder
 public record PaymentMethodRequest(@NotNull @NonNull String paymentToken,
                                    @NotNull @NonNull String verificationToken,
                                    @NotBlank String emailValidationToken,

@@ -1,3 +1,17 @@
 package com.green.yp.api.apitype.invoice;
 
-public record InvoiceResponse() {}
+
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.util.UUID;
+
+public record InvoiceResponse(UUID invoiceId,
+                              UUID paymentTransactionId,
+                              String externalRef,
+                              InvoiceType invoiceType,
+                              OffsetDateTime paidDate,
+                              String description,
+                              BigDecimal invoiceTotal,
+                              String paymentReceiptNumber,
+                              String invoiceNumber,
+                              String paymentReceiptUrl){}
