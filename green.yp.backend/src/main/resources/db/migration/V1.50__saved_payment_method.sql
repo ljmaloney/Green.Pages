@@ -24,6 +24,7 @@ BEGIN
             `payor_postal_code`        VARCHAR(16)      NOT NULL,
             `phone_number`             VARCHAR(20),
             `email_address`            VARCHAR(150),
+            `card_details`             JSON,
             PRIMARY KEY (`id`)
         ) ENGINE = InnoDB;
         SHOW WARNINGS;
