@@ -61,6 +61,4 @@ public class PaymentMethodService {
             repository.saveAndFlush(paymentMethod1);
         });
     }
-
-
 }

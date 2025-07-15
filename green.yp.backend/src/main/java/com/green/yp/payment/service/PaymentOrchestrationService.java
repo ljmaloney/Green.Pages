@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -41,6 +42,7 @@ public class PaymentOrchestrationService {
         }
     }
 
+    @Transactional
     public PaymentMethodResponse replaceCardOnFile(PaymentMethodRequest methodRequest){
         log.info("Replacing existing payment method for subscriber {}", methodRequest.referenceId());
         try{
@@ -61,6 +63,21 @@ public class PaymentOrchestrationService {
             throw new PreconditionFailedException("There was an error when attempting to save the card for the subscription");
         }
 
+    }
+
+    @Transactional
+    public void cancelCardOnFile(String referenceId) {
+        log.info("Cancelling existing payment method for subscriber {}", referenceId);
+        try{
+            var activeCard = methodService.findActiveMethod(referenceId);
+            //deactivate card
+            paymentService.deactivateExistingCard(activeCard.cardRef());
+            methodService.deactivateExistingCard(activeCard.paymentMethodId());
+
+        } catch (SquareApiException e){
+            log.warn("Error updating customer / saving card {}", e.getMessage(), e);
+            throw new PreconditionFailedException("There was an error when attempting to save the card for the subscription");
+        }
     }
 
     private boolean customerChanged(PaymentMethodRequest methodRequest, PaymentMethodResponse activeCard) {
