@@ -9,6 +9,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.Instant;
+import java.time.OffsetDateTime;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -38,7 +40,8 @@ public class PaymentMethod extends Mutable {
   private String cardRef;
 
   @Column(name = "cancel_date")
-  private Instant cancelDate;
+  @Temporal(TemporalType.TIMESTAMP)
+  private OffsetDateTime cancelDate;
 
   @Size(max = 100)
   @Column(name = "given_name", length = 100)
