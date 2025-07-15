@@ -1,9 +1,7 @@
 package com.green.yp.payment.service;
 
-import com.green.yp.api.apitype.payment.PaymentMethodRequest;
-import com.green.yp.api.apitype.payment.PaymentMethodResponse;
-import com.green.yp.api.apitype.payment.PaymentRequest;
-import com.green.yp.api.apitype.payment.PaymentResponse;
+import com.green.yp.api.apitype.payment.*;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -21,7 +19,7 @@ public interface PaymentService {
   PaymentResponse processPayment(
       PaymentRequest paymentRequest, UUID paymentTransactionId, Optional<String> customerRef);
 
-  PaymentMethodResponse createCustomer(PaymentMethodRequest methodRequest, UUID paymentMethodId);
+  PaymentCustomerResponse createCustomer(PaymentMethodRequest methodRequest, UUID paymentMethodId);
 
-  Object createPaymentMethod(PaymentMethodRequest methodRequest, String  externCustId, UUID paymentMethodId);
+  PaymentSavedCardResponse createPaymentMethod(PaymentMethodRequest methodRequest, String  externCustId, UUID paymentMethodId);
 }

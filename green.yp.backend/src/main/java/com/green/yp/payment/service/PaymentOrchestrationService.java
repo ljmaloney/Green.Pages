@@ -22,7 +22,7 @@ public class PaymentOrchestrationService {
         this.paymentService = paymentService;
     }
 
-    public PaymentMethodResponse createPaymentMethod(PaymentMethodRequest methodRequest) {
+    public PaymentCustomerResponse createPaymentMethod(PaymentMethodRequest methodRequest) {
         log.info("Creating new payment method for subscriber");
 
         UUID paymentMethodId = UUID.randomUUID();

@@ -1,9 +1,6 @@
 package com.green.yp.payment.service.impl;
 
-import com.green.yp.api.apitype.payment.PaymentMethodRequest;
-import com.green.yp.api.apitype.payment.PaymentMethodResponse;
-import com.green.yp.api.apitype.payment.PaymentRequest;
-import com.green.yp.api.apitype.payment.PaymentResponse;
+import com.green.yp.api.apitype.payment.*;
 import com.green.yp.exception.ErrorCodeType;
 import com.green.yp.exception.SystemException;
 import com.green.yp.payment.service.PaymentService;
@@ -14,6 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -23,13 +21,16 @@ import org.springframework.stereotype.Service;
 @ConditionalOnProperty(name = "greenyp.payment.service.impl", havingValue = "square",
         matchIfMissing = true)
 public class SquarePaymentService implements PaymentService {
+    private final SquareResponseMapper squareResponseMapper;
 
     private final SquareClient squareClient;
     private final SquareResponseMapper responseMapper;
 
-    public SquarePaymentService(SquareClient squareClient, SquareResponseMapper responseMapper) {
+    public SquarePaymentService(SquareClient squareClient, SquareResponseMapper responseMapper,
+                                SquareResponseMapper squareResponseMapper) {
         this.squareClient = squareClient;
         this.responseMapper = responseMapper;
+        this.squareResponseMapper = squareResponseMapper;
     }
 
     @Override
@@ -62,12 +63,16 @@ public class SquarePaymentService implements PaymentService {
         var squarePaymentResponse = squareClient.payments().create(squarePayment.build());
 
         return squarePaymentResponse.getPayment()
-                .map(payment -> responseMapper.toPaymentResponse(payment))
-                .orElseThrow();
+                .map(responseMapper::toPaymentResponse)
+                .orElseThrow(() -> {
+                    log.warn("There was an error when attempting to process payment {}", paymentTransactionId);
+                    return new SystemException("Error processing payment", HttpStatus.INTERNAL_SERVER_ERROR,
+                            ErrorCodeType.PAYMENT_CUSTOMER_ERROR);
+                });
     }
 
     @Override
-    public PaymentMethodResponse createCustomer(PaymentMethodRequest methodRequest, UUID paymentMethodId) {
+    public PaymentCustomerResponse createCustomer(PaymentMethodRequest methodRequest, UUID paymentMethodId) {
         log.debug("Creating new customer for paymentMethodId {}", paymentMethodId);
         var squareCustomer = CreateCustomerRequest.builder()
                 .idempotencyKey(paymentMethodId.toString())
@@ -76,20 +81,12 @@ public class SquarePaymentService implements PaymentService {
                 .familyName(methodRequest.lastName())
                 .emailAddress(methodRequest.emailAddress())
                 .phoneNumber(methodRequest.phoneNumber())
-                .address(Address.builder()
-                        .addressLine1(methodRequest.payorAddress1())
-                        .addressLine2(methodRequest.payorAddress2())
-                        .locality(methodRequest.payorCity())
-                        .administrativeDistrictLevel1(methodRequest.payorState())
-                        .postalCode(methodRequest.payorPostalCode())
-                        .firstName(methodRequest.firstName())
-                        .lastName(methodRequest.lastName())
-                        .build())
+                .address(createAddress(methodRequest))
                 .build();
 
         var custResponse = squareClient.customers().create(squareCustomer);
 
-        return custResponse.getCustomer().map(c -> new PaymentMethodResponse(c.getId().get(), paymentMethodId))
+        return custResponse.getCustomer().map(squareResponseMapper::toPaymentCustomerResponse)
                 .orElseThrow( () -> {
                     log.warn("There was an error creating customer for paymentMethodId {}", paymentMethodId);
                     return new SystemException("Error creating new subscriber customer", HttpStatus.INTERNAL_SERVER_ERROR,
@@ -97,9 +94,11 @@ public class SquarePaymentService implements PaymentService {
                 });
     }
 
+
+
     @Override
-    public Object createPaymentMethod(PaymentMethodRequest methodRequest,
-                                      String externCustId, UUID paymentMethodId) {
+    public PaymentSavedCardResponse createPaymentMethod(PaymentMethodRequest methodRequest,
+                                                        String externCustId, UUID paymentMethodId) {
         log.debug("Creating new card on file for customer {}", externCustId);
 
         var squareCard = CreateCardRequest.builder()
@@ -109,21 +108,18 @@ public class SquarePaymentService implements PaymentService {
                         .customerId(externCustId)
                         .referenceId(methodRequest.referenceId())
                         .cardholderName(String.join(" ", methodRequest.firstName(), methodRequest.lastName()))
-                        .billingAddress(Address.builder()
-                                .addressLine1(methodRequest.payorAddress1())
-                                .addressLine2(methodRequest.payorAddress2())
-                                .locality(methodRequest.payorCity())
-                                .administrativeDistrictLevel1(methodRequest.payorState())
-                                .postalCode(methodRequest.payorPostalCode())
-                                .firstName(methodRequest.firstName())
-                                .lastName(methodRequest.lastName())
-                                .build())
+                        .billingAddress(createAddress(methodRequest))
                         .build())
                 .build();
 
         var squareCardResponse = squareClient.cards().create(squareCard);
 
-        return null;
+        return squareCardResponse.getCard().map(squareResponseMapper::toSavedCardResponse)
+                .orElseThrow(() -> {
+                    log.warn("There was an error creating customer for paymentMethodId {}", paymentMethodId);
+                    return new SystemException("Error creating new subscriber customer", HttpStatus.INTERNAL_SERVER_ERROR,
+                            ErrorCodeType.PAYMENT_CUSTOMER_ERROR);
+                });
     }
 
     private Money createMoney(BigDecimal amount) {
@@ -133,4 +129,16 @@ public class SquarePaymentService implements PaymentService {
                 .build();
     }
 
+    @NotNull
+    private static Address createAddress(PaymentMethodRequest methodRequest) {
+        return Address.builder()
+                .addressLine1(methodRequest.payorAddress1())
+                .addressLine2(methodRequest.payorAddress2())
+                .locality(methodRequest.payorCity())
+                .administrativeDistrictLevel1(methodRequest.payorState())
+                .postalCode(methodRequest.payorPostalCode())
+                .firstName(methodRequest.firstName())
+                .lastName(methodRequest.lastName())
+                .build();
+    }
 }
