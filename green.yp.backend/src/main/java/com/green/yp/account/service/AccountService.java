@@ -14,7 +14,6 @@ import com.green.yp.api.apitype.producer.enumeration.ProducerDisplayContactType;
 import com.green.yp.api.contract.*;
 import com.green.yp.email.service.EmailService;
 import com.green.yp.exception.*;
-import com.green.yp.util.TokenUtils;
 import jakarta.validation.constraints.NotNull;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -41,7 +40,7 @@ public class AccountService {
 
   private final ProducerContract producerContract;
 
-  private final PaymentContract paymentContract;
+  private final ProducerPaymentContract producerPaymentContract;
 
   private final ProducerContactContract contactContract;
 
@@ -53,13 +52,13 @@ public class AccountService {
   public AccountService(
           EmailService emailService,
           ProducerContract producerContract,
-          PaymentContract paymentContract,
+          ProducerPaymentContract producerPaymentContract,
           ProducerContactContract contactContract,
           ProducerLocationContract locationContract,
           AccountMapper accountMapper, ProducerContactContract producerContactContract) {
     this.emailService = emailService;
     this.producerContract = producerContract;
-    this.paymentContract = paymentContract;
+    this.producerPaymentContract = producerPaymentContract;
     this.contactContract = contactContract;
     this.locationContract = locationContract;
     this.accountMapper = accountMapper;
@@ -75,7 +74,7 @@ public class AccountService {
 
     producerContract.cancelSubscription(accountId, null, ipAddress);
 
-    paymentContract.cancelBilling(accountId, null, ipAddress);
+    producerPaymentContract.cancelBilling(accountId, null, ipAddress);
 
     List<String> adminEmails = getAdminEmails(accountId);
 

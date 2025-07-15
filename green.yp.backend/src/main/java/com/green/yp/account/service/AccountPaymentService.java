@@ -34,7 +34,7 @@ public class AccountPaymentService {
 
   private final ProducerContract producerContract;
 
-  private final PaymentContract paymentContract;
+  private final ProducerPaymentContract producerPaymentContract;
 
   private final ProducerContactContract contactContract;
   private final ProducerLocationContract locationContract;
@@ -43,13 +43,13 @@ public class AccountPaymentService {
       EmailService emailService,
       ProducerInvoiceContract producerInvoiceContract,
       ProducerContract producerContract,
-      PaymentContract paymentContract,
+      ProducerPaymentContract producerPaymentContract,
       ProducerContactContract contactContract,
       ProducerLocationContract locationContract) {
     this.emailService = emailService;
     this.producerInvoiceContract = producerInvoiceContract;
     this.producerContract = producerContract;
-    this.paymentContract = paymentContract;
+    this.producerPaymentContract = producerPaymentContract;
     this.contactContract = contactContract;
     this.locationContract = locationContract;
   }
@@ -78,7 +78,7 @@ public class AccountPaymentService {
         producerInvoiceContract.createInvoice(paymentRequest.producerId(), requestIP);
 
     ProducerPaymentResponse producerPaymentResponse =
-        paymentContract.applyPayment(
+        producerPaymentContract.applyPayment(
             paymentRequest,
             producerInvoiceResponse.invoiceId(),
             ProducerPaymentType.INITIAL_PAYMENT,
@@ -129,7 +129,7 @@ public class AccountPaymentService {
     producerInvoiceContract.findInvoice(paymentRequest.invoiceId(), requestIP);
 
     ProducerPaymentResponse producerPaymentResponse =
-        paymentContract.applyPayment(paymentRequest, userId, requestIP);
+        producerPaymentContract.applyPayment(paymentRequest, userId, requestIP);
 
     //        emailService.sendEmail(EmailTemplateName.WELCOME_EMAIL, producerResponse,
     //                getAdminEmails(paymentRequest.producerId()).toArray(new String[0]));
