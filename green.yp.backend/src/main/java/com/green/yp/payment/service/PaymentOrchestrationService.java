@@ -3,7 +3,6 @@ package com.green.yp.payment.service;
 import com.green.yp.api.apitype.classified.PaymentMethodResponse;
 import com.green.yp.api.apitype.payment.*;
 import com.green.yp.exception.PreconditionFailedException;
-import com.green.yp.payment.mapper.PaymentMethodMapper;
 import com.squareup.square.core.SquareApiException;
 import java.util.Optional;
 import java.util.UUID;
