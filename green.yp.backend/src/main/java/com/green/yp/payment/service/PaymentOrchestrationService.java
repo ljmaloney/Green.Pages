@@ -1,8 +1,9 @@
 package com.green.yp.payment.service;
 
-import com.green.yp.api.apitype.payment.PaymentRequest;
-import com.green.yp.api.apitype.payment.PaymentTransactionResponse;
+import com.green.yp.api.apitype.payment.*;
+
 import java.util.Optional;
+import java.util.UUID;
 
 import com.squareup.square.core.SquareApiException;
 import lombok.extern.slf4j.Slf4j;
@@ -21,10 +22,22 @@ public class PaymentOrchestrationService {
         this.paymentService = paymentService;
     }
 
+    public PaymentMethodResponse createPaymentMethod(PaymentMethodRequest methodRequest) {
+        log.info("Creating new payment method for subscriber");
+
+        UUID paymentMethodId = UUID.randomUUID();
+
+        var newCustomer = paymentService.createCustomer(methodRequest, paymentMethodId);
+
+        var savedPayment = paymentService.createPaymentMethod(methodRequest, newCustomer.externCustRef(), newCustomer.idempotencyId());
+
+        //returned ssaved customer
+        return null;
+    }
+
     public PaymentTransactionResponse applyPayment(PaymentRequest paymentRequest, Optional<String> customerRef) {
         //first create payment record
         var paymentResponse = transactionService.createPaymentRecord(paymentRequest);
-
         try{
             //call payment partner API
             var cardResponse = paymentService.processPayment(paymentRequest, paymentResponse.getId(), customerRef);

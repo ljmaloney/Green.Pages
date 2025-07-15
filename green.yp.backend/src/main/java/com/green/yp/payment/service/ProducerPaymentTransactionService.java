@@ -1,7 +1,7 @@
 package com.green.yp.payment.service;
 
 import com.green.yp.api.apitype.invoice.ProducerInvoiceResponse;
-import com.green.yp.api.apitype.payment.PaymentMethodResponse;
+import com.green.yp.api.apitype.payment.ProducerPaymentMethodResponse;
 import com.green.yp.payment.data.enumeration.*;
 import com.green.yp.payment.data.model.ProducerPaymentTransaction;
 import com.green.yp.payment.data.repository.ProducerPaymentTransactionRepository;
@@ -24,7 +24,7 @@ public class ProducerPaymentTransactionService {
 
   public ProducerPaymentTransaction createTransaction(
       ProducerInvoiceResponse producerInvoiceResponse,
-      PaymentMethodResponse paymentMethod,
+      ProducerPaymentMethodResponse paymentMethod,
       ProducerPaymentType paymentType,
       PaymentIntegrationResponse response) {
 

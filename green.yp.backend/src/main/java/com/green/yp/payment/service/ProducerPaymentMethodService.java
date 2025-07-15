@@ -1,7 +1,7 @@
 package com.green.yp.payment.service;
 
-import com.green.yp.api.apitype.payment.PaymentMethodRequest;
-import com.green.yp.api.apitype.payment.PaymentMethodResponse;
+import com.green.yp.api.apitype.payment.ProducerPaymentMethodRequest;
+import com.green.yp.api.apitype.payment.ProducerPaymentMethodResponse;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.payment.data.enumeration.PaymentMethodType;
 import com.green.yp.payment.data.model.ProducerPaymentMethod;
@@ -32,7 +32,7 @@ public class ProducerPaymentMethodService {
   }
 
   @Transactional
-  public PaymentMethodResponse createPaymentMethod(PaymentMethodRequest paymentRequest) {
+  public ProducerPaymentMethodResponse createPaymentMethod(ProducerPaymentMethodRequest paymentRequest) {
     log.info(
         "Create payment method for {} using {}",
         paymentRequest.producerId(),
@@ -80,7 +80,7 @@ public class ProducerPaymentMethodService {
     log.info("Marked payment method is being cancelled / inactive for {}", producerId);
   }
 
-  public PaymentMethodResponse findPaymentMethod(UUID paymentMethodId) {
+  public ProducerPaymentMethodResponse findPaymentMethod(UUID paymentMethodId) {
     return repository
         .findById(paymentMethodId)
         .map(paymentMapper::fromEntity)

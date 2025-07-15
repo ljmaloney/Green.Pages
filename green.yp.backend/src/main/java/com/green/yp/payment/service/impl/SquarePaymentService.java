@@ -1,7 +1,11 @@
 package com.green.yp.payment.service.impl;
 
+import com.green.yp.api.apitype.payment.PaymentMethodRequest;
+import com.green.yp.api.apitype.payment.PaymentMethodResponse;
 import com.green.yp.api.apitype.payment.PaymentRequest;
 import com.green.yp.api.apitype.payment.PaymentResponse;
+import com.green.yp.exception.ErrorCodeType;
+import com.green.yp.exception.SystemException;
 import com.green.yp.payment.service.PaymentService;
 import com.squareup.square.SquareClient;
 import com.squareup.square.types.*;
@@ -11,6 +15,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -29,6 +34,7 @@ public class SquarePaymentService implements PaymentService {
 
     @Override
     public PaymentResponse processPayment(PaymentRequest paymentRequest, UUID paymentTransactionId, Optional<String> customerRef) {
+        log.debug("Processing payment for ref {} amount {}",  paymentTransactionId, paymentRequest.paymentAmount());
         var squarePayment = CreatePaymentRequest.builder()
                 .sourceId(paymentRequest.paymentToken())
                         .idempotencyKey(paymentTransactionId.toString())
@@ -58,6 +64,66 @@ public class SquarePaymentService implements PaymentService {
         return squarePaymentResponse.getPayment()
                 .map(payment -> responseMapper.toPaymentResponse(payment))
                 .orElseThrow();
+    }
+
+    @Override
+    public PaymentMethodResponse createCustomer(PaymentMethodRequest methodRequest, UUID paymentMethodId) {
+        log.debug("Creating new customer for paymentMethodId {}", paymentMethodId);
+        var squareCustomer = CreateCustomerRequest.builder()
+                .idempotencyKey(paymentMethodId.toString())
+                .companyName(Optional.of(methodRequest.companyName()))
+                .givenName(methodRequest.firstName())
+                .familyName(methodRequest.lastName())
+                .emailAddress(methodRequest.emailAddress())
+                .phoneNumber(methodRequest.phoneNumber())
+                .address(Address.builder()
+                        .addressLine1(methodRequest.payorAddress1())
+                        .addressLine2(methodRequest.payorAddress2())
+                        .locality(methodRequest.payorCity())
+                        .administrativeDistrictLevel1(methodRequest.payorState())
+                        .postalCode(methodRequest.payorPostalCode())
+                        .firstName(methodRequest.firstName())
+                        .lastName(methodRequest.lastName())
+                        .build())
+                .build();
+
+        var custResponse = squareClient.customers().create(squareCustomer);
+
+        return custResponse.getCustomer().map(c -> new PaymentMethodResponse(c.getId().get(), paymentMethodId))
+                .orElseThrow( () -> {
+                    log.warn("There was an error creating customer for paymentMethodId {}", paymentMethodId);
+                    return new SystemException("Error creating new subscriber customer", HttpStatus.INTERNAL_SERVER_ERROR,
+                            ErrorCodeType.PAYMENT_CUSTOMER_ERROR);
+                });
+    }
+
+    @Override
+    public Object createPaymentMethod(PaymentMethodRequest methodRequest,
+                                      String externCustId, UUID paymentMethodId) {
+        log.debug("Creating new card on file for customer {}", externCustId);
+
+        var squareCard = CreateCardRequest.builder()
+                .idempotencyKey(paymentMethodId.toString())
+                .sourceId(methodRequest.paymentToken())
+                .card(Card.builder()
+                        .customerId(externCustId)
+                        .referenceId(methodRequest.referenceId())
+                        .cardholderName(String.join(" ", methodRequest.firstName(), methodRequest.lastName()))
+                        .billingAddress(Address.builder()
+                                .addressLine1(methodRequest.payorAddress1())
+                                .addressLine2(methodRequest.payorAddress2())
+                                .locality(methodRequest.payorCity())
+                                .administrativeDistrictLevel1(methodRequest.payorState())
+                                .postalCode(methodRequest.payorPostalCode())
+                                .firstName(methodRequest.firstName())
+                                .lastName(methodRequest.lastName())
+                                .build())
+                        .build())
+                .build();
+
+        var squareCardResponse = squareClient.cards().create(squareCard);
+
+        return null;
     }
 
     private Money createMoney(BigDecimal amount) {
