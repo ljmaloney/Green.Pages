@@ -25,6 +25,12 @@ public interface PaymentMethodMapper {
                            PaymentCustomerResponse newCustomer,
                            PaymentSavedCardResponse savedCard);
 
+    @Mapping(target = "cardRef", source="savedCard.cardRef")
+    @Mapping(target = "cardDetails", source="savedCard.card")
+    PaymentMethod toEntity(PaymentMethodRequest methodRequest,
+                           String externCustRef,
+                           PaymentSavedCardResponse savedCard);
+
     @Mapping(target = "paymentMethodId", source="id")
     PaymentMethodResponse toResponse(PaymentMethod paymentMethod);
 }

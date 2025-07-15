@@ -94,7 +94,36 @@ public class SquarePaymentService implements PaymentService {
                 });
     }
 
+    @Override
+    public PaymentCustomerResponse updateCustomer(PaymentMethodRequest methodRequest, String externCustId, UUID paymentMethodId) {
+        log.debug("Updating existing customer for custId {}, referenceId {}", externCustId, methodRequest.referenceId());
 
+        var custResponse = squareClient.customers()
+                .update(UpdateCustomerRequest.builder()
+                        .customerId(externCustId)
+                        .referenceId(methodRequest.referenceId())
+                        .companyName(methodRequest.companyName())
+                        .givenName(methodRequest.firstName())
+                        .familyName(methodRequest.lastName())
+                        .emailAddress(methodRequest.emailAddress())
+                        .phoneNumber(methodRequest.phoneNumber())
+                        .address(createAddress(methodRequest))
+                        .build());
+
+        return custResponse.getCustomer().map(squareResponseMapper::toPaymentCustomerResponse)
+                .orElseThrow( () -> {
+                    log.warn("There was an error creating customer for paymentMethodId {}", paymentMethodId);
+                    return new SystemException("Error creating new subscriber customer", HttpStatus.INTERNAL_SERVER_ERROR,
+                            ErrorCodeType.PAYMENT_CUSTOMER_ERROR);
+                });
+    }
+
+    @Override
+    public void deactivateExistingCard(String cardRef) {
+        log.info("Deactivating existing card for cardRef {}", cardRef);
+        squareClient.cards().disable(DisableCardsRequest.builder().cardId(cardRef).build());
+        log.info("Deactivated existing card for cardRef {}", cardRef);
+    }
 
     @Override
     public PaymentSavedCardResponse createCardOnFile(PaymentMethodRequest methodRequest,
@@ -121,6 +150,8 @@ public class SquarePaymentService implements PaymentService {
                             ErrorCodeType.PAYMENT_CUSTOMER_ERROR);
                 });
     }
+
+
 
     private Money createMoney(BigDecimal amount) {
         return Money.builder()

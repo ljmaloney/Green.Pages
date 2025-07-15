@@ -2,13 +2,11 @@ package com.green.yp.payment.service;
 
 import com.green.yp.api.apitype.classified.PaymentMethodResponse;
 import com.green.yp.api.apitype.payment.*;
-
-import java.util.Optional;
-import java.util.UUID;
-
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.payment.mapper.PaymentMethodMapper;
 import com.squareup.square.core.SquareApiException;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -19,15 +17,12 @@ public class PaymentOrchestrationService {
     private final PaymentTransactionService transactionService;
     private final PaymentService paymentService;
     private final PaymentMethodService methodService;
-    private final PaymentMethodMapper mapper;
 
     public PaymentOrchestrationService(PaymentTransactionService transactionService,
-                                       PaymentService paymentService, PaymentMethodService methodService,
-                                       PaymentMethodMapper mapper) {
+                                       PaymentService paymentService, PaymentMethodService methodService) {
         this.transactionService =  transactionService;
         this.paymentService = paymentService;
         this.methodService = methodService;
-        this.mapper = mapper;
     }
 
     public PaymentMethodResponse createPaymentMethod(PaymentMethodRequest methodRequest) {
@@ -44,6 +39,41 @@ public class PaymentOrchestrationService {
             log.warn("Error creating new customer / saving card {}", e.getMessage(), e);
             throw new PreconditionFailedException("There was an error when attempting to save the card for the subscription");
         }
+    }
+
+    public PaymentMethodResponse replaceCardOnFile(PaymentMethodRequest methodRequest){
+        log.info("Replacing existing payment method for subscriber {}", methodRequest.referenceId());
+        try{
+            var activeCard = methodService.findActiveMethod(methodRequest.referenceId());
+
+            if ( customerChanged(methodRequest, activeCard)) {
+                paymentService.updateCustomer(methodRequest, activeCard.externCustRef(), UUID.randomUUID());
+            }
+            //deactivate card
+            paymentService.deactivateExistingCard(activeCard.cardRef());
+            methodService.deactivateExistingCard(activeCard.paymentMethodId());
+
+            var savedPayment = paymentService.createCardOnFile(methodRequest, activeCard.externCustRef(), UUID.randomUUID());
+
+            return methodService.createPaymentMethod(methodRequest, activeCard.externCustRef(), savedPayment);
+        } catch (SquareApiException e){
+            log.warn("Error updating customer / saving card {}", e.getMessage(), e);
+            throw new PreconditionFailedException("There was an error when attempting to save the card for the subscription");
+        }
+
+    }
+
+    private boolean customerChanged(PaymentMethodRequest methodRequest, PaymentMethodResponse activeCard) {
+        return !methodRequest.firstName().equals(activeCard.givenName()) ||
+               !methodRequest.lastName().equals(activeCard.familyName()) ||
+               !methodRequest.companyName().equals(activeCard.companyName()) ||
+               !methodRequest.payorAddress1().equals(activeCard.payorAddress1()) ||
+               !methodRequest.payorAddress2().equals(activeCard.payorAddress2()) ||
+               !methodRequest.payorCity().equals(activeCard.payorCity()) ||
+               !methodRequest.payorState().equals(activeCard.payorState()) ||
+               !methodRequest.payorPostalCode().equals(activeCard.payorPostalCode()) ||
+               !methodRequest.phoneNumber().equals(activeCard.phoneNumber()) ||
+               !methodRequest.emailAddress().equals(activeCard.emailAddress());
     }
 
     public PaymentTransactionResponse applyPayment(PaymentRequest paymentRequest, Optional<String> customerRef) {

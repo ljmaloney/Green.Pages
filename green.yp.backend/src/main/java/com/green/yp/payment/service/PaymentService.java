@@ -1,7 +1,6 @@
 package com.green.yp.payment.service;
 
 import com.green.yp.api.apitype.payment.*;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -22,4 +21,8 @@ public interface PaymentService {
   PaymentCustomerResponse createCustomer(PaymentMethodRequest methodRequest, UUID paymentMethodId);
 
   PaymentSavedCardResponse createCardOnFile(PaymentMethodRequest methodRequest, String  externCustId, UUID paymentMethodId);
+
+  PaymentCustomerResponse updateCustomer(PaymentMethodRequest methodRequest, String externCustId, UUID paymentMethodId);
+
+  void deactivateExistingCard(String cardRef);
 }

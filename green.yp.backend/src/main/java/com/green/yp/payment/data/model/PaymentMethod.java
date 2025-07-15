@@ -3,17 +3,13 @@ package com.green.yp.payment.data.model;
 import com.green.yp.common.data.converter.BooleanConverter;
 import com.green.yp.common.data.embedded.Mutable;
 import com.green.yp.payment.data.converter.JsonCardConvertor;
-import com.green.yp.payment.data.converter.JsonCardDetailsConvertor;
 import com.green.yp.payment.data.json.Card;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.time.Instant;
 import java.time.OffsetDateTime;
-
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 
 @Getter
 @Setter

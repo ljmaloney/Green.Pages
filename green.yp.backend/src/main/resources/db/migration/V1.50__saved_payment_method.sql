@@ -30,6 +30,7 @@ BEGIN
         SHOW WARNINGS;
         CREATE INDEX `payment_ref_id_idx` on `payment_method` (`reference_id`);
         CREATE INDEX `payment_method_active_idx` ON `greenyp`.`payment_method` (`active` ASC) VISIBLE;
+        CREATE INDEX `payment_mthd_ref_active_idx` on `payment_method` (`reference_id`, `active`);
     END;
 END //
 DELIMITER ;
