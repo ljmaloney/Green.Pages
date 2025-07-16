@@ -51,9 +51,10 @@
                             30 days at the cost of $${paymentAmount} in the ${categoryName} for
                             ${classifiedTitle}.
                         </p>
-                        <p>
-                            The confirmation code for the payment page is <strong>${emailValidationToken}</strong>. Enter this value on the
-                            Green Market classified payment page to confirm your identity.
+                        <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
+                            The confirmation code for the payment page is <br/><br/>
+                            <strong>${emailValidationToken}</strong>.
+                            <br/><br/>Enter this value on the Green Market classified payment page to confirm your identity.
                         </p>
                         <br/><br/>
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">

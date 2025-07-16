@@ -49,7 +49,7 @@
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
                            A new subscriber contact account has been created for you.
                         </p>
-                        <p>
+                        <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
                             The confirmation code for the payment page is <strong>${emailValidationToken}</strong>.
                             Enter this value to confirm your identity and confirm you received this email.
                         </p>

@@ -21,7 +21,7 @@ public enum EmailTemplateType {
           "email/classified-token.ftl",
           "Classified Authentication Token"),
   CLASSIFIED_EMAIL_VALIDATION("green.yp.classified.token",
-          "email/classified-token.ftl" ,
+          "email/classified-email-validation.ftl" ,
           "GreenMarket - Classified Ad Email Validation"),
   CONTACT_EMAIL_CONFIRMATION("green.yp.confirm.email",
           "email/subscriber-contact-token.ftl",

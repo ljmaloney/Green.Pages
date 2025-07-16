@@ -43,15 +43,16 @@
                 <!-- Main Content -->
                 <tr>
                     <td style="padding: 40px;">
-                        <p>
+                        <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
                             Dear ${firstName} ${lastName},
                         </p>
-                        <p>
-                            You recently requested access to update or renew your classified ad on our website. Your authorization token is ${emailValidationToken}.
+                        <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
+                            You recently requested access to update or renew your classified ad on our website.
+                            Your authorization token is ${emailValidationToken}.
                             Copy and past this token into the "Authorization Token" field on the form.
                         </p>
-                        <p>If your token as not been used within the next 15 minutes, it will expire.</p>
-                        <p>
+                        <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">If your token as not been used within the next 15 minutes, it will expire.</p>
+                        <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
                             The classified ad authentication token request was received from ip address ${ipAddress} at ${timestamp}.
                         </p>
                     </td>
