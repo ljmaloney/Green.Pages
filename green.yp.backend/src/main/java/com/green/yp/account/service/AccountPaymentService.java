@@ -1,10 +1,12 @@
 package com.green.yp.account.service;
 
+import com.green.yp.api.apitype.enumeration.EmailTemplateType;
 import com.green.yp.api.apitype.invoice.*;
 import com.green.yp.api.apitype.payment.*;
 import com.green.yp.api.apitype.producer.ProducerContactResponse;
 import com.green.yp.api.apitype.producer.ProducerResponse;
 import com.green.yp.api.apitype.producer.ProducerSubscriptionResponse;
+import com.green.yp.api.apitype.producer.enumeration.ProducerContactType;
 import com.green.yp.api.apitype.producer.enumeration.ProducerSubscriptionType;
 import com.green.yp.api.contract.*;
 import com.green.yp.email.service.EmailService;
@@ -12,10 +14,9 @@ import com.green.yp.exception.PreconditionFailedException;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.OffsetDateTime;
+import java.util.*;
+
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -76,6 +77,18 @@ public class AccountPaymentService {
       throw new PreconditionFailedException("Producer/Account is already active");
     }
 
+    ProducerContactResponse primaryContact =  contactContract.findAdminContacts(producerResponse.producerId())
+            .stream().filter(contact-> contact.producerContactType() == ProducerContactType.ADMIN)
+            .findFirst().orElseThrow( () -> {
+              log.error("No primary contact found for {}", paymentRequest.producerId());
+              return new PreconditionFailedException("No primary contact found for " + paymentRequest.producerId());
+            });
+
+    if ( primaryContact.emailConfirmedDate() == null ){
+      log.warn("Email has not been confirmed for the admin contact {} for {}", paymentRequest.producerId(), primaryContact.emailAddress());
+      throw new PreconditionFailedException("Admin email address has not been confirmed for the account");
+    }
+
     var invoice = createInvoiceForPayment(paymentRequest, producerResponse);
 
     var savedCustomerCard = paymentContract.createPaymentMethod(
@@ -112,6 +125,18 @@ public class AccountPaymentService {
             Optional.of(savedCustomerCard.externCustRef()));
 
     invoiceContract.updatePayment(invoice.invoiceId(), completedPayment);
+
+    emailService.sendEmailAsync(EmailTemplateType.PRODUCER_PAYMENT_CONFIRMATION,
+            Collections.singletonList(primaryContact.emailAddress()),
+            EmailTemplateType.PRODUCER_PAYMENT_CONFIRMATION.getSubjectFormat(),
+            () -> Map.of("invoice", invoice,
+                    "producerId", producerResponse.producerId(),
+                    "lastName", primaryContact.lastName(),
+                    "firstName", primaryContact.firstName(),
+                    "transactionRef", completedPayment.paymentRef(),
+                    "receiptUrl", completedPayment.receiptUrl(),
+                    "timestamp", OffsetDateTime.now(),
+                    "ipAddress", requestIP) );
 
     return new ApiPaymentResponse(
         true, completedPayment.receiptNumber(), completedPayment.receiptUrl());

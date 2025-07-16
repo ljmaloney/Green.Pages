@@ -25,7 +25,10 @@ public enum EmailTemplateType {
           "GreenMarket - Classified Ad Email Validation"),
   CONTACT_EMAIL_CONFIRMATION("green.yp.confirm.email",
           "email/subscriber-contact-token.ftl",
-          "GreenMarket - Subscriber Contact Email Confirmation"),;
+          "GreenMarket - Subscriber Contact Email Confirmation"),
+  PRODUCER_PAYMENT_CONFIRMATION("green.yp.sub.receipt",
+          "email/producer-subscription-receipt.ftl",
+          "Green Market - Subscriber Payment Receipt" );
 
   private final String templateName;
   private final String templateFileName;
