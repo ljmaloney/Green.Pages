@@ -218,7 +218,7 @@ public class AccountPaymentService {
     if (CollectionUtils.isEmpty(producers)) {
       return String.format("No unpaid subscribers over %s days old", daysOld);
     }
-    List<UUID> producerIds = producers.stream().map(p -> p.producerId()).toList();
+    List<UUID> producerIds = producers.stream().map(ProducerResponse::producerId).toList();
 
     producerContract.deleteCredentials(producerIds);
 
@@ -237,7 +237,7 @@ public class AccountPaymentService {
   private List<String> getAdminEmails(UUID accountId) {
     List<ProducerContactResponse> contacts = contactContract.findAdminContacts(accountId);
 
-    return contacts.stream().map(contact -> contact.emailAddress()).toList();
+    return contacts.stream().map(ProducerContactResponse::emailAddress).toList();
   }
 
   private InvoiceLineItemRequest createLineItem(ApplyPaymentMethodRequest paymentRequest,

@@ -62,4 +62,12 @@ public class ProducerContactContract {
   public void deleteContacts(@NotNull @NonNull List<UUID> producerIds) {
     orchestrationService.deleteContacts(producerIds);
   }
+
+  public void validateContact(@NotNull @NonNull UUID accountId, UUID contactId, @NotNull @NonNull String validationToken) {
+    service.validateContact(accountId, contactId, validationToken);
+  }
+
+  public void validateEmail(@NotNull @NonNull UUID accountId, String email, @NotNull @NonNull String validationToken) {
+    service.validateEmail(accountId, email, validationToken);
+  }
 }

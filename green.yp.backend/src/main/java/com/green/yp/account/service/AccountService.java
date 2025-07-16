@@ -186,6 +186,16 @@ public class AccountService {
             producerResponse, null, null, null);
   }
 
+  public void validateEmail(@NotNull @NonNull UUID accountId, UUID contactId, String email, @NotNull @NonNull String validationToken, String requestIP) {
+    if ( contactId != null ) {
+      contactContract.validateContact(accountId, contactId, validationToken);
+    } else if ( StringUtils.isNotBlank(email)) {
+      contactContract.validateEmail(accountId, email, validationToken);
+    } else {
+      throw new PreconditionFailedException("Provide either an email address or contactId for the email being validated");
+    }
+  }
+
   private ProducerCredentialsResponse createOrUpdateCredentials(
       ProducerResponse producerResponse,
       UserCredentialsRequest request,
@@ -349,4 +359,6 @@ public class AccountService {
 
     return contacts.stream().map(ProducerContactResponse::emailAddress).toList();
   }
+
+
 }

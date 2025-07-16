@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
@@ -51,6 +52,20 @@ public class AccountController {
   public ResponseApi<AccountResponse> findAccount(
       @PathVariable(name = "accountId") String accountId) {
     return new ResponseApi<>(accountService.findAccount(UUID.fromString(accountId)), null);
+  }
+
+  @ApiResponse(
+          responseCode = org.apache.hc.core5.http.HttpStatus.SC_NO_CONTENT + "",
+          description = "Returns the requested account information")
+  @GetMapping(path = "/{accountId}/validate")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void validateEmail(
+          @PathVariable(name = "accountId") UUID accountId,
+          @RequestParam(name="contactId", required = false) UUID contactId,
+          @RequestParam(name="email", required = false) String email,
+          @RequestParam(name="validationToken") String validationToken,
+          HttpServletRequest request) {
+    accountService.validateEmail(accountId, contactId, email, validationToken, RequestUtil.getRequestIP(request));
   }
 
   @IsAnyAuthenticatedUser
