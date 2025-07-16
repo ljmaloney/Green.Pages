@@ -48,14 +48,18 @@
                         </p>
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
                             You or someone you know is attempting to place a classified ad with us for
-                            30 days at the cost of $${paymentAmount} in the ${categoryName} for
+                            30 days at the cost of $${paymentAmount} in the ${categoryName} category for
+                        <div style="text-align: center;display: inline-block; margin: 20px 0; padding: 10px 20px; background-color: #f3f4f6; color: #111827; font-weight: bold; border-radius: 6px; font-size: 16px;">
                             ${classifiedTitle}.
+                        </div>
                         </p>
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
-                            The confirmation code for the payment page is <br/><br/>
-                            <strong>${emailValidationToken}</strong>.
-                            <br/><br/>Enter this value on the Green Market classified payment page to confirm your identity.
+                            The confirmation code for the payment page is below. Enter this value on the Green Market classified
+                            payment page to confirm your identity.
                         </p>
+                        <div style="text-align: center;display: inline-block; margin: 20px 0; padding: 10px 20px; background-color: #f3f4f6; color: #111827; font-weight: bold; border-radius: 6px; font-size: 16px;">
+                            ${emailValidationToken}
+                        </div>
                         <br/><br/>
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
                             The classified ad was placed from ip address ${ipAddress} at ${timestamp}.
