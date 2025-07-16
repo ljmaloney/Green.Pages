@@ -42,6 +42,7 @@ public class JwtSecurityConfig {
     }
 
     public AbstractAuthenticationToken convert(Jwt jwt) {
+      log.debug("converting jwt to extract roles");
       Set<SimpleGrantedAuthority> authorities = new HashSet<>();
 
       // Extract roles from token claims (optional)

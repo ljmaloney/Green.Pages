@@ -15,6 +15,7 @@ import com.green.yp.exception.SystemException;
 import com.green.yp.security.IsAnyAuthenticatedUser;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -121,7 +122,7 @@ public class AccountController {
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public ResponseApi<AccountResponse> updateAccount(@AuthUser AuthenticatedUser authenticatedUser,
+  public ResponseApi<AccountResponse> updateAccount(@Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser,
                                                     @RequestBody @Valid UpdateAccountRequest account) {
     try {
       return new ResponseApi<>(
@@ -138,7 +139,7 @@ public class AccountController {
           "Removes or disables unpaid accounts where a payment has not been received in over specified number of days")
   @PostMapping(path = "/clean/unpaid", produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public ResponseApi<String> cleanUnpaidAccounts(@AuthUser AuthenticatedUser authenticatedUser,
+  public ResponseApi<String> cleanUnpaidAccounts(@Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser,
       @RequestParam(name = "days", defaultValue = "30", required = false) Integer daysOld) {
     return new ResponseApi<>(
         paymentService.cleanUnpaidAccounts(daysOld, RequestUtil.getRequestIP()), null);
@@ -148,7 +149,7 @@ public class AccountController {
   @Operation(summary = "Cancels or disables an account")
   @DeleteMapping(path = "/{accountId}", produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public ResponseApi<String> cancelAccount(@AuthUser AuthenticatedUser authenticatedUser, @PathVariable UUID accountId) {
+  public ResponseApi<String> cancelAccount(@Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser, @PathVariable UUID accountId) {
     return new ResponseApi<>(
         accountService.cancelAccount(accountId, authenticatedUser.userId(), RequestUtil.getRequestIP()), null);
   }
