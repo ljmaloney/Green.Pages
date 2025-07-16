@@ -44,7 +44,7 @@
                 <tr>
                     <td style="padding: 40px;">
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
-                            Dear ${firstName} ${lastName},
+                            Dear ${contactName},
                         </p>
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
                            A new subscriber contact account has been created for you.

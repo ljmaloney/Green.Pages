@@ -128,7 +128,6 @@ public class FusionAuthService implements AuthenticationService {
     SearchRequest request = new SearchRequest(criteria);
 
     ClientResponse<SearchResponse, Errors> response = fusionAuthClient.searchUsersByQuery(request);
-
     if ( response.wasSuccessful()){
       log.warn("Found {} credentials for {} {}", response.successResponse.total, userName, emailAddress);
       return response.getSuccessResponse().users.stream()
