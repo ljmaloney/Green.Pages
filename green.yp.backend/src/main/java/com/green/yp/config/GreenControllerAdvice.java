@@ -18,6 +18,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 @Slf4j
 public class GreenControllerAdvice {
   @ExceptionHandler(Throwable.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseApi<Void> handleError(Throwable e) {
     log.error("An unexpected error occurred - {}", e.getMessage(), e);
     return new ResponseApi<>(
