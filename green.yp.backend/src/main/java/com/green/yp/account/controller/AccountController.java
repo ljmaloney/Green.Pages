@@ -57,7 +57,7 @@ public class AccountController {
   @ApiResponse(
           responseCode = org.apache.hc.core5.http.HttpStatus.SC_NO_CONTENT + "",
           description = "Returns the requested account information")
-  @GetMapping(path = "/{accountId}/validate")
+  @PostMapping(path = "/{accountId}/validate")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void validateEmail(
           @PathVariable(name = "accountId") UUID accountId,
