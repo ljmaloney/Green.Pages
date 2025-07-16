@@ -5,6 +5,7 @@ import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.exception.ErrorCodeType;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
+import com.green.yp.exception.UserCredentialsException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,17 @@ public class GreenControllerAdvice {
         null,
         new ErrorMessageApi(
             ErrorCodeType.SYSTEM_ERROR, "Unexpected error has occurred", e.getMessage()));
+  }
+
+  @ExceptionHandler(UserCredentialsException.class)
+  @ResponseStatus(HttpStatus.PRECONDITION_FAILED)
+  public ResponseApi<Void> handleError(UserCredentialsException e) {
+    log.warn("User credentials error: {}", e.getMessage());
+    return new ResponseApi<>(null,
+            new ErrorMessageApi(
+                    ErrorCodeType.PAYLOAD_VALIDATION,
+                    "One or more validation rules on the request failed.",
+                    e.getMessage()));
   }
 
   @ExceptionHandler(ConstraintViolationException.class)
