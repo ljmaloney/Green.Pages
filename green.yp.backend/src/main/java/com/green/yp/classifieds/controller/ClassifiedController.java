@@ -17,6 +17,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.validation.annotation.Validated;
@@ -39,6 +40,15 @@ public class ClassifiedController {
       @PathVariable("classifiedId") UUID classifiedId, HttpServletRequest request) {
     return new ResponseApi<>(
         service.findClassified(classifiedId, RequestUtil.getRequestIP(request)), null);
+  }
+
+  @PostMapping(path="{classifiedId}/validate")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void validateEmailToken(@PathVariable("classifiedId") UUID classifiedId,
+                                 @RequestParam("emailAddress") String emailAddress,
+                                 @RequestParam("token") String emailToken,
+                                 HttpServletRequest request){
+    service.validateEmail(classifiedId, emailAddress, emailToken, RequestUtil.getRequestIP(request));
   }
 
   @Operation(summary = "Requests sending authenticate messsage so classified customer can edit the ad")

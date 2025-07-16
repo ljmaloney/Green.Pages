@@ -103,4 +103,8 @@ public class ClassifiedCustomer extends Mutable {
         .append(emailAddress)
         .toHashCode();
   }
+
+    public boolean isValidToken(String emailToken) {
+      return emailToken.equals(this.getEmailAddressValidationToken());
+    }
 }
