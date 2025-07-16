@@ -1,7 +1,6 @@
 package com.green.yp.api.apitype.search;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-
 import java.math.BigDecimal;
 import java.util.UUID;
 

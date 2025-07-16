@@ -1,9 +1,8 @@
 package com.green.yp.api.apitype.classified;
 
 import jakarta.validation.constraints.*;
-import lombok.NonNull;
-
 import java.math.BigDecimal;
+import lombok.NonNull;
 
 public record ClassifiedUpdateRequest(@NotNull @NonNull BigDecimal price,
                                       @Pattern(regexp = "^[\\p{Alpha} ]*$", message = "Price per units should contain only alphabets and space")

@@ -1,8 +1,7 @@
 package com.green.yp.api.apitype.invoice;
 
-import lombok.Builder;
-
 import java.math.BigDecimal;
+import lombok.Builder;
 
 @Builder
 public record InvoiceLineItemRequest(int lineItemNumber,

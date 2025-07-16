@@ -1,10 +1,9 @@
 package com.green.yp.api.apitype.classified;
 
 import jakarta.validation.constraints.*;
-import lombok.NonNull;
-
 import java.math.BigDecimal;
 import java.util.UUID;
+import lombok.NonNull;
 
 public record ClassifiedRequest(@NotNull @NonNull UUID adType,
                                 @NotNull @NonNull UUID categoryId,

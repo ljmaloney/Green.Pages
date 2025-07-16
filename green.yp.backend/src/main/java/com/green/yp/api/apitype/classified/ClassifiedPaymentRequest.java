@@ -1,9 +1,8 @@
 package com.green.yp.api.apitype.classified;
 
 import jakarta.validation.constraints.*;
-import lombok.NonNull;
-
 import java.util.UUID;
+import lombok.NonNull;
 
 public record ClassifiedPaymentRequest(@NotNull @NonNull UUID classifiedId,
                                        @NotNull @NonNull String paymentToken,

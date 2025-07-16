@@ -1,11 +1,10 @@
 package com.green.yp.api.apitype.invoice;
 
-import lombok.Builder;
-
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
+import lombok.Builder;
 
 @Builder
 public record InvoiceRequest(String externalRef,

@@ -1,11 +1,9 @@
 package com.green.yp.api.apitype.payment;
 
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import jakarta.validation.constraints.*;
+import java.math.BigDecimal;
 import lombok.Builder;
 import lombok.NonNull;
-
-import java.math.BigDecimal;
 
 @Builder
 public record PaymentRequest(@NotNull @NonNull String paymentToken,

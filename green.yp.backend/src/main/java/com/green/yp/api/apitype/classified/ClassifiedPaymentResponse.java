@@ -2,7 +2,6 @@ package com.green.yp.api.apitype.classified;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-
 import java.util.UUID;
 
 public record ClassifiedPaymentResponse(UUID classifiedId,
