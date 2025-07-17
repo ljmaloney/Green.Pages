@@ -8,11 +8,15 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.UUID;
+
+import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 // @Builder
@@ -70,4 +74,24 @@ public class ProducerContact extends Mutable {
 
   @Column(name = "email_address", length = 150)
   private String emailAddress;
+
+    public boolean isValidEmailToken(@NotNull @NonNull String validationToken) {
+      return validationToken.equals(emailConfirmationToken);
+    }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    ProducerContact that = (ProducerContact) o;
+
+    return new EqualsBuilder().appendSuper(super.equals(o)).append(producerId, that.producerId).append(producerLocationId, that.producerLocationId).append(producerContactType, that.producerContactType).append(displayContactType, that.displayContactType).append(genericContactName, that.genericContactName).append(firstName, that.firstName).append(lastName, that.lastName).append(title, that.title).append(phoneNumber, that.phoneNumber).append(cellPhoneNumber, that.cellPhoneNumber).append(emailConfirmed, that.emailConfirmed).append(authenticationCancelDate, that.authenticationCancelDate).append(emailConfirmedDate, that.emailConfirmedDate).append(emailConfirmationToken, that.emailConfirmationToken).append(emailAddress, that.emailAddress).isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(producerId).append(producerLocationId).append(producerContactType).append(displayContactType).append(genericContactName).append(firstName).append(lastName).append(title).append(phoneNumber).append(cellPhoneNumber).append(emailConfirmed).append(authenticationCancelDate).append(emailConfirmedDate).append(emailConfirmationToken).append(emailAddress).toHashCode();
+  }
 }

@@ -1,8 +1,8 @@
 package com.green.yp.payment.mapper;
 
 import com.green.yp.api.apitype.payment.ApplyPaymentMethodRequest;
-import com.green.yp.api.apitype.payment.PaymentMethodRequest;
-import com.green.yp.api.apitype.payment.PaymentMethodResponse;
+import com.green.yp.api.apitype.payment.ProducerPaymentMethodRequest;
+import com.green.yp.api.apitype.payment.ProducerPaymentMethodResponse;
 import com.green.yp.api.apitype.payment.ProducerPaymentResponse;
 import com.green.yp.payment.data.model.ProducerPaymentMethod;
 import com.green.yp.payment.data.model.ProducerPaymentTransaction;
@@ -21,10 +21,10 @@ public interface PaymentMapper {
   @Mapping(source = "paymentMethodId", target = "methodId")
   ProducerPaymentResponse fromTransaction(ProducerPaymentTransaction savedTransaction);
 
-  PaymentMethodRequest toPaymentRequest(ApplyPaymentMethodRequest paymentRequest);
+  ProducerPaymentMethodRequest toPaymentRequest(ApplyPaymentMethodRequest paymentRequest);
 
-  ProducerPaymentMethod toEntity(PaymentMethodRequest paymentRequest);
+  ProducerPaymentMethod toEntity(ProducerPaymentMethodRequest paymentRequest);
 
   @Mapping(source = "id", target = "paymentMethodId")
-  PaymentMethodResponse fromEntity(ProducerPaymentMethod producerPaymentMethod);
+  ProducerPaymentMethodResponse fromEntity(ProducerPaymentMethod producerPaymentMethod);
 }

@@ -9,6 +9,7 @@ import com.green.yp.invoice.data.model.InvoiceLineItem;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(
@@ -20,7 +21,10 @@ public interface InvoiceMapper {
     InvoiceLineItem toEntity(InvoiceLineItemRequest invoiceLineItemRequest);
     List<InvoiceLineItem> toEntity(List<InvoiceLineItemRequest> lineItems);
 
+    @Mapping(target = "invoiceId", source="id")
     InvoiceResponse fromEntity(Invoice invoice);
+
+    @Mapping(target = "lineItemId", source="id")
     InvoiceLineItemResponse fromEntity(InvoiceLineItem lineItem);
     List<InvoiceLineItemResponse> fromEntity(List<InvoiceLineItem> lineItems);
 

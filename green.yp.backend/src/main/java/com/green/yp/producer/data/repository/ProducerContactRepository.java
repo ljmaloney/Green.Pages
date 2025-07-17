@@ -5,6 +5,7 @@ import com.green.yp.producer.data.model.ProducerContact;
 import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,6 +16,7 @@ import org.springframework.data.repository.query.Param;
 public interface ProducerContactRepository extends JpaRepository<ProducerContact, UUID> {
   List<ProducerContact> findByProducerIdAndProducerLocationId(UUID producerId, UUID locationId);
 
+  @Modifying
   @Query(
       """
                         UPDATE ProducerContact
@@ -62,4 +64,7 @@ public interface ProducerContactRepository extends JpaRepository<ProducerContact
         WHERE producerId in (:producerIds)
     """)
   void deleteContacts(@NotNull @NonNull @Param("producerIds") List<UUID> producerIds);
+
+  Optional<ProducerContact> findByProducerIdAndEmailAddress(@NotNull @NonNull UUID producerId,
+                                                   @NotNull @NonNull String email);
 }

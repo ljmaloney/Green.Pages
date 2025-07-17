@@ -1,10 +1,11 @@
 package com.green.yp.api.apitype.payment;
 
 import jakarta.validation.constraints.*;
+import java.math.BigDecimal;
+import lombok.Builder;
 import lombok.NonNull;
 
-import java.math.BigDecimal;
-
+@Builder
 public record PaymentRequest(@NotNull @NonNull String paymentToken,
                              @NotNull String verificationToken,
                              String referenceId,

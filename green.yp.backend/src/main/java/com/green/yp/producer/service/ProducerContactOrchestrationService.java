@@ -102,7 +102,7 @@ public class ProducerContactOrchestrationService {
       objectType = AuditObjectType.PRODUCER_CONTACT,
       actionType = AuditActionType.CREATE)
   public ProducerContactResponse createContact(
-      @NotNull @NonNull UUID locationId, ProducerContactRequest createContactRequest) {
+      @NotNull @NonNull UUID locationId, ProducerContactRequest createContactRequest, String ipAddress) {
     log.info(
         "Attempt to create contact {} for locationId {}",
         StringUtils.isNotBlank(createContactRequest.genericContactName())
@@ -110,7 +110,7 @@ public class ProducerContactOrchestrationService {
             : createContactRequest.firstName(),
         locationId);
     ProducerLocation location = locationService.findActiveLocation(locationId);
-    return createContact(location.getProducerId(), locationId, createContactRequest);
+    return createContact(location.getProducerId(), locationId, createContactRequest, ipAddress);
   }
 
   @AuditRequest(
@@ -137,13 +137,14 @@ public class ProducerContactOrchestrationService {
             ? locationService.findPrimaryLocation(producerId)
             : locationService.findLocation(locationId, false);
 
-    return createContact(producerId, location.locationId(), createContactRequest);
+    return createContact(producerId, location.locationId(), createContactRequest, ipAddress);
   }
 
   ProducerContactResponse createContact(
       @NotNull @NonNull UUID producerId,
       @NotNull @NonNull UUID locationId,
-      @NotNull @NonNull ProducerContactRequest createContactRequest)  {
+      @NotNull @NonNull ProducerContactRequest createContactRequest,
+      String ipAddress)  {
 
     if (StringUtils.isBlank(createContactRequest.genericContactName())
         && StringUtils.isBlank(createContactRequest.firstName())
@@ -163,22 +164,22 @@ public class ProducerContactOrchestrationService {
     ProducerContact savedContact = contactRepository.saveAndFlush(contact);
 
     if (StringUtils.isNotBlank(contact.getEmailAddress())) {
+      var contactName = StringUtils.isNotBlank(createContactRequest.genericContactName())
+              ? createContactRequest.genericContactName()
+              : String.join(" ", createContactRequest.firstName(), createContactRequest.lastName());
       emailContract.sendEmail(
               EmailTemplateType.CONTACT_EMAIL_CONFIRMATION,
               Collections.singletonList(contact.getEmailAddress()),
               EmailTemplateType.CONTACT_EMAIL_CONFIRMATION.getSubjectFormat(),
               () -> {
                 Map<String, Object> templateData = new HashMap<>();
-                templateData.put("lastName", createContactRequest.lastName());
-                templateData.put("firstName", createContactRequest.firstName());
+                templateData.put("contactName", contactName);
                 templateData.put("title", "Subscriber Contact Created");
                 templateData.put("emailValidationToken", contact.getEmailConfirmationToken());
-                templateData.put("ipAddress", RequestUtil.getRequestIP());
+                templateData.put("ipAddress", ipAddress);
                 templateData.put("timestamp", contact.getCreateDate());
                 return templateData;
               });
-      emailContract.sendEmail(
-          EmailTemplateType.CONTACT_EMAIL_CONFIRMATION, contact, contact.getEmailAddress());
     }
 
     log.info(

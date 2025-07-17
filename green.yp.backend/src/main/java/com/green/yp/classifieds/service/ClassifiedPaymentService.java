@@ -10,7 +10,7 @@ import com.green.yp.api.apitype.invoice.InvoiceRequest;
 import com.green.yp.api.apitype.invoice.InvoiceType;
 import com.green.yp.api.apitype.payment.PaymentTransactionResponse;
 import com.green.yp.api.contract.InvoiceContract;
-import com.green.yp.api.contract.PaymentContract;
+import com.green.yp.api.contract.ProducerPaymentContract;
 import com.green.yp.classifieds.data.model.ClassifiedCustomer;
 import com.green.yp.classifieds.data.model.ClassifiedCustomerProjection;
 import com.green.yp.classifieds.data.repository.ClassifiedCustomerRepository;
@@ -23,7 +23,6 @@ import com.green.yp.util.TokenUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -35,7 +34,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class ClassifiedPaymentService {
-  private final PaymentContract paymentContract;
+  private final ProducerPaymentContract producerPaymentContract;
   private final ClassifiedPaymentMapper paymentMapper;
   private final ClassifiedRepository classifiedRepository;
   private final ClassifiedAdTypeService adTypeService;
@@ -50,14 +49,13 @@ public class ClassifiedPaymentService {
                        Classified Title : %s
                        Classified Description : %s
                        Term : 1 month
-                       Cost : $%s
-  """;
+                       Cost : $%s""";
 
   @Value("${greenyp.classified.baseUrl}")
   private String classifiedUrl;
 
   public ClassifiedPaymentService(
-      PaymentContract paymentContract,
+      ProducerPaymentContract producerPaymentContract,
       ClassifiedRepository classifiedRepository,
       ClassifiedCustomerRepository customerRepository,
       ClassifiedAdTypeService adTypeService,
@@ -65,7 +63,7 @@ public class ClassifiedPaymentService {
       EmailService emailService,
       InvoiceContract invoiceContract,
       ClassifiedPaymentMapper paymentMapper) {
-    this.paymentContract = paymentContract;
+    this.producerPaymentContract = producerPaymentContract;
     this.paymentMapper = paymentMapper;
     this.adTypeService = adTypeService;
     this.classifiedCategoryService = classifiedCategoryService;
@@ -104,7 +102,7 @@ public class ClassifiedPaymentService {
             adType.monthlyPrice()));
 
     var paymentResponse =
-        paymentContract.applyPayment(
+        producerPaymentContract.applyPayment(
             paymentMapper.toPaymentRequest(paymentRequest, "GrnPgs-Classifieds", adType.monthlyPrice(), adType.monthlyPrice(), note, requestIP),
             Optional.empty());
 

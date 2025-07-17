@@ -37,7 +37,7 @@ repositories {
 ext {
     springCloudVersion = "2024.0.1"
     springDocVersion = "2.8.5"
-    lombokVersion = "1.18.30"
+    lombokVersion = "1.18.38"
     hikariVersion="6.3.0"
     squareVersion="45.0.0.20250618"
 }

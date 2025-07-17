@@ -37,6 +37,7 @@ public class AuthenticationConfig {
             auth ->
                 auth.requestMatchers(HttpMethod.POST, "/account",
                                 "/account/applyPayment",
+                                "/account/*/validate",
                                 "/contact",
                                 "/classified/create-ad").permitAll()
                     .requestMatchers(

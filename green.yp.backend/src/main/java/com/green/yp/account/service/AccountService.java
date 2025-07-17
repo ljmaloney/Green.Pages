@@ -14,7 +14,6 @@ import com.green.yp.api.apitype.producer.enumeration.ProducerDisplayContactType;
 import com.green.yp.api.contract.*;
 import com.green.yp.email.service.EmailService;
 import com.green.yp.exception.*;
-import com.green.yp.util.TokenUtils;
 import jakarta.validation.constraints.NotNull;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -75,7 +74,7 @@ public class AccountService {
 
     producerContract.cancelSubscription(accountId, null, ipAddress);
 
-    paymentContract.cancelBilling(accountId, null, ipAddress);
+    paymentContract.cancelCardOnFile(accountId.toString());
 
     List<String> adminEmails = getAdminEmails(accountId);
 
@@ -185,6 +184,16 @@ public class AccountService {
 
     return new AccountResponse(
             producerResponse, null, null, null);
+  }
+
+  public void validateEmail(@NotNull @NonNull UUID accountId, UUID contactId, String email, @NotNull @NonNull String validationToken, String requestIP) {
+    if ( contactId != null ) {
+      contactContract.validateContact(accountId, contactId, validationToken);
+    } else if ( StringUtils.isNotBlank(email)) {
+      contactContract.validateEmail(accountId, email, validationToken);
+    } else {
+      throw new PreconditionFailedException("Provide either an email address or contactId for the email being validated");
+    }
   }
 
   private ProducerCredentialsResponse createOrUpdateCredentials(
@@ -350,4 +359,6 @@ public class AccountService {
 
     return contacts.stream().map(ProducerContactResponse::emailAddress).toList();
   }
+
+
 }

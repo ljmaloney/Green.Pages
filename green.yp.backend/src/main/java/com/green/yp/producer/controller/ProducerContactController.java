@@ -12,6 +12,7 @@ import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -68,10 +69,10 @@ public class ProducerContactController {
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ProducerContactResponse> createContact(
-      @PathVariable("locationId") UUID locationId,@AuthUser AuthenticatedUser authenticatedUser,
-      @Valid @RequestBody ProducerContactRequest createContactRequest) throws Exception {
+          @PathVariable("locationId") UUID locationId, @AuthUser AuthenticatedUser authenticatedUser,
+          @Valid @RequestBody ProducerContactRequest createContactRequest, HttpServletRequest request) throws Exception {
     return new ResponseApi<>(
-        contactOrchestrationService.createContact(locationId, createContactRequest), null);
+        contactOrchestrationService.createContact(locationId, createContactRequest, RequestUtil.getRequestIP(request)), null);
   }
 
   @IsAnyAuthenticatedUser

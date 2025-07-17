@@ -1,7 +1,6 @@
 package com.green.yp.api.apitype;
 
 import com.green.yp.api.apitype.enumeration.ServicePriceUnitsType;
-import com.green.yp.api.contract.LineOfBusinessContract;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;

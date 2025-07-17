@@ -44,14 +44,17 @@
                 <tr>
                     <td style="padding: 40px;">
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
-                            Dear ${firstName} ${lastName},
+                            Dear ${contactName},
                         </p>
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
                            A new subscriber contact account has been created for you.
                         </p>
-                        <p>
-                            The confirmation code for the payment page is <strong>${emailValidationToken}</strong>.
-                            Enter this value to confirm your identity and confirm you received this email.
+                        <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
+                            The confirmation code for the contact email is below. Enter this value to confirm your identity and confirm you received this email.
+                            <br/><br/>
+                            <div style="text-align: center;display: inline-block; margin: 20px 0; padding: 10px 20px; background-color: #f3f4f6; color: #111827; font-weight: bold; border-radius: 6px; font-size: 16px;">
+                                ${emailValidationToken}
+                            </div>
                         </p>
                         <br/><br/>
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">

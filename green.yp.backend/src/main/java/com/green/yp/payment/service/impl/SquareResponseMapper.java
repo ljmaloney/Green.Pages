@@ -1,6 +1,8 @@
 package com.green.yp.payment.service.impl;
 
+import com.green.yp.api.apitype.payment.PaymentCustomerResponse;
 import com.green.yp.api.apitype.payment.PaymentResponse;
+import com.green.yp.api.apitype.payment.PaymentSavedCardResponse;
 import com.green.yp.payment.data.json.CardDetails;
 import com.green.yp.payment.data.json.CardError;
 import com.squareup.square.types.*;
@@ -16,6 +18,16 @@ import org.mapstruct.*;
     unmappedTargetPolicy = ReportingPolicy.IGNORE,
     injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface SquareResponseMapper {
+
+  @Mapping(target = "externCustRef", source = "id", qualifiedByName = "unwrapOptionalString")
+  @Mapping(target = "firstName", source="givenName", qualifiedByName = "unwrapOptionalString")
+  @Mapping(target = "lastName", source="familyName", qualifiedByName = "unwrapOptionalString")
+  @Mapping(target = "idempotencyId", source = "referenceId", qualifiedByName = "unwrapOptionalString")
+  PaymentCustomerResponse toPaymentCustomerResponse(Customer customer);
+
+  @Mapping(target = "cardRef", source = "id", qualifiedByName = "unwrapOptionalString")
+  @Mapping(target = "paymentMethodId", source="referenceId", qualifiedByName = "unwrapOptionalString")
+  PaymentSavedCardResponse toSavedCardResponse(@NotNull Card card);
 
   @Mapping(
       target = "paymentTransactionId",

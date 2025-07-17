@@ -3,8 +3,6 @@ package com.green.yp.api.contract;
 import com.green.yp.api.apitype.payment.*;
 import com.green.yp.payment.data.enumeration.ProducerPaymentType;
 import com.green.yp.payment.service.PaymentOrchestrationService;
-import com.green.yp.payment.service.ProducerPaymentMethodService;
-import com.green.yp.payment.service.ProducerPaymentOrchestrationService;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -13,40 +11,26 @@ import org.springframework.stereotype.Component;
 @Component
 public class PaymentContract {
 
-  private final PaymentOrchestrationService transactionService;
-
-  private final ProducerPaymentOrchestrationService paymentService;
-
-  private final ProducerPaymentMethodService methodService;
+  private final PaymentOrchestrationService orchestrationService;
 
   public PaymentContract(
-          ProducerPaymentOrchestrationService paymentService,
-          PaymentOrchestrationService transactionService,
-          ProducerPaymentMethodService methodService) {
-    this.paymentService = paymentService;
-    this.transactionService = transactionService;
-    this.methodService = methodService;
+          PaymentOrchestrationService orchestrationService) {
+    this.orchestrationService = orchestrationService;
   }
 
-  public void cancelBilling(UUID accountId, String userId, String ipAddress) {
-    methodService.cancelBilling(accountId, userId, ipAddress);
+  public PaymentTransactionResponse applyPayment(PaymentRequest paymentRequest, Optional<String> customerRef) {
+    return orchestrationService.applyPayment(paymentRequest, customerRef);
   }
 
-  public ProducerPaymentResponse applyPayment(
-      ApplyPaymentMethodRequest paymentRequest,
-      UUID invoiceId,
-      ProducerPaymentType paymentType,
-      String requestIP) {
-    return paymentService.applyPayment(paymentRequest, invoiceId, paymentType, requestIP);
+  public PaymentMethodResponse createPaymentMethod(PaymentMethodRequest methodRequest){
+    return orchestrationService.createPaymentMethod(methodRequest);
   }
 
-  public ProducerPaymentResponse applyPayment(
-      ApplyPaymentRequest paymentRequest, String userId, String requestIP) {
-    return paymentService.applyPayment(paymentRequest, userId, requestIP);
+  public void cancelCardOnFile(String referenceId) {
+    orchestrationService.cancelCardOnFile(referenceId);
   }
 
-    public PaymentTransactionResponse applyPayment(PaymentRequest paymentRequest, Optional<String> customerRef) {
-      return transactionService.applyPayment(paymentRequest, customerRef);
-    }
-
+  public PaymentMethodResponse replaceCardOnFile(PaymentMethodRequest methodRequest){
+    return orchestrationService.replaceCardOnFile(methodRequest);
+  }
 }

@@ -15,7 +15,7 @@
 <table role="presentation" style="width: 100%; background-color: #f9fafb; margin: 0; padding: 40px 0;">
     <tr>
         <td align="center">
-            <table role="presentation" style="width: 100%; max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); overflow: hidden;">
+            <table role="presentation" style="width: 100%; max-width: 800px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); overflow: hidden;">
                 <!-- Header -->
                 <tr>
                     <td style="background-color: #ffffff; padding: 32px 40px 24px 40px; border-bottom: 1px solid #e5e7eb;">
@@ -44,16 +44,64 @@
                 <tr>
                     <td style="padding: 40px;">
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
-                            Dear ${firstName} ${lastName},
+                            Dear ${customer.firstName} ${customer.lastName},
                         </p>
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
-                            You recently requested access to update or renew your classified ad on our website.
-                            Your authorization token is ${emailValidationToken}.
-                            Copy and past this token into the "Authorization Token" field on the form.
+                            Thank you for listing your business with us. Your credit card has been charged for amount of the subscription package.
+                            <br/>
+                            To manage your subscription, login to your account dashboard at
+                            <a href="https://www.greenyp.com/dashboard">https://www.greenyp.com/dashboard</a>.
                         </p>
-                        <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">If your token as not been used within the next 15 minutes, it will expire.</p>
+                        <table style="width: 95%; font-size: 14px; color: #6b7280; line-height: 1.4;">
+                            <tr>
+                                <td colspan="2">Please note the following reference numbers for this transaction</td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; width: 20%">Green Market Account ID :</td>
+                                <td style="text-align: left">${producerId}</td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; width: 20%">Transaction Ref :</td>
+                                <td style="text-align: left">${transactionRef}</td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; width: 20%">Receipt Link :</td>
+                                <td style="text-align: left"><a href="${receiptUrl}">${receiptUrl}</a></td>
+                            </tr>
+                        </table>
+                        <br/><br/>
+                        <table style="width: 95%; font-size: 14px; color: #6b7280; line-height: 1.4;">
+                            <tr>
+                                <th>Invoice Number : </th><th style="text-align: left">${invoice.invoiceNumber}</th>
+                            </tr>
+                            <tr>
+                                <th>Description : </th><th style="text-align: left">${invoice.invoiceNumber}</th>
+                            </tr>
+                            <tr>
+                                <th>Total Amount : </th><th style="text-align: left">$${invoice.invoiceTotal?string["#,##0.00"]}</th>
+                            </tr>
+                        </table>
+                        <h3>Line Items</h3>
+                        <table style="width: 95%; font-size: 14px; color: #6b7280; line-height: 1.4;">
+                            <thead>
+                            <tr>
+                                <th>Line Number</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <#list invoice.lineItems as item>
+                                <tr>
+                                    <td>${item.lineNumber}</td>
+                                    <td>${item.description}</td>
+                                    <td>$${item.amount?string["#,##0.00"]}</td>
+                                </tr>
+                            </#list>
+                            </tbody>
+                        </table>
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
-                            The classified ad authentication token request was received from ip address ${ipAddress} at ${timestamp}.
+                            The classified ad was placed from ip address ${ipAddress} at ${timestamp}.
                         </p>
                     </td>
                 </tr>

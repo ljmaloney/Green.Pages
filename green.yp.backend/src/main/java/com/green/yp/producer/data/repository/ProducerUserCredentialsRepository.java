@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -75,4 +76,9 @@ public interface ProducerUserCredentialsRepository
                                        @Param("producerId") UUID producerId,
                                        @Param("firstName") String firstName,
                                        @Param("lastName") String lastName);
+  @Modifying
+  @Query("""
+    DELETE FROM ProducerUserCredentials where producerId IN :producerIds
+""")
+  Integer deleteByProducerIds(@Param("producerIds") List<UUID> producerIdList);
 }

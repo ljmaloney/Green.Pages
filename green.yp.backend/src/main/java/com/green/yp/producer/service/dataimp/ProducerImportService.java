@@ -47,7 +47,7 @@ public class ProducerImportService {
                 businessName,
                 lineOfBusinessId,
                 UUID.fromString(IMPORT_SUB_ID),
-                ProducerSubscriptionType.LIVE_UNPAID,
+                ProducerSubscriptionType.DATA_LOAD_UNPAID,
                 null,
                 null,
                 null),

@@ -3,7 +3,7 @@ package com.green.yp.payment.service;
 import com.green.yp.api.apitype.invoice.ProducerInvoiceResponse;
 import com.green.yp.api.apitype.payment.ApplyPaymentMethodRequest;
 import com.green.yp.api.apitype.payment.ApplyPaymentRequest;
-import com.green.yp.api.apitype.payment.PaymentMethodResponse;
+import com.green.yp.api.apitype.payment.ProducerPaymentMethodResponse;
 import com.green.yp.api.apitype.payment.ProducerPaymentResponse;
 import com.green.yp.api.contract.ProducerInvoiceContract;
 import com.green.yp.exception.PreconditionFailedException;
@@ -66,7 +66,7 @@ public class ProducerPaymentOrchestrationService {
                 () -> {
                   ProducerInvoiceResponse producerInvoiceResponse =
                       producerInvoiceContract.findInvoice(invoiceId, requestIP);
-                  PaymentMethodResponse paymentMethod =
+                  ProducerPaymentMethodResponse paymentMethod =
                       producerPaymentMethodService.createPaymentMethod(
                           paymentMapper.toPaymentRequest(paymentRequest));
                   return Optional.ofNullable(
@@ -89,7 +89,7 @@ public class ProducerPaymentOrchestrationService {
                 () -> {
                   ProducerInvoiceResponse producerInvoiceResponse =
                       producerInvoiceContract.findInvoice(paymentRequest.invoiceId(), requestIP);
-                  PaymentMethodResponse paymentMethod = null;
+                  ProducerPaymentMethodResponse paymentMethod = null;
                   if (paymentRequest.savedPaymentMethodId() != null) {
                     paymentMethod =
                         producerPaymentMethodService.findPaymentMethod(
@@ -111,7 +111,7 @@ public class ProducerPaymentOrchestrationService {
 
   private ProducerPaymentTransaction applyPayment(
       ProducerInvoiceResponse producerInvoiceResponse,
-      PaymentMethodResponse paymentMethod,
+      ProducerPaymentMethodResponse paymentMethod,
       ProducerPaymentType paymentType,
       String requestIP) {
     log.info(

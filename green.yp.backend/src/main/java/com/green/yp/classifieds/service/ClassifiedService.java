@@ -230,4 +230,23 @@ public class ClassifiedService {
       //delete customer records not associated with an ad that have email_validation_date null
 //        customerRepository.deleteInvalidCustomers(deleteDate);
     }
+
+    public void validateEmail(UUID classifiedId, String emailAddress, String emailToken, String requestIP) {
+      log.info("Validating email address {} for classifiedId: {} from {}", emailAddress, classifiedId, requestIP);
+      repository.findClassifiedAndCustomer(classifiedId).ifPresentOrElse( projection -> {
+                var customer = projection.customer();
+                if ( customer.getEmailAddress().equals(emailAddress) && customer.isValidToken(emailToken)){
+                    customer.setEmailValidationDate(OffsetDateTime.now());
+                    customerRepository.save(customer);
+                }else {
+                    log.warn("Invalid email or email token for classifiedId {}", classifiedId);
+                    throw new PreconditionFailedException("Invalid email or email token");
+                }
+              },
+              () -> {
+                  log.warn("No classified found for {}", classifiedId);
+                  throw new NotFoundException("classified", classifiedId);
+              }
+      );
+    }
 }

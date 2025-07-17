@@ -8,12 +8,15 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
 @Table(name = "classified", schema = "greenyp")
 public class Classified extends Mutable {
 
@@ -34,7 +37,6 @@ public class Classified extends Mutable {
   @Column(name = "classified_customer_id")
   private UUID classifiedCustomerId;
 
-  @ColumnDefault("0")
   @Column(name = "renewal_count")
   private Integer renewalCount;
 
@@ -92,4 +94,20 @@ public class Classified extends Mutable {
   @NotNull
   @Column(name = "latitude", nullable = false)
   private BigDecimal latitude;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    Classified that = (Classified) o;
+
+    return new EqualsBuilder().appendSuper(super.equals(o)).append(activeDate, that.activeDate).append(lastActiveDate, that.lastActiveDate).append(adTypeId, that.adTypeId).append(categoryId, that.categoryId).append(classifiedCustomerId, that.classifiedCustomerId).append(renewalCount, that.renewalCount).append(price, that.price).append(perUnitType, that.perUnitType).append(idToken, that.idToken).append(title, that.title).append(description, that.description).append(city, that.city).append(state, that.state).append(postalCode, that.postalCode).append(emailAddress, that.emailAddress).append(phoneNumber, that.phoneNumber).append(longitude, that.longitude).append(latitude, that.latitude).isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(activeDate).append(lastActiveDate).append(adTypeId).append(categoryId).append(classifiedCustomerId).append(renewalCount).append(price).append(perUnitType).append(idToken).append(title).append(description).append(city).append(state).append(postalCode).append(emailAddress).append(phoneNumber).append(longitude).append(latitude).toHashCode();
+  }
 }

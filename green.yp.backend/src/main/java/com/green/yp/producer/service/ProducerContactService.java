@@ -2,6 +2,8 @@ package com.green.yp.producer.service;
 
 import com.green.yp.api.apitype.producer.ProducerContactResponse;
 import com.green.yp.api.apitype.producer.enumeration.ProducerContactType;
+import com.green.yp.exception.BusinessException;
+import com.green.yp.exception.ErrorCodeType;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.producer.data.model.ProducerContact;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -37,7 +40,7 @@ public class ProducerContactService {
             .orElseThrow(() -> new NotFoundException("ProducerContact", contactId));
 
     if (contact.getProducerContactType() == ProducerContactType.DISABLED) {
-      log.error("Producer contact identified by {} is not active");
+      log.error("Producer contact identified by {} is not active", contactId);
       throw new PreconditionFailedException(
           "Producer contact identified by {} is not active", contactId);
     }
@@ -48,7 +51,7 @@ public class ProducerContactService {
   public ProducerContactResponse findContact(
       @NotNull @NonNull UUID contactId, @NotNull @NonNull Boolean activeOnly) {
     log.info("Loading {} contact for contactId {}", activeOnly ? "active" : "", contactId);
-    if (activeOnly.booleanValue()) {
+    if (activeOnly) {
       return producerContactMapper.fromEntity(findActiveContact(contactId));
     }
     return contactRepository
@@ -74,8 +77,6 @@ public class ProducerContactService {
         activeOnly ? "active" : "",
         producerId,
         locationId);
-
-    List<ProducerContactType> activeTypes = ProducerContactType.getActiveTypes();
 
     List<ProducerContact> contacts =
         activeOnly
@@ -125,5 +126,41 @@ public class ProducerContactService {
         contactRepository.findProducerContacts(
             producerId, ProducerContactType.ADMIN, ProducerContactType.PRIMARY);
     return producerContactMapper.fromEntity(contacts);
+  }
+
+  public void validateContact(@NotNull @NonNull UUID producerId,
+                              @NotNull @NonNull UUID contactId,
+                              @NotNull @NonNull String validationToken) {
+    contactRepository.findById(contactId).ifPresentOrElse( contact -> {
+      if (contact.isValidEmailToken(validationToken)) {
+        contact.setEmailConfirmed(true);
+        contact.setEmailConfirmedDate(OffsetDateTime.now());
+        contactRepository.save(contact);
+      } else {
+        log.warn("Invalid email token {} for {}", validationToken, contactId);
+        throw new BusinessException("Invalid email validation token", HttpStatus.BAD_REQUEST, ErrorCodeType.BUSINESS_VALIDATION_ERROR);
+      }
+    }, () -> {
+      log.warn("No contact found for {}", contactId);
+      throw new NotFoundException("No contact found for " + contactId);
+    });
+  }
+
+  public void validateEmail(@NotNull @NonNull UUID accountId,
+                            @NotNull @NonNull String email,
+                            @NotNull @NonNull String validationToken) {
+    contactRepository.findByProducerIdAndEmailAddress(accountId, email).ifPresentOrElse( contact -> {
+      if (contact.isValidEmailToken(validationToken)) {
+        contact.setEmailConfirmed(true);
+        contact.setEmailConfirmedDate(OffsetDateTime.now());
+        contactRepository.save(contact);
+      } else {
+        log.warn("Invalid email token {} for {}", validationToken, email);
+        throw new BusinessException("Invalid email validation token", HttpStatus.BAD_REQUEST, ErrorCodeType.BUSINESS_VALIDATION_ERROR);
+      }
+    }, () -> {
+      log.warn("No contact found for {}", email);
+      throw new NotFoundException("No contact found for " + email);
+    });
   }
 }

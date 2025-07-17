@@ -1,9 +1,8 @@
 package com.green.yp.api.apitype;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.NonNull;
-
 import java.util.Map;
+import lombok.NonNull;
 
 public record UpdateSubscriptionFeatureRequest(@NotNull @NonNull String feature,
                                                @NotNull @NonNull Integer sortOrder,

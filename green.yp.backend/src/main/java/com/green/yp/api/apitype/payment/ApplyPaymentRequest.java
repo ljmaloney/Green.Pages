@@ -10,4 +10,4 @@ public record ApplyPaymentRequest(
     @NotNull @NonNull UUID producerId,
     ProducerPaymentType paymentType,
     UUID savedPaymentMethodId,
-    PaymentMethodRequest newPaymentMethod) {}
+    ProducerPaymentMethodRequest newPaymentMethod) {}

@@ -16,7 +16,8 @@ public enum ErrorCodeType {
   UNEXPECTED_PAYMENT_ERROR("Unexpected payment error", HttpStatus.INTERNAL_SERVER_ERROR.value()),
   MAX_LOGIN_ATTEMPTS(
       "Max login attempts exceeded, contact account is locked for {} minutes",
-      HttpStatus.LOCKED.value());
+      HttpStatus.LOCKED.value()),
+  PAYMENT_CUSTOMER_ERROR("Error creating customer for payment method", HttpStatus.INTERNAL_SERVER_ERROR.value() );
   private final int errorCode;
   private final String messageFormat;
 

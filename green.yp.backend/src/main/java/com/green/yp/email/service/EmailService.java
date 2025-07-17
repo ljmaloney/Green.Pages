@@ -42,7 +42,7 @@ public class EmailService {
       @NotNull @Size(min = 1) List<String> toAddressSupplier,
       String subject,
       @NotNull Supplier<Map<String, Object>> mappingSupplier) {
-    log.info("Sending {} email", emailTemplate.getSubjectFormat());
+    log.info("Sending {} email to {}" , emailTemplate.getSubjectFormat(), toAddressSupplier);
     try {
       MimeMessage message = mailSender.createMimeMessage();
 
@@ -62,6 +62,7 @@ public class EmailService {
       helper.setText(out.toString(), true); // true = HTML
 
       mailSender.send(message);
+      log.info("Sent {} message successfully", emailTemplate.getSubjectFormat());
     } catch (Exception e) {
       log.error("Unexpected exception sending email", e);
       throw new SystemException("Unexpected exception sending email", e);

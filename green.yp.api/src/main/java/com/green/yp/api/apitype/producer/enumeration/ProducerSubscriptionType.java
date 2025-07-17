@@ -6,5 +6,6 @@ public enum ProducerSubscriptionType {
   LIVE_ACTIVE, // active listing
   LIVE_CANCELED, // cancelled listing
   LIVE_DISABLED_NONPAYMENT, // disabled for non payment
-  LIVE_UNPAID // unpaid (new)
+  LIVE_UNPAID,
+  DATA_LOAD_UNPAID// unpaid (new)
 }
