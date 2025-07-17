@@ -34,8 +34,8 @@ public class GreenControllerAdvice {
     log.warn("User credentials error: {}", e.getMessage());
     return new ResponseApi<>(null,
             new ErrorMessageApi(
-                    ErrorCodeType.PAYLOAD_VALIDATION,
-                    "One or more validation rules on the request failed.",
+                    e.getErrorCode(),
+                    "A user already exists for the username / email address",
                     e.getMessage()));
   }
 
