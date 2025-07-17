@@ -342,13 +342,17 @@ public class ProducerUserService {
   //            objectType = AuditObjectType.PRODUCER_LOCATION, actionType =
   //            AuditActionType.DELETE_LOCATION)
   public void removeCredentials(List<UUID> producerIdList) {
+    log.info("Removing credentials for producers {}", producerIdList);
     List<ProducerUserCredentials> credentials =
         credentialsRepository.findCredentials(producerIdList);
     credentials.stream()
         .filter(creds -> StringUtils.isNotBlank(creds.getExternalAuthorizationServiceRef()))
         .forEach(
             creds -> authenticationContract.removeUser(creds.getExternalAuthorizationServiceRef()));
-    credentialsRepository.deleteAll(credentials);
+
+    credentialsRepository.deleteByProducerIds(producerIdList);
+
+    log.info("Completed removing/deleting credentials for producers {}", producerIdList);
   }
 
   private String createPasswordHash(String password) throws NoSuchAlgorithmException {

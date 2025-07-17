@@ -221,12 +221,16 @@ public class AccountPaymentService {
     List<UUID> producerIds = producers.stream().map(ProducerResponse::producerId).toList();
 
     producerContract.deleteCredentials(producerIds);
+    log.info("Removed / deleted credentials for {}", producers);
 
     contactContract.deleteContacts(producerIds);
+    log.info("Removed / deleted contacts for {}", producers);
 
     locationContract.deleteLocation(producerIds);
+    log.info("Removed / deleted locations for {}", producers);
 
     producerContract.deleteProducers(producerIds, ipAddress);
+    log.info("Removed / deleted producer records for {}", producers);
 
     log.info("Removed {} unpaid account subscriptions", producers.size());
 

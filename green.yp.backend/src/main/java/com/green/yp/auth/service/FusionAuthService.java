@@ -23,6 +23,7 @@ import java.util.UUID;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -180,11 +181,12 @@ public class FusionAuthService implements AuthenticationService {
   }
 
   public void removeUser(String externalAuthorizationServiceRef) {
+    log.info("Remove/Revolk user from FusionAuth for {}", externalAuthorizationServiceRef);
     ClientResponse<Void, Errors> response =
         fusionAuthClient.deleteUser(UUID.fromString(externalAuthorizationServiceRef));
     if (response.wasSuccessful()) {
       log.debug("Deleted fusion auth credentials for : {}", externalAuthorizationServiceRef);
-    } else {
+    } else if (response.getStatus() != HttpStatus.SC_NOT_FOUND) {
       // Handle errors
       log.error(
           "Error occurred when deleting credentials for {} : {}",
