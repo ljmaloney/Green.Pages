@@ -38,7 +38,7 @@ public class EmailValidationService {
             validationRequest.externRef(), validationRequest.emailAddress())
         .ifPresentOrElse(
             emailValidation -> {
-              if (StringUtils.equals(emailValidation.getEmailToken(), validationRequest.token())) {
+              if (!StringUtils.equals(emailValidation.getEmailToken(), validationRequest.token())) {
                 log.warn(
                     "Email address {} validation tokens do not match from ipAddress {} ",
                     validationRequest.emailAddress(),

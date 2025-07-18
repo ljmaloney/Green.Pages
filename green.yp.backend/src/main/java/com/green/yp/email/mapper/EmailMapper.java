@@ -15,5 +15,6 @@ import org.mapstruct.ReportingPolicy;
 public interface EmailMapper {
 
   @Mapping(target = "validationId", source = "id")
+  @Mapping(target = "token", source = "emailToken")
   EmailValidationResponse fromEntity(@NotNull EmailValidation emailValidation);
 }
