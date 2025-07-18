@@ -39,6 +39,7 @@ public class AuthenticationConfig {
                                 "/account/applyPayment",
                                 "/account/*/validate",
                                 "/contact",
+                                "/email/validate",
                                 "/classified/create-ad").permitAll()
                     .requestMatchers(
                         "/",
