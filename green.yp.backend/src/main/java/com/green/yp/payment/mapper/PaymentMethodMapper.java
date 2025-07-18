@@ -16,6 +16,7 @@ import org.mapstruct.ReportingPolicy;
         injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface PaymentMethodMapper {
 
+    PaymentMethod toEntity(PaymentMethodRequest methodRequest);
 
     @Mapping(target = "id", source = "newCustomer.idempotencyId")
     @Mapping(target = "externCustRef", source="newCustomer.externCustRef")

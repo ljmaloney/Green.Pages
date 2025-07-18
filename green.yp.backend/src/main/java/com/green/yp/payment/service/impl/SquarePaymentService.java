@@ -131,6 +131,16 @@ public class SquarePaymentService implements PaymentService {
                                                      String externCustId, UUID paymentMethodId) {
         log.debug("Creating new card on file for customer {}", externCustId);
 
+        var cards = squareClient.cards().list(ListCardsRequest.builder()
+                        .customerId(externCustId)
+                        .includeDisabled(false)
+                .referenceId(methodRequest.referenceId())
+                .build());
+
+        cards.getItems().forEach(card -> deactivateExistingCard(card.getId().get()));
+
+        log.info("PaymentMethodRequest - {}", methodRequest);
+
         var squareCard = CreateCardRequest.builder()
                 .idempotencyKey(paymentMethodId.toString())
                 .sourceId(methodRequest.paymentToken())
@@ -142,6 +152,8 @@ public class SquarePaymentService implements PaymentService {
                         .build()).verificationToken(methodRequest.verificationToken())
                 .build();
 
+        log.info("Square request data :  {}", squareCard);
+
         var squareCardResponse = squareClient.cards().create(squareCard);
 
         return squareCardResponse.getCard().map(squareResponseMapper::toSavedCardResponse)
@@ -151,8 +163,6 @@ public class SquarePaymentService implements PaymentService {
                             ErrorCodeType.PAYMENT_CUSTOMER_ERROR);
                 });
     }
-
-
 
     private Money createMoney(BigDecimal amount) {
         return Money.builder()
@@ -165,12 +175,14 @@ public class SquarePaymentService implements PaymentService {
     private static Address createAddress(PaymentMethodRequest methodRequest) {
         return Address.builder()
                 .addressLine1(methodRequest.payorAddress1())
-                .addressLine2(methodRequest.payorAddress2())
+                .addressLine2(StringUtils.isNotBlank(methodRequest.payorAddress2())
+                        ? Optional.of(methodRequest.payorAddress2()) : Optional.empty())
                 .locality(methodRequest.payorCity())
                 .administrativeDistrictLevel1(methodRequest.payorState())
                 .postalCode(methodRequest.payorPostalCode())
                 .firstName(methodRequest.firstName())
                 .lastName(methodRequest.lastName())
+                .country(Country.US)
                 .build();
     }
 }

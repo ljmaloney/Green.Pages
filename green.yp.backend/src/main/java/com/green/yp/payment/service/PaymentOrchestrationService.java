@@ -28,15 +28,18 @@ public class PaymentOrchestrationService {
     public PaymentMethodResponse createPaymentMethod(PaymentMethodRequest methodRequest) {
         log.info("Creating new payment method for subscriber");
         try{
-            UUID paymentMethodId = UUID.randomUUID();
 
-            var newCustomer = paymentService.createCustomer(methodRequest, paymentMethodId);
+            var tempMethod = methodService.createTempCustomer(methodRequest);
+            var newCustomer = paymentService.createCustomer(methodRequest, tempMethod.paymentMethodId());
 
-            var savedPayment = paymentService.createCardOnFile(methodRequest, newCustomer.externCustRef(), newCustomer.idempotencyId());
+            tempMethod = methodService.updateSavedCustomer(tempMethod, newCustomer.externCustRef());
 
-               return methodService.createPaymentMethod(methodRequest, newCustomer, savedPayment);
+            var savedPayment = paymentService.createCardOnFile(methodRequest,
+                    newCustomer.externCustRef(), tempMethod.paymentMethodId());
+            return methodService.updateCardOnFile(tempMethod, savedPayment);
         } catch (SquareApiException e){
-            log.warn("Error creating new customer / saving card {}", e.getMessage(), e);
+            log.error("Error Body {}", e.body());
+            log.error("Error creating new customer / saving card {}", e.getMessage(), e);
             throw new PreconditionFailedException("There was an error when attempting to save the card for the subscription");
         }
     }
@@ -61,7 +64,6 @@ public class PaymentOrchestrationService {
             log.warn("Error updating customer / saving card {}", e.getMessage(), e);
             throw new PreconditionFailedException("There was an error when attempting to save the card for the subscription");
         }
-
     }
 
     @Transactional
