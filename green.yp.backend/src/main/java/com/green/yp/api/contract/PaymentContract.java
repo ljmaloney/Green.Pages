@@ -1,11 +1,10 @@
 package com.green.yp.api.contract;
 
 import com.green.yp.api.apitype.payment.*;
-import com.green.yp.payment.data.enumeration.ProducerPaymentType;
 import com.green.yp.payment.service.PaymentOrchestrationService;
 
 import java.util.Optional;
-import java.util.UUID;
+
 import org.springframework.stereotype.Component;
 
 @Component

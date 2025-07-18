@@ -76,7 +76,7 @@ public class SquarePaymentService implements PaymentService {
         log.debug("Creating new customer for paymentMethodId {}", paymentMethodId);
         var squareCustomer = CreateCustomerRequest.builder()
                 .idempotencyKey(paymentMethodId.toString())
-                .companyName(Optional.of(methodRequest.companyName()))
+                .companyName(StringUtils.isNotBlank(methodRequest.companyName()) ? Optional.of(methodRequest.companyName()) : Optional.empty())
                 .givenName(methodRequest.firstName())
                 .familyName(methodRequest.lastName())
                 .emailAddress(methodRequest.emailAddress())
