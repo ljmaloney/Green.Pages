@@ -21,7 +21,6 @@ public class EmailValidation extends Mutable {
   @Column(name = "email_validation_date")
   private OffsetDateTime emailValidationDate;
 
-  @Size(max = 50)
   @Enumerated(EnumType.STRING)
   @Column(name = "validation_status", length = 50)
   private EmailValidationStatusType validationStatus;
