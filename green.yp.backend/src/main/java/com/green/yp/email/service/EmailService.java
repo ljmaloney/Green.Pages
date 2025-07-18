@@ -42,7 +42,7 @@ public class EmailService {
       @NotNull @Size(min = 1) List<String> toAddressSupplier,
       String subject,
       @NotNull Supplier<Map<String, Object>> mappingSupplier) {
-    log.info("Sending {} email to {}" , emailTemplate.getSubjectFormat(), toAddressSupplier);
+    log.info("Sending {} email to {}", emailTemplate.getSubjectFormat(), toAddressSupplier);
     try {
       MimeMessage message = mailSender.createMimeMessage();
 
@@ -51,7 +51,7 @@ public class EmailService {
       helper.setSubject(subject);
       helper.setFrom(defaultFromEmail);
 
-        var model = new HashMap<String, Object>(mappingSupplier.get());
+      var model = new HashMap<String, Object>(mappingSupplier.get());
       model.put(
           "subject", StringUtils.isBlank(subject) ? emailTemplate.getSubjectFormat() : subject);
 

@@ -4,17 +4,19 @@ import com.green.yp.api.apitype.classified.ClassifiedAdCustomerResponse;
 import com.green.yp.api.apitype.classified.ClassifiedRequest;
 import com.green.yp.api.apitype.classified.ClassifiedResponse;
 import com.green.yp.api.apitype.classified.ClassifiedUpdateRequest;
+import com.green.yp.api.apitype.email.EmailValidationStatusType;
 import com.green.yp.api.apitype.enumeration.ClassifiedTokenType;
 import com.green.yp.api.apitype.enumeration.EmailTemplateType;
+import com.green.yp.api.contract.EmailContract;
 import com.green.yp.classifieds.data.model.Classified;
 import com.green.yp.classifieds.data.model.ClassifiedToken;
 import com.green.yp.classifieds.data.repository.ClassifedTokenRepository;
 import com.green.yp.classifieds.data.repository.ClassifiedCustomerRepository;
 import com.green.yp.classifieds.data.repository.ClassifiedRepository;
 import com.green.yp.classifieds.mapper.ClassifiedMapper;
-import com.green.yp.email.service.EmailService;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
+import com.green.yp.producer.mapper.ProducerLocationMapper;
 import com.green.yp.util.TokenUtils;
 import jakarta.validation.Valid;
 import java.security.NoSuchAlgorithmException;
@@ -27,6 +29,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class ClassifiedService {
+    private final ProducerLocationMapper producerLocationMapper;
 
     private static final String CLASSIFIED = "Classified";
 
@@ -42,7 +45,7 @@ public class ClassifiedService {
   private final ClassifiedAdTypeService adTypeService;
   private final ClassifiedCategoryService categoryService;
   private final ClassifiedGeocodeService geocodeService;
-  private final EmailService emailService;
+  private final EmailContract emailContract;
   private final ClassifiedImageService imageService;
   private final ClassifiedMapper mapper;
 
@@ -53,17 +56,19 @@ public class ClassifiedService {
           ClassifiedAdTypeService adTypeService,
           ClassifiedCategoryService categoryService,
           ClassifiedGeocodeService geocodeService,
-          EmailService emailService, ClassifiedImageService imageService,
-          ClassifiedMapper mapper) {
+          EmailContract emailContract, ClassifiedImageService imageService,
+          ClassifiedMapper mapper,
+          ProducerLocationMapper producerLocationMapper) {
     this.repository = repository;
     this.tokenRepository = tokenRepository;
     this.customerRepository = customerRepository;
     this.adTypeService = adTypeService;
     this.categoryService = categoryService;
     this.geocodeService = geocodeService;
-    this.emailService = emailService;
+    this.emailContract = emailContract;
       this.imageService = imageService;
       this.mapper = mapper;
+      this.producerLocationMapper = producerLocationMapper;
   }
 
   public ClassifiedAdCustomerResponse findClassifiedAndCustomer(UUID classifiedId) {
@@ -95,6 +100,7 @@ public class ClassifiedService {
         request.categoryId(),
         request.emailAddress(),
         requestIP);
+
     // upsert customer record if not already found
     var customer =
         customerRepository
@@ -142,9 +148,11 @@ public class ClassifiedService {
 
     var classifiedResponse = mapper.fromEntity(repository.saveAndFlush(classified));
 
+    var emailValidation = emailContract.validateEmail(classified.getId().toString(), customer.getEmailAddress());
+
     // send confirmation email
-    if( customer.getEmailValidationDate() == null ){
-        emailService.sendEmailAsync(
+    if(emailValidation.validationStatus() == EmailValidationStatusType.NOT_VALIDATED ){
+        emailContract.sendEmail(
                   EmailTemplateType.CLASSIFIED_EMAIL_VALIDATION,
                   Collections.singletonList(classified.getEmailAddress()),
                   EmailTemplateType.CLASSIFIED_EMAIL_VALIDATION.getSubjectFormat(),
@@ -154,7 +162,7 @@ public class ClassifiedService {
                       templateData.put("firstName", request.firstName());
                       templateData.put("classifiedTitle", request.title());
                       templateData.put("categoryName", category.name());
-                      templateData.put("emailValidationToken", customer.getEmailAddressValidationToken());
+                      templateData.put("emailValidationToken", emailValidation.token());
                       templateData.put("adTypeName", adType.adTypeName());
                       templateData.put("paymentAmount", adType.monthlyPrice());
                       templateData.put("ipAddress", requestIP);
@@ -205,7 +213,7 @@ public class ClassifiedService {
 
     List<String> toList = List.of(classified.customer().getEmailAddress());
 
-    emailService.sendEmailAsync(
+    emailContract.sendEmail(
         EmailTemplateType.CLASSIFIED_AUTH_TOKEN,
         toList,
         EmailTemplateType.CLASSIFIED_AUTH_TOKEN.getSubjectFormat(),

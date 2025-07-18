@@ -76,12 +76,13 @@ public class SquarePaymentService implements PaymentService {
         log.debug("Creating new customer for paymentMethodId {}", paymentMethodId);
         var squareCustomer = CreateCustomerRequest.builder()
                 .idempotencyKey(paymentMethodId.toString())
-                .companyName(Optional.of(methodRequest.companyName()))
+                .companyName(StringUtils.isNotBlank(methodRequest.companyName()) ? Optional.of(methodRequest.companyName()) : Optional.empty())
                 .givenName(methodRequest.firstName())
                 .familyName(methodRequest.lastName())
                 .emailAddress(methodRequest.emailAddress())
                 .phoneNumber(methodRequest.phoneNumber())
                 .address(createAddress(methodRequest))
+                .referenceId(methodRequest.referenceId())
                 .build();
 
         var custResponse = squareClient.customers().create(squareCustomer);
@@ -130,6 +131,12 @@ public class SquarePaymentService implements PaymentService {
                                                      String externCustId, UUID paymentMethodId) {
         log.debug("Creating new card on file for customer {}", externCustId);
 
+        var cards = squareClient.cards().list(ListCardsRequest.builder()
+                        .customerId(externCustId)
+                        .includeDisabled(false)
+                .referenceId(methodRequest.referenceId())
+                .build());
+
         var squareCard = CreateCardRequest.builder()
                 .idempotencyKey(paymentMethodId.toString())
                 .sourceId(methodRequest.paymentToken())
@@ -138,7 +145,7 @@ public class SquarePaymentService implements PaymentService {
                         .referenceId(methodRequest.referenceId())
                         .cardholderName(String.join(" ", methodRequest.firstName(), methodRequest.lastName()))
                         .billingAddress(createAddress(methodRequest))
-                        .build())
+                        .build()).verificationToken(methodRequest.verificationToken())
                 .build();
 
         var squareCardResponse = squareClient.cards().create(squareCard);
