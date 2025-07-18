@@ -8,6 +8,8 @@ import jakarta.validation.constraints.Size;
 import java.time.OffsetDateTime;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Getter
 @Setter
@@ -40,4 +42,20 @@ public class EmailValidation extends Mutable {
   @NotNull
   @Column(name = "email_address", nullable = false, length = 150)
   private String emailAddress;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    EmailValidation that = (EmailValidation) o;
+
+    return new EqualsBuilder().appendSuper(super.equals(o)).append(emailValidationDate, that.emailValidationDate).append(validationStatus, that.validationStatus).append(ipAddress, that.ipAddress).append(externRef, that.externRef).append(emailToken, that.emailToken).append(emailAddress, that.emailAddress).isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(emailValidationDate).append(validationStatus).append(ipAddress).append(externRef).append(emailToken).append(emailAddress).toHashCode();
+  }
 }
