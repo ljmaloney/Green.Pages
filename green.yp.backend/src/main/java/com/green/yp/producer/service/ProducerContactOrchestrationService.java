@@ -17,8 +17,6 @@ import com.green.yp.producer.data.model.ProducerContact;
 import com.green.yp.producer.data.model.ProducerLocation;
 import com.green.yp.producer.data.repository.ProducerContactRepository;
 import com.green.yp.producer.mapper.ProducerContactMapper;
-import com.green.yp.util.RequestUtil;
-import com.green.yp.util.TokenUtils;
 import jakarta.validation.constraints.NotNull;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -251,6 +249,8 @@ public class ProducerContactOrchestrationService {
       actionType = AuditActionType.DELETE_LOCATION)
   public void deleteContacts(List<UUID> producerIds) {
     log.info("Deleting contacts for producers {}", producerIds);
+    producerIds.parallelStream()
+            .forEach(producerId -> emailContract.deleteValidation(producerId.toString()));
     contactRepository.deleteContacts(producerIds);
   }
 }

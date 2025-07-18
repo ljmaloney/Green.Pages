@@ -74,4 +74,9 @@ public class EmailValidationService {
             })
         .get();
   }
+
+    public void deleteValidation(String externRef) {
+      log.info("Delete email validation record for {}", externRef);
+      repository.deleteByExternRef(externRef);
+    }
 }

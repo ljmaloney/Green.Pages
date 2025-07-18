@@ -41,4 +41,8 @@ public class EmailContract {
   public EmailValidationResponse validateEmail(String externRef, String emailAddress){
     return emailValidationService.findValidatedEmail(externRef, emailAddress);
   }
+
+  public void deleteValidation(String externRef) {
+    emailValidationService.deleteValidation(externRef);
+  }
 }
