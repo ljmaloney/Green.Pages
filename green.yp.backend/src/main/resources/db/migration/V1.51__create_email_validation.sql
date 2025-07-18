@@ -11,7 +11,7 @@ BEGIN
         `last_update_date`          DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
         `version`                   INT                 NOT NULL,
         `email_validation_date`     DATETIME,
-        `invalid_email`             VARCHAR(50)         default 'NOT_VALIDATED',
+        `validation_status`         VARCHAR(50)         default 'NOT_VALIDATED',
         `ip_address`                VARCHAR(50),
         `extern_ref`                varchar(50),
         `email_token`               varchar(50),
