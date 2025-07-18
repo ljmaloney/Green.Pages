@@ -51,7 +51,7 @@ public class ProducerContact extends Mutable {
   @Column(name = "title", length = 50)
   private String title;
 
-  @Column(name = "phoneNumber", length = 12)
+  @Column(name = "phone_number", length = 12)
   private String phoneNumber;
 
   @Column(name = "cell_phone_number", length = 12)
