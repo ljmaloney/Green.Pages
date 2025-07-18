@@ -10,6 +10,8 @@ import jakarta.validation.constraints.Size;
 import java.time.OffsetDateTime;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Getter
 @Setter
@@ -17,13 +19,11 @@ import lombok.Setter;
 @Table(name = "payment_method", schema = "greenyp")
 public class PaymentMethod extends Mutable {
 
-  @NotNull
   @Convert(converter = BooleanConverter.class)
   @Column(name = "active", nullable = false)
   private Boolean active;
 
   @Size(max = 50)
-  @NotNull
   @Column(name = "reference_id", nullable = false, length = 50)
   private String referenceId;
 
@@ -86,4 +86,20 @@ public class PaymentMethod extends Mutable {
   @Column(name="card_details")
   @Convert(converter = JsonCardConvertor.class)
   private Card cardDetails;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    PaymentMethod that = (PaymentMethod) o;
+
+    return new EqualsBuilder().appendSuper(super.equals(o)).append(active, that.active).append(referenceId, that.referenceId).append(externCustRef, that.externCustRef).append(cardRef, that.cardRef).append(cancelDate, that.cancelDate).append(givenName, that.givenName).append(familyName, that.familyName).append(companyName, that.companyName).append(payorAddress1, that.payorAddress1).append(payorAddress2, that.payorAddress2).append(payorCity, that.payorCity).append(payorState, that.payorState).append(payorPostalCode, that.payorPostalCode).append(phoneNumber, that.phoneNumber).append(emailAddress, that.emailAddress).append(cardDetails, that.cardDetails).isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(active).append(referenceId).append(externCustRef).append(cardRef).append(cancelDate).append(givenName).append(familyName).append(companyName).append(payorAddress1).append(payorAddress2).append(payorCity).append(payorState).append(payorPostalCode).append(phoneNumber).append(emailAddress).append(cardDetails).toHashCode();
+  }
 }

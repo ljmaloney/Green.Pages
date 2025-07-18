@@ -35,7 +35,9 @@ public class PaymentMethodService {
         return mapper.toResponse(repository.saveAndFlush(paymentMethod));
     }
 
-    public PaymentMethodResponse createPaymentMethod(PaymentMethodRequest methodRequest, String externCustRef, PaymentSavedCardResponse savedPayment) {
+    public PaymentMethodResponse createPaymentMethod(PaymentMethodRequest methodRequest,
+                                                     String externCustRef,
+                                                     PaymentSavedCardResponse savedPayment) {
         var paymentMethod = mapper.toEntity(methodRequest, externCustRef, savedPayment);
 
         return mapper.toResponse(repository.saveAndFlush(paymentMethod));

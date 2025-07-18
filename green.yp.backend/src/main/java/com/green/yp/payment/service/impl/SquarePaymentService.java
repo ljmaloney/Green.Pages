@@ -82,6 +82,7 @@ public class SquarePaymentService implements PaymentService {
                 .emailAddress(methodRequest.emailAddress())
                 .phoneNumber(methodRequest.phoneNumber())
                 .address(createAddress(methodRequest))
+                .referenceId(methodRequest.referenceId())
                 .build();
 
         var custResponse = squareClient.customers().create(squareCustomer);
@@ -138,7 +139,7 @@ public class SquarePaymentService implements PaymentService {
                         .referenceId(methodRequest.referenceId())
                         .cardholderName(String.join(" ", methodRequest.firstName(), methodRequest.lastName()))
                         .billingAddress(createAddress(methodRequest))
-                        .build())
+                        .build()).verificationToken(methodRequest.verificationToken())
                 .build();
 
         var squareCardResponse = squareClient.cards().create(squareCard);
