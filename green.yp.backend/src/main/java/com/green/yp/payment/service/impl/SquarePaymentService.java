@@ -131,6 +131,12 @@ public class SquarePaymentService implements PaymentService {
                                                      String externCustId, UUID paymentMethodId) {
         log.debug("Creating new card on file for customer {}", externCustId);
 
+        var cards = squareClient.cards().list(ListCardsRequest.builder()
+                        .customerId(externCustId)
+                        .includeDisabled(false)
+                .referenceId(methodRequest.referenceId())
+                .build());
+
         var squareCard = CreateCardRequest.builder()
                 .idempotencyKey(paymentMethodId.toString())
                 .sourceId(methodRequest.paymentToken())
