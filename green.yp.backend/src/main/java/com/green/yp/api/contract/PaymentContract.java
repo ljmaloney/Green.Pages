@@ -3,7 +3,9 @@ package com.green.yp.api.contract;
 import com.green.yp.api.apitype.payment.*;
 import com.green.yp.payment.service.PaymentOrchestrationService;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
@@ -31,5 +33,9 @@ public class PaymentContract {
 
   public PaymentMethodResponse replaceCardOnFile(PaymentMethodRequest methodRequest){
     return orchestrationService.replaceCardOnFile(methodRequest);
+  }
+
+  public void disablePaymentMethod(List<UUID> producerIds) {
+    producerIds.forEach(id -> orchestrationService.disablePaymentMethods(id));
   }
 }

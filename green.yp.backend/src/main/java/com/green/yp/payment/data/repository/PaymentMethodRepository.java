@@ -22,4 +22,6 @@ public interface PaymentMethodRepository extends JpaRepository<PaymentMethod, UU
 
     Optional<PaymentMethod> findByReferenceIdAndStatusTypeEquals(String referenceId,
                                                                  PaymentMethodStatusType paymentMethodStatusType);
+
+  void deletePaymentMethodByReferenceIdAndStatusTypeEquals(String referenceId, PaymentMethodStatusType paymentMethodStatusType);
 }

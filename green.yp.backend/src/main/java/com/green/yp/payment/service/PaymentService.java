@@ -27,4 +27,6 @@ public interface PaymentService {
       PaymentMethodRequest methodRequest, String externCustId, UUID paymentMethodId);
 
   void deactivateExistingCard(String cardRef);
+
+  void deleteCustomer(String externCustomerRef);
 }

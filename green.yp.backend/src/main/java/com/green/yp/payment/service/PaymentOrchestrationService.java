@@ -2,11 +2,15 @@ package com.green.yp.payment.service;
 
 import com.green.yp.api.apitype.payment.*;
 import com.green.yp.api.apitype.payment.PaymentMethodResponse;
+import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
+import com.green.yp.payment.data.enumeration.PaymentMethodStatusType;
 import com.squareup.square.core.SquareApiException;
+
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +30,13 @@ public class PaymentOrchestrationService {
     }
 
     public PaymentMethodResponse createPaymentMethod(PaymentMethodRequest methodRequest) {
+        try{
+            methodService.findActiveMethod(methodRequest.referenceId());
+            return replaceCardOnFile(methodRequest);
+        } catch (NotFoundException nfe){
+            log.warn("No active payment method found for referenceId {}", methodRequest.referenceId());
+        }
+
         log.info("Creating new payment method for subscriber");
         try{
 
@@ -106,5 +117,26 @@ public class PaymentOrchestrationService {
             log.warn(e.getMessage(), e);
             return transactionService.updatePaymentError(paymentResponse.getId(), e.getMessage(), e.statusCode(), e.body().toString());
         }
+    }
+
+    @Async
+    public void disablePaymentMethods(UUID producerId) {
+        log.info("Disabling existing payment method for subscriber {}", producerId);
+        try{
+            var savedMethod = methodService.findMethod(producerId.toString());
+            if (savedMethod.statusType() == PaymentMethodStatusType.TEMP ){
+                methodService.deleteMethod(producerId.toString());
+            } else if ( savedMethod.statusType() == PaymentMethodStatusType.CUSTOMER_CREATED){
+                paymentService.deleteCustomer(savedMethod.externCustRef());
+                methodService.deactivateExistingCard(savedMethod.paymentMethodId());
+            } else if ( savedMethod.statusType() == PaymentMethodStatusType.CCOF_CREATED){
+                paymentService.deactivateExistingCard(savedMethod.cardRef());
+                paymentService.deleteCustomer(savedMethod.externCustRef());
+                methodService.deactivateExistingCard(savedMethod.paymentMethodId());
+            }
+        } catch(Exception e){
+            log.warn("Error removing temp card data / saving card {}", e.getMessage(), e);
+        }
+
     }
 }

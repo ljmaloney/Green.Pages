@@ -199,6 +199,8 @@ public class AccountPaymentService {
     }
     List<UUID> producerIds = producers.stream().map(ProducerResponse::producerId).toList();
 
+    paymentContract.disablePaymentMethod(producerIds);
+
     producerContract.deleteCredentials(producerIds);
     log.info("Removed / deleted credentials for {}", producers);
 

@@ -9,6 +9,7 @@ import com.green.yp.payment.data.model.PaymentMethod;
 import com.green.yp.payment.data.repository.PaymentMethodRepository;
 import com.green.yp.payment.mapper.PaymentMethodMapper;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -54,6 +55,7 @@ public class PaymentMethodService {
         .orElseThrow(() -> new NotFoundException("No payment method found for " + externCustRef));
   }
 
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public PaymentMethodResponse updateCardOnFile(
       PaymentMethodResponse method, PaymentSavedCardResponse savedPayment) {
     log.debug(
@@ -111,4 +113,22 @@ public class PaymentMethodService {
               repository.saveAndFlush(paymentMethod1);
             });
   }
+
+  public PaymentMethodResponse findMethod(String referenceId) {
+    return repository.findActiveMethod(referenceId,
+                    List.of(PaymentMethodStatusType.TEMP,
+                    PaymentMethodStatusType.CCOF_CREATED,
+                            PaymentMethodStatusType.CUSTOMER_CREATED))
+        .map(mapper::toResponse)
+        .orElseThrow(
+            () -> {
+              log.warn("No active payment method found for referenceId {}", referenceId);
+              return new NotFoundException(
+                  "Payment method not found for referenceId " + referenceId);
+            });
+        }
+
+    public void deleteMethod(String referenceId) {
+      repository.deletePaymentMethodByReferenceIdAndStatusTypeEquals(referenceId, PaymentMethodStatusType.TEMP);
+    }
 }

@@ -167,6 +167,12 @@ public class SquarePaymentService implements PaymentService {
   }
 
   @Override
+  public void deleteCustomer(String externCustomerRef) {
+    log.debug("Deleting existing customer for customerRef {}", externCustomerRef);
+    squareClient.customers().delete(DeleteCustomersRequest.builder().customerId(externCustomerRef).build());
+  }
+
+  @Override
   public PaymentSavedCardResponse createCardOnFile(
       PaymentMethodRequest methodRequest, String externCustId, UUID paymentMethodId) {
     log.debug("Creating new card on file for customer {}", externCustId);
