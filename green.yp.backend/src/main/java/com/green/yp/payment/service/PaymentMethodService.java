@@ -77,7 +77,7 @@ public class PaymentMethodService {
     }
 
     public PaymentMethodResponse findActiveMethod(String referenceId) {
-        return repository.findByReferenceIdAndStatusTypeEquals(referenceId, PaymentMethodStatusType.CCOF_CREATED)
+        return repository.findActiveMethod(referenceId, PaymentMethodStatusType.activeTypes())
                 .map(mapper::toResponse)
                 .orElseThrow( () -> {
                     log.warn("No active payment method found for referenceId {}", referenceId);
@@ -85,9 +85,21 @@ public class PaymentMethodService {
                 });
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public PaymentMethodResponse replaceCustomer(PaymentMethodRequest methodRequest, PaymentMethodResponse existingMethod) {
+        log.info("Disable existing record and create new record for {}", existingMethod.paymentMethodId());
+
+        deactivateExistingCard(existingMethod.paymentMethodId());
+
+        var newMethod = mapper.toEntity(methodRequest);
+        newMethod.setStatusType(PaymentMethodStatusType.CUSTOMER_CREATED);
+        newMethod.setExternCustRef(existingMethod.externCustRef());
+
+        return mapper.toResponse(repository.saveAndFlush(newMethod));
+    }
+
     public void deactivateExistingCard(UUID paymentMethodId) {
         log.debug("Deactivating existing Card for referenceId {}", paymentMethodId);
-
         repository.findById(paymentMethodId)
                 .ifPresent( paymentMethod1 -> {
             paymentMethod1.setStatusType(PaymentMethodStatusType.DISABLED);
@@ -95,4 +107,6 @@ public class PaymentMethodService {
             repository.saveAndFlush(paymentMethod1);
         });
     }
+
+
 }

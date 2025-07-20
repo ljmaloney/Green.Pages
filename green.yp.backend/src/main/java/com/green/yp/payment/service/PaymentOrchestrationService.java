@@ -55,11 +55,11 @@ public class PaymentOrchestrationService {
             }
             //deactivate card
             paymentService.deactivateExistingCard(activeCard.cardRef());
-            methodService.deactivateExistingCard(activeCard.paymentMethodId());
+            var newMethod = methodService.replaceCustomer(methodRequest, activeCard);
 
-            var savedPayment = paymentService.createCardOnFile(methodRequest, activeCard.externCustRef(), UUID.randomUUID());
+            var savedPayment = paymentService.createCardOnFile(methodRequest, activeCard.externCustRef(), newMethod.paymentMethodId());
 
-            return methodService.createPaymentMethod(methodRequest, activeCard.externCustRef(), savedPayment);
+            return methodService.updateCardOnFile(newMethod, savedPayment);
         } catch (SquareApiException e){
             log.warn("Error updating customer / saving card {}", e.getMessage(), e);
             throw new PreconditionFailedException("There was an error when attempting to save the card for the subscription");

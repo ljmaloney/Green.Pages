@@ -1,5 +1,7 @@
 package com.green.yp.api.apitype.payment;
 
+import com.green.yp.payment.data.enumeration.PaymentMethodStatusType;
+
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -7,9 +9,9 @@ public record PaymentMethodResponse(UUID paymentMethodId,
                                     OffsetDateTime createDate,
                                     OffsetDateTime lastUpdateDate,
                                     OffsetDateTime cancelDate,
-                                    Boolean active,
                                     String referenceId,
                                     String externCustRef,
+                                    PaymentMethodStatusType statusType,
                                     String cardRef,
                                     String givenName,
                                     String familyName,
