@@ -48,6 +48,7 @@ public class EmailValidationService {
               emailValidation.setEmailValidationDate(OffsetDateTime.now());
               emailValidation.setIpAddress(requestIP);
               emailValidation.setValidationStatus(EmailValidationStatusType.VALIDATED);
+              repository.saveAndFlush(emailValidation);
             },
             () -> {
               log.warn(
@@ -65,6 +66,7 @@ public class EmailValidationService {
         .map(mapper::fromEntity)
         .or(
             () -> {
+                log.info("Creating new email validation entry for externRef {}", externRef);
               EmailValidation emailValidation = new EmailValidation();
               emailValidation.setExternRef(externRef);
               emailValidation.setValidationStatus(EmailValidationStatusType.NOT_VALIDATED);
