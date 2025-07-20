@@ -10,6 +10,7 @@ import com.squareup.square.core.SquareApiException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,18 +93,19 @@ public class PaymentOrchestrationService {
         }
     }
 
-    private boolean customerChanged(PaymentMethodRequest methodRequest, PaymentMethodResponse activeCard) {
-        return !methodRequest.firstName().equals(activeCard.givenName()) ||
-               !methodRequest.lastName().equals(activeCard.familyName()) ||
-               !methodRequest.companyName().equals(activeCard.companyName()) ||
-               !methodRequest.payorAddress1().equals(activeCard.payorAddress1()) ||
-               !methodRequest.payorAddress2().equals(activeCard.payorAddress2()) ||
-               !methodRequest.payorCity().equals(activeCard.payorCity()) ||
-               !methodRequest.payorState().equals(activeCard.payorState()) ||
-               !methodRequest.payorPostalCode().equals(activeCard.payorPostalCode()) ||
-               !methodRequest.phoneNumber().equals(activeCard.phoneNumber()) ||
-               !methodRequest.emailAddress().equals(activeCard.emailAddress());
-    }
+  private boolean customerChanged(
+      PaymentMethodRequest methodRequest, PaymentMethodResponse activeCard) {
+    return !StringUtils.equals(methodRequest.firstName(), activeCard.givenName())
+        || !StringUtils.equals(methodRequest.lastName(), activeCard.familyName())
+        || !StringUtils.equals(methodRequest.companyName(), activeCard.companyName())
+        || !StringUtils.equals(methodRequest.payorAddress1(), activeCard.payorAddress1())
+        || !StringUtils.equals(methodRequest.payorAddress2(), activeCard.payorAddress2())
+        || !StringUtils.equals(methodRequest.payorCity(), activeCard.payorCity())
+        || !StringUtils.equals(methodRequest.payorState(), activeCard.payorState())
+        || !StringUtils.equals(methodRequest.payorPostalCode(), activeCard.payorPostalCode())
+        || !StringUtils.equals(methodRequest.phoneNumber(), activeCard.phoneNumber())
+        || !StringUtils.equals(methodRequest.emailAddress(), activeCard.emailAddress());
+  }
 
     public PaymentTransactionResponse applyPayment(PaymentRequest paymentRequest,
                                                    Optional<String> customerRef,
