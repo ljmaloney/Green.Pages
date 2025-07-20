@@ -59,23 +59,6 @@ public class PaymentMethodService {
         }).orElseThrow(() -> new NotFoundException("No payment method found for " + savedPayment.cardRef()));
     }
 
-    public PaymentMethodResponse createPaymentMethod(PaymentMethodRequest methodRequest,
-                                                     PaymentCustomerResponse newCustomer,
-                                                     PaymentSavedCardResponse savedPayment) {
-
-        var paymentMethod = mapper.toEntity(methodRequest, newCustomer, savedPayment);
-
-        return mapper.toResponse(repository.saveAndFlush(paymentMethod));
-    }
-
-    public PaymentMethodResponse createPaymentMethod(PaymentMethodRequest methodRequest,
-                                                     String externCustRef,
-                                                     PaymentSavedCardResponse savedPayment) {
-        var paymentMethod = mapper.toEntity(methodRequest, externCustRef, savedPayment);
-
-        return mapper.toResponse(repository.saveAndFlush(paymentMethod));
-    }
-
     public PaymentMethodResponse findActiveMethod(String referenceId) {
         return repository.findActiveMethod(referenceId, PaymentMethodStatusType.activeTypes())
                 .map(mapper::toResponse)
