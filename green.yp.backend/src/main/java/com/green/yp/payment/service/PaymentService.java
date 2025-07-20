@@ -16,13 +16,17 @@ public interface PaymentService {
   }
 
   PaymentResponse processPayment(
-      PaymentRequest paymentRequest, UUID paymentTransactionId, Optional<String> customerRef);
+          PaymentRequest paymentRequest, UUID paymentTransactionId, Optional<String> customerRef, boolean cardOnFile);
 
   PaymentCustomerResponse createCustomer(PaymentMethodRequest methodRequest, UUID paymentMethodId);
 
-  PaymentSavedCardResponse createCardOnFile(PaymentMethodRequest methodRequest, String  externCustId, UUID paymentMethodId);
+  PaymentSavedCardResponse createCardOnFile(
+      PaymentMethodRequest methodRequest, String externCustId, UUID paymentMethodId);
 
-  PaymentCustomerResponse updateCustomer(PaymentMethodRequest methodRequest, String externCustId, UUID paymentMethodId);
+  PaymentCustomerResponse updateCustomer(
+      PaymentMethodRequest methodRequest, String externCustId, UUID paymentMethodId);
 
   void deactivateExistingCard(String cardRef);
+
+  void deleteCustomer(String externCustomerRef);
 }

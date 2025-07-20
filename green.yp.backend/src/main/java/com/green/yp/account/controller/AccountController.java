@@ -56,28 +56,30 @@ public class AccountController {
   }
 
   @ApiResponse(
-          responseCode = org.apache.hc.core5.http.HttpStatus.SC_NO_CONTENT + "",
-          description = "Returns the requested account information")
+      responseCode = org.apache.hc.core5.http.HttpStatus.SC_NO_CONTENT + "",
+      description = "Returns the requested account information")
   @PostMapping(path = "/{accountId}/validate")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void validateEmail(
-          @PathVariable(name = "accountId") UUID accountId,
-          @RequestParam(name="contactId", required = false) UUID contactId,
-          @RequestParam(name="email", required = false) String email,
-          @RequestParam(name="validationToken") String validationToken,
-          HttpServletRequest request) {
-    accountService.validateEmail(accountId, contactId, email, validationToken, RequestUtil.getRequestIP(request));
+      @PathVariable(name = "accountId") UUID accountId,
+      @RequestParam(name = "contactId", required = false) UUID contactId,
+      @RequestParam(name = "email", required = false) String email,
+      @RequestParam(name = "validationToken") String validationToken,
+      HttpServletRequest request) {
+    accountService.validateEmail(
+        accountId, contactId, email, validationToken, RequestUtil.getRequestIP(request));
   }
 
   @IsAnyAuthenticatedUser
   @ApiResponse(
-          responseCode = org.apache.hc.core5.http.HttpStatus.SC_OK + "",
-          description = "Returns the requested account information",
-          content = @Content(mediaType = "application/json"))
+      responseCode = org.apache.hc.core5.http.HttpStatus.SC_OK + "",
+      description = "Returns the requested account information",
+      content = @Content(mediaType = "application/json"))
   @GetMapping(path = "/user/{externUserRef}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<AccountResponse> findAccountUserRef(
-          @PathVariable(name = "externUserRef") String externalUserRef) {
-    return new ResponseApi<>(accountService.findUserAccount(externalUserRef, RequestUtil.getRequestIP()), null);
+      @PathVariable(name = "externUserRef") String externalUserRef) {
+    return new ResponseApi<>(
+        accountService.findUserAccount(externalUserRef, RequestUtil.getRequestIP()), null);
   }
 
   @PostMapping(
@@ -122,11 +124,13 @@ public class AccountController {
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public ResponseApi<AccountResponse> updateAccount(@Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser,
-                                                    @RequestBody @Valid UpdateAccountRequest account) {
+  public ResponseApi<AccountResponse> updateAccount(
+      @Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser,
+      @RequestBody @Valid UpdateAccountRequest account) {
     try {
       return new ResponseApi<>(
-          accountService.updateAccount(Optional.empty(), account, authenticatedUser.userId(),RequestUtil.getRequestIP()),
+          accountService.updateAccount(
+              Optional.empty(), account, authenticatedUser.userId(), RequestUtil.getRequestIP()),
           null);
     } catch (NoSuchAlgorithmException e) {
       throw new SystemException("System error, missing configuration", e);
@@ -139,7 +143,8 @@ public class AccountController {
           "Removes or disables unpaid accounts where a payment has not been received in over specified number of days")
   @PostMapping(path = "/clean/unpaid", produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public ResponseApi<String> cleanUnpaidAccounts(@Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser,
+  public ResponseApi<String> cleanUnpaidAccounts(
+      @Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser,
       @RequestParam(name = "days", defaultValue = "30", required = false) Integer daysOld) {
     return new ResponseApi<>(
         paymentService.cleanUnpaidAccounts(daysOld, RequestUtil.getRequestIP()), null);
@@ -149,8 +154,12 @@ public class AccountController {
   @Operation(summary = "Cancels or disables an account")
   @DeleteMapping(path = "/{accountId}", produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public ResponseApi<String> cancelAccount(@Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser, @PathVariable UUID accountId) {
+  public ResponseApi<String> cancelAccount(
+      @Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser,
+      @PathVariable UUID accountId) {
     return new ResponseApi<>(
-        accountService.cancelAccount(accountId, authenticatedUser.userId(), RequestUtil.getRequestIP()), null);
+        accountService.cancelAccount(
+            accountId, authenticatedUser.userId(), RequestUtil.getRequestIP()),
+        null);
   }
 }

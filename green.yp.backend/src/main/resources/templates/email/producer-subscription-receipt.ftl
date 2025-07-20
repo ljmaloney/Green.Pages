@@ -44,10 +44,11 @@
                 <tr>
                     <td style="padding: 40px;">
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
-                            Dear ${customer.firstName} ${customer.lastName},
+                            Dear ${firstName} ${lastName},
                         </p>
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
-                            Thank you for listing your business with us. Your credit card has been charged for amount of the subscription package.
+                            Thank you for listing your business with us. Your credit card has been charged for the
+                            amount of the subscription package.
                             <br/>
                             To manage your subscription, login to your account dashboard at
                             <a href="https://www.greenyp.com/dashboard">https://www.greenyp.com/dashboard</a>.

@@ -17,8 +17,6 @@ import com.green.yp.producer.data.model.ProducerContact;
 import com.green.yp.producer.data.model.ProducerLocation;
 import com.green.yp.producer.data.repository.ProducerContactRepository;
 import com.green.yp.producer.mapper.ProducerContactMapper;
-import com.green.yp.util.RequestUtil;
-import com.green.yp.util.TokenUtils;
 import jakarta.validation.constraints.NotNull;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -153,11 +151,13 @@ public class ProducerContactOrchestrationService {
           "Contact must have either a generic name or a firstName + lastName");
     }
 
+    var validation = emailContract.validateEmail(producerId.toString(), createContactRequest.emailAddress());
+
     ProducerContact contact = producerContactMapper.toEntity(createContactRequest);
     contact.setProducerId(producerId);
     contact.setProducerLocationId(locationId);
     if (StringUtils.isNotBlank(contact.getEmailAddress())) {
-      contact.setEmailConfirmationToken(TokenUtils.generateCode(8));
+      contact.setEmailConfirmationToken(validation.token());
       contact.setEmailConfirmed(false);
     }
 
@@ -175,7 +175,7 @@ public class ProducerContactOrchestrationService {
                 Map<String, Object> templateData = new HashMap<>();
                 templateData.put("contactName", contactName);
                 templateData.put("title", "Subscriber Contact Created");
-                templateData.put("emailValidationToken", contact.getEmailConfirmationToken());
+                templateData.put("emailValidationToken", validation.token());
                 templateData.put("ipAddress", ipAddress);
                 templateData.put("timestamp", contact.getCreateDate());
                 return templateData;
@@ -249,6 +249,8 @@ public class ProducerContactOrchestrationService {
       actionType = AuditActionType.DELETE_LOCATION)
   public void deleteContacts(List<UUID> producerIds) {
     log.info("Deleting contacts for producers {}", producerIds);
+    producerIds.parallelStream()
+            .forEach(producerId -> emailContract.deleteValidation(producerId.toString()));
     contactRepository.deleteContacts(producerIds);
   }
 }

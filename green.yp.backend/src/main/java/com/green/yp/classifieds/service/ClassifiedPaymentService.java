@@ -104,7 +104,7 @@ public class ClassifiedPaymentService {
     var paymentResponse =
         producerPaymentContract.applyPayment(
             paymentMapper.toPaymentRequest(paymentRequest, "GrnPgs-Classifieds", adType.monthlyPrice(), adType.monthlyPrice(), note, requestIP),
-            Optional.empty());
+            Optional.empty(), false);
 
     if ( !"COMPLETED".equals(paymentResponse.status()) ) {
       log.warn("Attempted to process payment of classified ad {} failed", classified.classified().getId());

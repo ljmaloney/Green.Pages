@@ -45,8 +45,8 @@ public class ProducerPaymentContract {
     return paymentService.applyPayment(paymentRequest, userId, requestIP);
   }
 
-    public PaymentTransactionResponse applyPayment(PaymentRequest paymentRequest, Optional<String> customerRef) {
-      return transactionService.applyPayment(paymentRequest, customerRef);
+    public PaymentTransactionResponse applyPayment(PaymentRequest paymentRequest, Optional<String> customerRef, boolean cardOnFile) {
+      return transactionService.applyPayment(paymentRequest, customerRef, cardOnFile);
     }
 
 }

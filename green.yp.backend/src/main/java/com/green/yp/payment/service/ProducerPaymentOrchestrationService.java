@@ -103,7 +103,10 @@ public class ProducerPaymentOrchestrationService {
                   }
                   return Optional.ofNullable(
                       applyPayment(
-                              producerInvoiceResponse, paymentMethod, paymentRequest.paymentType(), requestIP));
+                          producerInvoiceResponse,
+                          paymentMethod,
+                          paymentRequest.paymentType(),
+                          requestIP));
                 });
 
     return paymentMapper.fromTransaction(transaction.get());
@@ -130,7 +133,8 @@ public class ProducerPaymentOrchestrationService {
     PaymentIntegrationResponse response = paymentIntegration.applyPayment(request, requestIP);
 
     ProducerPaymentTransaction transaction =
-        transactionService.createTransaction(producerInvoiceResponse, paymentMethod, paymentType, response);
+        transactionService.createTransaction(
+            producerInvoiceResponse, paymentMethod, paymentType, response);
 
     if (response.isFailed()) {
 

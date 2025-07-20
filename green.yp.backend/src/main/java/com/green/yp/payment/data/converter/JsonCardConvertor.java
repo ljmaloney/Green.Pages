@@ -10,24 +10,25 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Converter
 public class JsonCardConvertor implements AttributeConverter<Card, String> {
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    @Override
-    public String convertToDatabaseColumn(Card card) {
-        try {
-            return card != null ? objectMapper.writeValueAsString(card) : null;
-        } catch (Exception e) {
-            log.error("Unexpected error converting map to JSON string", e);
-            throw new SystemException("Error converting map to JSON", e);
-        }
-    }
+  private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Override
-    public Card convertToEntityAttribute(String dbData) {
-        try {
-            return dbData != null ? objectMapper.readValue(dbData, Card.class) : null;
-        } catch (Exception e) {
-            log.error("Unexpected error converting JSON string to map", e);
-            throw new SystemException("Error converting JSON to map", e);
-        }
+  @Override
+  public String convertToDatabaseColumn(Card card) {
+    try {
+      return card != null ? objectMapper.writeValueAsString(card) : null;
+    } catch (Exception e) {
+      log.error("Unexpected error converting map to JSON string", e);
+      throw new SystemException("Error converting map to JSON", e);
     }
+  }
+
+  @Override
+  public Card convertToEntityAttribute(String dbData) {
+    try {
+      return dbData != null ? objectMapper.readValue(dbData, Card.class) : null;
+    } catch (Exception e) {
+      log.error("Unexpected error converting JSON string to map", e);
+      throw new SystemException("Error converting JSON to map", e);
+    }
+  }
 }

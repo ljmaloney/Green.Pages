@@ -1,11 +1,12 @@
 package com.green.yp.api.contract;
 
 import com.green.yp.api.apitype.payment.*;
-import com.green.yp.payment.data.enumeration.ProducerPaymentType;
 import com.green.yp.payment.service.PaymentOrchestrationService;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,8 +19,8 @@ public class PaymentContract {
     this.orchestrationService = orchestrationService;
   }
 
-  public PaymentTransactionResponse applyPayment(PaymentRequest paymentRequest, Optional<String> customerRef) {
-    return orchestrationService.applyPayment(paymentRequest, customerRef);
+  public PaymentTransactionResponse applyPayment(PaymentRequest paymentRequest, Optional<String> customerRef, boolean cardOnFile) {
+    return orchestrationService.applyPayment(paymentRequest, customerRef, cardOnFile);
   }
 
   public PaymentMethodResponse createPaymentMethod(PaymentMethodRequest methodRequest){
@@ -32,5 +33,9 @@ public class PaymentContract {
 
   public PaymentMethodResponse replaceCardOnFile(PaymentMethodRequest methodRequest){
     return orchestrationService.replaceCardOnFile(methodRequest);
+  }
+
+  public void disablePaymentMethod(List<UUID> producerIds) {
+    producerIds.forEach(id -> orchestrationService.disablePaymentMethods(id));
   }
 }

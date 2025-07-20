@@ -1,8 +1,8 @@
 package com.green.yp.payment.data.model;
 
-import com.green.yp.common.data.converter.BooleanConverter;
 import com.green.yp.common.data.embedded.Mutable;
 import com.green.yp.payment.data.converter.JsonCardConvertor;
+import com.green.yp.payment.data.enumeration.PaymentMethodStatusType;
 import com.green.yp.payment.data.json.Card;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -10,6 +10,8 @@ import jakarta.validation.constraints.Size;
 import java.time.OffsetDateTime;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Getter
 @Setter
@@ -17,13 +19,11 @@ import lombok.Setter;
 @Table(name = "payment_method", schema = "greenyp")
 public class PaymentMethod extends Mutable {
 
-  @NotNull
-  @Convert(converter = BooleanConverter.class)
-  @Column(name = "active", nullable = false)
-  private Boolean active;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "status", nullable = false)
+  private PaymentMethodStatusType statusType;
 
   @Size(max = 50)
-  @NotNull
   @Column(name = "reference_id", nullable = false, length = 50)
   private String referenceId;
 
@@ -83,7 +83,59 @@ public class PaymentMethod extends Mutable {
   @Column(name = "email_address", length = 150)
   private String emailAddress;
 
-  @Column(name="card_details")
+  @Column(name = "card_details")
   @Convert(converter = JsonCardConvertor.class)
   private Card cardDetails;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    PaymentMethod that = (PaymentMethod) o;
+
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(statusType, that.statusType)
+        .append(referenceId, that.referenceId)
+        .append(externCustRef, that.externCustRef)
+        .append(cardRef, that.cardRef)
+        .append(cancelDate, that.cancelDate)
+        .append(givenName, that.givenName)
+        .append(familyName, that.familyName)
+        .append(companyName, that.companyName)
+        .append(payorAddress1, that.payorAddress1)
+        .append(payorAddress2, that.payorAddress2)
+        .append(payorCity, that.payorCity)
+        .append(payorState, that.payorState)
+        .append(payorPostalCode, that.payorPostalCode)
+        .append(phoneNumber, that.phoneNumber)
+        .append(emailAddress, that.emailAddress)
+        .append(cardDetails, that.cardDetails)
+        .isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(statusType)
+        .append(referenceId)
+        .append(externCustRef)
+        .append(cardRef)
+        .append(cancelDate)
+        .append(givenName)
+        .append(familyName)
+        .append(companyName)
+        .append(payorAddress1)
+        .append(payorAddress2)
+        .append(payorCity)
+        .append(payorState)
+        .append(payorPostalCode)
+        .append(phoneNumber)
+        .append(emailAddress)
+        .append(cardDetails)
+        .toHashCode();
+  }
 }

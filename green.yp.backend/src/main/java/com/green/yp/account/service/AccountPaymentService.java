@@ -1,5 +1,6 @@
 package com.green.yp.account.service;
 
+import com.green.yp.account.mapper.AccountPaymentMapper;
 import com.green.yp.api.apitype.enumeration.EmailTemplateType;
 import com.green.yp.api.apitype.invoice.*;
 import com.green.yp.api.apitype.payment.*;
@@ -12,11 +13,9 @@ import com.green.yp.api.contract.*;
 import com.green.yp.email.service.EmailService;
 import com.green.yp.exception.PreconditionFailedException;
 import jakarta.validation.constraints.NotNull;
-
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.*;
-
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -35,6 +34,7 @@ public class AccountPaymentService {
   private final ProducerInvoiceContract producerInvoiceContract;
 
   private final ProducerContract producerContract;
+  private final EmailContract emailContract;
 
   private final ProducerPaymentContract producerPaymentContract;
 
@@ -42,21 +42,25 @@ public class AccountPaymentService {
   private final ProducerLocationContract locationContract;
   private final PaymentContract paymentContract;
 
+  private final AccountPaymentMapper paymentMapper;
+
   public AccountPaymentService(
           EmailService emailService, InvoiceContract invoiceContract,
           ProducerInvoiceContract producerInvoiceContract,
-          ProducerContract producerContract,
+          ProducerContract producerContract, EmailContract emailContract,
           ProducerPaymentContract producerPaymentContract,
           ProducerContactContract contactContract,
-          ProducerLocationContract locationContract, PaymentContract paymentContract) {
+          ProducerLocationContract locationContract, PaymentContract paymentContract, AccountPaymentMapper paymentMapper) {
     this.emailService = emailService;
       this.invoiceContract = invoiceContract;
       this.producerInvoiceContract = producerInvoiceContract;
     this.producerContract = producerContract;
-    this.producerPaymentContract = producerPaymentContract;
+      this.emailContract = emailContract;
+      this.producerPaymentContract = producerPaymentContract;
     this.contactContract = contactContract;
     this.locationContract = locationContract;
     this.paymentContract = paymentContract;
+      this.paymentMapper = paymentMapper;
   }
 
   /**
@@ -84,45 +88,21 @@ public class AccountPaymentService {
               return new PreconditionFailedException("No primary contact found for " + paymentRequest.producerId());
             });
 
-    if ( primaryContact.emailConfirmedDate() == null ){
+    var validation = emailContract.validateEmail(paymentRequest.producerId().toString(), primaryContact.emailAddress());
+
+    if (validation.validationStatus().isValidated() ){
       log.warn("Email has not been confirmed for the admin contact {} for {}", paymentRequest.producerId(), primaryContact.emailAddress());
       throw new PreconditionFailedException("Admin email address has not been confirmed for the account");
     }
 
     var invoice = createInvoiceForPayment(paymentRequest, producerResponse);
 
-    var savedCustomerCard = paymentContract.createPaymentMethod(
-        PaymentMethodRequest.builder()
-                .referenceId(paymentRequest.producerId().toString())
-                .paymentToken(paymentRequest.paymentToken())
-                .verificationToken(paymentRequest.verificationToken())
-                .emailValidationToken(paymentRequest.emailValidationToken())
-                .companyName(paymentRequest.companyName())
-                .firstName(paymentRequest.firstName())
-                .lastName(paymentRequest.lastName())
-                .payorAddress1(paymentRequest.payorAddress1())
-                .payorAddress2(paymentRequest.payorAddress2())
-                .payorCity(paymentRequest.payorCity())
-                .payorPostalCode(paymentRequest.payorPostalCode())
-                .phoneNumber(paymentRequest.phoneNumber())
-                .emailAddress(paymentRequest.emailAddress())
-            .build());
+    var savedCustomerCard = paymentContract.createPaymentMethod(paymentMapper.toPaymentMethod(paymentRequest));
 
-    var completedPayment = paymentContract.applyPayment(PaymentRequest.builder()
-                    .paymentToken(savedCustomerCard.cardRef())
-                    .paymentAmount(invoice.invoiceTotal())
-                    .totalAmount(invoice.invoiceTotal())
-                    .note(invoice.invoiceNumber())
-                    .firstName(paymentRequest.firstName())
-                    .lastName(paymentRequest.firstName())
-                    .address(paymentRequest.payorAddress1())
-                    .city(paymentRequest.payorCity())
-                    .state(paymentRequest.payorState())
-                    .postalCode(paymentRequest.payorPostalCode())
-                    .phoneNumber(paymentRequest.phoneNumber())
-                    .emailAddress(paymentRequest.emailAddress())
-                    .build(),
-            Optional.of(savedCustomerCard.externCustRef()));
+    var completedPayment =
+        paymentContract.applyPayment(
+            paymentMapper.toPaymentRequest(paymentRequest, savedCustomerCard, invoice),
+                Optional.of(savedCustomerCard.externCustRef()), true);
 
     invoiceContract.updatePayment(invoice.invoiceId(), completedPayment);
 
@@ -219,6 +199,8 @@ public class AccountPaymentService {
       return String.format("No unpaid subscribers over %s days old", daysOld);
     }
     List<UUID> producerIds = producers.stream().map(ProducerResponse::producerId).toList();
+
+    paymentContract.disablePaymentMethod(producerIds);
 
     producerContract.deleteCredentials(producerIds);
     log.info("Removed / deleted credentials for {}", producers);

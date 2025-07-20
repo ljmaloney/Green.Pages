@@ -50,12 +50,13 @@ public class AccountService {
   private final ProducerContactContract producerContactContract;
 
   public AccountService(
-          EmailService emailService,
-          ProducerContract producerContract,
-          PaymentContract paymentContract,
-          ProducerContactContract contactContract,
-          ProducerLocationContract locationContract,
-          AccountMapper accountMapper, ProducerContactContract producerContactContract) {
+      EmailService emailService,
+      ProducerContract producerContract,
+      PaymentContract paymentContract,
+      ProducerContactContract contactContract,
+      ProducerLocationContract locationContract,
+      AccountMapper accountMapper,
+      ProducerContactContract producerContactContract) {
     this.emailService = emailService;
     this.producerContract = producerContract;
     this.paymentContract = paymentContract;
@@ -65,7 +66,10 @@ public class AccountService {
     this.producerContactContract = producerContactContract;
   }
 
-  @AuditRequest(requestParameter = "accountId", actionType = AuditActionType.CANCEL_ACCOUNT, objectType = AuditObjectType.OBJECT)
+  @AuditRequest(
+      requestParameter = "accountId",
+      actionType = AuditActionType.CANCEL_ACCOUNT,
+      objectType = AuditObjectType.OBJECT)
   @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
   public String cancelAccount(UUID accountId, String userId, String ipAddress) {
     log.info("Cancelling subscription for {} from ipAddress {}", accountId, ipAddress);
@@ -92,10 +96,18 @@ public class AccountService {
     log.info("Loading account info for logged user by ref {}", externalUserRef);
 
     var credsOptional = producerContract.findCredentialByRef(externalUserRef, ipAddress);
-    var producerId = credsOptional.orElseThrow(() -> {
-      log.warn("No saved record mapping externalUserRef {} to producer/subscriber", externalUserRef);
-      return new NotFoundException(String.format("No subscribtion found for user identified by %s", externalUserRef));
-    }).producerId();
+    var producerId =
+        credsOptional
+            .orElseThrow(
+                () -> {
+                  log.warn(
+                      "No saved record mapping externalUserRef {} to producer/subscriber",
+                      externalUserRef);
+                  return new NotFoundException(
+                      String.format(
+                          "No subscribtion found for user identified by %s", externalUserRef));
+                })
+            .producerId();
 
     return findAccount(producerId);
   }
@@ -130,16 +142,25 @@ public class AccountService {
       }
     }
 
-    producerContract.findCredential(account.masterUserCredentials().userName(),
-            account.masterUserCredentials().emailAddress()).ifPresentOrElse(credentials -> {
-              log.warn("Existing user credentials found for username {} or email {}",
-                      account.masterUserCredentials().userName(),
-                      account.masterUserCredentials().emailAddress());
-              throw new UserCredentialsException(account.masterUserCredentials().userName(),
-                      account.masterUserCredentials().emailAddress());
-            }, () -> log.debug("No existing user credentials found for username {} or email {}",
-                account.masterUserCredentials().userName(),
-                account.masterUserCredentials().emailAddress()));
+    producerContract
+        .findCredential(
+            account.masterUserCredentials().userName(),
+            account.masterUserCredentials().emailAddress())
+        .ifPresentOrElse(
+            credentials -> {
+              log.warn(
+                  "Existing user credentials found for username {} or email {}",
+                  account.masterUserCredentials().userName(),
+                  account.masterUserCredentials().emailAddress());
+              throw new UserCredentialsException(
+                  account.masterUserCredentials().userName(),
+                  account.masterUserCredentials().emailAddress());
+            },
+            () ->
+                log.debug(
+                    "No existing user credentials found for username {} or email {}",
+                    account.masterUserCredentials().userName(),
+                    account.masterUserCredentials().emailAddress()));
 
     // create producer record
     ProducerResponse producerResponse =
@@ -148,10 +169,13 @@ public class AccountService {
     // validate contact, must have contact type of PRIMARY or ADMIN for account creation
     isValidPrimaryContact(account);
 
-    ProducerLocationResponse locationResponse = createOrUpdateLocation(account, producerResponse.producerId(), ipAddress);
+    ProducerLocationResponse locationResponse =
+        createOrUpdateLocation(account, producerResponse.producerId(), ipAddress);
 
-    List<ProducerContactResponse> adminContacts =  contactContract.findAdminContacts(producerResponse.producerId());
-    ProducerContactResponse contactResponse = createOrUpdateContact(
+    List<ProducerContactResponse> adminContacts =
+        contactContract.findAdminContacts(producerResponse.producerId());
+    ProducerContactResponse contactResponse =
+        createOrUpdateContact(
             producerResponse,
             Optional.of(account.primaryContact()),
             adminContacts,
@@ -161,16 +185,19 @@ public class AccountService {
 
     // create admin/master user credentials
     var credentialsResponse =
-            createOrUpdateCredentials(
-                    producerResponse, account.masterUserCredentials(), contactResponse, ipAddress);
+        createOrUpdateCredentials(
+            producerResponse, account.masterUserCredentials(), contactResponse, ipAddress);
 
     return new AccountResponse(
-            producerResponse, locationResponse, adminContacts, credentialsResponse);
+        producerResponse, locationResponse, adminContacts, credentialsResponse);
   }
 
   @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
   public AccountResponse updateAccount(
-          Optional<ProducerResponse> producerOptional, UpdateAccountRequest account, String ipAddress, String requestIP)
+      Optional<ProducerResponse> producerOptional,
+      UpdateAccountRequest account,
+      String ipAddress,
+      String requestIP)
       throws NoSuchAlgorithmException {
 
     var producerResponse =
@@ -182,17 +209,22 @@ public class AccountService {
               return producerContract.findProducer(account.producerId());
             });
 
-    return new AccountResponse(
-            producerResponse, null, null, null);
+    return new AccountResponse(producerResponse, null, null, null);
   }
 
-  public void validateEmail(@NotNull @NonNull UUID accountId, UUID contactId, String email, @NotNull @NonNull String validationToken, String requestIP) {
-    if ( contactId != null ) {
+  public void validateEmail(
+      @NotNull @NonNull UUID accountId,
+      UUID contactId,
+      String email,
+      @NotNull @NonNull String validationToken,
+      String requestIP) {
+    if (contactId != null) {
       contactContract.validateContact(accountId, contactId, validationToken);
-    } else if ( StringUtils.isNotBlank(email)) {
+    } else if (StringUtils.isNotBlank(email)) {
       contactContract.validateEmail(accountId, email, validationToken);
     } else {
-      throw new PreconditionFailedException("Provide either an email address or contactId for the email being validated");
+      throw new PreconditionFailedException(
+          "Provide either an email address or contactId for the email being validated");
     }
   }
 
@@ -213,22 +245,27 @@ public class AccountService {
     if (request != null) {
       UUID credentialContactId = contactResponse.contactId();
       if (credentialsResponse == null) {
-        if ( createCredentialsContact(request, contactResponse)){
-          var credContact = producerContactContract.createContact(new ProducerContactRequest(null,
-                          contactResponse.producerLocationId(),
-                          ProducerContactType.ADMIN,
-                          ProducerDisplayContactType.NO_DISPLAY,
-                          null,
-                          request.firstName(),
-                          request.lastName(),
-                          null,
-                          request.businessPhone(),
-                          request.cellPhone(),
-                          request.emailAddress()),
+        if (createCredentialsContact(request, contactResponse)) {
+          var credContact =
+              producerContactContract.createContact(
+                  new ProducerContactRequest(
+                      null,
+                      contactResponse.producerLocationId(),
+                      ProducerContactType.ADMIN,
+                      ProducerDisplayContactType.NO_DISPLAY,
+                      null,
+                      request.firstName(),
+                      request.lastName(),
+                      null,
+                      request.businessPhone(),
+                      request.cellPhone(),
+                      request.emailAddress()),
                   producerResponse.producerId(),
                   contactResponse.producerLocationId(),
                   ipAddress);
-          log.info("Created new contact for credentials as ADMIN / NO DISPLAY, contactId {}", credContact.contactId());
+          log.info(
+              "Created new contact for credentials as ADMIN / NO DISPLAY, contactId {}",
+              credContact.contactId());
           credentialContactId = credContact.contactId();
         }
         credentialsResponse =
@@ -257,11 +294,11 @@ public class AccountService {
     return credentialsResponse;
   }
 
-  private boolean createCredentialsContact(UserCredentialsRequest request,
-                                           ProducerContactResponse contactResponse) {
+  private boolean createCredentialsContact(
+      UserCredentialsRequest request, ProducerContactResponse contactResponse) {
     return request.firstName().equals(contactResponse.firstName())
-            && request.lastName().equals(contactResponse.lastName())
-            && request.emailAddress().equals(contactResponse.emailAddress());
+        && request.lastName().equals(contactResponse.lastName())
+        && request.emailAddress().equals(contactResponse.emailAddress());
   }
 
   private ProducerContactResponse createOrUpdateContact(
@@ -293,7 +330,7 @@ public class AccountService {
   }
 
   private ProducerLocationResponse createOrUpdateLocation(
-          CreateAccountRequest account, @NonNull @NotNull UUID producerId, String ipAddress) {
+      CreateAccountRequest account, @NonNull @NotNull UUID producerId, String ipAddress) {
     // create or update primary location
     ProducerLocationResponse locationResponse = null;
     try {
@@ -311,8 +348,7 @@ public class AccountService {
         }
         request = accountMapper.copyRequest(request, locationResponse.locationId());
       }
-      locationResponse =
-          locationContract.updatePrimaryLocation(producerId, request, ipAddress);
+      locationResponse = locationContract.updatePrimaryLocation(producerId, request, ipAddress);
     }
     return locationResponse;
   }
@@ -344,7 +380,7 @@ public class AccountService {
                 contact.contactId().equals(request.contactId())
                     || contact.emailAddress().equals(request.emailAddress()))
         .findFirst()
-            .orElseGet(
+        .orElseGet(
             () -> {
               log.info(
                   "No Primary contact exists for contact {} or email {} to update",
@@ -359,6 +395,4 @@ public class AccountService {
 
     return contacts.stream().map(ProducerContactResponse::emailAddress).toList();
   }
-
-
 }

@@ -46,10 +46,10 @@ public class PaymentTransaction extends Mutable {
   @Column(name = "status", length = 50)
   private String status;
 
-  @Column(name="error_message")
+  @Column(name = "error_message")
   private String errorMessage;
 
-  @Column(name="error_code")
+  @Column(name = "error_code")
   private Integer errorCode;
 
   @Size(max = 50)
@@ -131,7 +131,7 @@ public class PaymentTransaction extends Mutable {
   @Column(name = "version_token")
   private String versionToken;
 
-  @Column(name="error_body")
+  @Column(name = "error_body")
   private String errorBody;
 
   @Column(name = "payment_details")

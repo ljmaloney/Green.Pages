@@ -20,13 +20,19 @@ import org.mapstruct.*;
 public interface SquareResponseMapper {
 
   @Mapping(target = "externCustRef", source = "id", qualifiedByName = "unwrapOptionalString")
-  @Mapping(target = "firstName", source="givenName", qualifiedByName = "unwrapOptionalString")
-  @Mapping(target = "lastName", source="familyName", qualifiedByName = "unwrapOptionalString")
-  @Mapping(target = "idempotencyId", source = "referenceId", qualifiedByName = "unwrapOptionalString")
+  @Mapping(target = "firstName", source = "givenName", qualifiedByName = "unwrapOptionalString")
+  @Mapping(target = "lastName", source = "familyName", qualifiedByName = "unwrapOptionalString")
+  @Mapping(
+      target = "idempotencyId",
+      source = "referenceId",
+      qualifiedByName = "unwrapOptionalString")
   PaymentCustomerResponse toPaymentCustomerResponse(Customer customer);
 
   @Mapping(target = "cardRef", source = "id", qualifiedByName = "unwrapOptionalString")
-  @Mapping(target = "paymentMethodId", source="referenceId", qualifiedByName = "unwrapOptionalString")
+  @Mapping(
+      target = "paymentMethodId",
+      source = "referenceId",
+      qualifiedByName = "unwrapOptionalString")
   PaymentSavedCardResponse toSavedCardResponse(@NotNull Card card);
 
   @Mapping(
