@@ -9,13 +9,13 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(
-        componentModel = "spring",
-        unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        injectionStrategy = InjectionStrategy.CONSTRUCTOR)
+    componentModel = "spring",
+    unmappedTargetPolicy = ReportingPolicy.IGNORE,
+    injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface PaymentTransactionMapper {
 
-    PaymentTransaction toEntity(PaymentRequest paymentRequest);
+  PaymentTransaction toEntity(PaymentRequest paymentRequest);
 
-    @Mapping(target="transactionId", source="id")
-    PaymentTransactionResponse fromEntity(PaymentTransaction save);
+  @Mapping(target = "transactionId", source = "id")
+  PaymentTransactionResponse fromEntity(PaymentTransaction save);
 }

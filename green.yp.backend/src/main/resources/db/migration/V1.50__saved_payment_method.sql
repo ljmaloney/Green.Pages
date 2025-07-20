@@ -10,7 +10,7 @@ BEGIN
         `create_date`              DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP,
         `last_update_date`         DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP,
         `version`                  INT              NOT NULL,
-        `active`                   CHAR(1)          NOT NULL,
+        `status`                   VARCHAR(50)      NOT NULL,
         `reference_id`             VARCHAR(50)      NOT NULL,
         `extern_cust_ref`          VARCHAR(50),
         `card_ref`                 VARCHAR(100),

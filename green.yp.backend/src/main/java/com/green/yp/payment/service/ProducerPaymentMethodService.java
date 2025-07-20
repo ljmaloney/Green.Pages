@@ -32,7 +32,8 @@ public class ProducerPaymentMethodService {
   }
 
   @Transactional
-  public ProducerPaymentMethodResponse createPaymentMethod(ProducerPaymentMethodRequest paymentRequest) {
+  public ProducerPaymentMethodResponse createPaymentMethod(
+      ProducerPaymentMethodRequest paymentRequest) {
     log.info(
         "Create payment method for {} using {}",
         paymentRequest.producerId(),

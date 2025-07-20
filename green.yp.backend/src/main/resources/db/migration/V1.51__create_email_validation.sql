@@ -18,8 +18,7 @@ BEGIN
         `email_address`             VARCHAR(150)        NOT NULL,
         PRIMARY KEY (`id`)
     ) ENGINE = InnoDB;
-    CREATE UNIQUE INDEX email_validation_email_idx on email_validation(`email_address`);
-    CREATE INDEX email_validation_email_ref_idx on email_validation (`extern_ref`, `email_address`);
+    CREATE UNIQUE INDEX email_validation_email_idx on email_validation(`extern_ref`,`email_address`);
     SHOW WARNINGS;
 END //
 DELIMITER ;

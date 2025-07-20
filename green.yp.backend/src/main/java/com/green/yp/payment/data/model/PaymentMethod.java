@@ -83,7 +83,7 @@ public class PaymentMethod extends Mutable {
   @Column(name = "email_address", length = 150)
   private String emailAddress;
 
-  @Column(name="card_details")
+  @Column(name = "card_details")
   @Convert(converter = JsonCardConvertor.class)
   private Card cardDetails;
 
@@ -95,11 +95,47 @@ public class PaymentMethod extends Mutable {
 
     PaymentMethod that = (PaymentMethod) o;
 
-    return new EqualsBuilder().appendSuper(super.equals(o)).append(statusType, that.statusType).append(referenceId, that.referenceId).append(externCustRef, that.externCustRef).append(cardRef, that.cardRef).append(cancelDate, that.cancelDate).append(givenName, that.givenName).append(familyName, that.familyName).append(companyName, that.companyName).append(payorAddress1, that.payorAddress1).append(payorAddress2, that.payorAddress2).append(payorCity, that.payorCity).append(payorState, that.payorState).append(payorPostalCode, that.payorPostalCode).append(phoneNumber, that.phoneNumber).append(emailAddress, that.emailAddress).append(cardDetails, that.cardDetails).isEquals();
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(statusType, that.statusType)
+        .append(referenceId, that.referenceId)
+        .append(externCustRef, that.externCustRef)
+        .append(cardRef, that.cardRef)
+        .append(cancelDate, that.cancelDate)
+        .append(givenName, that.givenName)
+        .append(familyName, that.familyName)
+        .append(companyName, that.companyName)
+        .append(payorAddress1, that.payorAddress1)
+        .append(payorAddress2, that.payorAddress2)
+        .append(payorCity, that.payorCity)
+        .append(payorState, that.payorState)
+        .append(payorPostalCode, that.payorPostalCode)
+        .append(phoneNumber, that.phoneNumber)
+        .append(emailAddress, that.emailAddress)
+        .append(cardDetails, that.cardDetails)
+        .isEquals();
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(statusType).append(referenceId).append(externCustRef).append(cardRef).append(cancelDate).append(givenName).append(familyName).append(companyName).append(payorAddress1).append(payorAddress2).append(payorCity).append(payorState).append(payorPostalCode).append(phoneNumber).append(emailAddress).append(cardDetails).toHashCode();
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(statusType)
+        .append(referenceId)
+        .append(externCustRef)
+        .append(cardRef)
+        .append(cancelDate)
+        .append(givenName)
+        .append(familyName)
+        .append(companyName)
+        .append(payorAddress1)
+        .append(payorAddress2)
+        .append(payorCity)
+        .append(payorState)
+        .append(payorPostalCode)
+        .append(phoneNumber)
+        .append(emailAddress)
+        .append(cardDetails)
+        .toHashCode();
   }
 }
