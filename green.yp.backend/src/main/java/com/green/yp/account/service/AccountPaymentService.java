@@ -101,7 +101,8 @@ public class AccountPaymentService {
 
     var completedPayment =
         paymentContract.applyPayment(
-            paymentMapper.toPaymentRequest(paymentRequest, savedCustomerCard, invoice), Optional.of(savedCustomerCard.externCustRef()));
+            paymentMapper.toPaymentRequest(paymentRequest, savedCustomerCard, invoice),
+                Optional.of(savedCustomerCard.externCustRef()), true);
 
     invoiceContract.updatePayment(invoice.invoiceId(), completedPayment);
 

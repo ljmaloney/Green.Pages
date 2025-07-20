@@ -105,12 +105,14 @@ public class PaymentOrchestrationService {
                !methodRequest.emailAddress().equals(activeCard.emailAddress());
     }
 
-    public PaymentTransactionResponse applyPayment(PaymentRequest paymentRequest, Optional<String> customerRef) {
+    public PaymentTransactionResponse applyPayment(PaymentRequest paymentRequest,
+                                                   Optional<String> customerRef,
+                                                   Boolean cardOnFile) {
         //first create payment record
         var paymentResponse = transactionService.createPaymentRecord(paymentRequest);
         try{
             //call payment partner API
-            var cardResponse = paymentService.processPayment(paymentRequest, paymentResponse.getId(), customerRef);
+            var cardResponse = paymentService.processPayment(paymentRequest, paymentResponse.getId(), customerRef, cardOnFile);
             //update payment record
             return transactionService.updatePayment(paymentResponse.getId(), cardResponse);
         } catch (SquareApiException e){

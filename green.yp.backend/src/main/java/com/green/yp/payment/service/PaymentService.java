@@ -16,7 +16,7 @@ public interface PaymentService {
   }
 
   PaymentResponse processPayment(
-      PaymentRequest paymentRequest, UUID paymentTransactionId, Optional<String> customerRef);
+          PaymentRequest paymentRequest, UUID paymentTransactionId, Optional<String> customerRef, boolean cardOnFile);
 
   PaymentCustomerResponse createCustomer(PaymentMethodRequest methodRequest, UUID paymentMethodId);
 
