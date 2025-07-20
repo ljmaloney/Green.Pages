@@ -10,8 +10,10 @@ import com.green.yp.payment.data.repository.PaymentTransactionRepository;
 import com.green.yp.payment.mapper.PaymentTransactionMapper;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.JavaTypeRegistrations;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
@@ -26,7 +28,7 @@ public class PaymentTransactionService {
     this.mapper = mapper;
   }
 
-  @Transactional
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public PaymentTransaction createPaymentRecord(PaymentRequest paymentRequest) {
     log.info("creating new payment record for token");
     var transaction = mapper.toEntity(paymentRequest);
@@ -65,6 +67,7 @@ public class PaymentTransactionService {
     return mapper.fromEntity(repository.save(transaction));
   }
 
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public PaymentTransactionResponse updatePaymentError(
       UUID transactionId, String errorMessage, int errorCode, String errorBody) {
     log.info("updating payment record {} for completion with response", transactionId);

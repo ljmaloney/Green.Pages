@@ -19,8 +19,8 @@ public class PaymentContract {
     this.orchestrationService = orchestrationService;
   }
 
-  public PaymentTransactionResponse applyPayment(PaymentRequest paymentRequest, Optional<String> customerRef) {
-    return orchestrationService.applyPayment(paymentRequest, customerRef);
+  public PaymentTransactionResponse applyPayment(PaymentRequest paymentRequest, Optional<String> customerRef, boolean cardOnFile) {
+    return orchestrationService.applyPayment(paymentRequest, customerRef, cardOnFile);
   }
 
   public PaymentMethodResponse createPaymentMethod(PaymentMethodRequest methodRequest){

@@ -39,7 +39,7 @@ public class SquarePaymentService implements PaymentService {
 
   @Override
   public PaymentResponse processPayment(
-      PaymentRequest paymentRequest, UUID paymentTransactionId, Optional<String> customerRef) {
+          PaymentRequest paymentRequest, UUID paymentTransactionId, Optional<String> customerRef, boolean cardOnFile) {
     log.debug(
         "Processing payment for ref {} amount {}",
         paymentTransactionId,
@@ -50,7 +50,7 @@ public class SquarePaymentService implements PaymentService {
             .idempotencyKey(paymentTransactionId.toString())
             .autocomplete(true)
             .referenceId(paymentRequest.referenceId())
-            .verificationToken(paymentRequest.verificationToken())
+            .verificationToken(cardOnFile ? Optional.empty() : Optional.of(paymentRequest.verificationToken()))
             .note(paymentRequest.note())
             .statementDescriptionIdentifier(
                 StringUtils.truncate(paymentRequest.statementDescription(), 20))
