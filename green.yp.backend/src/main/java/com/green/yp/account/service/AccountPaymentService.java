@@ -107,6 +107,9 @@ public class AccountPaymentService {
 
     invoiceContract.updatePayment(invoice.invoiceId(), completedPayment);
 
+    producerContract.activateProducer(paymentRequest.producerId(),
+            completedPayment.createDate(), completedPayment.createDate(), "system", requestIP);
+
     emailService.sendEmailAsync(EmailTemplateType.PRODUCER_PAYMENT_CONFIRMATION,
             Collections.singletonList(primaryContact.emailAddress()),
             EmailTemplateType.PRODUCER_PAYMENT_CONFIRMATION.getSubjectFormat(),
