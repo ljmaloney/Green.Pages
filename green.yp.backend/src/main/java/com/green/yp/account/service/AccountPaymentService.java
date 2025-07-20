@@ -90,7 +90,8 @@ public class AccountPaymentService {
 
     var validation = emailContract.validateEmail(paymentRequest.producerId().toString(), primaryContact.emailAddress());
 
-    if (validation.validationStatus().isValidated() ){
+    if (!validation.validationStatus().isValidated()
+        && !paymentRequest.emailValidationToken().equals(validation.token())) {
       log.warn("Email has not been confirmed for the admin contact {} for {}", paymentRequest.producerId(), primaryContact.emailAddress());
       throw new PreconditionFailedException("Admin email address has not been confirmed for the account");
     }
@@ -175,9 +176,6 @@ public class AccountPaymentService {
     ProducerPaymentResponse producerPaymentResponse =
         producerPaymentContract.applyPayment(paymentRequest, userId, requestIP);
 
-    //        emailService.sendEmail(EmailTemplateName.WELCOME_EMAIL, producerResponse,
-    //                getAdminEmails(paymentRequest.producerId()).toArray(new String[0]));
-
     return new ApiPaymentResponse(
         true, producerPaymentResponse.responseCode(), producerPaymentResponse.responseText());
   }
@@ -218,12 +216,6 @@ public class AccountPaymentService {
 
     return String.format(
         "Removed %s unpaid account subscriptions over %s days old", producerIds.size(), daysOld);
-  }
-
-  private List<String> getAdminEmails(UUID accountId) {
-    List<ProducerContactResponse> contacts = contactContract.findAdminContacts(accountId);
-
-    return contacts.stream().map(ProducerContactResponse::emailAddress).toList();
   }
 
   private InvoiceLineItemRequest createLineItem(ApplyPaymentMethodRequest paymentRequest,
