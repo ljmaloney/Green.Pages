@@ -5,8 +5,8 @@ import com.green.yp.account.service.AccountService;
 import com.green.yp.api.apitype.account.AccountResponse;
 import com.green.yp.api.apitype.account.CreateAccountRequest;
 import com.green.yp.api.apitype.account.UpdateAccountRequest;
+import com.green.yp.api.apitype.payment.ApiPaymentRequest;
 import com.green.yp.api.apitype.payment.ApiPaymentResponse;
-import com.green.yp.api.apitype.payment.ApplyPaymentMethodRequest;
 import com.green.yp.api.apitype.payment.ApplyPaymentRequest;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.config.security.AuthUser;
@@ -101,7 +101,7 @@ public class AccountController {
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ApiPaymentResponse> applyInitialPayment(
-      @RequestBody @Valid ApplyPaymentMethodRequest paymentRequest) {
+          @RequestBody @Valid ApiPaymentRequest paymentRequest) {
     return new ResponseApi<>(
         paymentService.applyInitialPayment(paymentRequest, RequestUtil.getRequestIP()), null);
   }

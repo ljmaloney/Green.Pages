@@ -72,11 +72,11 @@ public class AccountPaymentService {
    */
   @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
   public ApiPaymentResponse applyInitialPayment(
-      @NotNull @NonNull ApplyPaymentMethodRequest paymentRequest,
+      @NotNull @NonNull ApiPaymentRequest paymentRequest,
       @NotNull @NonNull String requestIP) {
-    log.info("Apply initial subscription payment for {}", paymentRequest.producerId());
+    log.info("Apply initial subscription payment for {}", paymentRequest.referenceId());
 
-    ProducerResponse producerResponse = producerContract.findProducer(paymentRequest.producerId());
+    ProducerResponse producerResponse = producerContract.findProducer(paymentRequest.referenceId());
     if (producerResponse.subscriptionType() == ProducerSubscriptionType.LIVE_ACTIVE) {
       throw new PreconditionFailedException("Producer/Account is already active");
     }
@@ -84,15 +84,15 @@ public class AccountPaymentService {
     ProducerContactResponse primaryContact =  contactContract.findAdminContacts(producerResponse.producerId())
             .stream().filter(contact-> contact.producerContactType() == ProducerContactType.ADMIN)
             .findFirst().orElseThrow( () -> {
-              log.error("No primary contact found for {}", paymentRequest.producerId());
-              return new PreconditionFailedException("No primary contact found for " + paymentRequest.producerId());
+              log.error("No primary contact found for {}", paymentRequest.referenceId());
+              return new PreconditionFailedException("No primary contact found for " + paymentRequest.referenceId());
             });
 
-    var validation = emailContract.validateEmail(paymentRequest.producerId().toString(), primaryContact.emailAddress());
+    var validation = emailContract.validateEmail(paymentRequest.referenceId().toString(), primaryContact.emailAddress());
 
     if (!validation.validationStatus().isValidated()
         && !paymentRequest.emailValidationToken().equals(validation.token())) {
-      log.warn("Email has not been confirmed for the admin contact {} for {}", paymentRequest.producerId(), primaryContact.emailAddress());
+      log.warn("Email has not been confirmed for the admin contact {} for {}", paymentRequest.referenceId(), primaryContact.emailAddress());
       throw new PreconditionFailedException("Admin email address has not been confirmed for the account");
     }
 
@@ -107,7 +107,7 @@ public class AccountPaymentService {
 
     invoiceContract.updatePayment(invoice.invoiceId(), completedPayment);
 
-    producerContract.activateProducer(paymentRequest.producerId(),
+    producerContract.activateProducer(paymentRequest.referenceId(),
             completedPayment.createDate(), completedPayment.createDate(), "system", requestIP);
 
     emailService.sendEmailAsync(EmailTemplateType.PRODUCER_PAYMENT_CONFIRMATION,
@@ -126,12 +126,12 @@ public class AccountPaymentService {
         true, completedPayment.receiptNumber(), completedPayment.receiptUrl());
   }
 
-  private InvoiceResponse createInvoiceForPayment(@org.jetbrains.annotations.NotNull ApplyPaymentMethodRequest paymentRequest, ProducerResponse producerResponse) {
+  private InvoiceResponse createInvoiceForPayment(ApiPaymentRequest paymentRequest, ProducerResponse producerResponse) {
     var primarySubscription =
             producerResponse.subscriptions().stream()
                     .filter(sub -> sub.subscriptionType().isPrimarySubscription())
                     .findFirst()
-                    .orElseThrow(() -> new PreconditionFailedException( "No primary subscription found for %s", paymentRequest.producerId()));
+                    .orElseThrow(() -> new PreconditionFailedException( "No primary subscription found for %s", paymentRequest.referenceId()));
 
     List<InvoiceLineItemRequest> lineItems = new ArrayList<>();
     lineItems.add(createLineItem(paymentRequest, primarySubscription, 1));
@@ -147,7 +147,7 @@ public class AccountPaymentService {
 
     return invoiceContract.createInvoice(
         InvoiceRequest.builder()
-            .externalRef(paymentRequest.producerId().toString())
+            .externalRef(paymentRequest.referenceId().toString())
             .invoiceType(InvoiceType.SUBSCRIPTION)
             .description(
                 String.format(
@@ -221,11 +221,11 @@ public class AccountPaymentService {
         "Removed %s unpaid account subscriptions over %s days old", producerIds.size(), daysOld);
   }
 
-  private InvoiceLineItemRequest createLineItem(ApplyPaymentMethodRequest paymentRequest,
+  private InvoiceLineItemRequest createLineItem(ApiPaymentRequest paymentRequest,
                                                 ProducerSubscriptionResponse subscription,
                                                 int lineItemNumber) {
     return InvoiceLineItemRequest.builder()
-            .externalRef1(paymentRequest.producerId().toString())
+            .externalRef1(paymentRequest.referenceId().toString())
             .externalRef2(subscription.subscriptionId().toString())
             .lineItemNumber(lineItemNumber)
             .description(getLineItemDescription(subscription))
