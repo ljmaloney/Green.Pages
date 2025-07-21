@@ -43,7 +43,7 @@ public class ClassifiedPaymentService {
   private final InvoiceContract invoiceContract;
   private final EmailService emailService;
 
-  private final static String paymentNoteFormat = """
+  private static final String PAYMENT_NOTE_FORMAT = """
                        Classified Ad Package: %s
                        Classified Category : %s
                        Classified Title : %s
@@ -95,7 +95,7 @@ public class ClassifiedPaymentService {
 
     var category = classifiedCategoryService.findCategory(classified.classified().getCategoryId());
 
-    var note = StringUtils.trim(String.format(paymentNoteFormat, adType.adTypeName(),
+    var note = StringUtils.trim(String.format(PAYMENT_NOTE_FORMAT, adType.adTypeName(),
             category.name(),
             classified.classified().getTitle(),
             StringUtils.truncate(classified.classified().getDescription(), 100),
