@@ -66,7 +66,9 @@ public class PaymentOrchestrationService {
                 paymentService.updateCustomer(methodRequest, activeCard.externCustRef(), UUID.randomUUID());
             }
             //deactivate card
-            paymentService.deactivateExistingCard(activeCard.cardRef());
+            if ( StringUtils.isNotBlank(activeCard.cardRef())){
+                paymentService.deactivateExistingCard(activeCard.cardRef());
+            }
             var newMethod = methodService.replaceCustomer(methodRequest, activeCard);
 
             var savedPayment = paymentService.createCardOnFile(methodRequest, activeCard.externCustRef(), newMethod.paymentMethodId());
