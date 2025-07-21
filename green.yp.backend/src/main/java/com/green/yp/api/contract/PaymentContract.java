@@ -23,8 +23,8 @@ public class PaymentContract {
     return orchestrationService.applyPayment(paymentRequest, customerRef, cardOnFile);
   }
 
-  public PaymentMethodResponse createPaymentMethod(PaymentMethodRequest methodRequest){
-    return orchestrationService.createPaymentMethod(methodRequest);
+  public PaymentMethodResponse createPaymentMethod(PaymentMethodRequest methodRequest, String requestIp){
+    return orchestrationService.createPaymentMethod(methodRequest, requestIp);
   }
 
   public void cancelCardOnFile(String referenceId) {
@@ -36,6 +36,6 @@ public class PaymentContract {
   }
 
   public void disablePaymentMethod(List<UUID> producerIds) {
-    producerIds.forEach(id -> orchestrationService.disablePaymentMethods(id));
+    producerIds.forEach(orchestrationService::disablePaymentMethods);
   }
 }

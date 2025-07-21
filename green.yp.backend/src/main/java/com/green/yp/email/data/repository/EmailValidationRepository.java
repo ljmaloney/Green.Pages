@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface EmailValidationRepository extends JpaRepository<EmailValidation, UUID> {
   Optional<EmailValidation> findByExternRefAndEmailAddress(String externRef, String emailAddress);
@@ -12,5 +14,8 @@ public interface EmailValidationRepository extends JpaRepository<EmailValidation
   Optional<EmailValidation> findByEmailAddress(String emailAddress);
 
   @Modifying
-  void deleteByExternRef(String externRef);
+  @Query("""
+    DELETE FROM EmailValidation ev WHERE ev.externRef=:externRef 
+""")
+  void deleteByExternRef(@Param("externRef") String externRef);
 }

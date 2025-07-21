@@ -98,7 +98,7 @@ public class AccountPaymentService {
 
     var invoice = createInvoiceForPayment(paymentRequest, producerResponse);
 
-    var savedCustomerCard = paymentContract.createPaymentMethod(paymentMapper.toPaymentMethod(paymentRequest));
+    var savedCustomerCard = paymentContract.createPaymentMethod(paymentMapper.toPaymentMethod(paymentRequest), requestIP);
 
     var completedPayment =
         paymentContract.applyPayment(

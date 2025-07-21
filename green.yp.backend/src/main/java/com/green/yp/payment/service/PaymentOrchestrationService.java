@@ -1,5 +1,8 @@
 package com.green.yp.payment.service;
 
+import com.green.yp.api.AuditRequest;
+import com.green.yp.api.apitype.enumeration.AuditActionType;
+import com.green.yp.api.apitype.enumeration.AuditObjectType;
 import com.green.yp.api.apitype.payment.*;
 import com.green.yp.api.apitype.payment.PaymentMethodResponse;
 import com.green.yp.exception.NotFoundException;
@@ -30,7 +33,10 @@ public class PaymentOrchestrationService {
         this.methodService = methodService;
     }
 
-    public PaymentMethodResponse createPaymentMethod(PaymentMethodRequest methodRequest) {
+    @AuditRequest(requestParameter = "methodRequest",
+            objectType = AuditObjectType.PAYMENT_METHOD_REQUEST,
+            actionType = AuditActionType.CREATE)
+    public PaymentMethodResponse createPaymentMethod(PaymentMethodRequest methodRequest, String requestIp) {
         try{
             methodService.findActiveMethod(methodRequest.referenceId());
             return replaceCardOnFile(methodRequest);
@@ -68,14 +74,16 @@ public class PaymentOrchestrationService {
             //deactivate card
             if ( StringUtils.isNotBlank(activeCard.cardRef())){
                 paymentService.deactivateExistingCard(activeCard.cardRef());
+                log.debug("Deactivated existing payment method for subscriber {}", methodRequest.referenceId());
             }
             var newMethod = methodService.replaceCustomer(methodRequest, activeCard);
+            log.debug("Replaced existing payment method for subscriber {} with {}", methodRequest.referenceId(), newMethod.paymentMethodId());
 
             var savedPayment = paymentService.createCardOnFile(methodRequest, activeCard.externCustRef(), newMethod.paymentMethodId());
 
             return methodService.updateCardOnFile(newMethod, savedPayment);
         } catch (SquareApiException e){
-            log.warn("Error updating customer / saving card {}", e.getMessage(), e);
+            log.warn("Error updating customer / saving card {} - {}", e.getMessage(), e.body(), e);
             throw new PreconditionFailedException("There was an error when attempting to save the card for the subscription");
         }
     }
