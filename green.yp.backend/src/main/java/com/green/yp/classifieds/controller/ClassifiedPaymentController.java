@@ -1,7 +1,7 @@
 package com.green.yp.classifieds.controller;
 
-import com.green.yp.api.apitype.classified.ClassifiedPaymentRequest;
 import com.green.yp.api.apitype.classified.ClassifiedPaymentResponse;
+import com.green.yp.api.apitype.payment.ApiPaymentRequest;
 import com.green.yp.classifieds.service.ClassifiedPaymentService;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.util.RequestUtil;
@@ -32,7 +32,7 @@ public class ClassifiedPaymentController {
 
     @Operation(summary = "Proceses payment for a classified ad")
     @PostMapping(path = "payment", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseApi<ClassifiedPaymentResponse> processPayment(@RequestBody @Valid ClassifiedPaymentRequest paymentRequest,
+    public ResponseApi<ClassifiedPaymentResponse> processPayment(@RequestBody @Valid ApiPaymentRequest paymentRequest,
                                                                  HttpServletRequest httpServletRequest){
         return new ResponseApi<>(paymentService.processPayment(paymentRequest,
                 RequestUtil.getRequestIP(httpServletRequest)), null);

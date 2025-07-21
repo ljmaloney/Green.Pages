@@ -14,6 +14,7 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -48,6 +49,7 @@ public class EmailValidationService {
               emailValidation.setEmailValidationDate(OffsetDateTime.now());
               emailValidation.setIpAddress(requestIP);
               emailValidation.setValidationStatus(EmailValidationStatusType.VALIDATED);
+              repository.saveAndFlush(emailValidation);
             },
             () -> {
               log.warn(
@@ -65,6 +67,7 @@ public class EmailValidationService {
         .map(mapper::fromEntity)
         .or(
             () -> {
+                log.info("Creating new email validation entry for externRef {}", externRef);
               EmailValidation emailValidation = new EmailValidation();
               emailValidation.setExternRef(externRef);
               emailValidation.setValidationStatus(EmailValidationStatusType.NOT_VALIDATED);
@@ -75,6 +78,7 @@ public class EmailValidationService {
         .get();
   }
 
+    @Transactional
     public void deleteValidation(String externRef) {
       log.info("Delete email validation record for {}", externRef);
       repository.deleteByExternRef(externRef);

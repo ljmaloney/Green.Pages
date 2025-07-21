@@ -73,13 +73,13 @@
                         <br/><br/>
                         <table style="width: 95%; font-size: 14px; color: #6b7280; line-height: 1.4;">
                             <tr>
-                                <th>Invoice Number : </th><th style="text-align: left">${invoice.invoiceNumber}</th>
+                                <th>Invoice Number : </th><th style="text-align: left">${invoiceNumber}</th>
                             </tr>
                             <tr>
-                                <th>Description : </th><th style="text-align: left">${invoice.invoiceNumber}</th>
+                                <th>Description : </th><th style="text-align: left">${invoiceDescription}</th>
                             </tr>
                             <tr>
-                                <th>Total Amount : </th><th style="text-align: left">$${invoice.invoiceTotal?string["#,##0.00"]}</th>
+                                <th>Total Amount : </th><th style="text-align: left">$${invoiceTotal?string["#,##0.00"]}</th>
                             </tr>
                         </table>
                         <h3>Line Items</h3>

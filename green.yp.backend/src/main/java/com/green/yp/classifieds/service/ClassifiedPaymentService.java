@@ -2,12 +2,12 @@ package com.green.yp.classifieds.service;
 
 import com.green.yp.api.apitype.classified.ClassifiedAdTypeResponse;
 import com.green.yp.api.apitype.classified.ClassifiedCategoryResponse;
-import com.green.yp.api.apitype.classified.ClassifiedPaymentRequest;
 import com.green.yp.api.apitype.classified.ClassifiedPaymentResponse;
 import com.green.yp.api.apitype.enumeration.EmailTemplateType;
 import com.green.yp.api.apitype.invoice.InvoiceLineItemRequest;
 import com.green.yp.api.apitype.invoice.InvoiceRequest;
 import com.green.yp.api.apitype.invoice.InvoiceType;
+import com.green.yp.api.apitype.payment.ApiPaymentRequest;
 import com.green.yp.api.apitype.payment.PaymentTransactionResponse;
 import com.green.yp.api.contract.InvoiceContract;
 import com.green.yp.api.contract.ProducerPaymentContract;
@@ -43,7 +43,7 @@ public class ClassifiedPaymentService {
   private final InvoiceContract invoiceContract;
   private final EmailService emailService;
 
-  private final String paymentNoteFormat = """
+  private static final String PAYMENT_NOTE_FORMAT = """
                        Classified Ad Package: %s
                        Classified Category : %s
                        Classified Title : %s
@@ -74,16 +74,16 @@ public class ClassifiedPaymentService {
   }
 
   public ClassifiedPaymentResponse processPayment(
-      @Valid ClassifiedPaymentRequest paymentRequest, String requestIP) {
+          @Valid ApiPaymentRequest paymentRequest, String requestIP) {
 
     var classified =
         classifiedRepository
-            .findClassifiedAndCustomer(paymentRequest.classifiedId())
+            .findClassifiedAndCustomer(paymentRequest.referenceId())
             .orElseThrow(
                 () -> {
                   log.error(
-                      String.format("Classified not found for %s", paymentRequest.classifiedId()));
-                  return new NotFoundException("Classified", paymentRequest.classifiedId());
+                      String.format("Classified not found for %s", paymentRequest.referenceId()));
+                  return new NotFoundException("Classified", paymentRequest.referenceId());
                 });
 
     if ( invalidEmailToken(classified.customer(), paymentRequest.emailValidationToken())){
@@ -95,7 +95,7 @@ public class ClassifiedPaymentService {
 
     var category = classifiedCategoryService.findCategory(classified.classified().getCategoryId());
 
-    var note = StringUtils.trim(String.format(paymentNoteFormat, adType.adTypeName(),
+    var note = StringUtils.trim(String.format(PAYMENT_NOTE_FORMAT, adType.adTypeName(),
             category.name(),
             classified.classified().getTitle(),
             StringUtils.truncate(classified.classified().getDescription(), 100),

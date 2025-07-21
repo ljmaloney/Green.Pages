@@ -1,5 +1,8 @@
 package com.green.yp.payment.service;
 
+import com.green.yp.api.AuditRequest;
+import com.green.yp.api.apitype.enumeration.AuditActionType;
+import com.green.yp.api.apitype.enumeration.AuditObjectType;
 import com.green.yp.api.apitype.payment.*;
 import com.green.yp.api.apitype.payment.PaymentMethodResponse;
 import com.green.yp.exception.NotFoundException;
@@ -10,6 +13,7 @@ import com.squareup.square.core.SquareApiException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +33,10 @@ public class PaymentOrchestrationService {
         this.methodService = methodService;
     }
 
-    public PaymentMethodResponse createPaymentMethod(PaymentMethodRequest methodRequest) {
+    @AuditRequest(requestParameter = "methodRequest",
+            objectType = AuditObjectType.PAYMENT_METHOD_REQUEST,
+            actionType = AuditActionType.CREATE)
+    public PaymentMethodResponse createPaymentMethod(PaymentMethodRequest methodRequest, String requestIp) {
         try{
             methodService.findActiveMethod(methodRequest.referenceId());
             return replaceCardOnFile(methodRequest);
@@ -65,14 +72,18 @@ public class PaymentOrchestrationService {
                 paymentService.updateCustomer(methodRequest, activeCard.externCustRef(), UUID.randomUUID());
             }
             //deactivate card
-            paymentService.deactivateExistingCard(activeCard.cardRef());
+            if ( StringUtils.isNotBlank(activeCard.cardRef())){
+                paymentService.deactivateExistingCard(activeCard.cardRef());
+                log.debug("Deactivated existing payment method for subscriber {}", methodRequest.referenceId());
+            }
             var newMethod = methodService.replaceCustomer(methodRequest, activeCard);
+            log.debug("Replaced existing payment method for subscriber {} with {}", methodRequest.referenceId(), newMethod.paymentMethodId());
 
             var savedPayment = paymentService.createCardOnFile(methodRequest, activeCard.externCustRef(), newMethod.paymentMethodId());
 
             return methodService.updateCardOnFile(newMethod, savedPayment);
         } catch (SquareApiException e){
-            log.warn("Error updating customer / saving card {}", e.getMessage(), e);
+            log.warn("Error updating customer / saving card {} - {}", e.getMessage(), e.body(), e);
             throw new PreconditionFailedException("There was an error when attempting to save the card for the subscription");
         }
     }
@@ -92,18 +103,19 @@ public class PaymentOrchestrationService {
         }
     }
 
-    private boolean customerChanged(PaymentMethodRequest methodRequest, PaymentMethodResponse activeCard) {
-        return !methodRequest.firstName().equals(activeCard.givenName()) ||
-               !methodRequest.lastName().equals(activeCard.familyName()) ||
-               !methodRequest.companyName().equals(activeCard.companyName()) ||
-               !methodRequest.payorAddress1().equals(activeCard.payorAddress1()) ||
-               !methodRequest.payorAddress2().equals(activeCard.payorAddress2()) ||
-               !methodRequest.payorCity().equals(activeCard.payorCity()) ||
-               !methodRequest.payorState().equals(activeCard.payorState()) ||
-               !methodRequest.payorPostalCode().equals(activeCard.payorPostalCode()) ||
-               !methodRequest.phoneNumber().equals(activeCard.phoneNumber()) ||
-               !methodRequest.emailAddress().equals(activeCard.emailAddress());
-    }
+  private boolean customerChanged(
+      PaymentMethodRequest methodRequest, PaymentMethodResponse activeCard) {
+    return !StringUtils.equals(methodRequest.firstName(), activeCard.givenName())
+        || !StringUtils.equals(methodRequest.lastName(), activeCard.familyName())
+        || !StringUtils.equals(methodRequest.companyName(), activeCard.companyName())
+        || !StringUtils.equals(methodRequest.payorAddress1(), activeCard.payorAddress1())
+        || !StringUtils.equals(methodRequest.payorAddress2(), activeCard.payorAddress2())
+        || !StringUtils.equals(methodRequest.payorCity(), activeCard.payorCity())
+        || !StringUtils.equals(methodRequest.payorState(), activeCard.payorState())
+        || !StringUtils.equals(methodRequest.payorPostalCode(), activeCard.payorPostalCode())
+        || !StringUtils.equals(methodRequest.phoneNumber(), activeCard.phoneNumber())
+        || !StringUtils.equals(methodRequest.emailAddress(), activeCard.emailAddress());
+  }
 
     public PaymentTransactionResponse applyPayment(PaymentRequest paymentRequest,
                                                    Optional<String> customerRef,
