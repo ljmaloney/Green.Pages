@@ -26,7 +26,6 @@ public record ApiPaymentRequest(@NotNull @NonNull UUID referenceId,
                                 String lastName,
                                 @NotBlank(message = "Enter the street address for accurate location sorting")
                                 String addressLine1,
-                                @NotBlank(message = "Enter the street address for accurate location sorting")
                                 String addressLine2,
                                 @NotBlank(message = "Enter the city for the classified listing")
                                 @Pattern(regexp = "^[A-Za-z\\s\\-.']+$", message = "City should contain only alphabets, spaces, or hyphens")
