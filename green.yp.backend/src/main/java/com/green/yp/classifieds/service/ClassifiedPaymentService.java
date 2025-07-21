@@ -3,14 +3,17 @@ package com.green.yp.classifieds.service;
 import com.green.yp.api.apitype.classified.ClassifiedAdTypeResponse;
 import com.green.yp.api.apitype.classified.ClassifiedCategoryResponse;
 import com.green.yp.api.apitype.classified.ClassifiedPaymentResponse;
+import com.green.yp.api.apitype.email.EmailValidationStatusType;
 import com.green.yp.api.apitype.enumeration.EmailTemplateType;
 import com.green.yp.api.apitype.invoice.InvoiceLineItemRequest;
 import com.green.yp.api.apitype.invoice.InvoiceRequest;
 import com.green.yp.api.apitype.invoice.InvoiceType;
 import com.green.yp.api.apitype.payment.ApiPaymentRequest;
 import com.green.yp.api.apitype.payment.PaymentTransactionResponse;
+import com.green.yp.api.contract.EmailContract;
 import com.green.yp.api.contract.InvoiceContract;
 import com.green.yp.api.contract.ProducerPaymentContract;
+import com.green.yp.classifieds.data.model.Classified;
 import com.green.yp.classifieds.data.model.ClassifiedCustomer;
 import com.green.yp.classifieds.data.model.ClassifiedCustomerProjection;
 import com.green.yp.classifieds.data.repository.ClassifiedCustomerRepository;
@@ -41,7 +44,7 @@ public class ClassifiedPaymentService {
   private final ClassifiedCategoryService classifiedCategoryService;
   private final ClassifiedCustomerRepository customerRepository;
   private final InvoiceContract invoiceContract;
-  private final EmailService emailService;
+  private final EmailContract emailService;
 
   private static final String PAYMENT_NOTE_FORMAT = """
                        Classified Ad Package: %s
@@ -60,7 +63,7 @@ public class ClassifiedPaymentService {
       ClassifiedCustomerRepository customerRepository,
       ClassifiedAdTypeService adTypeService,
       ClassifiedCategoryService classifiedCategoryService,
-      EmailService emailService,
+      EmailContract emailService,
       InvoiceContract invoiceContract,
       ClassifiedPaymentMapper paymentMapper) {
     this.producerPaymentContract = producerPaymentContract;
@@ -86,7 +89,7 @@ public class ClassifiedPaymentService {
                   return new NotFoundException("Classified", paymentRequest.referenceId());
                 });
 
-    if ( invalidEmailToken(classified.customer(), paymentRequest.emailValidationToken())){
+    if ( invalidEmailToken(classified.classified()) ){
        log.warn("Attempt to create an ad using an invalid email token for customer {}", classified.customer().getId());
       throw new PreconditionFailedException("Invalid email address token %s",paymentRequest.emailValidationToken());
     }
@@ -137,7 +140,7 @@ public class ClassifiedPaymentService {
 
   private void sendConfirmationEmail(String requestIP, ClassifiedAdTypeResponse adType, ClassifiedCustomerProjection classified, ClassifiedCategoryResponse category, String directLink, PaymentTransactionResponse paymentResponse) {
     String subject = String.format("Greenyp - %s classified ad confirmation", adType.adTypeName());
-    emailService.sendEmailAsync(EmailTemplateType.CLASSIFIED_CONFIRMATION,
+    emailService.sendEmail(EmailTemplateType.CLASSIFIED_CONFIRMATION,
             Collections.singletonList(classified.classified().getEmailAddress()),
             subject,
             () -> Map.of("customer", classified.customer(),
@@ -170,14 +173,9 @@ public class ClassifiedPaymentService {
                     paymentResponse.totalAmount()))));
   }
 
-  private boolean invalidEmailToken(ClassifiedCustomer customer, @NotBlank String emailToken) {
-    if ( customer.getEmailValidationDate()  != null) {
-      return false;
-    } else if ( emailToken.equals(customer.getEmailAddressValidationToken()) ) {
-      customer.setEmailValidationDate(OffsetDateTime.now());
-      customerRepository.save(customer);
-      return false;
-    }
-    return true;
-  }
+  private boolean invalidEmailToken(Classified classified) {
+    var response =
+        emailService.validateEmail(classified.getId().toString(), classified.getEmailAddress());
+    return !(response.validationStatus() == EmailValidationStatusType.VALIDATED);
+   }
 }
