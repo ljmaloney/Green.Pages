@@ -151,7 +151,8 @@ public class ClassifiedService {
     var emailValidation = emailContract.validateEmail(classified.getId().toString(), customer.getEmailAddress());
 
     // send confirmation email
-    if(emailValidation.validationStatus() == EmailValidationStatusType.NOT_VALIDATED ){
+    if(emailValidation.validationStatus() == EmailValidationStatusType.NOT_VALIDATED
+       || emailValidation.validationStatus() == EmailValidationStatusType.VALIDATED ){
         emailContract.sendEmail(
                   EmailTemplateType.CLASSIFIED_EMAIL_VALIDATION,
                   Collections.singletonList(classified.getEmailAddress()),
