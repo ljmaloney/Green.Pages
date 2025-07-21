@@ -109,19 +109,27 @@ public class AccountPaymentService {
 
     producerContract.activateProducer(paymentRequest.referenceId(),
             completedPayment.createDate(), completedPayment.createDate(), "system", requestIP);
-
-    emailService.sendEmailAsync(EmailTemplateType.PRODUCER_PAYMENT_CONFIRMATION,
-            Collections.singletonList(primaryContact.emailAddress()),
-            EmailTemplateType.PRODUCER_PAYMENT_CONFIRMATION.getSubjectFormat(),
-            () -> Map.of("invoice", invoice,
-                    "producerId", producerResponse.producerId(),
-                    "lastName", primaryContact.lastName(),
-                    "firstName", primaryContact.firstName(),
-                    "transactionRef", completedPayment.paymentRef(),
-                    "receiptUrl", completedPayment.receiptUrl(),
-                    "timestamp", OffsetDateTime.now(),
-                    "ipAddress", requestIP) );
-
+    try{
+      emailService.sendEmailAsync(EmailTemplateType.PRODUCER_PAYMENT_CONFIRMATION,
+          Collections.singletonList(primaryContact.emailAddress()),
+          EmailTemplateType.PRODUCER_PAYMENT_CONFIRMATION.getSubjectFormat(),
+          () -> {
+              Map<String, Object> map = new HashMap<>(Map.of("invoice", invoice,
+                      "invoiceNumber", invoice.invoiceNumber(),
+                      "invoiceDescription", invoice.description(),
+                      "producerId", producerResponse.producerId(),
+                      "lastName", primaryContact.lastName(),
+                      "firstName", primaryContact.firstName(),
+                      "transactionRef", completedPayment.paymentRef(),
+                      "receiptUrl", completedPayment.receiptUrl(),
+                      "timestamp", OffsetDateTime.now(),
+                      "ipAddress", requestIP));
+            map.put("invoiceTotal", invoice.invoiceTotal());
+            return map;
+          } );
+    } catch (Exception e) {
+      log.error("Unexpected error sending confirmation email to {} ", paymentRequest.referenceId(), e);
+    }
     return new ApiPaymentResponse(
         true, completedPayment.receiptNumber(), completedPayment.receiptUrl());
   }
