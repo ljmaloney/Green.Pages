@@ -103,20 +103,7 @@ public class PaymentOrchestrationService {
         }
     }
 
-  private boolean customerChanged(
-      PaymentMethodRequest methodRequest, PaymentMethodResponse activeCard) {
-    return !StringUtils.equals(methodRequest.firstName(), activeCard.givenName())
-        || !StringUtils.equals(methodRequest.lastName(), activeCard.familyName())
-        || !StringUtils.equals(methodRequest.companyName(), activeCard.companyName())
-        || !StringUtils.equals(methodRequest.payorAddress1(), activeCard.payorAddress1())
-        || !StringUtils.equals(methodRequest.payorAddress2(), activeCard.payorAddress2())
-        || !StringUtils.equals(methodRequest.payorCity(), activeCard.payorCity())
-        || !StringUtils.equals(methodRequest.payorState(), activeCard.payorState())
-        || !StringUtils.equals(methodRequest.payorPostalCode(), activeCard.payorPostalCode())
-        || !StringUtils.equals(methodRequest.phoneNumber(), activeCard.phoneNumber())
-        || !StringUtils.equals(methodRequest.emailAddress(), activeCard.emailAddress());
-  }
-
+    @Transactional
     public PaymentTransactionResponse applyPayment(PaymentRequest paymentRequest,
                                                    Optional<String> customerRef,
                                                    Boolean cardOnFile) {
@@ -152,5 +139,19 @@ public class PaymentOrchestrationService {
             log.warn("Error removing temp card data / saving card {}", e.getMessage(), e);
         }
 
+    }
+
+    private boolean customerChanged(
+            PaymentMethodRequest methodRequest, PaymentMethodResponse activeCard) {
+        return !StringUtils.equals(methodRequest.firstName(), activeCard.givenName())
+               || !StringUtils.equals(methodRequest.lastName(), activeCard.familyName())
+               || !StringUtils.equals(methodRequest.companyName(), activeCard.companyName())
+               || !StringUtils.equals(methodRequest.payorAddress1(), activeCard.payorAddress1())
+               || !StringUtils.equals(methodRequest.payorAddress2(), activeCard.payorAddress2())
+               || !StringUtils.equals(methodRequest.payorCity(), activeCard.payorCity())
+               || !StringUtils.equals(methodRequest.payorState(), activeCard.payorState())
+               || !StringUtils.equals(methodRequest.payorPostalCode(), activeCard.payorPostalCode())
+               || !StringUtils.equals(methodRequest.phoneNumber(), activeCard.phoneNumber())
+               || !StringUtils.equals(methodRequest.emailAddress(), activeCard.emailAddress());
     }
 }
