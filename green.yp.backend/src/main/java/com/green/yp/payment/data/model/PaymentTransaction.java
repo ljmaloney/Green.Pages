@@ -91,17 +91,17 @@ public class PaymentTransaction extends Mutable {
   private String firstName;
 
   @Size(max = 100)
-  @NotNull( message = "last Name is missing")
+  @NotNull(message = "last Name is missing")
   @Column(name = "last_name", nullable = false, length = 100)
   private String lastName;
 
   @Size(max = 100)
-  @NotNull( message = "Address is missing")
+  @NotNull(message = "Address is missing")
   @Column(name = "address", nullable = false, length = 100)
   private String address;
 
   @Size(max = 100)
-  @NotNull( message = "City is missing")
+  @NotNull(message = "City is missing")
   @Column(name = "city", nullable = false, length = 100)
   private String city;
 
@@ -116,12 +116,12 @@ public class PaymentTransaction extends Mutable {
   private String postalCode;
 
   @Size(max = 20)
-  @NotNull( message = "phone number is missing")
+  @NotNull(message = "phone number is missing")
   @Column(name = "phone_number", nullable = false, length = 15)
   private String phoneNumber;
 
   @Size(max = 100)
-  @NotNull( message = "email address is missing")
+  @NotNull(message = "email address is missing")
   @Column(name = "email_address", nullable = false, length = 100)
   private String emailAddress;
 
