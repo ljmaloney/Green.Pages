@@ -8,6 +8,8 @@ import com.green.yp.util.TokenUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Slf4j
 @Service
 public class ClassifiedCustomerService {
@@ -25,30 +27,37 @@ public class ClassifiedCustomerService {
      */
     public ClassifiedCustomer upsertCustomer(ClassifiedRequest request){
         return repository
-                .findClassifiedCustomerByEmailAddress(
-                        request.emailAddress())
-                .map(
-                        cust -> {
-                            if (!cust.getEmailAddress().equals(request.emailAddress())
-                                || cust.getEmailValidationDate() == null) {
-                                log.debug(
-                                        "customer {} email address has been changed, found with phone",
-                                        cust.getId());
-                                cust.setEmailAddress(request.emailAddress());
-                                cust.setEmailValidationDate(null);
-                                cust.setEmailAddressValidationToken(TokenUtils.generateCode(8));
-                                return repository.save(cust);
-                            }
-                            return cust;
-                        })
-                .or( () -> {
-                    return repository.findClassifiedCustomerByPhoneNumber(request.phoneNumber());
-                })
+                .findClassifiedCustomerByEmailAddress(request.emailAddress())
+                .map(cust -> {
+                    upsertCustomerData(request, cust);
+                    cust.setPhoneNumber(request.phoneNumber());
+                    return repository.save(cust);
+                 })
+                .or( () -> repository.findClassifiedCustomerByPhoneNumber(request.phoneNumber())
+                        .map(cust -> {
+                            log.debug(
+                                    "customer {} email address has been changed, found with phone",
+                                    cust.getId());
+                            cust.setEmailAddress(request.emailAddress());
+                            cust.setEmailValidationDate(null);
+                            cust.setEmailAddressValidationToken(TokenUtils.generateCode(8));
+                            upsertCustomerData(request, cust);
+                            return repository.save(cust);
+                        })).or(Optional::empty)
                 .orElseGet(
-                        () -> {
-                            var newCustomer = mapper.customterFromClassified(request);
-                            newCustomer.setEmailAddressValidationToken(TokenUtils.generateCode(8));
-                            return repository.saveAndFlush(newCustomer);
-                        });
+                                () -> {
+                                    var newCustomer = mapper.customterFromClassified(request);
+                                    newCustomer.setEmailAddressValidationToken(TokenUtils.generateCode(8));
+                                    return repository.saveAndFlush(newCustomer);
+                });
+    }
+
+    private static void upsertCustomerData(ClassifiedRequest request, ClassifiedCustomer cust) {
+        cust.setFirstName(request.firstName());
+        cust.setLastName(request.lastName());
+        cust.setAddress(request.address());
+        cust.setCity(request.city());
+        cust.setState(request.state());
+        cust.setPostalCode(request.postalCode());
     }
 }

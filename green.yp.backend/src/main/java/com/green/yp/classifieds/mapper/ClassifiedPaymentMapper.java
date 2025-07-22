@@ -20,6 +20,7 @@ public interface ClassifiedPaymentMapper {
     @Mapping(target = "postalCode", source = "request.postalCode")
     @Mapping(target = "emailAddress", source = "request.emailAddress")
     @Mapping(target = "phoneNumber", source = "request.phoneNumber")
+    @Mapping(target = "address", source = "request.addressLine1")
     PaymentRequest toPaymentRequest(ApiPaymentRequest request,
                                     String statementDescription,
                                     BigDecimal paymentAmount,
