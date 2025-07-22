@@ -8,9 +8,10 @@ import com.green.yp.exception.SystemException;
 import com.green.yp.payment.data.model.PaymentTransaction;
 import com.green.yp.payment.data.repository.PaymentTransactionRepository;
 import com.green.yp.payment.mapper.PaymentTransactionMapper;
+import com.squareup.square.core.SquareApiException;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.JavaTypeRegistrations;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -69,7 +70,7 @@ public class PaymentTransactionService {
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public PaymentTransactionResponse updatePaymentError(
-      UUID transactionId, String errorMessage, int errorCode, String errorBody) {
+      UUID transactionId, SquareApiException apiException) {
     log.info("updating payment record {} for completion with response", transactionId);
 
     var transaction =
@@ -83,11 +84,15 @@ public class PaymentTransactionService {
                       HttpStatus.INTERNAL_SERVER_ERROR,
                       ErrorCodeType.SYSTEM_ERROR);
                 });
-
+    var errors = apiException.errors();
     transaction.setStatus("PAYMENT_ERROR");
-    transaction.setErrorCode(errorCode);
-    transaction.setErrorMessage(errorMessage);
-    transaction.setErrorBody(errorBody);
+    transaction.setErrorStatusCode(
+        CollectionUtils.isNotEmpty(errors) ? errors.getFirst().getCode().toString() : "No code");
+    transaction.setErrorDetail(
+        CollectionUtils.isNotEmpty(errors) ? errors.getFirst().getDetail().get() : "No Details");
+    transaction.setErrorCode(apiException.statusCode());
+    transaction.setErrorMessage(apiException.getMessage());
+    transaction.setErrorBody(apiException.body().toString());
 
     return mapper.fromEntity(repository.save(transaction));
   }

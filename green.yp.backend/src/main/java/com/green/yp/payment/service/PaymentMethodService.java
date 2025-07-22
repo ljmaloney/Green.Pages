@@ -115,10 +115,13 @@ public class PaymentMethodService {
   }
 
   public PaymentMethodResponse findMethod(String referenceId) {
-    return repository.findActiveMethod(referenceId,
-                    List.of(PaymentMethodStatusType.TEMP,
-                    PaymentMethodStatusType.CCOF_CREATED,
-                            PaymentMethodStatusType.CUSTOMER_CREATED))
+    return repository
+        .findActiveMethod(
+            referenceId,
+            List.of(
+                PaymentMethodStatusType.TEMP,
+                PaymentMethodStatusType.CCOF_CREATED,
+                PaymentMethodStatusType.CUSTOMER_CREATED))
         .map(mapper::toResponse)
         .orElseThrow(
             () -> {
@@ -126,9 +129,10 @@ public class PaymentMethodService {
               return new NotFoundException(
                   "Payment method not found for referenceId " + referenceId);
             });
-        }
+  }
 
-    public void deleteMethod(String referenceId) {
-      repository.deletePaymentMethodByReferenceIdAndStatusTypeEquals(referenceId, PaymentMethodStatusType.TEMP);
-    }
+  public void deleteMethod(String referenceId) {
+    repository.deletePaymentMethodByReferenceIdAndStatusTypeEquals(
+        referenceId, PaymentMethodStatusType.TEMP);
+  }
 }

@@ -29,6 +29,7 @@ public interface SquareResponseMapper {
   PaymentCustomerResponse toPaymentCustomerResponse(Customer customer);
 
   @Mapping(target = "cardRef", source = "id", qualifiedByName = "unwrapOptionalString")
+  @Mapping(target = "card", source = ".")
   @Mapping(
       target = "paymentMethodId",
       source = "referenceId",

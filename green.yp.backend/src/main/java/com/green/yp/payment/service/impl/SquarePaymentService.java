@@ -39,7 +39,10 @@ public class SquarePaymentService implements PaymentService {
 
   @Override
   public PaymentResponse processPayment(
-          PaymentRequest paymentRequest, UUID paymentTransactionId, Optional<String> customerRef, boolean cardOnFile) {
+      PaymentRequest paymentRequest,
+      UUID paymentTransactionId,
+      Optional<String> customerRef,
+      boolean cardOnFile) {
     log.debug(
         "Processing payment for ref {} amount {}",
         paymentTransactionId,
@@ -50,7 +53,8 @@ public class SquarePaymentService implements PaymentService {
             .idempotencyKey(paymentTransactionId.toString())
             .autocomplete(true)
             .referenceId(paymentRequest.referenceId())
-            .verificationToken(cardOnFile ? Optional.empty() : Optional.of(paymentRequest.verificationToken()))
+            .verificationToken(
+                cardOnFile ? Optional.empty() : Optional.of(paymentRequest.verificationToken()))
             .note(paymentRequest.note())
             .statementDescriptionIdentifier(
                 StringUtils.truncate(paymentRequest.statementDescription(), 20))
@@ -169,7 +173,9 @@ public class SquarePaymentService implements PaymentService {
   @Override
   public void deleteCustomer(String externCustomerRef) {
     log.debug("Deleting existing customer for customerRef {}", externCustomerRef);
-    squareClient.customers().delete(DeleteCustomersRequest.builder().customerId(externCustomerRef).build());
+    squareClient
+        .customers()
+        .delete(DeleteCustomersRequest.builder().customerId(externCustomerRef).build());
   }
 
   @Override

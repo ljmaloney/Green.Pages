@@ -14,6 +14,7 @@ import org.mapstruct.ReportingPolicy;
     injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface PaymentTransactionMapper {
 
+  @Mapping(target = "address", source = "address")
   PaymentTransaction toEntity(PaymentRequest paymentRequest);
 
   @Mapping(target = "transactionId", source = "id")

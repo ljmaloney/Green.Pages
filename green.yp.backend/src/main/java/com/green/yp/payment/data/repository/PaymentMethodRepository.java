@@ -11,17 +11,19 @@ import org.springframework.data.repository.query.Param;
 
 public interface PaymentMethodRepository extends JpaRepository<PaymentMethod, UUID> {
 
-  @Query("""
+  @Query(
+"""
     SELECT method
     FROM PaymentMethod method
     WHERE method.referenceId=:referenceId and method.statusType IN (:statusTypes)
 """)
   Optional<PaymentMethod> findActiveMethod(
-          @Param("referenceId") String referenceId,
-          @Param("statusTypes") List<PaymentMethodStatusType> statusTypes);
+      @Param("referenceId") String referenceId,
+      @Param("statusTypes") List<PaymentMethodStatusType> statusTypes);
 
-    Optional<PaymentMethod> findByReferenceIdAndStatusTypeEquals(String referenceId,
-                                                                 PaymentMethodStatusType paymentMethodStatusType);
+  Optional<PaymentMethod> findByReferenceIdAndStatusTypeEquals(
+      String referenceId, PaymentMethodStatusType paymentMethodStatusType);
 
-  void deletePaymentMethodByReferenceIdAndStatusTypeEquals(String referenceId, PaymentMethodStatusType paymentMethodStatusType);
+  void deletePaymentMethodByReferenceIdAndStatusTypeEquals(
+      String referenceId, PaymentMethodStatusType paymentMethodStatusType);
 }

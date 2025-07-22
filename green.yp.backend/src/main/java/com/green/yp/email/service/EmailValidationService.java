@@ -63,7 +63,7 @@ public class EmailValidationService {
   public EmailValidationResponse findValidatedEmail(String externRef, String emailAddress) {
     log.info("Returning email address {} for externRef {}", emailAddress, externRef);
     return repository
-        .findByEmailAddress(emailAddress)
+        .findByExternRefAndEmailAddress(externRef, emailAddress)
         .map(mapper::fromEntity)
         .or(
             () -> {

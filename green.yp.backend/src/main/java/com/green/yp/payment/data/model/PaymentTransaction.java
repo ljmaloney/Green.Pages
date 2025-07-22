@@ -52,6 +52,12 @@ public class PaymentTransaction extends Mutable {
   @Column(name = "error_code")
   private Integer errorCode;
 
+  @Column(name = "error_status_code")
+  private String errorStatusCode;
+
+  @Column(name = "error_detail")
+  private String errorDetail;
+
   @Size(max = 50)
   @Column(name = "source_type", length = 50)
   private String sourceType;
@@ -80,42 +86,42 @@ public class PaymentTransaction extends Mutable {
   private String currencyCode;
 
   @Size(max = 100)
-  @NotNull
+  @NotNull(message = "First Name is missing")
   @Column(name = "first_name", nullable = false, length = 100)
   private String firstName;
 
   @Size(max = 100)
-  @NotNull
+  @NotNull(message = "last Name is missing")
   @Column(name = "last_name", nullable = false, length = 100)
   private String lastName;
 
   @Size(max = 100)
-  @NotNull
+  @NotNull(message = "Address is missing")
   @Column(name = "address", nullable = false, length = 100)
   private String address;
 
   @Size(max = 100)
-  @NotNull
+  @NotNull(message = "City is missing")
   @Column(name = "city", nullable = false, length = 100)
   private String city;
 
   @Size(max = 2)
-  @NotNull
+  @NotNull(message = "state is missing")
   @Column(name = "state", nullable = false, length = 2)
   private String state;
 
   @Size(max = 10)
-  @NotNull
+  @NotNull(message = "postal code is missing")
   @Column(name = "postal_code", nullable = false, length = 10)
   private String postalCode;
 
   @Size(max = 20)
-  @NotNull
+  @NotNull(message = "phone number is missing")
   @Column(name = "phone_number", nullable = false, length = 15)
   private String phoneNumber;
 
   @Size(max = 100)
-  @NotNull
+  @NotNull(message = "email address is missing")
   @Column(name = "email_address", nullable = false, length = 100)
   private String emailAddress;
 
@@ -132,13 +138,14 @@ public class PaymentTransaction extends Mutable {
   private String versionToken;
 
   @Column(name = "error_body")
+  @Lob
   private String errorBody;
 
   @Column(name = "payment_details")
   @Convert(converter = JsonCardDetailsConvertor.class)
   private CardDetails paymentDetails;
 
-  @NotNull
+  @NotNull(message = "note is missing")
   @Lob
   @Column(name = "note", nullable = false)
   private String note;
