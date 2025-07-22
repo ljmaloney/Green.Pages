@@ -17,6 +17,7 @@ import org.mapstruct.ReportingPolicy;
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface InvoiceMapper {
+    
     Invoice toEntity(InvoiceRequest invoiceRequest);
     InvoiceLineItem toEntity(InvoiceLineItemRequest invoiceLineItemRequest);
     List<InvoiceLineItem> toEntity(List<InvoiceLineItemRequest> lineItems);
@@ -28,4 +29,5 @@ public interface InvoiceMapper {
     InvoiceLineItemResponse fromEntity(InvoiceLineItem lineItem);
     List<InvoiceLineItemResponse> fromEntity(List<InvoiceLineItem> lineItems);
 
+    InvoiceResponse toResponse(InvoiceResponse invoiceResponse);
 }

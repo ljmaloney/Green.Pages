@@ -32,17 +32,6 @@ public class ClassifiedCustomerService {
                     upsertCustomerData(request, cust);
                     return repository.save(cust);
                  })
-//                .or( () -> repository.findClassifiedCustomerByPhoneNumber(request.phoneNumber())
-//                        .map(cust -> {
-//                            log.debug(
-//                                    "customer {} email address has been changed, found with phone",
-//                                    cust.getId());
-//                            cust.setEmailAddress(request.emailAddress());
-//                            cust.setEmailValidationDate(null);
-//                            cust.setEmailAddressValidationToken(TokenUtils.generateCode(8));
-//                            upsertCustomerData(request, cust);
-//                            return repository.save(cust);
-//                        })).or(Optional::empty)
                 .orElseGet(
                                 () -> {
                                     var newCustomer = mapper.customterFromClassified(request);

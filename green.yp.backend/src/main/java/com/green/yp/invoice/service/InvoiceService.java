@@ -2,18 +2,23 @@ package com.green.yp.invoice.service;
 
 import com.green.yp.api.apitype.invoice.InvoiceRequest;
 import com.green.yp.api.apitype.invoice.InvoiceResponse;
+import com.green.yp.api.apitype.invoice.InvoiceType;
 import com.green.yp.api.apitype.payment.PaymentTransactionResponse;
+import com.green.yp.config.security.AuthenticatedUser;
 import com.green.yp.invoice.data.model.Invoice;
 import com.green.yp.invoice.data.repository.InvoiceRepository;
 import com.green.yp.invoice.mapper.InvoiceMapper;
 import java.sql.Date;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -67,5 +72,18 @@ public class InvoiceService {
         String prefix = new SimpleDateFormat("yyyyMMdd").format(Date.from(startDate.toInstant()));
         return String.format(
                 "%s-%s", prefix, new DecimalFormat("000000").format(counter.doubleValue() + 1));
+    }
+
+    public List<InvoiceResponse> findInvoices(InvoiceType invoiceType,
+                                              String referenceId,
+                                              LocalDate startDate,
+                                              LocalDate endDate,
+                                              AuthenticatedUser authenticatedUser,
+                                              String requestIP) {
+        log.info("Finding {} invoices for {} between {} and {} ", invoiceType, referenceId, startDate, endDate);
+        return invoiceRepository.findInvoices(invoiceType, referenceId, startDate, endDate)
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 }

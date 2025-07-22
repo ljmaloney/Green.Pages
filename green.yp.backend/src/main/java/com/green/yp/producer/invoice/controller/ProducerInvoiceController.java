@@ -20,11 +20,11 @@ import java.util.UUID;
 @Slf4j
 @Validated
 @Tag(name = "For retrieval of subscriber invoices")
-@RequestMapping("invoice")
-public class InvoiceController {
+//@RequestMapping("invoice")
+public class ProducerInvoiceController {
     private final ProducerInvoiceService producerInvoiceService;
 
-    public InvoiceController(ProducerInvoiceService producerInvoiceService){
+    public ProducerInvoiceController(ProducerInvoiceService producerInvoiceService){
         this.producerInvoiceService = producerInvoiceService;
     }
 
@@ -41,6 +41,7 @@ public class InvoiceController {
                                                                    @RequestParam("endDate") String endDate,
                                                                    @RequestParam(value = "descending", defaultValue = "true") Boolean descending){
         return new ResponseApi<>(producerInvoiceService.findInvoices(producerId,
-                DateUtils.parseDate(startDate, LocalDate.class), DateUtils.parseDate(endDate, LocalDate.class), descending), null);
+                DateUtils.parseDate(startDate, LocalDate.class),
+                DateUtils.parseDate(endDate, LocalDate.class), descending), null);
     }
 }
