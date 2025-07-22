@@ -9,6 +9,7 @@ import com.green.yp.api.apitype.enumeration.ClassifiedTokenType;
 import com.green.yp.api.apitype.enumeration.EmailTemplateType;
 import com.green.yp.api.contract.EmailContract;
 import com.green.yp.classifieds.data.model.Classified;
+import com.green.yp.classifieds.data.model.ClassifiedCustomer;
 import com.green.yp.classifieds.data.model.ClassifiedToken;
 import com.green.yp.classifieds.data.repository.ClassifedTokenRepository;
 import com.green.yp.classifieds.data.repository.ClassifiedCustomerRepository;
@@ -23,15 +24,14 @@ import java.security.NoSuchAlgorithmException;
 import java.time.OffsetDateTime;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
 public class ClassifiedService {
-    private final ProducerLocationMapper producerLocationMapper;
-
-    private static final String CLASSIFIED = "Classified";
+  private static final String CLASSIFIED = "Classified";
 
   @Value("${green.yp.classified.token.timeout:15}")
   private Integer tokenTimeoutMinutes;
@@ -47,6 +47,7 @@ public class ClassifiedService {
   private final ClassifiedGeocodeService geocodeService;
   private final EmailContract emailContract;
   private final ClassifiedImageService imageService;
+  private final ClassifiedCustomerService customerService;
   private final ClassifiedMapper mapper;
 
   public ClassifiedService(
@@ -58,7 +59,7 @@ public class ClassifiedService {
           ClassifiedGeocodeService geocodeService,
           EmailContract emailContract, ClassifiedImageService imageService,
           ClassifiedMapper mapper,
-          ProducerLocationMapper producerLocationMapper) {
+          ClassifiedCustomerService customerService) {
     this.repository = repository;
     this.tokenRepository = tokenRepository;
     this.customerRepository = customerRepository;
@@ -68,7 +69,7 @@ public class ClassifiedService {
     this.emailContract = emailContract;
       this.imageService = imageService;
       this.mapper = mapper;
-      this.producerLocationMapper = producerLocationMapper;
+      this.customerService = customerService;
   }
 
   public ClassifiedAdCustomerResponse findClassifiedAndCustomer(UUID classifiedId) {
@@ -88,7 +89,7 @@ public class ClassifiedService {
         .map(mapper::fromEntity)
         .orElseThrow(
             () -> {
-              log.warn("No classified found for id {}", classifiedId);
+              log.warn("No classified found for id {} from {}", classifiedId, requestIP);
               return new NotFoundException(CLASSIFIED, classifiedId);
             });
   }
@@ -102,30 +103,7 @@ public class ClassifiedService {
         requestIP);
 
     // upsert customer record if not already found
-    var customer =
-        customerRepository
-            .findClassifiedCustomerByEmailAddressOrPhoneNumber(
-                request.emailAddress(), request.phoneNumber())
-            .map(
-                cust -> {
-                  if (!cust.getEmailAddress().equals(request.emailAddress())
-                      || cust.getEmailValidationDate() == null) {
-                    log.debug(
-                        "customer {} email address has been changed, found with phone",
-                        cust.getId());
-                    cust.setEmailAddress(request.emailAddress());
-                    cust.setEmailValidationDate(null);
-                    cust.setEmailAddressValidationToken(TokenUtils.generateCode(8));
-                    return customerRepository.save(cust);
-                  }
-                  return cust;
-                })
-            .orElseGet(
-                () -> {
-                  var newCustomer = mapper.customterFromClassified(request);
-                  newCustomer.setEmailAddressValidationToken(TokenUtils.generateCode(8));
-                  return customerRepository.saveAndFlush(newCustomer);
-                });
+    var customer = customerService.upsertCustomer(request);
 
     log.debug("Validate adType for {}", request.address());
     var adType = adTypeService.findAdType(request.adType());
@@ -175,7 +153,7 @@ public class ClassifiedService {
     return classifiedResponse;
   }
 
-  public ClassifiedResponse updateClassified(
+    public ClassifiedResponse updateClassified(
       @Valid ClassifiedUpdateRequest classifiedRequest, String requestIP) {
     return null;
   }
@@ -189,7 +167,7 @@ public class ClassifiedService {
             .orElseThrow(
                 () -> {
                   log.warn("No classified found for id {}", classifiedId);
-                  return new NotFoundException("Classified", classifiedId);
+                  return new NotFoundException(CLASSIFIED, classifiedId);
                 });
 
     if (!classified.customer().getEmailAddress().equals(tokenDestination)
@@ -236,8 +214,6 @@ public class ClassifiedService {
           repository.delete(classified);
           log.info("Deleted unpaid classified: {} - {}", classified.getId(), classified.getTitle());
       });
-      //delete customer records not associated with an ad that have email_validation_date null
-//        customerRepository.deleteInvalidCustomers(deleteDate);
     }
 
     public void validateEmail(UUID classifiedId, String emailAddress, String emailToken, String requestIP) {
