@@ -21,12 +21,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @Slf4j
 @Validated
-@Tag(name = "Endpoints for handling the producer / subscriber contacts")
+@Tag(name = "Endpoint for retrieval of invoices")
 @RequestMapping("invoice")
 public class InvoiceController {
     private final InvoiceService invoiceService;
