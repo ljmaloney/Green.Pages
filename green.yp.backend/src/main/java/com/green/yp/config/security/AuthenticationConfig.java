@@ -59,6 +59,7 @@ public class AuthenticationConfig {
                         "/index.html",
                         "/account/**",
                         "/account/user/**",
+                        "/invoice/**",
                         "/reference/**",
                         "/producer/profiles",
                         "/producer/profile/**",
