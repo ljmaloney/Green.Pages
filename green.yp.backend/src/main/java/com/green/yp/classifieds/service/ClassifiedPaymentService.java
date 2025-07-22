@@ -111,9 +111,13 @@ public class ClassifiedPaymentService {
 
     if ( !"COMPLETED".equals(paymentResponse.status()) ) {
       log.warn("Attempted to process payment of classified ad {} failed", classified.classified().getId());
-      return new ClassifiedPaymentResponse(classified.classified().getId(),
-              classified.classified().getTitle(),
-              paymentResponse.status(),null,null, null);
+      return ClassifiedPaymentResponse.builder()
+              .classifiedId(classified.classified().getId())
+              .classifiedTitle(classified.classified().getTitle())
+              .paymentStatus(paymentResponse.status())
+              .errorStatusCode(paymentResponse.errorStatusCode())
+              .errorDetail(paymentResponse.errorDetail())
+              .build();
     }
 
     var token = TokenUtils.generateCode(10);
@@ -135,7 +139,7 @@ public class ClassifiedPaymentService {
             classified.classified().getTitle(),
             paymentResponse.status(),
             paymentResponse.paymentRef(),
-            paymentResponse.orderRef(), paymentResponse.receiptNumber());
+            paymentResponse.orderRef(), paymentResponse.receiptNumber(), null, null);
   }
 
   private void sendConfirmationEmail(String requestIP, ClassifiedAdTypeResponse adType, ClassifiedCustomerProjection classified, ClassifiedCategoryResponse category, String directLink, PaymentTransactionResponse paymentResponse) {

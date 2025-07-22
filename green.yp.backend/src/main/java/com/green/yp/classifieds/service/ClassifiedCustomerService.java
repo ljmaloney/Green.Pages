@@ -27,23 +27,22 @@ public class ClassifiedCustomerService {
      */
     public ClassifiedCustomer upsertCustomer(ClassifiedRequest request){
         return repository
-                .findClassifiedCustomerByEmailAddress(request.emailAddress())
+                .findClassifiedCustomerByEmailAddressAndPhoneNumber(request.emailAddress(), request.phoneNumber())
                 .map(cust -> {
                     upsertCustomerData(request, cust);
-                    cust.setPhoneNumber(request.phoneNumber());
                     return repository.save(cust);
                  })
-                .or( () -> repository.findClassifiedCustomerByPhoneNumber(request.phoneNumber())
-                        .map(cust -> {
-                            log.debug(
-                                    "customer {} email address has been changed, found with phone",
-                                    cust.getId());
-                            cust.setEmailAddress(request.emailAddress());
-                            cust.setEmailValidationDate(null);
-                            cust.setEmailAddressValidationToken(TokenUtils.generateCode(8));
-                            upsertCustomerData(request, cust);
-                            return repository.save(cust);
-                        })).or(Optional::empty)
+//                .or( () -> repository.findClassifiedCustomerByPhoneNumber(request.phoneNumber())
+//                        .map(cust -> {
+//                            log.debug(
+//                                    "customer {} email address has been changed, found with phone",
+//                                    cust.getId());
+//                            cust.setEmailAddress(request.emailAddress());
+//                            cust.setEmailValidationDate(null);
+//                            cust.setEmailAddressValidationToken(TokenUtils.generateCode(8));
+//                            upsertCustomerData(request, cust);
+//                            return repository.save(cust);
+//                        })).or(Optional::empty)
                 .orElseGet(
                                 () -> {
                                     var newCustomer = mapper.customterFromClassified(request);
