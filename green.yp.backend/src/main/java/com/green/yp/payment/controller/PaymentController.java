@@ -1,5 +1,6 @@
 package com.green.yp.payment.controller;
 
+import com.green.yp.api.apitype.payment.ApiPaymentRequest;
 import com.green.yp.api.apitype.payment.PaymentMethodRequest;
 import com.green.yp.api.apitype.payment.PaymentMethodResponse;
 import com.green.yp.common.dto.ResponseApi;
@@ -45,7 +46,7 @@ public class PaymentController {
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<PaymentMethodResponse> replacePaymentMethod(
-      @RequestBody PaymentMethodRequest methodRequest) {
+      @RequestBody ApiPaymentRequest methodRequest) {
     return new ResponseApi<>(orchestrationService.replaceCardOnFile(methodRequest), null);
   }
 }

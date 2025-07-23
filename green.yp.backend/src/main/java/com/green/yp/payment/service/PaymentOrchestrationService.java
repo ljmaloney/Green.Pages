@@ -8,6 +8,7 @@ import com.green.yp.api.apitype.payment.PaymentMethodResponse;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.payment.data.enumeration.PaymentMethodStatusType;
+import com.green.yp.payment.mapper.PaymentMapper;
 import com.squareup.square.core.SquareApiException;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,14 +25,16 @@ public class PaymentOrchestrationService {
   private final PaymentTransactionService transactionService;
   private final PaymentService paymentService;
   private final PaymentMethodService methodService;
+  private final PaymentMapper paymentMapper;
 
   public PaymentOrchestrationService(
-      PaymentTransactionService transactionService,
-      PaymentService paymentService,
-      PaymentMethodService methodService) {
+          PaymentTransactionService transactionService,
+          PaymentService paymentService,
+          PaymentMethodService methodService, PaymentMapper paymentMapper) {
     this.transactionService = transactionService;
     this.paymentService = paymentService;
     this.methodService = methodService;
+      this.paymentMapper = paymentMapper;
   }
 
   @AuditRequest(
@@ -65,6 +68,11 @@ public class PaymentOrchestrationService {
       throw new PreconditionFailedException(
           "There was an error when attempting to save the card for the subscription");
     }
+  }
+
+  @Transactional
+  public PaymentMethodResponse replaceCardOnFile(ApiPaymentRequest apiPaymentRequest) {
+    return replaceCardOnFile(paymentMapper.toPaymentMethodRequest(apiPaymentRequest));
   }
 
   @Transactional
