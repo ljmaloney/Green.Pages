@@ -5,6 +5,7 @@ import com.green.yp.api.apitype.enumeration.AuditActionType;
 import com.green.yp.api.apitype.enumeration.AuditObjectType;
 import com.green.yp.api.apitype.payment.*;
 import com.green.yp.api.apitype.payment.PaymentMethodResponse;
+import com.green.yp.config.security.AuthenticatedUser;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.payment.data.enumeration.PaymentMethodStatusType;
@@ -71,8 +72,14 @@ public class PaymentOrchestrationService {
   }
 
   @Transactional
-  public PaymentMethodResponse replaceCardOnFile(ApiPaymentRequest apiPaymentRequest) {
-    return replaceCardOnFile(paymentMapper.toPaymentMethodRequest(apiPaymentRequest));
+  public PaymentMethodResponse replaceCardOnFile(ApiPaymentRequest methodRequest,
+                                                 AuthenticatedUser authenticatedUser,
+                                                 boolean createNew, String ipAddress) {
+    if ( createNew ){
+      log.info("Create payment method for subscriber {} from ip {}", authenticatedUser.userId(), ipAddress );
+      return createPaymentMethod(paymentMapper.toPaymentMethodRequest(methodRequest), ipAddress);
+    }
+    return replaceCardOnFile(paymentMapper.toPaymentMethodRequest(methodRequest));
   }
 
   @Transactional
@@ -175,4 +182,6 @@ public class PaymentOrchestrationService {
         || !StringUtils.equals(methodRequest.phoneNumber(), activeCard.phoneNumber())
         || !StringUtils.equals(methodRequest.emailAddress(), activeCard.emailAddress());
   }
+
+
 }

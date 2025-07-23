@@ -4,12 +4,16 @@ import com.green.yp.api.apitype.payment.ApiPaymentRequest;
 import com.green.yp.api.apitype.payment.PaymentMethodRequest;
 import com.green.yp.api.apitype.payment.PaymentMethodResponse;
 import com.green.yp.common.dto.ResponseApi;
+import com.green.yp.config.security.AuthUser;
+import com.green.yp.config.security.AuthenticatedUser;
 import com.green.yp.payment.service.PaymentMethodService;
 import com.green.yp.payment.service.PaymentOrchestrationService;
 import com.green.yp.security.IsSubscriberAdminOrAdmin;
+import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -45,8 +49,9 @@ public class PaymentController {
       path = "replace",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseApi<PaymentMethodResponse> replacePaymentMethod(
-      @RequestBody ApiPaymentRequest methodRequest) {
-    return new ResponseApi<>(orchestrationService.replaceCardOnFile(methodRequest), null);
+  public ResponseApi<PaymentMethodResponse> replacePaymentMethod(@AuthUser AuthenticatedUser authenticatedUser,
+                                                                 @RequestParam(name = "createNew", defaultValue = "false") boolean createNew,
+                                                                 @RequestBody ApiPaymentRequest methodRequest, HttpServletRequest request) {
+    return new ResponseApi<>(orchestrationService.replaceCardOnFile(methodRequest,  authenticatedUser, createNew, RequestUtil.getRequestIP(request)), null);
   }
 }
