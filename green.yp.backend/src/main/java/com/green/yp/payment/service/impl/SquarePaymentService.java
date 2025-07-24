@@ -54,7 +54,7 @@ public class SquarePaymentService implements PaymentService {
             .autocomplete(true)
             .referenceId(paymentRequest.referenceId())
             .verificationToken(
-                cardOnFile ? Optional.empty() : Optional.of(paymentRequest.verificationToken()))
+                cardOnFile ? Optional.empty() : Optional.ofNullable(paymentRequest.verificationToken()))
             .note(paymentRequest.note())
             .statementDescriptionIdentifier(
                 StringUtils.truncate(paymentRequest.statementDescription(), 20))
