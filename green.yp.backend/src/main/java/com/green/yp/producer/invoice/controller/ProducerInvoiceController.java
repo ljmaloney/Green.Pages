@@ -20,7 +20,7 @@ import java.util.UUID;
 @Slf4j
 @Validated
 @Tag(name = "For retrieval of subscriber invoices")
-//@RequestMapping("invoice")
+@RequestMapping("producer/invoice")
 public class ProducerInvoiceController {
     private final ProducerInvoiceService producerInvoiceService;
 
