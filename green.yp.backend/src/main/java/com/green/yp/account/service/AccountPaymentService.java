@@ -124,6 +124,7 @@ public class AccountPaymentService {
                       "receiptUrl", completedPayment.receiptUrl(),
                       "timestamp", OffsetDateTime.now(),
                       "ipAddress", requestIP));
+              map.put("invoiceLineItems", invoice.lineItems());
             map.put("invoiceTotal", invoice.invoiceTotal());
             return map;
           } );

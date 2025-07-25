@@ -92,7 +92,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <#list invoice.lineItems as item>
+                            <#list invoiceLineItems as item>
                                 <tr>
                                     <td>${item.lineNumber}</td>
                                     <td>${item.description}</td>
