@@ -197,7 +197,9 @@ public class AccountPaymentService {
   public PaymentMethodResponse replacePayment(@NotNull @NonNull @Valid ApiPaymentRequest paymentRequest,
                                            @NotNull @NonNull AuthenticatedUser authenticatedUser,
                                            @NotNull @NonNull String requestIP) {
-    return paymentContract.replaceCardOnFile(paymentRequest, authenticatedUser, true, requestIP);
+    boolean createNew = paymentContract.getPaymentMethod(paymentRequest.referenceId(), authenticatedUser, requestIP).isPresent();
+
+    return paymentContract.replaceCardOnFile(paymentRequest, authenticatedUser, createNew, requestIP);
   }
 
   /**

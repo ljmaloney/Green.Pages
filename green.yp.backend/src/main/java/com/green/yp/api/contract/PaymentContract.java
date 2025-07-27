@@ -2,6 +2,8 @@ package com.green.yp.api.contract;
 
 import com.green.yp.api.apitype.payment.*;
 import com.green.yp.config.security.AuthenticatedUser;
+import com.green.yp.exception.NotFoundException;
+import com.green.yp.payment.service.PaymentMethodService;
 import com.green.yp.payment.service.PaymentOrchestrationService;
 
 import java.util.List;
@@ -17,10 +19,12 @@ import org.springframework.stereotype.Component;
 public class PaymentContract {
 
   private final PaymentOrchestrationService orchestrationService;
+  private final PaymentMethodService paymentMethodService;
 
   public PaymentContract(
-          PaymentOrchestrationService orchestrationService) {
+          PaymentOrchestrationService orchestrationService, PaymentMethodService paymentMethodService) {
     this.orchestrationService = orchestrationService;
+      this.paymentMethodService = paymentMethodService;
   }
 
   public PaymentTransactionResponse applyPayment(PaymentRequest paymentRequest, Optional<String> customerRef, boolean cardOnFile) {
@@ -48,5 +52,15 @@ public class PaymentContract {
                                               boolean createNew,
                                               @NotNull @NonNull String requestIP) {
       return orchestrationService.replaceCardOnFile(paymentRequest, authenticatedUser, createNew, requestIP);
+  }
+
+  public Optional<PaymentMethodResponse> getPaymentMethod(@NotNull @NonNull UUID referenceId,
+                                           @NotNull @NonNull AuthenticatedUser authenticatedUser,
+                                           @NotNull @NonNull String requestIP) {
+    try{
+      return Optional.of(paymentMethodService.findMethod(referenceId.toString()));
+    } catch (NotFoundException nfe){
+      return Optional.empty();
+    }
   }
 }

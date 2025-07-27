@@ -182,6 +182,4 @@ public class PaymentOrchestrationService {
         || !StringUtils.equals(methodRequest.phoneNumber(), activeCard.phoneNumber())
         || !StringUtils.equals(methodRequest.emailAddress(), activeCard.emailAddress());
   }
-
-
 }
