@@ -37,4 +37,6 @@ public interface AccountPaymentMapper {
     PaymentRequest toPaymentRequest(@NotNull @NonNull ApiPaymentRequest paymentRequest,
                                     PaymentMethodResponse savedCustomerCard,
                                     InvoiceResponse invoice);
+
+    ApiPaymentResponse toApiResponse(PaymentMethodResponse paymentMethodResponse);
 }

@@ -1,12 +1,16 @@
 package com.green.yp.api.contract;
 
 import com.green.yp.api.apitype.payment.*;
+import com.green.yp.config.security.AuthenticatedUser;
 import com.green.yp.payment.service.PaymentOrchestrationService;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -37,5 +41,12 @@ public class PaymentContract {
 
   public void disablePaymentMethod(List<UUID> producerIds) {
     producerIds.forEach(orchestrationService::disablePaymentMethods);
+  }
+
+  public PaymentMethodResponse replaceCardOnFile(@NotNull @NonNull @Valid ApiPaymentRequest paymentRequest,
+                                              @NotNull @NonNull AuthenticatedUser authenticatedUser,
+                                              boolean createNew,
+                                              @NotNull @NonNull String requestIP) {
+      return orchestrationService.replaceCardOnFile(paymentRequest, authenticatedUser, createNew, requestIP);
   }
 }

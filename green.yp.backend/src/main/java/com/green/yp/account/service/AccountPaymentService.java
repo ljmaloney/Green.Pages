@@ -10,8 +10,10 @@ import com.green.yp.api.apitype.producer.ProducerSubscriptionResponse;
 import com.green.yp.api.apitype.producer.enumeration.ProducerContactType;
 import com.green.yp.api.apitype.producer.enumeration.ProducerSubscriptionType;
 import com.green.yp.api.contract.*;
+import com.green.yp.config.security.AuthenticatedUser;
 import com.green.yp.email.service.EmailService;
 import com.green.yp.exception.PreconditionFailedException;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -190,6 +192,12 @@ public class AccountPaymentService {
 
     return new ApiPaymentResponse(
         true, producerPaymentResponse.responseCode(), producerPaymentResponse.responseText());
+  }
+
+  public PaymentMethodResponse replacePayment(@NotNull @NonNull @Valid ApiPaymentRequest paymentRequest,
+                                           @NotNull @NonNull AuthenticatedUser authenticatedUser,
+                                           @NotNull @NonNull String requestIP) {
+    return paymentContract.replaceCardOnFile(paymentRequest, authenticatedUser, true, requestIP);
   }
 
   /**
