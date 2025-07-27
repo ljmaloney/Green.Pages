@@ -28,7 +28,7 @@ public class InvoiceLineItem extends Immutable {
   @Column(name = "external_ref_2", nullable = false, length = 50)
   private String externalRef2;
 
-  @Column(name = "line_item")
+  @Column(name = "line_item_number")
   private Integer lineNumber;
 
   @Column(name = "quantity")
