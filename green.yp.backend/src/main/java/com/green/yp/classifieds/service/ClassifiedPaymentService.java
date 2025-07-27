@@ -174,9 +174,9 @@ public class ClassifiedPaymentService {
                     classified.classified().getId().toString(),
                     null,
                     String.format("%s : Ad Package %s", classified.classified().getTitle(), adType.adTypeName()),
+                    1,
                     paymentResponse.totalAmount()))));
   }
-
   private boolean invalidEmailToken(Classified classified) {
     var response =
         emailService.validateEmail(classified.getId().toString(), classified.getEmailAddress());

@@ -47,8 +47,9 @@ public class InvoiceService {
         Map<String, Integer> lineMap = new HashMap<>();
         lineMap.put("lineNumber", 1);
         invoice.getLineItems().forEach(line -> {
+            line.setInvoice(invoice);
+            line.setLineNumber(lineMap.get("lineNumber"));
             lineMap.put("lineNumber", lineMap.get("lineNumber")+1);
-            line.setInvoice(invoice); line.setLineNumber(lineMap.get("lineNumber"));
         });
 
         return mapper.fromEntity(invoiceRepository.saveAndFlush(invoice));

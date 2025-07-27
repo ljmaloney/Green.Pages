@@ -237,6 +237,7 @@ public class AccountPaymentService {
             .externalRef1(paymentRequest.referenceId().toString())
             .externalRef2(subscription.subscriptionId().toString())
             .lineItemNumber(lineItemNumber)
+            .quantity(1)
             .description(getLineItemDescription(subscription))
             .amount(subscription.subscriptionAmount())
             .build();
