@@ -13,6 +13,8 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
@@ -81,9 +83,11 @@ public class InvoiceService {
                                               AuthenticatedUser authenticatedUser,
                                               String requestIP) {
         log.info("Finding {} invoices for {} between {} and {} ", invoiceType, referenceId, startDate, endDate);
-        return invoiceRepository.findInvoices(invoiceType, referenceId, startDate, endDate)
+        return invoiceRepository.findInvoices(invoiceType, referenceId,
+                OffsetDateTime.of(startDate.atTime(0,0,0), ZoneOffset.UTC),
+                OffsetDateTime.of(endDate.atTime(23,59,59), ZoneOffset.UTC))
                 .stream()
-                .map(mapper::toResponse)
+                .map(mapper::fromEntity)
                 .toList();
     }
 }

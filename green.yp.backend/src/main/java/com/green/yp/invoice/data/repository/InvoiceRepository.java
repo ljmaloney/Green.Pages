@@ -35,9 +35,9 @@ public interface InvoiceRepository extends JpaRepository<Invoice, UUID> {
                 AND (:referenceId IS NULL OR invoice.externalRef = :referenceId)
                 AND invoice.paidDate BETWEEN :startDate AND :endDate
         """)
-  List<InvoiceResponse> findInvoices(
+  List<Invoice> findInvoices(
       @Param("invoiceType") InvoiceType invoiceType,
       @Param("referenceId") String referenceId,
-      @Param("startDate") LocalDate startDate,
-      @Param("endDate") LocalDate endDate);
+      @Param("startDate") OffsetDateTime startDate,
+      @Param("endDate") OffsetDateTime endDate);
 }
