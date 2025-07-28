@@ -47,22 +47,26 @@ public class AccountPaymentService {
   private final AccountPaymentMapper paymentMapper;
 
   public AccountPaymentService(
-          EmailService emailService, InvoiceContract invoiceContract,
-          ProducerInvoiceContract producerInvoiceContract,
-          ProducerContract producerContract, EmailContract emailContract,
-          ProducerPaymentContract producerPaymentContract,
-          ProducerContactContract contactContract,
-          ProducerLocationContract locationContract, PaymentContract paymentContract, AccountPaymentMapper paymentMapper) {
+      EmailService emailService,
+      InvoiceContract invoiceContract,
+      ProducerInvoiceContract producerInvoiceContract,
+      ProducerContract producerContract,
+      EmailContract emailContract,
+      ProducerPaymentContract producerPaymentContract,
+      ProducerContactContract contactContract,
+      ProducerLocationContract locationContract,
+      PaymentContract paymentContract,
+      AccountPaymentMapper paymentMapper) {
     this.emailService = emailService;
-      this.invoiceContract = invoiceContract;
-      this.producerInvoiceContract = producerInvoiceContract;
+    this.invoiceContract = invoiceContract;
+    this.producerInvoiceContract = producerInvoiceContract;
     this.producerContract = producerContract;
-      this.emailContract = emailContract;
-      this.producerPaymentContract = producerPaymentContract;
+    this.emailContract = emailContract;
+    this.producerPaymentContract = producerPaymentContract;
     this.contactContract = contactContract;
     this.locationContract = locationContract;
     this.paymentContract = paymentContract;
-      this.paymentMapper = paymentMapper;
+    this.paymentMapper = paymentMapper;
   }
 
   /**
@@ -74,8 +78,7 @@ public class AccountPaymentService {
    */
   @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
   public ApiPaymentResponse applyInitialPayment(
-      @NotNull @NonNull ApiPaymentRequest paymentRequest,
-      @NotNull @NonNull String requestIP) {
+      @NotNull @NonNull ApiPaymentRequest paymentRequest, @NotNull @NonNull String requestIP) {
     log.info("Apply initial subscription payment for {}", paymentRequest.referenceId());
 
     ProducerResponse producerResponse = producerContract.findProducer(paymentRequest.referenceId());
@@ -83,93 +86,90 @@ public class AccountPaymentService {
       throw new PreconditionFailedException("Producer/Account is already active");
     }
 
-    ProducerContactResponse primaryContact =  contactContract.findAdminContacts(producerResponse.producerId())
-            .stream().filter(contact-> contact.producerContactType() == ProducerContactType.ADMIN)
-            .findFirst().orElseThrow( () -> {
-              log.error("No primary contact found for {}", paymentRequest.referenceId());
-              return new PreconditionFailedException("No primary contact found for " + paymentRequest.referenceId());
-            });
+    ProducerContactResponse primaryContact =
+        contactContract.findAdminContacts(producerResponse.producerId()).stream()
+            .filter(contact -> contact.producerContactType() == ProducerContactType.ADMIN)
+            .findFirst()
+            .orElseThrow(
+                () -> {
+                  log.error("No primary contact found for {}", paymentRequest.referenceId());
+                  return new PreconditionFailedException(
+                      "No primary contact found for " + paymentRequest.referenceId());
+                });
 
-    var validation = emailContract.validateEmail(paymentRequest.referenceId().toString(), primaryContact.emailAddress());
+    var validation =
+        emailContract.validateEmail(
+            paymentRequest.referenceId().toString(), primaryContact.emailAddress());
 
     if (!validation.validationStatus().isValidated()
         && !paymentRequest.emailValidationToken().equals(validation.token())) {
-      log.warn("Email has not been confirmed for the admin contact {} for {}", paymentRequest.referenceId(), primaryContact.emailAddress());
-      throw new PreconditionFailedException("Admin email address has not been confirmed for the account");
+      log.warn(
+          "Email has not been confirmed for the admin contact {} for {}",
+          paymentRequest.referenceId(),
+          primaryContact.emailAddress());
+      throw new PreconditionFailedException(
+          "Admin email address has not been confirmed for the account");
     }
 
     var invoice = createInvoiceForPayment(paymentRequest, producerResponse);
 
-    var savedCustomerCard = paymentContract.createPaymentMethod(paymentMapper.toPaymentMethod(paymentRequest), requestIP);
+    var savedCustomerCard =
+        paymentContract.createPaymentMethod(
+            paymentMapper.toPaymentMethod(paymentRequest), requestIP);
 
     var completedPayment =
         paymentContract.applyPayment(
             paymentMapper.toPaymentRequest(paymentRequest, savedCustomerCard, invoice),
-                Optional.of(savedCustomerCard.externCustRef()), true);
+            Optional.of(savedCustomerCard.externCustRef()),
+            true);
 
     invoiceContract.updatePayment(invoice.invoiceId(), completedPayment);
 
-    producerContract.activateProducer(paymentRequest.referenceId(),
-            completedPayment.createDate(), completedPayment.createDate(), "system", requestIP);
-    try{
-      emailService.sendEmailAsync(EmailTemplateType.PRODUCER_PAYMENT_CONFIRMATION,
+    producerContract.activateProducer(
+        paymentRequest.referenceId(),
+        completedPayment.createDate(),
+        completedPayment.createDate(),
+        "system",
+        requestIP);
+    try {
+      emailService.sendEmailAsync(
+          EmailTemplateType.PRODUCER_PAYMENT_CONFIRMATION,
           Collections.singletonList(primaryContact.emailAddress()),
           EmailTemplateType.PRODUCER_PAYMENT_CONFIRMATION.getSubjectFormat(),
           () -> {
-              Map<String, Object> map = new HashMap<>(Map.of("invoice", invoice,
-                      "invoiceNumber", invoice.invoiceNumber(),
-                      "invoiceDescription", invoice.description(),
-                      "producerId", producerResponse.producerId(),
-                      "lastName", primaryContact.lastName(),
-                      "firstName", primaryContact.firstName(),
-                      "transactionRef", completedPayment.paymentRef(),
-                      "receiptUrl", completedPayment.receiptUrl(),
-                      "timestamp", OffsetDateTime.now(),
-                      "ipAddress", requestIP));
-              map.put("invoiceLineItems", invoice.lineItems());
+            Map<String, Object> map =
+                new HashMap<>(
+                    Map.of(
+                        "invoice",
+                        invoice,
+                        "invoiceNumber",
+                        invoice.invoiceNumber(),
+                        "invoiceDescription",
+                        invoice.description(),
+                        "producerId",
+                        producerResponse.producerId(),
+                        "lastName",
+                        primaryContact.lastName(),
+                        "firstName",
+                        primaryContact.firstName(),
+                        "transactionRef",
+                        completedPayment.paymentRef(),
+                        "receiptUrl",
+                        completedPayment.receiptUrl(),
+                        "timestamp",
+                        OffsetDateTime.now(),
+                        "ipAddress",
+                        requestIP));
+            map.put("invoiceLineItems", invoice.lineItems());
             map.put("invoiceTotal", invoice.invoiceTotal());
             return map;
-          } );
+          });
     } catch (Exception e) {
-      log.error("Unexpected error sending confirmation email to {} ", paymentRequest.referenceId(), e);
+      log.error(
+          "Unexpected error sending confirmation email to {} ", paymentRequest.referenceId(), e);
     }
     return new ApiPaymentResponse(
         true, completedPayment.receiptNumber(), completedPayment.receiptUrl());
-  }
-
-  private InvoiceResponse createInvoiceForPayment(ApiPaymentRequest paymentRequest, ProducerResponse producerResponse) {
-    var primarySubscription =
-            producerResponse.subscriptions().stream()
-                    .filter(sub -> sub.subscriptionType().isPrimarySubscription())
-                    .findFirst()
-                    .orElseThrow(() -> new PreconditionFailedException( "No primary subscription found for %s", paymentRequest.referenceId()));
-
-    List<InvoiceLineItemRequest> lineItems = new ArrayList<>();
-    lineItems.add(createLineItem(paymentRequest, primarySubscription, 1));
-
-    List<ProducerSubscriptionResponse> addOnSubscriptions =
-            producerResponse.subscriptions().stream()
-                    .filter(sub -> !sub.subscriptionType().isPrimarySubscription())
-                    .toList();
-
-    lineItems.addAll(addOnSubscriptions.stream()
-            .map( addOn -> createLineItem(paymentRequest, addOn, 0))
-            .toList());
-
-    return invoiceContract.createInvoice(
-        InvoiceRequest.builder()
-            .externalRef(paymentRequest.referenceId().toString())
-            .invoiceType(InvoiceType.SUBSCRIPTION)
-            .description(
-                String.format(
-                    "%s : Subscription Package %s",
-                    producerResponse.businessName(), primarySubscription.displayName()))
-            .lineItems(lineItems)
-            .invoiceTotal(
-                lineItems.stream()
-                    .map(InvoiceLineItemRequest::amount)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add))
-            .build());
   }
 
   public ApiPaymentResponse applyPayment(
@@ -194,12 +194,17 @@ public class AccountPaymentService {
         true, producerPaymentResponse.responseCode(), producerPaymentResponse.responseText());
   }
 
-  public PaymentMethodResponse replacePayment(@NotNull @NonNull @Valid ApiPaymentRequest paymentRequest,
-                                           @NotNull @NonNull AuthenticatedUser authenticatedUser,
-                                           @NotNull @NonNull String requestIP) {
-    boolean createNew = paymentContract.getPaymentMethod(paymentRequest.referenceId(), authenticatedUser, requestIP).isPresent();
+  public PaymentMethodResponse replacePayment(
+      @NotNull @NonNull @Valid ApiPaymentRequest paymentRequest,
+      @NotNull @NonNull AuthenticatedUser authenticatedUser,
+      @NotNull @NonNull String requestIP) {
+    boolean createNew =
+        paymentContract
+            .getPaymentMethod(paymentRequest.referenceId(), authenticatedUser, requestIP)
+            .isEmpty();
 
-    return paymentContract.replaceCardOnFile(paymentRequest, authenticatedUser, createNew, requestIP);
+    return paymentContract.replaceCardOnFile(
+        paymentRequest, authenticatedUser, createNew, requestIP);
   }
 
   /**
@@ -240,31 +245,72 @@ public class AccountPaymentService {
         "Removed %s unpaid account subscriptions over %s days old", producerIds.size(), daysOld);
   }
 
-  private InvoiceLineItemRequest createLineItem(ApiPaymentRequest paymentRequest,
-                                                ProducerSubscriptionResponse subscription,
-                                                int lineItemNumber) {
+  private InvoiceResponse createInvoiceForPayment(
+      ApiPaymentRequest paymentRequest, ProducerResponse producerResponse) {
+    var primarySubscription =
+        producerResponse.subscriptions().stream()
+            .filter(sub -> sub.subscriptionType().isPrimarySubscription())
+            .findFirst()
+            .orElseThrow(
+                () ->
+                    new PreconditionFailedException(
+                        "No primary subscription found for %s", paymentRequest.referenceId()));
+
+    List<InvoiceLineItemRequest> lineItems = new ArrayList<>();
+    lineItems.add(createLineItem(paymentRequest, primarySubscription, 1));
+
+    List<ProducerSubscriptionResponse> addOnSubscriptions =
+        producerResponse.subscriptions().stream()
+            .filter(sub -> !sub.subscriptionType().isPrimarySubscription())
+            .toList();
+
+    lineItems.addAll(
+        addOnSubscriptions.stream()
+            .map(addOn -> createLineItem(paymentRequest, addOn, 0))
+            .toList());
+
+    return invoiceContract.createInvoice(
+        InvoiceRequest.builder()
+            .externalRef(paymentRequest.referenceId().toString())
+            .invoiceType(InvoiceType.SUBSCRIPTION)
+            .description(
+                String.format(
+                    "%s : Subscription Package %s",
+                    producerResponse.businessName(), primarySubscription.displayName()))
+            .lineItems(lineItems)
+            .invoiceTotal(
+                lineItems.stream()
+                    .map(InvoiceLineItemRequest::amount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add))
+            .build());
+  }
+
+  private InvoiceLineItemRequest createLineItem(
+      ApiPaymentRequest paymentRequest,
+      ProducerSubscriptionResponse subscription,
+      int lineItemNumber) {
     return InvoiceLineItemRequest.builder()
-            .externalRef1(paymentRequest.referenceId().toString())
-            .externalRef2(subscription.subscriptionId().toString())
-            .lineItemNumber(lineItemNumber)
-            .quantity(1)
-            .description(getLineItemDescription(subscription))
-            .amount(subscription.subscriptionAmount())
-            .build();
+        .externalRef1(paymentRequest.referenceId().toString())
+        .externalRef2(subscription.subscriptionId().toString())
+        .lineItemNumber(lineItemNumber)
+        .quantity(1)
+        .description(getLineItemDescription(subscription))
+        .amount(subscription.subscriptionAmount())
+        .build();
   }
 
   private String getLineItemDescription(ProducerSubscriptionResponse subscription) {
     return switch (subscription.subscriptionType()) {
       case DATA_IMPORT_NO_DISPLAY, TOP_LEVEL, LINE_OF_BUSINESS ->
-              String.format(
-                      "%s - %s",
-                      subscription.invoiceCycleType().getCycleDescription(),
-                      subscription.shortDescription());
+          String.format(
+              "%s - %s",
+              subscription.invoiceCycleType().getCycleDescription(),
+              subscription.shortDescription());
       case ADD_ON, LINE_OF_BUSINESS_ADD_ON ->
-              String.format(
-                      "%s - Additional Services - %s",
-                      subscription.invoiceCycleType().getCycleDescription(),
-                      subscription.shortDescription());
+          String.format(
+              "%s - Additional Services - %s",
+              subscription.invoiceCycleType().getCycleDescription(),
+              subscription.shortDescription());
     };
   }
 }

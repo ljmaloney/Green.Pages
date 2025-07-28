@@ -102,7 +102,7 @@ public class AccountController {
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ApiPaymentResponse> applyInitialPayment(
-          @RequestBody @Valid ApiPaymentRequest paymentRequest) {
+      @RequestBody @Valid ApiPaymentRequest paymentRequest) {
     return new ResponseApi<>(
         paymentService.applyInitialPayment(paymentRequest, RequestUtil.getRequestIP()), null);
   }
@@ -118,16 +118,20 @@ public class AccountController {
         paymentService.applyPayment(paymentRequest, null, RequestUtil.getRequestIP()), null);
   }
 
+  @IsAnyAuthenticatedUser
   @Operation(summary = "Applies a payment on an existing subscription with an invoice")
   @PostMapping(
       path = "/replace/payment",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseApi<PaymentMethodResponse> replacePayment(@Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser,
-                                                           @RequestBody @Valid ApiPaymentRequest paymentRequest,
-                                                           HttpServletRequest request) {
+  public ResponseApi<PaymentMethodResponse> replacePayment(
+      @Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser,
+      @RequestBody @Valid ApiPaymentRequest paymentRequest,
+      HttpServletRequest request) {
     return new ResponseApi<>(
-            paymentService.replacePayment(paymentRequest, authenticatedUser, RequestUtil.getRequestIP(request)), null);
+        paymentService.replacePayment(
+            paymentRequest, authenticatedUser, RequestUtil.getRequestIP(request)),
+        null);
   }
 
   @IsAnyAuthenticatedUser
