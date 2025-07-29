@@ -86,16 +86,7 @@ public class AccountPaymentService {
       throw new PreconditionFailedException("Producer/Account is already active");
     }
 
-    ProducerContactResponse primaryContact =
-        contactContract.findAdminContacts(producerResponse.producerId()).stream()
-            .filter(contact -> contact.producerContactType() == ProducerContactType.ADMIN)
-            .findFirst()
-            .orElseThrow(
-                () -> {
-                  log.error("No primary contact found for {}", paymentRequest.referenceId());
-                  return new PreconditionFailedException(
-                      "No primary contact found for " + paymentRequest.referenceId());
-                });
+    ProducerContactResponse primaryContact = getPrimaryContact(paymentRequest, producerResponse);
 
     var validation =
         emailContract.validateEmail(
@@ -131,43 +122,9 @@ public class AccountPaymentService {
         completedPayment.createDate(),
         "system",
         requestIP);
-    try {
-      emailService.sendEmailAsync(
-          EmailTemplateType.PRODUCER_PAYMENT_CONFIRMATION,
-          Collections.singletonList(primaryContact.emailAddress()),
-          EmailTemplateType.PRODUCER_PAYMENT_CONFIRMATION.getSubjectFormat(),
-          () -> {
-            Map<String, Object> map =
-                new HashMap<>(
-                    Map.of(
-                        "invoice",
-                        invoice,
-                        "invoiceNumber",
-                        invoice.invoiceNumber(),
-                        "invoiceDescription",
-                        invoice.description(),
-                        "producerId",
-                        producerResponse.producerId(),
-                        "lastName",
-                        primaryContact.lastName(),
-                        "firstName",
-                        primaryContact.firstName(),
-                        "transactionRef",
-                        completedPayment.paymentRef(),
-                        "receiptUrl",
-                        completedPayment.receiptUrl(),
-                        "timestamp",
-                        OffsetDateTime.now(),
-                        "ipAddress",
-                        requestIP));
-            map.put("invoiceLineItems", invoice.lineItems());
-            map.put("invoiceTotal", invoice.invoiceTotal());
-            return map;
-          });
-    } catch (Exception e) {
-      log.error(
-          "Unexpected error sending confirmation email to {} ", paymentRequest.referenceId(), e);
-    }
+
+    sendPaymentCompleted(paymentRequest, requestIP, primaryContact, invoice, producerResponse, completedPayment);
+
     return new ApiPaymentResponse(
         true, completedPayment.receiptNumber(), completedPayment.receiptUrl());
   }
@@ -198,13 +155,45 @@ public class AccountPaymentService {
       @NotNull @NonNull @Valid ApiPaymentRequest paymentRequest,
       @NotNull @NonNull AuthenticatedUser authenticatedUser,
       @NotNull @NonNull String requestIP) {
+
+    var producer = producerContract.findProducer(paymentRequest.referenceId());
+
+    if ( producer.cancelDate() != null){
+      log.info("Cannot update payment method for non-active (cancelled) producer {} cancelDate {}",
+              producer.producerId(), producer.cancelDate());
+      throw new PreconditionFailedException(
+          "Cannot update payment method for non-active (cancelled) producer");
+    }
+
     boolean createNew =
         paymentContract
             .getPaymentMethod(paymentRequest.referenceId(), authenticatedUser, requestIP)
             .isEmpty();
 
-    return paymentContract.replaceCardOnFile(
+    var methodResponse = paymentContract.replaceCardOnFile(
         paymentRequest, authenticatedUser, createNew, requestIP);
+
+    if ( producer.getLastBillPaidDate() != null ) {
+      var unpaidInvoice = invoiceContract.findUnpaidInvoice(paymentRequest.referenceId(), authenticatedUser, requestIP)
+              .orElseGet( () -> createInvoiceForPayment(paymentRequest, producer));
+
+      var completedPayment =
+              paymentContract.applyPayment(
+                      paymentMapper.toPaymentRequest(paymentRequest, methodResponse, unpaidInvoice),
+                      Optional.of(methodResponse.externCustRef()),
+                      true);
+
+      invoiceContract.updatePayment(unpaidInvoice.invoiceId(), completedPayment);
+
+      producerContract.updatePaidDates(paymentRequest.referenceId(),
+              completedPayment.createDate(), completedPayment.createDate(), authenticatedUser.userId(), requestIP);
+
+      var primaryContact = getPrimaryContact(paymentRequest, producer);
+
+      sendPaymentCompleted(paymentRequest,requestIP, primaryContact, unpaidInvoice, producer, completedPayment);
+    }
+
+    return methodResponse;
   }
 
   /**
@@ -312,5 +301,64 @@ public class AccountPaymentService {
               subscription.invoiceCycleType().getCycleDescription(),
               subscription.shortDescription());
     };
+  }
+
+  private ProducerContactResponse getPrimaryContact(@NotNull ApiPaymentRequest paymentRequest,
+                                                    @NotNull ProducerResponse producerResponse) {
+    return contactContract.findAdminContacts(producerResponse.producerId()).stream()
+        .filter(contact -> contact.producerContactType() == ProducerContactType.ADMIN)
+        .findFirst()
+        .orElseThrow(
+            () -> {
+              log.error("No primary contact found for {}", paymentRequest.referenceId());
+              return new PreconditionFailedException(
+                  "No primary contact found for " + paymentRequest.referenceId());
+            });
+  }
+
+  private void sendPaymentCompleted(
+      @NotNull ApiPaymentRequest paymentRequest,
+      @NotNull String requestIP,
+      @NotNull ProducerContactResponse primaryContact,
+      @NotNull InvoiceResponse invoice,
+      @NotNull ProducerResponse producerResponse,
+      @NotNull PaymentTransactionResponse completedPayment) {
+    try {
+      emailService.sendEmailAsync(
+              EmailTemplateType.PRODUCER_PAYMENT_CONFIRMATION,
+              Collections.singletonList(primaryContact.emailAddress()),
+              EmailTemplateType.PRODUCER_PAYMENT_CONFIRMATION.getSubjectFormat(),
+              () -> {
+                Map<String, Object> map =
+                        new HashMap<>(
+                                Map.of(
+                                        "invoice",
+                                        invoice,
+                                        "invoiceNumber",
+                                        invoice.invoiceNumber(),
+                                        "invoiceDescription",
+                                        invoice.description(),
+                                        "producerId",
+                                        producerResponse.producerId(),
+                                        "lastName",
+                                        primaryContact.lastName(),
+                                        "firstName",
+                                        primaryContact.firstName(),
+                                        "transactionRef",
+                                        completedPayment.paymentRef(),
+                                        "receiptUrl",
+                                        completedPayment.receiptUrl(),
+                                        "timestamp",
+                                        OffsetDateTime.now(),
+                                        "ipAddress",
+                                        requestIP));
+                map.put("invoiceLineItems", invoice.lineItems());
+                map.put("invoiceTotal", invoice.invoiceTotal());
+                return map;
+              });
+    } catch (Exception e) {
+      log.error(
+              "Unexpected error sending confirmation email to {} ", paymentRequest.referenceId(), e);
+    }
   }
 }
