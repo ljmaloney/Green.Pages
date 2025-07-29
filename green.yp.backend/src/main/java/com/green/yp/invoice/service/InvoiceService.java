@@ -13,15 +13,12 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.*;
 
+import jakarta.validation.constraints.NotNull;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +26,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class InvoiceService {
 
+    public static final String LINE_NUMBER = "lineNumber";
     private final InvoiceRepository invoiceRepository;
     private final InvoiceMapper mapper;
 
@@ -45,11 +43,11 @@ public class InvoiceService {
         invoice.setInvoiceNumber(nextInvoiceNumber);
         //this is a little hack to get around functional requiring final objects.
         Map<String, Integer> lineMap = new HashMap<>();
-        lineMap.put("lineNumber", 1);
+        lineMap.put(LINE_NUMBER, 1);
         invoice.getLineItems().forEach(line -> {
             line.setInvoice(invoice);
-            line.setLineNumber(lineMap.get("lineNumber"));
-            lineMap.put("lineNumber", lineMap.get("lineNumber")+1);
+            line.setLineNumber(lineMap.get(LINE_NUMBER));
+            lineMap.put(LINE_NUMBER, lineMap.get(LINE_NUMBER) + 1);
         });
 
         return mapper.fromEntity(invoiceRepository.saveAndFlush(invoice));
@@ -83,12 +81,23 @@ public class InvoiceService {
                                               LocalDate endDate,
                                               AuthenticatedUser authenticatedUser,
                                               String requestIP) {
-        log.info("Finding {} invoices for {} between {} and {} ", invoiceType, referenceId, startDate, endDate);
+        log.info("Finding {} invoices for {} between {} and {} from requestIP {}",
+                invoiceType, referenceId, startDate, endDate, requestIP);
         return invoiceRepository.findInvoices(invoiceType, referenceId,
                 OffsetDateTime.of(startDate.atTime(0,0,0), ZoneOffset.UTC),
                 OffsetDateTime.of(endDate.atTime(23,59,59), ZoneOffset.UTC))
                 .stream()
                 .map(mapper::fromEntity)
                 .toList();
+    }
+
+    public Optional<InvoiceResponse> findUnpaidInvoice(@NotNull @NonNull UUID referenceId,
+                                                       @NotNull @NonNull AuthenticatedUser authenticatedUser,
+                                                       @NotNull @NonNull String requestIP) {
+        log.info("Finding most recent unpaid invoice for {} from requestIp {}", referenceId, requestIP);
+        return invoiceRepository.findUnpaidInvoices(String.valueOf(referenceId))
+                .stream()
+                .findFirst()
+                .map(mapper::fromEntity);
     }
 }
