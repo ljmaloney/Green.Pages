@@ -8,7 +8,7 @@ import java.util.UUID;
 public record ApiPaymentRequest(@NotNull @NonNull UUID referenceId,
                                 @NotNull @NonNull String paymentToken,
                                 String verificationToken,
-                                @NotBlank String emailValidationToken,
+                                String emailValidationToken,
                                 String companyName,
                                 @Pattern(regexp = "^[\\p{Alpha} ]*$", message = "First Name should contain only alphabets and space")
                                 @Pattern(regexp = "^[A-Za-z\\s\\-.']+$", message = "First Name should contain only alphabets, spaces, or hyphens")

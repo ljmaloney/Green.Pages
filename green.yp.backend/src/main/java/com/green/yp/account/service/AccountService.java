@@ -31,8 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 /**
- * Account Orchestration service used to 1. Create the account 2. Cancel the account 3. Apply
- * initial payment to make the account "live"
+ * Account Orchestration service used to
+ * 1. Create the account
+ * 2. Cancel the account
+ * 3. Apply initial payment to make the account "live"
  */
 public class AccountService {
 

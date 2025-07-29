@@ -19,7 +19,7 @@ public record ProducerResponse(
     @NotNull @NonNull String businessName,
     OffsetDateTime cancelDate,
     OffsetDateTime lastBillDate,
-    OffsetDateTime getLastBillPaidDate,
+    OffsetDateTime lastBillPaidDate,
     UUID lineOfBusinessId,
     @NotNull @NonNull ProducerSubscriptionType subscriptionType,
     InvoiceCycleType invoiceCycleType,

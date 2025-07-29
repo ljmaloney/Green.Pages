@@ -92,11 +92,11 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <#list invoice.lineItems as item>
+                            <#list invoiceLineItems as item>
                                 <tr>
-                                    <td>${item.lineNumber}</td>
-                                    <td>${item.description}</td>
-                                    <td>$${item.amount?string["#,##0.00"]}</td>
+                                    <td>${item.lineNumber()}</td>
+                                    <td>${item.description()}</td>
+                                    <td>$${item.amount()?string["#,##0.00"]}</td>
                                 </tr>
                             </#list>
                             </tbody>

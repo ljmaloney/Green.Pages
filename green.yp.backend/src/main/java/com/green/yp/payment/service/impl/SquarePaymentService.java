@@ -53,6 +53,7 @@ public class SquarePaymentService implements PaymentService {
             .idempotencyKey(paymentTransactionId.toString())
             .autocomplete(true)
             .referenceId(paymentRequest.referenceId())
+//            .verificationToken(Optional.ofNullable(paymentRequest.verificationToken()))
             .verificationToken(
                 cardOnFile ? Optional.empty() : Optional.ofNullable(paymentRequest.verificationToken()))
             .note(paymentRequest.note())
@@ -212,7 +213,7 @@ public class SquarePaymentService implements PaymentService {
             .verificationToken(methodRequest.verificationToken())
             .build();
 
-    log.info("Square request data :  {}", squareCard);
+    log.debug("Square request data :  {}", squareCard);
 
     var squareCardResponse = squareClient.cards().create(squareCard);
 

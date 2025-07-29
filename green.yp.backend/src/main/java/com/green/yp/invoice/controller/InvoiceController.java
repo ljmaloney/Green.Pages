@@ -2,6 +2,7 @@ package com.green.yp.invoice.controller;
 
 import com.green.yp.api.apitype.invoice.InvoiceResponse;
 import com.green.yp.api.apitype.invoice.InvoiceType;
+import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.config.security.AuthUser;
 import com.green.yp.config.security.AuthenticatedUser;
 import com.green.yp.invoice.service.InvoiceService;
@@ -15,7 +16,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,13 +38,13 @@ public class InvoiceController {
     @ApiResponse(responseCode = "200", description = "Producer/Subscriber contact")
     @ApiResponse(responseCode = "404", description = "Contact not found")
     @IsSubscriberAdminOrAdmin
-    @GetMapping(path = "producer/{producerId}search", produces= MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<InvoiceResponse>> findProducerInvoices(@PathVariable("producerId") String producerId,
-                                                                      @RequestParam("startDate") String startDate,
-                                                                      @RequestParam("endDate") String endDate,
-                                                                      @AuthUser AuthenticatedUser authenticatedUser,
-                                                                      HttpServletRequest request) throws Exception {
-        return new ResponseEntity<>(invoiceService.findInvoices(InvoiceType.SUBSCRIPTION, producerId,
+    @GetMapping(path = "producer/{producerId}/search", produces= MediaType.APPLICATION_JSON_VALUE)
+    public ResponseApi<List<InvoiceResponse>> findProducerInvoices(@PathVariable("producerId") String producerId,
+                                                                   @RequestParam("startDate") String startDate,
+                                                                   @RequestParam("endDate") String endDate,
+                                                                   @AuthUser AuthenticatedUser authenticatedUser,
+                                                                   HttpServletRequest request) throws Exception {
+        return new ResponseApi<>(invoiceService.findInvoices(InvoiceType.SUBSCRIPTION, producerId,
                 DateUtils.parseDate(startDate, LocalDate.class),
                 DateUtils.parseDate(endDate, LocalDate.class), authenticatedUser, RequestUtil.getRequestIP(request)), null);
     }
@@ -54,11 +54,11 @@ public class InvoiceController {
     @ApiResponse(responseCode = "404", description = "Contact not found")
     @IsAdmin
     @GetMapping(path = "classifieds/search", produces= MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<InvoiceResponse>> findClassifiedInvoices(@RequestParam("startDate") String startDate,
+    public ResponseApi<List<InvoiceResponse>> findClassifiedInvoices(@RequestParam("startDate") String startDate,
                                                                         @RequestParam("endDate") String endDate,
                                                                       @AuthUser AuthenticatedUser authenticatedUser,
-                                                                      HttpServletRequest request) throws Exception {
-        return new ResponseEntity<>(invoiceService.findInvoices(InvoiceType.CLASSIFIED, null,
+                                                                      HttpServletRequest request) {
+        return new ResponseApi<>(invoiceService.findInvoices(InvoiceType.CLASSIFIED, null,
                 DateUtils.parseDate(startDate, LocalDate.class),
                 DateUtils.parseDate(endDate, LocalDate.class),
                 authenticatedUser, RequestUtil.getRequestIP(request)), null);

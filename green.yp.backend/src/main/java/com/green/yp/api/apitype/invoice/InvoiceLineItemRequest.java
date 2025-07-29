@@ -8,4 +8,5 @@ public record InvoiceLineItemRequest(int lineItemNumber,
                                      String externalRef1,
                                      String externalRef2,
                                      String description,
+                                     Integer quantity,
                                      BigDecimal amount) {}

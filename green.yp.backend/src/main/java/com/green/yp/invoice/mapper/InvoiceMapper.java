@@ -28,6 +28,4 @@ public interface InvoiceMapper {
     @Mapping(target = "lineItemId", source="id")
     InvoiceLineItemResponse fromEntity(InvoiceLineItem lineItem);
     List<InvoiceLineItemResponse> fromEntity(List<InvoiceLineItem> lineItems);
-
-    InvoiceResponse toResponse(InvoiceResponse invoiceResponse);
 }

@@ -2,6 +2,7 @@ package com.green.yp.api.contract;
 
 import com.green.yp.api.apitype.producer.*;
 import com.green.yp.api.apitype.producer.enumeration.ProducerSubscriptionType;
+import com.green.yp.config.security.AuthenticatedUser;
 import com.green.yp.producer.data.model.ProducerUserCredentials;
 import com.green.yp.producer.service.ProducerLocationService;
 import com.green.yp.producer.service.ProducerOrchestrationService;
@@ -143,5 +144,13 @@ public class ProducerContract {
 
   public Optional<ProducerCredentialsResponse> findCredentialByRef(String externalUserRef, String ipAddress) {
     return producerUserService.findCredentialByRef(externalUserRef, ipAddress);
+  }
+
+  public ProducerResponse updatePaidDates(UUID accountId,
+                              OffsetDateTime lastInvoiceDate,
+                              OffsetDateTime subscriptionPaidDate,
+                              String userId,
+                              String ipAddress) {
+    return producerService.updateBillPaidDate(accountId, lastInvoiceDate, subscriptionPaidDate, userId, ipAddress);
   }
 }
