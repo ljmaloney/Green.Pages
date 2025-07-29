@@ -174,7 +174,7 @@ public class AccountPaymentService {
     var methodResponse = paymentContract.replaceCardOnFile(
         paymentRequest, authenticatedUser, createNew, requestIP);
 
-    if ( producer.getLastBillPaidDate() == null ) {
+    if ( producer.lastBillPaidDate() == null ) {
       var unpaidInvoice = invoiceContract.findUnpaidInvoice(paymentRequest.referenceId(), authenticatedUser, requestIP)
               .orElseGet( () -> createInvoiceForPayment(paymentRequest, producer));
 
