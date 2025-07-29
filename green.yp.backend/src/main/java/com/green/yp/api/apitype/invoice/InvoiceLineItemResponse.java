@@ -10,4 +10,14 @@ public record InvoiceLineItemResponse(UUID lineItemId,
                                       Integer lineNumber,
                                       Integer quantity,
                                       String description,
-                                      BigDecimal amount) {}
+                                      BigDecimal amount) {
+    public Integer getLineNumber(){
+        return lineNumber;
+    }
+    public String getDescription(){
+        return description;
+    }
+    public BigDecimal getAmount(){
+        return amount;
+    }
+}
