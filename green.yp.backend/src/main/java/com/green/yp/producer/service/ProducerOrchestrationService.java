@@ -238,7 +238,7 @@ public class ProducerOrchestrationService {
       OffsetDateTime subscriptionPaidDate,
       String userId,
       String ipAddress) {
-
+    log.info("Making producer {} active by user {} from ipAddress {}", producerId, userId, ipAddress);
     Producer producer =
         producerRepository
             .findById(producerId)
@@ -270,6 +270,27 @@ public class ProducerOrchestrationService {
         .stream()
         .map(producerMapper::fromEntity)
         .toList();
+  }
+
+  public ProducerResponse updateBillPaidDate(@NonNull @NotNull UUID producerId,
+                                             @NonNull @NotNull OffsetDateTime lastInvoiceDate,
+                                             @NonNull @NotNull OffsetDateTime subscriptionPaidDate,
+                                             @NonNull @NotNull String userId,
+                                             @NonNull @NotNull String ipAddress) {
+    log.info("Updating bill paid date for {} by user {} from ip address {}", producerId, userId, ipAddress);
+    Producer producer =
+            producerRepository
+                    .findById(producerId)
+                    .orElseThrow(() -> new NotFoundException(PRODUCER_ID, producerId));
+
+    producer.setCancelDate(null);
+    producer.setSubscriptionType(ProducerSubscriptionType.LIVE_ACTIVE);
+    producer.setLastBillDate(lastInvoiceDate);
+    producer.setLastBillPaidDate(subscriptionPaidDate);
+
+    producerRepository.saveAndFlush(producer);
+
+    return findProducer(producerId);
   }
 
   @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
