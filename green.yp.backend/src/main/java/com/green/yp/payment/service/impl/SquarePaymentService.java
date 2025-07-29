@@ -212,7 +212,7 @@ public class SquarePaymentService implements PaymentService {
             .verificationToken(methodRequest.verificationToken())
             .build();
 
-    log.info("Square request data :  {}", squareCard);
+    log.debug("Square request data :  {}", squareCard);
 
     var squareCardResponse = squareClient.cards().create(squareCard);
 
