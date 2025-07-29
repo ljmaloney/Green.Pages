@@ -12,6 +12,7 @@ import com.green.yp.api.apitype.producer.enumeration.ProducerSubscriptionType;
 import com.green.yp.api.contract.*;
 import com.green.yp.config.security.AuthenticatedUser;
 import com.green.yp.email.service.EmailService;
+import com.green.yp.exception.PaymentFailedException;
 import com.green.yp.exception.PreconditionFailedException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -182,6 +183,14 @@ public class AccountPaymentService {
                       paymentMapper.toPaymentRequest(paymentRequest, methodResponse, unpaidInvoice),
                       Optional.of(methodResponse.externCustRef()),
                       true);
+
+      if ( !"COMPLETED".equals(completedPayment.status()) ) {
+        log.warn("Payment method saved for {} but outstanding invoice could not be paid due to {} - {}",
+                paymentRequest.referenceId(),
+                completedPayment.errorStatusCode(),
+                completedPayment.errorDetail());
+        throw new PaymentFailedException(completedPayment.errorStatusCode(), completedPayment.errorDetail());
+      }
 
       invoiceContract.updatePayment(unpaidInvoice.invoiceId(), completedPayment);
 

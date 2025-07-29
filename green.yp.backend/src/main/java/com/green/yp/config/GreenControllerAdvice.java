@@ -2,10 +2,7 @@ package com.green.yp.config;
 
 import com.green.yp.common.dto.ErrorMessageApi;
 import com.green.yp.common.dto.ResponseApi;
-import com.green.yp.exception.ErrorCodeType;
-import com.green.yp.exception.NotFoundException;
-import com.green.yp.exception.PreconditionFailedException;
-import com.green.yp.exception.UserCredentialsException;
+import com.green.yp.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +46,18 @@ public class GreenControllerAdvice {
             ErrorCodeType.PAYLOAD_VALIDATION,
             "One or more validation rules on the request failed.",
             e.getMessage()));
+  }
+
+  @ExceptionHandler(PaymentFailedException.class)
+  @ResponseStatus(HttpStatus.PRECONDITION_FAILED)
+  public ResponseApi<Void> handlePaymentException(PaymentFailedException e){
+    log.warn("A validation constraint on a payload was violated - {}", e.getMessage(), e);
+    return new ResponseApi<>(
+            null,
+            new ErrorMessageApi(
+                    e.getErrorCode(),
+                    "Error processing your payment request.",
+                    e.getMessage()));
   }
 
   @ExceptionHandler(NoResourceFoundException.class)
