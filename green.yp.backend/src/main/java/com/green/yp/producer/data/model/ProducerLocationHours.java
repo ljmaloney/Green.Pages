@@ -6,10 +6,12 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -39,4 +41,36 @@ public class ProducerLocationHours extends Mutable {
   @ManyToOne
   @JoinColumn(name = "producer_location_id")
   private ProducerLocation producerLocation;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    ProducerLocationHours that = (ProducerLocationHours) o;
+
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(producerId, that.producerId)
+        .append(producerLocationId, that.producerLocationId)
+        .append(dayOfWeek, that.dayOfWeek)
+        .append(openTime, that.openTime)
+        .append(closeTime, that.closeTime)
+        .append(producerLocation, that.producerLocation)
+        .isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(producerId)
+        .append(producerLocationId)
+        .append(dayOfWeek)
+        .append(openTime)
+        .append(closeTime)
+        .append(producerLocation)
+        .toHashCode();
+  }
 }

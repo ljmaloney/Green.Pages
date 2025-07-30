@@ -7,10 +7,14 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.UUID;
 import lombok.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -50,4 +54,38 @@ public class ProducerSubscription extends Mutable {
   @Enumerated(EnumType.STRING)
   @Column(name = "invoice_cycle_type", nullable = false)
   private InvoiceCycleType invoiceCycleType;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    ProducerSubscription that = (ProducerSubscription) o;
+
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(producerId, that.producerId)
+        .append(subscriptionId, that.subscriptionId)
+        .append(nextInvoiceDate, that.nextInvoiceDate)
+        .append(startDate, that.startDate)
+        .append(endDate, that.endDate)
+        .append(producer, that.producer)
+        .append(invoiceCycleType, that.invoiceCycleType)
+        .isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(producerId)
+        .append(subscriptionId)
+        .append(nextInvoiceDate)
+        .append(startDate)
+        .append(endDate)
+        .append(producer)
+        .append(invoiceCycleType)
+        .toHashCode();
+  }
 }

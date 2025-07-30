@@ -2,8 +2,6 @@ package com.green.yp.api.contract;
 
 import com.green.yp.api.apitype.producer.*;
 import com.green.yp.api.apitype.producer.enumeration.ProducerSubscriptionType;
-import com.green.yp.config.security.AuthenticatedUser;
-import com.green.yp.producer.data.model.ProducerUserCredentials;
 import com.green.yp.producer.service.ProducerLocationService;
 import com.green.yp.producer.service.ProducerOrchestrationService;
 import com.green.yp.producer.service.ProducerSubscriptionService;
@@ -123,7 +121,12 @@ public class ProducerContract {
 
   public List<ProducerResponse> findLastModified(
       Integer daysOld, ProducerSubscriptionType producerSubscriptionType) {
-    return producerService.findLastModified(daysOld, producerSubscriptionType);
+    return producerService.findLastModified(daysOld, producerSubscriptionType, -1);
+  }
+
+  public List<ProducerResponse> findLastModified(
+          Integer daysOld, ProducerSubscriptionType producerSubscriptionType, int maxRecords) {
+    return producerService.findLastModified(daysOld, producerSubscriptionType, maxRecords);
   }
 
   public void deleteCredentials(List<UUID> producerIdList) {

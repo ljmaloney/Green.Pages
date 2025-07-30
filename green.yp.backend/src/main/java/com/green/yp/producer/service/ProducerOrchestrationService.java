@@ -26,8 +26,10 @@ import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
+
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Limit;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -39,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProducerOrchestrationService {
 
   private static final String PRODUCER_ID = "ProducerId";
+  private static final long MONTH_INCREMENT = 1L;
 
   final LineOfBusinessContract lobContract;
 
@@ -104,7 +107,7 @@ public class ProducerOrchestrationService {
       actionType = AuditActionType.UPDATE)
   public ProducerResponse updateProducer(ProducerRequest producerUpdate) {
     log.info(
-        "Updating producer %s identified by %s",
+        "Updating producer {} identified by {}",
         producerUpdate.businessName(), producerUpdate.producerId());
 
     Producer producer =
@@ -258,13 +261,23 @@ public class ProducerOrchestrationService {
     producer.setCancelDate(null);
     producer.setLastBillDate(lastInvoiceDate);
     producer.setLastBillPaidDate(subscriptionPaidDate);
+    producer.getSubscriptionList()
+            .forEach(subscription -> {
+              subscription.setNextInvoiceDate(lastInvoiceDate.plusMonths(MONTH_INCREMENT).toLocalDate());
+              subscription.setEndDate(null);
+            });
+
     producerRepository.saveAndFlush(producer);
 
     return findProducer(producerId);
   }
 
   public List<ProducerResponse> findLastModified(
-      Integer daysOld, ProducerSubscriptionType producerSubscriptionType) {
+          Integer daysOld, ProducerSubscriptionType producerSubscriptionType, int maxRecords) {
+    if ( maxRecords > 0 ){
+      return producerRepository.findByLastUpdateDateBeforeAndSubscriptionType(OffsetDateTime.now().minusDays(daysOld), producerSubscriptionType, Limit.of(maxRecords))
+              .stream().map(producerMapper::fromEntity).toList();
+    }
     return producerRepository
         .findLastModified(OffsetDateTime.now().minusDays(daysOld), producerSubscriptionType)
         .stream()
@@ -287,6 +300,11 @@ public class ProducerOrchestrationService {
     producer.setSubscriptionType(ProducerSubscriptionType.LIVE_ACTIVE);
     producer.setLastBillDate(lastInvoiceDate);
     producer.setLastBillPaidDate(subscriptionPaidDate);
+    producer.getSubscriptionList()
+            .forEach( subscription ->{
+                      subscription.setNextInvoiceDate(lastInvoiceDate.plusMinutes(MONTH_INCREMENT).toLocalDate());
+                      subscription.setEndDate(null);
+                    });
 
     producerRepository.saveAndFlush(producer);
 

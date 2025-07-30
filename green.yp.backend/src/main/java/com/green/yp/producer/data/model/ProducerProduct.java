@@ -11,10 +11,12 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.UUID;
 import lombok.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -78,10 +80,58 @@ public class ProducerProduct extends Mutable {
   }
 
   public void setDiscontinued(Boolean disc) {
-    this.discontinued  = Boolean.valueOf(disc);
-    if ( !discontinued ) {
+    this.discontinued = disc;
+    if (!discontinued) {
       this.setDiscontinueDate(null);
       this.setLastOrderDate(null);
     }
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    ProducerProduct that = (ProducerProduct) o;
+
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(producerId, that.producerId)
+        .append(producerLocationId, that.producerLocationId)
+        .append(productType, that.productType)
+        .append(botanicalGroup, that.botanicalGroup)
+        .append(name, that.name)
+        .append(price, that.price)
+        .append(availableQuantity, that.availableQuantity)
+        .append(containerSize, that.containerSize)
+        .append(discontinued, that.discontinued)
+        .append(discontinueDate, that.discontinueDate)
+        .append(lastOrderDate, that.lastOrderDate)
+        .append(description, that.description)
+        .append(attributes, that.attributes)
+        .append(productImage, that.productImage)
+        .isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(producerId)
+        .append(producerLocationId)
+        .append(productType)
+        .append(botanicalGroup)
+        .append(name)
+        .append(price)
+        .append(availableQuantity)
+        .append(containerSize)
+        .append(discontinued)
+        .append(discontinueDate)
+        .append(lastOrderDate)
+        .append(description)
+        .append(attributes)
+        .append(productImage)
+        .toHashCode();
   }
 }

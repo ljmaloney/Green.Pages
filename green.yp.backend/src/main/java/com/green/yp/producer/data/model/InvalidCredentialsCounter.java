@@ -5,10 +5,12 @@ import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
-@Data
-@EqualsAndHashCode
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -45,4 +47,34 @@ public class InvalidCredentialsCounter {
   @NotNull
   @Column(name = "user_credentials_id", updatable = false)
   private UUID userCredentialsId;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    InvalidCredentialsCounter that = (InvalidCredentialsCounter) o;
+
+    return new EqualsBuilder()
+        .append(id, that.id)
+        .append(createdDate, that.createdDate)
+        .append(userId, that.userId)
+        .append(badCreds, that.badCreds)
+        .append(ipAddress, that.ipAddress)
+        .append(userCredentialsId, that.userCredentialsId)
+        .isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .append(id)
+        .append(createdDate)
+        .append(userId)
+        .append(badCreds)
+        .append(ipAddress)
+        .append(userCredentialsId)
+        .toHashCode();
+  }
 }

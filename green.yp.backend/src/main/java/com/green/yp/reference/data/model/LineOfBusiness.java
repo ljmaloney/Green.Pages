@@ -5,10 +5,12 @@ import com.green.yp.common.data.embedded.Mutable;
 import com.green.yp.reference.data.enumeration.LineOfBusinessCreateType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -40,4 +42,40 @@ public class LineOfBusiness extends Mutable {
 
   @Column(name = "short_description", length = 200)
   private String shortDescription;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    LineOfBusiness that = (LineOfBusiness) o;
+
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(lineOfBusinessName, that.lineOfBusinessName)
+        .append(createType, that.createType)
+        .append(createByReference, that.createByReference)
+        .append(description, that.description)
+        .append(enableDistanceRadius, that.enableDistanceRadius)
+        .append(iconName, that.iconName)
+        .append(iconFileName, that.iconFileName)
+        .append(shortDescription, that.shortDescription)
+        .isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(lineOfBusinessName)
+        .append(createType)
+        .append(createByReference)
+        .append(description)
+        .append(enableDistanceRadius)
+        .append(iconName)
+        .append(iconFileName)
+        .append(shortDescription)
+        .toHashCode();
+  }
 }

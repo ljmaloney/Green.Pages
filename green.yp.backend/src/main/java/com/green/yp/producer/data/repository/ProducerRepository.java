@@ -7,6 +7,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.NonNull;
+import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -18,7 +19,7 @@ public interface ProducerRepository extends JpaRepository<Producer, UUID> {
                     Select producer
                     From Producer producer
                     Where producer.websiteUrl like %:hostname%
-                              """)
+                  """)
   List<Producer> findByHostname(@NotNull @NonNull @Param("hostname") String hostname);
 
   @Query(
@@ -41,4 +42,8 @@ public interface ProducerRepository extends JpaRepository<Producer, UUID> {
       @NotNull @NonNull @Param("producerIds") List<UUID> producerIds,
       @NotNull @NonNull @Param("producerSubscriptionType")
           ProducerSubscriptionType producerSubscriptionType);
+
+  List<Producer> findByLastUpdateDateBeforeAndSubscriptionType(OffsetDateTime offsetDateTime,
+                                                               ProducerSubscriptionType producerSubscriptionType,
+                                                               Limit of);
 }

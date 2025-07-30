@@ -3,10 +3,12 @@ package com.green.yp.producer.data.model;
 import jakarta.persistence.*;
 import java.util.UUID;
 import lombok.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-@Data
+@Getter
+@Setter
 @Entity
-@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -28,4 +30,30 @@ public class ProducerLineOfBusiness {
   @ManyToOne
   @JoinColumn(name = "producer_id", insertable = false, updatable = false)
   private Producer producer;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    ProducerLineOfBusiness that = (ProducerLineOfBusiness) o;
+
+    return new EqualsBuilder()
+        .append(producerId, that.producerId)
+        .append(lineOfBusinessId, that.lineOfBusinessId)
+        .append(primaryLob, that.primaryLob)
+        .append(producer, that.producer)
+        .isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .append(producerId)
+        .append(lineOfBusinessId)
+        .append(primaryLob)
+        .append(producer)
+        .toHashCode();
+  }
 }

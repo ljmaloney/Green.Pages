@@ -4,14 +4,15 @@ import com.green.yp.common.data.converter.BooleanConverter;
 import com.green.yp.common.data.converter.JsonMapConverter;
 import com.green.yp.common.data.embedded.Mutable;
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDate;
 import java.util.Map;
+import lombok.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -26,20 +27,20 @@ public class SubscriptionFeature extends Mutable {
   @Temporal(TemporalType.DATE)
   private LocalDate endDate;
 
-  @Column(name="feature")
+  @Column(name = "feature")
   private String feature;
 
-  @Column(name="sort_order")
+  @Column(name = "sort_order")
   private Integer sortOrder;
 
-  @Column(name="display")
+  @Column(name = "display")
   @Convert(converter = BooleanConverter.class)
   private Boolean display;
 
   @Column(name = "feature_name")
   private String featureName;
 
-  @Column(name="config")
+  @Column(name = "config")
   @Convert(converter = JsonMapConverter.class)
   private Map<String, Object> configMap;
 
@@ -55,18 +56,54 @@ public class SubscriptionFeature extends Mutable {
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    SubscriptionFeature that = (SubscriptionFeature) o;
+
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(startDate, that.startDate)
+        .append(endDate, that.endDate)
+        .append(feature, that.feature)
+        .append(sortOrder, that.sortOrder)
+        .append(display, that.display)
+        .append(featureName, that.featureName)
+        .append(configMap, that.configMap)
+        .append(subscription, that.subscription)
+        .isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(startDate)
+        .append(endDate)
+        .append(feature)
+        .append(sortOrder)
+        .append(display)
+        .append(featureName)
+        .append(configMap)
+        .append(subscription)
+        .toHashCode();
+  }
+
+  @Override
   public String toString() {
-    return "SubscriptionFeature [" +
-           "id:" +
-           getId().toString() +
-           ", subscriptionId:" +
-           subscription.getId() +
-           ", startDate:" +
-           startDate +
-           ", endDate:" +
-           endDate +
-           ", featureName:" +
-           featureName +
-           "]";
+    return "SubscriptionFeature ["
+        + "id:"
+        + getId().toString()
+        + ", subscriptionId:"
+        + subscription.getId()
+        + ", startDate:"
+        + startDate
+        + ", endDate:"
+        + endDate
+        + ", featureName:"
+        + featureName
+        + "]";
   }
 }

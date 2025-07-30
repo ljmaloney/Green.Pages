@@ -8,10 +8,12 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -67,5 +69,47 @@ public class Producer extends Mutable {
       subscriptionList = new ArrayList<>();
     }
     subscriptionList.add(subscription);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    Producer producer = (Producer) o;
+
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(name, producer.name)
+        .append(subscriptionType, producer.subscriptionType)
+        .append(cancelDate, producer.cancelDate)
+        .append(lastBillDate, producer.lastBillDate)
+        .append(lastBillPaidDate, producer.lastBillPaidDate)
+        .append(hasImagesUploaded, producer.hasImagesUploaded)
+        .append(websiteUrl, producer.websiteUrl)
+        .append(iconLink, producer.iconLink)
+        .append(narrative, producer.narrative)
+        .append(linesOfBusiness, producer.linesOfBusiness)
+        .append(subscriptionList, producer.subscriptionList)
+        .isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(name)
+        .append(subscriptionType)
+        .append(cancelDate)
+        .append(lastBillDate)
+        .append(lastBillPaidDate)
+        .append(hasImagesUploaded)
+        .append(websiteUrl)
+        .append(iconLink)
+        .append(narrative)
+        .append(linesOfBusiness)
+        .append(subscriptionList)
+        .toHashCode();
   }
 }

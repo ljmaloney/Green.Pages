@@ -11,10 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -85,5 +87,55 @@ public class ProducerLocation extends Mutable {
       this.locationHours = new ArrayList<>();
     }
     this.locationHours.addAll(locationHours);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    ProducerLocation that = (ProducerLocation) o;
+
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(producerId, that.producerId)
+        .append(locationName, that.locationName)
+        .append(locationType, that.locationType)
+        .append(locationDisplayType, that.locationDisplayType)
+        .append(active, that.active)
+        .append(addressLine1, that.addressLine1)
+        .append(addressLine2, that.addressLine2)
+        .append(addressLine3, that.addressLine3)
+        .append(city, that.city)
+        .append(state, that.state)
+        .append(postalCode, that.postalCode)
+        .append(latitude, that.latitude)
+        .append(longitude, that.longitude)
+        .append(websiteUrl, that.websiteUrl)
+        .append(locationHours, that.locationHours)
+        .isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(producerId)
+        .append(locationName)
+        .append(locationType)
+        .append(locationDisplayType)
+        .append(active)
+        .append(addressLine1)
+        .append(addressLine2)
+        .append(addressLine3)
+        .append(city)
+        .append(state)
+        .append(postalCode)
+        .append(latitude)
+        .append(longitude)
+        .append(websiteUrl)
+        .append(locationHours)
+        .toHashCode();
   }
 }

@@ -14,6 +14,7 @@ import com.green.yp.config.security.AuthenticatedUser;
 import com.green.yp.email.service.EmailService;
 import com.green.yp.exception.PaymentFailedException;
 import com.green.yp.exception.PreconditionFailedException;
+import com.green.yp.util.RequestUtil;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -22,6 +23,7 @@ import java.util.*;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -73,9 +75,9 @@ public class AccountPaymentService {
   /**
    * Applies the first subscription payment and makes the account go "live".
    *
-   * @param paymentRequest
-   * @param requestIP
-   * @return
+   * @param paymentRequest - the normalized payment/biiling data DTO
+   * @param requestIP - IP address
+   * @return The saved payment data
    */
   @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
   public ApiPaymentResponse applyInitialPayment(
@@ -205,6 +207,19 @@ public class AccountPaymentService {
     return methodResponse;
   }
 
+  @Async
+  public void cleanAbandonedAccounts(int daysOld){
+    log.info("Removing unpaid (abandoned signup) account records and credentials");
+
+    List<ProducerResponse> producers = producerContract.findLastModified(daysOld, ProducerSubscriptionType.LIVE_UNPAID, 5);
+    while( CollectionUtils.isNotEmpty(producers)) {
+      List<UUID> producerIds = producers.stream().map(ProducerResponse::producerId).toList();
+      cleanupAbandonedProducers(RequestUtil.getRequestIP(), producerIds);
+      producers = producerContract.findLastModified(daysOld, ProducerSubscriptionType.LIVE_UNPAID, 5);
+    }
+    log.info("Removed unpaid (abandoned signup) account records and credentials");
+  }
+
   /**
    * The purpose of this method is to clean up records corresponding to any subscriptions started
    * but never finished or made active.
@@ -213,8 +228,8 @@ public class AccountPaymentService {
    * @return
    */
   @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-  public String cleanUnpaidAccounts(@NotNull @NonNull Integer daysOld, String ipAddress) {
-    log.info("Removing unpaid account records and credentials");
+  public String cleanAbandonedAccounts(@NotNull @NonNull Integer daysOld, String ipAddress) {
+    log.info("Removing unpaid (abandoned signup) account records and credentials");
 
     List<ProducerResponse> producers =
         producerContract.findLastModified(daysOld, ProducerSubscriptionType.LIVE_UNPAID);
@@ -223,24 +238,28 @@ public class AccountPaymentService {
     }
     List<UUID> producerIds = producers.stream().map(ProducerResponse::producerId).toList();
 
-    paymentContract.disablePaymentMethod(producerIds);
-
-    producerContract.deleteCredentials(producerIds);
-    log.info("Removed / deleted credentials for {}", producers);
-
-    contactContract.deleteContacts(producerIds);
-    log.info("Removed / deleted contacts for {}", producers);
-
-    locationContract.deleteLocation(producerIds);
-    log.info("Removed / deleted locations for {}", producers);
-
-    producerContract.deleteProducers(producerIds, ipAddress);
-    log.info("Removed / deleted producer records for {}", producers);
-
-    log.info("Removed {} unpaid account subscriptions", producers.size());
+    cleanupAbandonedProducers(ipAddress, producerIds);
 
     return String.format(
         "Removed %s unpaid account subscriptions over %s days old", producerIds.size(), daysOld);
+  }
+
+  private void cleanupAbandonedProducers(String ipAddress, List<UUID> producerIds) {
+    paymentContract.disablePaymentMethod(producerIds);
+
+    producerContract.deleteCredentials(producerIds);
+    log.info("Removed / deleted credentials for {}", producerIds);
+
+    contactContract.deleteContacts(producerIds);
+    log.info("Removed / deleted contacts for {}", producerIds);
+
+    locationContract.deleteLocation(producerIds);
+    log.info("Removed / deleted locations for {}", producerIds);
+
+    producerContract.deleteProducers(producerIds, ipAddress);
+    log.info("Removed / deleted producer records for {}", producerIds);
+
+    log.info("Removed {} unpaid account subscriptions", producerIds.size());
   }
 
   private InvoiceResponse createInvoiceForPayment(
