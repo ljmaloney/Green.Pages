@@ -76,4 +76,10 @@ public class ProducerProduct extends Mutable {
   public boolean isDiscontinued() {
     return Boolean.TRUE.equals(discontinued);
   }
+
+  public void setDiscontinued(Boolean discontinued) {
+    this.setDiscontinued(discontinued);
+    this.setDiscontinueDate(null);
+    this.setLastOrderDate(null);
+  }
 }

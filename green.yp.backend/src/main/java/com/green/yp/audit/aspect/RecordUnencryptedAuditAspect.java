@@ -2,6 +2,8 @@ package com.green.yp.audit.aspect;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.green.yp.api.AuditRequest;
 import com.green.yp.api.contract.ProducerAuditContract;
 import com.green.yp.exception.SystemException;
@@ -60,13 +62,14 @@ public class RecordUnencryptedAuditAspect {
     }
 
     try {
+      ObjectMapper mapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
       auditContract.createAuditRecord(
           annotation.objectType(),
           annotation.actionType(),
           StringUtils.isNotBlank(userId) ? userId : ipAddress,
           ipAddress,
           requestPayload != null ? requestPayload.getClass().getSimpleName() : "",
-          requestPayload != null ? new ObjectMapper().writeValueAsString(requestPayload) : null);
+          requestPayload != null ? mapper.writeValueAsString(requestPayload) : null);
     } catch (JsonProcessingException e) {
       log.error("Unexpected error serializing payload for audit contract");
       throw new SystemException("Unexpected error serializing payload for audit contract", e);
