@@ -262,7 +262,10 @@ public class ProducerOrchestrationService {
     producer.setLastBillDate(lastInvoiceDate);
     producer.setLastBillPaidDate(subscriptionPaidDate);
     producer.getSubscriptionList()
-            .forEach(subscription -> subscription.setNextInvoiceDate(lastInvoiceDate.plusMonths(MONTH_INCREMENT).toLocalDate()));
+            .forEach(subscription -> {
+              subscription.setNextInvoiceDate(lastInvoiceDate.plusMonths(MONTH_INCREMENT).toLocalDate());
+              subscription.setEndDate(null);
+            });
 
     producerRepository.saveAndFlush(producer);
 
@@ -298,8 +301,10 @@ public class ProducerOrchestrationService {
     producer.setLastBillDate(lastInvoiceDate);
     producer.setLastBillPaidDate(subscriptionPaidDate);
     producer.getSubscriptionList()
-            .forEach( subscription ->
-                    subscription.setNextInvoiceDate(lastInvoiceDate.plusMinutes(MONTH_INCREMENT).toLocalDate()));
+            .forEach( subscription ->{
+                      subscription.setNextInvoiceDate(lastInvoiceDate.plusMinutes(MONTH_INCREMENT).toLocalDate());
+                      subscription.setEndDate(null);
+                    });
 
     producerRepository.saveAndFlush(producer);
 
