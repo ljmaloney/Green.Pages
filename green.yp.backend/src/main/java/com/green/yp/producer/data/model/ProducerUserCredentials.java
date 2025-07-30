@@ -7,10 +7,12 @@ import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -65,4 +67,52 @@ public class ProducerUserCredentials extends Mutable {
   @Column(name = "reset_token_timeout")
   @Temporal(TemporalType.TIMESTAMP)
   private OffsetDateTime resetTokenTimeout;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    ProducerUserCredentials that = (ProducerUserCredentials) o;
+
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(userId, that.userId)
+        .append(emailAddress, that.emailAddress)
+        .append(producerId, that.producerId)
+        .append(producerContactId, that.producerContactId)
+        .append(externalAuthorizationServiceRef, that.externalAuthorizationServiceRef)
+        .append(registrationRef, that.registrationRef)
+        .append(firstName, that.firstName)
+        .append(lastName, that.lastName)
+        .append(password, that.password)
+        .append(enabled, that.enabled)
+        .append(lastChangeDate, that.lastChangeDate)
+        .append(adminUser, that.adminUser)
+        .append(resetToken, that.resetToken)
+        .append(resetTokenTimeout, that.resetTokenTimeout)
+        .isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(userId)
+        .append(emailAddress)
+        .append(producerId)
+        .append(producerContactId)
+        .append(externalAuthorizationServiceRef)
+        .append(registrationRef)
+        .append(firstName)
+        .append(lastName)
+        .append(password)
+        .append(enabled)
+        .append(lastChangeDate)
+        .append(adminUser)
+        .append(resetToken)
+        .append(resetTokenTimeout)
+        .toHashCode();
+  }
 }

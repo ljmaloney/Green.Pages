@@ -14,6 +14,7 @@ import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.producer.data.model.Producer;
 import com.green.yp.producer.data.model.ProducerLineOfBusiness;
+import com.green.yp.producer.data.model.ProducerSubscription;
 import com.green.yp.producer.data.record.ProducerSubscriptionRecord;
 import com.green.yp.producer.data.repository.ProducerLobRepository;
 import com.green.yp.producer.data.repository.ProducerRepository;
@@ -39,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProducerOrchestrationService {
 
   private static final String PRODUCER_ID = "ProducerId";
+  private static final long MONTH_INCREMENT = 1L;
 
   final LineOfBusinessContract lobContract;
 
@@ -258,6 +260,9 @@ public class ProducerOrchestrationService {
     producer.setCancelDate(null);
     producer.setLastBillDate(lastInvoiceDate);
     producer.setLastBillPaidDate(subscriptionPaidDate);
+    producer.getSubscriptionList()
+            .forEach(subscription -> subscription.setNextInvoiceDate(lastInvoiceDate.plusMonths(MONTH_INCREMENT).toLocalDate()));
+
     producerRepository.saveAndFlush(producer);
 
     return findProducer(producerId);
@@ -287,6 +292,9 @@ public class ProducerOrchestrationService {
     producer.setSubscriptionType(ProducerSubscriptionType.LIVE_ACTIVE);
     producer.setLastBillDate(lastInvoiceDate);
     producer.setLastBillPaidDate(subscriptionPaidDate);
+    producer.getSubscriptionList()
+            .forEach( subscription ->
+                    subscription.setNextInvoiceDate(lastInvoiceDate.plusMinutes(MONTH_INCREMENT).toLocalDate()));
 
     producerRepository.saveAndFlush(producer);
 
