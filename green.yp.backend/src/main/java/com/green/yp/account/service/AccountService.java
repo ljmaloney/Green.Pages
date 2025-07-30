@@ -230,6 +230,13 @@ public class AccountService {
     }
   }
 
+  public void processMonthlyPayment(){
+    log.info("Begin processing monthly producer / pro subscriptions");
+
+    producerContract.initalizePaymentProcessQueue();
+
+  }
+
   private ProducerCredentialsResponse createOrUpdateCredentials(
       ProducerResponse producerResponse,
       UserCredentialsRequest request,

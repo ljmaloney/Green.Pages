@@ -156,4 +156,8 @@ public class ProducerContract {
                               String ipAddress) {
     return producerService.updateBillPaidDate(accountId, lastInvoiceDate, subscriptionPaidDate, userId, ipAddress);
   }
+
+  public void initalizePaymentProcessQueue() {
+    producerService.initializePaymentProcessQueue();
+  }
 }
