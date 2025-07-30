@@ -198,7 +198,7 @@ public class AccountService {
   public AccountResponse updateAccount(
       Optional<ProducerResponse> producerOptional,
       UpdateAccountRequest account,
-      String ipAddress,
+      String userId,
       String requestIP)
       throws NoSuchAlgorithmException {
 
