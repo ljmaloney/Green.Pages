@@ -14,7 +14,6 @@ import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.producer.data.model.Producer;
 import com.green.yp.producer.data.model.ProducerLineOfBusiness;
-import com.green.yp.producer.data.model.ProducerSubscription;
 import com.green.yp.producer.data.record.ProducerSubscriptionRecord;
 import com.green.yp.producer.data.repository.ProducerLobRepository;
 import com.green.yp.producer.data.repository.ProducerRepository;
@@ -27,8 +26,10 @@ import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
+
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Limit;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -106,7 +107,7 @@ public class ProducerOrchestrationService {
       actionType = AuditActionType.UPDATE)
   public ProducerResponse updateProducer(ProducerRequest producerUpdate) {
     log.info(
-        "Updating producer %s identified by %s",
+        "Updating producer {} identified by {}",
         producerUpdate.businessName(), producerUpdate.producerId());
 
     Producer producer =
@@ -269,7 +270,11 @@ public class ProducerOrchestrationService {
   }
 
   public List<ProducerResponse> findLastModified(
-      Integer daysOld, ProducerSubscriptionType producerSubscriptionType) {
+          Integer daysOld, ProducerSubscriptionType producerSubscriptionType, int maxRecords) {
+    if ( maxRecords > 0 ){
+      return producerRepository.findByLastUpdateDateBeforeAndSubscriptionType(OffsetDateTime.now().minusDays(daysOld), producerSubscriptionType, Limit.of(maxRecords))
+              .stream().map(producerMapper::fromEntity).toList();
+    }
     return producerRepository
         .findLastModified(OffsetDateTime.now().minusDays(daysOld), producerSubscriptionType)
         .stream()

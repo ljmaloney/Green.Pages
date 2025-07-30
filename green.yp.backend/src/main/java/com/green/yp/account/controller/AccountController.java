@@ -13,6 +13,7 @@ import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.config.security.AuthUser;
 import com.green.yp.config.security.AuthenticatedUser;
 import com.green.yp.exception.SystemException;
+import com.green.yp.security.IsAdmin;
 import com.green.yp.security.IsAnyAuthenticatedUser;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +29,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -154,6 +156,7 @@ public class AccountController {
     }
   }
 
+  @IsAdmin
   @Operation(
       summary = "Removes / disables unpaid accounts",
       description =
@@ -164,7 +167,12 @@ public class AccountController {
       @Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser,
       @RequestParam(name = "days", defaultValue = "30", required = false) Integer daysOld) {
     return new ResponseApi<>(
-        paymentService.cleanUnpaidAccounts(daysOld, RequestUtil.getRequestIP()), null);
+        paymentService.cleanAbandonedAccounts(daysOld, RequestUtil.getRequestIP()), null);
+  }
+
+  @Scheduled(cron = "0 0 0,12 * * *")
+  public void cleanAbandonedAccounts(){
+    paymentService.cleanAbandonedAccounts(5);
   }
 
   @IsAnyAuthenticatedUser
