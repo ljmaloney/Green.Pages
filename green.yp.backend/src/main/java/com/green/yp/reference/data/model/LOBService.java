@@ -6,10 +6,12 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -33,4 +35,34 @@ public class LOBService extends Mutable {
 
   @Column(name = "service_description", length = 512)
   private String serviceDescription;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    LOBService that = (LOBService) o;
+
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(lineOfBusinessId, that.lineOfBusinessId)
+        .append(createdByReference, that.createdByReference)
+        .append(createdByType, that.createdByType)
+        .append(serviceName, that.serviceName)
+        .append(serviceDescription, that.serviceDescription)
+        .isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(lineOfBusinessId)
+        .append(createdByReference)
+        .append(createdByType)
+        .append(serviceName)
+        .append(serviceDescription)
+        .toHashCode();
+  }
 }
