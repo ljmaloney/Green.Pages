@@ -55,10 +55,10 @@ public class PaymentContract {
   }
 
   public Optional<PaymentMethodResponse> getPaymentMethod(@NotNull @NonNull UUID referenceId,
-                                           AuthenticatedUser authenticatedUser,
-                                           @NotNull @NonNull String requestIP) {
+                                           String authenticatedUser,
+                                           String requestIP) {
     try{
-      return Optional.of(paymentMethodService.findMethod(referenceId.toString()));
+      return Optional.of(paymentMethodService.findMethod(referenceId.toString(), authenticatedUser, requestIP));
     } catch (NotFoundException nfe){
       return Optional.empty();
     }

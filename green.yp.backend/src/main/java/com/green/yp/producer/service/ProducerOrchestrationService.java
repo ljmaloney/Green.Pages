@@ -298,11 +298,12 @@ public class ProducerOrchestrationService {
         .toList();
   }
 
+  @Transactional
   public ProducerResponse updateBillPaidDate(@NonNull @NotNull UUID producerId,
                                              @NonNull @NotNull OffsetDateTime lastInvoiceDate,
                                              @NonNull @NotNull OffsetDateTime subscriptionPaidDate,
                                              @NonNull @NotNull String userId,
-                                             @NonNull @NotNull String ipAddress) {
+                                             String ipAddress) {
     log.info("Updating bill paid date for {} by user {} from ip address {}", producerId, userId, ipAddress);
     Producer producer =
             producerRepository
@@ -356,9 +357,11 @@ public class ProducerOrchestrationService {
   public void initializePaymentProcessQueue() {
     log.debug("Initializing producer / pro subscriptions processing queue");
 
-    OffsetDateTime invoiceDate = OffsetDateTime.now().minusMonths(intervalAmount);
+    OffsetDateTime invoiceDate = OffsetDateTime.now();
     if ( "days".equalsIgnoreCase(intervalType)){
       invoiceDate = invoiceDate.minusDays(1);
+    } else {
+      invoiceDate = invoiceDate.minusMonths(intervalAmount);
     }
 
     List<UUID> subsToProcess = subProcessRepository.getProducersToProcess(invoiceDate);

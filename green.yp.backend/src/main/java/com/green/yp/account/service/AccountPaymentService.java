@@ -226,7 +226,7 @@ public class AccountPaymentService {
 
     boolean createNew =
         paymentContract
-            .getPaymentMethod(paymentRequest.referenceId(), authenticatedUser, requestIP)
+            .getPaymentMethod(paymentRequest.referenceId(), authenticatedUser.userId(), requestIP)
             .isEmpty();
 
     var methodResponse = paymentContract.replaceCardOnFile(

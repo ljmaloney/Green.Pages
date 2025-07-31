@@ -29,7 +29,9 @@ public interface ProducerSubProcessRepository extends JpaRepository<ProducerSubs
     """)
   List<UUID> getProducersToProcess(@Param("invoiceDate") OffsetDateTime invoiceDate);
 
-    void deleteByProducerId(UUID producer);
+  @Modifying
+  @Query("DELETE FROM ProducerSubscriptionProcess where producerId=:producerId")
+  void deleteByProducerId(@Param("producerId") UUID producer);
 
   @Query(
       nativeQuery = true,

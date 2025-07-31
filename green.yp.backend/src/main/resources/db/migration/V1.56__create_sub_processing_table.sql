@@ -14,7 +14,7 @@ BEGIN
         `process_step`              VARCHAR(50)         DEFAULT 'IN_PROCESS',
         PRIMARY KEY (`id`)
     ) ENGINE = InnoDB;
-    CREATE UNIQUE INDEX producer_subscription_process_idx on producer_subscription_process(`producer_id`);
+    CREATE INDEX producer_subscription_process_idx on producer_subscription_process(`producer_id`);
     SHOW WARNINGS;
 END //
 DELIMITER ;

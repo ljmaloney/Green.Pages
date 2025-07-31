@@ -19,10 +19,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -231,6 +234,8 @@ public class AccountService {
     }
   }
 
+  @Scheduled(fixedDelayString="${greenyp.classified.unpaid.clean.fixedDelay:180}",
+          timeUnit = TimeUnit.MINUTES)
   public void processMonthlyPayment(){
     log.info("Begin processing monthly producer / pro subscriptions");
 
