@@ -48,17 +48,19 @@
                         </p>
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
                             Thank you for listing your business with us. Your credit card has been charged for the
-                            amount of the subscription package.
-                            <br/>
-                            To manage your subscription, login to your account dashboard at
-                            <a href="https://www.greenyp.com/dashboard">https://www.greenyp.com/dashboard</a>.
+                            amount of the selected subscription package.
+                        </p>
+                        <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
+                            Use your green professional dashboard at <a href="https://www.greenyp.com/dashboard">https://www.greenyp.com/dashboard</a>. You
+                            can add authorized users, upgrade or downgrade your account, add services, products, and additional locations
+                            (if enabled for your account).
                         </p>
                         <table style="width: 95%; font-size: 14px; color: #6b7280; line-height: 1.4;">
                             <tr>
                                 <td colspan="2">Please note the following reference numbers for this transaction</td>
                             </tr>
                             <tr>
-                                <td style="text-align: right; width: 20%">Green Market Account ID :</td>
+                                <td style="text-align: right; width: 20%">Account ID :</td>
                                 <td style="text-align: left">${producerId}</td>
                             </tr>
                             <tr>
@@ -71,32 +73,34 @@
                             </tr>
                         </table>
                         <br/><br/>
-                        <table style="width: 95%; font-size: 14px; color: #6b7280; line-height: 1.4;">
+                        <table style="width: 95%; font-size: 12px; color: #6b7280; line-height: 1.4;">
                             <tr>
-                                <th>Invoice Number : </th><th style="text-align: left">${invoiceNumber}</th>
+                                <th style="text-align: right">Invoice Number : </th><th style="text-align: left">${invoiceNumber}</th>
                             </tr>
                             <tr>
-                                <th>Description : </th><th style="text-align: left">${invoiceDescription}</th>
+                                <th style="text-align: right">Description : </th><th style="text-align: left">${invoiceDescription}</th>
                             </tr>
                             <tr>
-                                <th>Total Amount : </th><th style="text-align: left">$${invoiceTotal?string["#,##0.00"]}</th>
+                                <th style="text-align: right">Total Amount : </th><th style="text-align: left">$${invoiceTotal?string["#,##0.00"]}</th>
                             </tr>
                         </table>
-                        <h3>Line Items</h3>
-                        <table style="width: 95%; font-size: 14px; color: #6b7280; line-height: 1.4;">
+                        <table style="width: 95%; font-size: 12px; color: #6b7280; line-height: 1.4;">
                             <thead>
                             <tr>
-                                <th>Line Number</th>
-                                <th>Description</th>
-                                <th>Amount</th>
+                                <th colspan="2" style="font-size: 14px; color: #6b7280; line-height: 1.4;">Line Items</th>
+                            </tr>
+                            <tr>
+                                <th style="text-align: left; width: 20%">Line Number</th>
+                                <th style="text-align: left">Description</th>
+                                <th style="text-align: left; width: 20%">Amount</th>
                             </tr>
                             </thead>
                             <tbody>
                             <#list invoiceLineItems as item>
                                 <tr>
-                                    <td>${item.lineNumber()}</td>
+                                    <td style="text-align: left; width: 20%">${item.lineNumber()}</td>
                                     <td>${item.description()}</td>
-                                    <td>$${item.amount()?string["#,##0.00"]}</td>
+                                    <td style="text-align: right; width: 20%">$${item.amount()?string["#,##0.00"]}</td>
                                 </tr>
                             </#list>
                             </tbody>

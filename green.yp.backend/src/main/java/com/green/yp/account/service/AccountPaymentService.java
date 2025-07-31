@@ -350,7 +350,7 @@ public class AccountPaymentService {
             .invoiceType(InvoiceType.SUBSCRIPTION)
             .description(
                 String.format(
-                    "%s : Subscription Package %s",
+                    "%s : %s",
                     producerResponse.businessName(), primarySubscription.displayName()))
             .lineItems(lineItems)
             .invoiceTotal(
@@ -380,12 +380,12 @@ public class AccountPaymentService {
           String.format(
               "%s - %s",
               subscription.invoiceCycleType().getCycleDescription(),
-              subscription.shortDescription());
+              subscription.displayName());
       case ADD_ON, LINE_OF_BUSINESS_ADD_ON ->
           String.format(
               "%s - Additional Services - %s",
               subscription.invoiceCycleType().getCycleDescription(),
-              subscription.shortDescription());
+              subscription.displayName());
     };
   }
 
