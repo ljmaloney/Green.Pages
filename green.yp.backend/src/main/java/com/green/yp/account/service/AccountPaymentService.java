@@ -26,6 +26,7 @@ import java.util.*;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -201,13 +202,13 @@ public class AccountPaymentService {
     invoiceContract.updatePayment(invoice.invoiceId(), completedPayment);
 
     producerContract.updatePaidDates(producer.producerId(),
-            invoice.createDate(), completedPayment.createDate(), "system", RequestUtil.getRequestIP());
+            invoice.createDate(), completedPayment.createDate(), "system", "system");
 
     producerContract.updateProcessStatus(
         producer.producerId(), ProducerSubProcessType.PAYMENT_SUCCESS);
 
     var primaryContact = getPrimaryContact(producer);
-    sendPaymentCompleted(RequestUtil.getRequestIP(),primaryContact,invoice, producer, completedPayment);
+    sendPaymentCompleted("system",primaryContact,invoice, producer, completedPayment);
   }
 
   public PaymentMethodResponse replacePayment(
@@ -407,6 +408,7 @@ public class AccountPaymentService {
       @NotNull ProducerResponse producerResponse,
       @NotNull PaymentTransactionResponse completedPayment) {
     try {
+      log.debug("Sending payment completed email for {}", producerResponse.producerId());
       emailService.sendEmailAsync(
               EmailTemplateType.PRODUCER_PAYMENT_CONFIRMATION,
               Collections.singletonList(primaryContact.emailAddress()),
@@ -434,7 +436,7 @@ public class AccountPaymentService {
                                         "timestamp",
                                         OffsetDateTime.now(),
                                         "ipAddress",
-                                        requestIP));
+                                        StringUtils.isNotBlank(requestIP) ? requestIP : "system"));
                 map.put("invoiceLineItems", invoice.lineItems());
                 map.put("invoiceTotal", invoice.invoiceTotal());
                 return map;
