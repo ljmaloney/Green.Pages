@@ -71,33 +71,20 @@
                         <br/><br/>
                         <table style="width: 95%; font-size: 14px; color: #6b7280; line-height: 1.4;">
                             <tr>
-                                <th>Invoice Number : </th><th style="text-align: left">${invoiceNumber}</th>
+                                <td colspan="2">Please note the following reference numbers for this transaction</td>
                             </tr>
                             <tr>
-                                <th>Description : </th><th style="text-align: left">${invoiceDescription}</th>
+                                <td style="text-align: right; width: 20%">Account ID :</td>
+                                <td style="text-align: left">${producerId}</td>
                             </tr>
                             <tr>
-                                <th>Total Amount : </th><th style="text-align: left">$${invoiceTotal?string["#,##0.00"]}</th>
+                                <td style="text-align: right; width: 20%">Transaction Ref :</td>
+                                <td style="text-align: left">${transactionRef}</td>
                             </tr>
-                        </table>
-                        <h3>Line Items</h3>
-                        <table style="width: 95%; font-size: 14px; color: #6b7280; line-height: 1.4;">
-                            <thead>
                             <tr>
-                                <th>Line Number</th>
-                                <th>Description</th>
-                                <th>Amount</th>
+                                <td style="text-align: right; width: 20%">Receipt Link :</td>
+                                <td style="text-align: left"><a href="${receiptUrl}">${receiptUrl}</a></td>
                             </tr>
-                            </thead>
-                            <tbody>
-                            <#list invoiceLineItems as item>
-                                <tr>
-                                    <td>${item.lineNumber()}</td>
-                                    <td>${item.description()}</td>
-                                    <td>$${item.amount()?string["#,##0.00"]}</td>
-                                </tr>
-                            </#list>
-                            </tbody>
                         </table>
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
                             The subscription payment was attempted at ${timestamp}.
