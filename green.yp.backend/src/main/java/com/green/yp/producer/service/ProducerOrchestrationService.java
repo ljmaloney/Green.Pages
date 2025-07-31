@@ -14,7 +14,7 @@ import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.producer.data.model.Producer;
 import com.green.yp.producer.data.model.ProducerLineOfBusiness;
-import com.green.yp.producer.data.model.ProducerSubProcessType;
+import com.green.yp.api.apitype.enumeration.ProducerSubProcessType;
 import com.green.yp.producer.data.model.ProducerSubscriptionProcess;
 import com.green.yp.producer.data.record.ProducerSubscriptionRecord;
 import com.green.yp.producer.data.repository.ProducerLobRepository;
@@ -367,9 +367,30 @@ public class ProducerOrchestrationService {
       subProcessRepository.deleteByProducerId(producer);
       subProcessRepository.saveAndFlush(ProducerSubscriptionProcess.builder()
               .producerId(producer)
-              .processStep(ProducerSubProcessType.IN_PROCESS)
+              .processStep(ProducerSubProcessType.PREPARE)
               .build());
     });
     log.debug("Initialized producer / pro subscriptions processing queue");
   }
+
+  @Transactional
+  public List<ProducerResponse> getProducersToProcess(int maxNumberToProcess) {
+    List<ProducerSubscriptionProcess> subsToProcess = subProcessRepository.findItemsToProcess(maxNumberToProcess);
+
+    List<UUID> producerIds = subsToProcess.stream()
+            .map(ProducerSubscriptionProcess::getProducerId)
+            .toList();
+
+    subProcessRepository.updateStatus(producerIds, ProducerSubProcessType.PROCESS_STARTED);
+
+    return producerIds.stream().map(this::findProducer).toList();
+
+  }
+
+  public void updateProcessStatus(@NonNull @NotNull UUID producerId, ProducerSubProcessType producerSubscriptionType) {
+    subProcessRepository.findByProducerId(producerId).ifPresent(s -> {
+      s.setProcessStep(producerSubscriptionType);
+      subProcessRepository.saveAndFlush(s);
+    });
+    }
 }

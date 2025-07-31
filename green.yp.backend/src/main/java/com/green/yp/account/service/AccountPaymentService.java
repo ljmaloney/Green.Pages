@@ -2,6 +2,7 @@ package com.green.yp.account.service;
 
 import com.green.yp.account.mapper.AccountPaymentMapper;
 import com.green.yp.api.apitype.enumeration.EmailTemplateType;
+import com.green.yp.api.apitype.enumeration.ProducerSubProcessType;
 import com.green.yp.api.apitype.invoice.*;
 import com.green.yp.api.apitype.payment.*;
 import com.green.yp.api.apitype.producer.ProducerContactResponse;
@@ -14,6 +15,7 @@ import com.green.yp.config.security.AuthenticatedUser;
 import com.green.yp.email.service.EmailService;
 import com.green.yp.exception.PaymentFailedException;
 import com.green.yp.exception.PreconditionFailedException;
+import com.green.yp.payment.data.enumeration.PaymentMethodStatusType;
 import com.green.yp.util.RequestUtil;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -105,7 +107,7 @@ public class AccountPaymentService {
           "Admin email address has not been confirmed for the account");
     }
 
-    var invoice = createInvoiceForPayment(paymentRequest, producerResponse);
+    var invoice = createInvoiceForPayment(producerResponse);
 
     var savedCustomerCard =
         paymentContract.createPaymentMethod(
@@ -154,6 +156,51 @@ public class AccountPaymentService {
         true, producerPaymentResponse.responseCode(), producerPaymentResponse.responseText());
   }
 
+  public void processSubscriptionPayment(ProducerResponse producer) {
+    log.info("Processing monthly subscription payment for {}", producer.producerId());
+
+    if ( producer.cancelDate() != null){
+      log.warn("Cannot update payment method for non-active (cancelled) producer {} cancelDate {}",
+              producer.producerId(), producer.cancelDate());
+      return;
+    }
+
+    var paymentMethod = paymentContract
+            .getPaymentMethod(producer.producerId(), null, RequestUtil.getRequestIP())
+            .filter(pm -> pm.statusType() == PaymentMethodStatusType.CCOF_CREATED)
+            .orElse(null);
+    if (paymentMethod == null) {
+      log.warn("No Saved / Active payment method found for {}", producer.producerId());
+      return;
+    }
+
+    var invoice = createInvoiceForPayment(producer);
+
+    var completedPayment =
+            paymentContract.applyPayment(
+                    paymentMapper.toPaymentRequest(producer, paymentMethod, invoice),
+                    Optional.of(paymentMethod.externCustRef()),
+                    true);
+
+    if ( !"COMPLETED".equals(completedPayment.status()) ) {
+      log.warn("Subscription payment failed for {} due to {} - {}",
+              producer.producerId(),
+              completedPayment.errorStatusCode(),
+              completedPayment.errorDetail());
+      producerContract.updateProcessStatus(
+              producer.producerId(), ProducerSubProcessType.PAYMENT_FAILED);
+      return;
+    }
+
+    invoiceContract.updatePayment(invoice.invoiceId(), completedPayment);
+
+    producerContract.updatePaidDates(producer.producerId(),
+            completedPayment.createDate(), completedPayment.createDate(), "system", RequestUtil.getRequestIP());
+
+    producerContract.updateProcessStatus(
+        producer.producerId(), ProducerSubProcessType.PAYMENT_SUCCESS);
+  }
+
   public PaymentMethodResponse replacePayment(
       @NotNull @NonNull @Valid ApiPaymentRequest paymentRequest,
       @NotNull @NonNull AuthenticatedUser authenticatedUser,
@@ -178,7 +225,7 @@ public class AccountPaymentService {
 
     if ( producer.lastBillPaidDate() == null ) {
       var unpaidInvoice = invoiceContract.findUnpaidInvoice(paymentRequest.referenceId(), authenticatedUser, requestIP)
-              .orElseGet( () -> createInvoiceForPayment(paymentRequest, producer));
+              .orElseGet( () -> createInvoiceForPayment(producer));
 
       var completedPayment =
               paymentContract.applyPayment(
@@ -264,8 +311,7 @@ public class AccountPaymentService {
     log.info("Removed {} unpaid account subscriptions", producerIds.size());
   }
 
-  private InvoiceResponse createInvoiceForPayment(
-      ApiPaymentRequest paymentRequest, ProducerResponse producerResponse) {
+  private InvoiceResponse createInvoiceForPayment(ProducerResponse producerResponse) {
     var primarySubscription =
         producerResponse.subscriptions().stream()
             .filter(sub -> sub.subscriptionType().isPrimarySubscription())
@@ -273,10 +319,10 @@ public class AccountPaymentService {
             .orElseThrow(
                 () ->
                     new PreconditionFailedException(
-                        "No primary subscription found for %s", paymentRequest.referenceId()));
+                        "No primary subscription found for %s", producerResponse.producerId()));
 
     List<InvoiceLineItemRequest> lineItems = new ArrayList<>();
-    lineItems.add(createLineItem(paymentRequest, primarySubscription, 1));
+    lineItems.add(createLineItem(producerResponse.producerId(), primarySubscription, 1));
 
     List<ProducerSubscriptionResponse> addOnSubscriptions =
         producerResponse.subscriptions().stream()
@@ -285,12 +331,12 @@ public class AccountPaymentService {
 
     lineItems.addAll(
         addOnSubscriptions.stream()
-            .map(addOn -> createLineItem(paymentRequest, addOn, 0))
+            .map(addOn -> createLineItem(producerResponse.producerId(), addOn, 0))
             .toList());
 
     return invoiceContract.createInvoice(
         InvoiceRequest.builder()
-            .externalRef(paymentRequest.referenceId().toString())
+            .externalRef(producerResponse.producerId().toString())
             .invoiceType(InvoiceType.SUBSCRIPTION)
             .description(
                 String.format(
@@ -305,11 +351,11 @@ public class AccountPaymentService {
   }
 
   private InvoiceLineItemRequest createLineItem(
-      ApiPaymentRequest paymentRequest,
+      UUID producerId,
       ProducerSubscriptionResponse subscription,
       int lineItemNumber) {
     return InvoiceLineItemRequest.builder()
-        .externalRef1(paymentRequest.referenceId().toString())
+        .externalRef1(producerId.toString())
         .externalRef2(subscription.subscriptionId().toString())
         .lineItemNumber(lineItemNumber)
         .quantity(1)

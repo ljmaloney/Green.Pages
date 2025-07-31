@@ -1,5 +1,6 @@
 package com.green.yp.api.contract;
 
+import com.green.yp.api.apitype.enumeration.ProducerSubProcessType;
 import com.green.yp.api.apitype.producer.*;
 import com.green.yp.api.apitype.producer.enumeration.ProducerSubscriptionType;
 import com.green.yp.producer.service.ProducerLocationService;
@@ -159,5 +160,13 @@ public class ProducerContract {
 
   public void initalizePaymentProcessQueue() {
     producerService.initializePaymentProcessQueue();
+  }
+
+  public List<ProducerResponse> getProducersToProcess(int maxNumberToProcess) {
+    return producerService.getProducersToProcess(maxNumberToProcess);
+  }
+
+  public void updateProcessStatus(@NonNull @NotNull UUID producerId, ProducerSubProcessType producerSubscriptionType) {
+    producerService.updateProcessStatus(producerId, producerSubscriptionType);
   }
 }

@@ -1,5 +1,6 @@
 package com.green.yp.producer.data.model;
 
+import com.green.yp.api.apitype.enumeration.ProducerSubProcessType;
 import com.green.yp.common.data.embedded.Mutable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

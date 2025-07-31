@@ -1,7 +1,8 @@
-package com.green.yp.producer.data.model;
+package com.green.yp.api.apitype.enumeration;
 
 public enum ProducerSubProcessType {
-    IN_PROCESS,
+    PREPARE,
+    PROCESS_STARTED,
     INVOICE_CREATED,
     TRANSACTION_CREATED,
     PAYMENT_SUCCESS,

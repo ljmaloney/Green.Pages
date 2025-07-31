@@ -47,24 +47,25 @@ public class AccountService {
   private final ProducerContactContract contactContract;
 
   private final ProducerLocationContract locationContract;
-
+  private final AccountPaymentService paymentService;
   private final AccountMapper accountMapper;
   private final ProducerContactContract producerContactContract;
 
   public AccountService(
-      EmailService emailService,
-      ProducerContract producerContract,
-      PaymentContract paymentContract,
-      ProducerContactContract contactContract,
-      ProducerLocationContract locationContract,
-      AccountMapper accountMapper,
-      ProducerContactContract producerContactContract) {
+          EmailService emailService,
+          ProducerContract producerContract,
+          PaymentContract paymentContract,
+          ProducerContactContract contactContract,
+          ProducerLocationContract locationContract, AccountPaymentService paymentService,
+          AccountMapper accountMapper,
+          ProducerContactContract producerContactContract) {
     this.emailService = emailService;
     this.producerContract = producerContract;
     this.paymentContract = paymentContract;
     this.contactContract = contactContract;
     this.locationContract = locationContract;
-    this.accountMapper = accountMapper;
+      this.paymentService = paymentService;
+      this.accountMapper = accountMapper;
     this.producerContactContract = producerContactContract;
   }
 
@@ -235,6 +236,13 @@ public class AccountService {
 
     producerContract.initalizePaymentProcessQueue();
 
+    List<ProducerResponse> producersToProcess = producerContract.getProducersToProcess(5);
+    while(CollectionUtils.isNotEmpty(producersToProcess)){
+
+      producersToProcess.forEach(paymentService::processSubscriptionPayment);
+
+      producersToProcess = producerContract.getProducersToProcess(5);
+    }
   }
 
   private ProducerCredentialsResponse createOrUpdateCredentials(
