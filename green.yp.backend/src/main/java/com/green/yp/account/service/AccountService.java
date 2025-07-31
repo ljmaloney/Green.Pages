@@ -19,10 +19,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -47,24 +50,25 @@ public class AccountService {
   private final ProducerContactContract contactContract;
 
   private final ProducerLocationContract locationContract;
-
+  private final AccountPaymentService paymentService;
   private final AccountMapper accountMapper;
   private final ProducerContactContract producerContactContract;
 
   public AccountService(
-      EmailService emailService,
-      ProducerContract producerContract,
-      PaymentContract paymentContract,
-      ProducerContactContract contactContract,
-      ProducerLocationContract locationContract,
-      AccountMapper accountMapper,
-      ProducerContactContract producerContactContract) {
+          EmailService emailService,
+          ProducerContract producerContract,
+          PaymentContract paymentContract,
+          ProducerContactContract contactContract,
+          ProducerLocationContract locationContract, AccountPaymentService paymentService,
+          AccountMapper accountMapper,
+          ProducerContactContract producerContactContract) {
     this.emailService = emailService;
     this.producerContract = producerContract;
     this.paymentContract = paymentContract;
     this.contactContract = contactContract;
     this.locationContract = locationContract;
-    this.accountMapper = accountMapper;
+      this.paymentService = paymentService;
+      this.accountMapper = accountMapper;
     this.producerContactContract = producerContactContract;
   }
 
@@ -230,6 +234,22 @@ public class AccountService {
     }
   }
 
+  @Scheduled(fixedDelayString="${greenyp.classified.unpaid.clean.fixedDelay:180}",
+          timeUnit = TimeUnit.MINUTES)
+  public void processMonthlyPayment(){
+    log.info("Begin processing monthly producer / pro subscriptions");
+
+    producerContract.initializePaymentProcessQueue();
+
+    List<ProducerResponse> producersToProcess = producerContract.getProducersToProcess(5);
+    while(CollectionUtils.isNotEmpty(producersToProcess)){
+
+      producersToProcess.forEach(paymentService::processSubscriptionPayment);
+
+      producersToProcess = producerContract.getProducersToProcess(5);
+    }
+  }
+
   private ProducerCredentialsResponse createOrUpdateCredentials(
       ProducerResponse producerResponse,
       UserCredentialsRequest request,
@@ -340,7 +360,6 @@ public class AccountService {
     } catch (NotFoundException pfe) {
       log.info("No Primary location found for {}", producerId);
     }
-    if (account.primaryLocation() != null) {
       LocationRequest request = account.primaryLocation();
       if (locationResponse != null) {
         if (request.locationId() != null
@@ -351,18 +370,15 @@ public class AccountService {
         request = accountMapper.copyRequest(request, locationResponse.locationId());
       }
       locationResponse = locationContract.updatePrimaryLocation(producerId, request, ipAddress);
-    }
-    return locationResponse;
+      return locationResponse;
   }
 
   private void isValidPrimaryContact(CreateAccountRequest account) {
-    if (account.primaryContact() != null) {
       if (!account.primaryContact().producerContactType().isAccountCreation()) {
         log.info(
             "Attempt to create account with invalid contact, contact must be ADMIN or PRIMARY");
         throw new PreconditionFailedException("ContactType must be one of ADMIN or PRIMARY");
       }
-    }
   }
 
   private boolean isModifyingExistingCredentials(

@@ -153,7 +153,7 @@ public class PaymentOrchestrationService {
   public void disablePaymentMethods(UUID producerId) {
     log.info("Disabling existing payment method for subscriber {}", producerId);
     try {
-      var savedMethod = methodService.findMethod(producerId.toString());
+      var savedMethod = methodService.findMethod(producerId.toString(), "system", "");
       if (savedMethod.statusType() == PaymentMethodStatusType.TEMP) {
         methodService.deleteMethod(producerId.toString());
       } else if (savedMethod.statusType() == PaymentMethodStatusType.CUSTOMER_CREATED) {

@@ -114,7 +114,7 @@ public class PaymentMethodService {
             });
   }
 
-  public PaymentMethodResponse findMethod(String referenceId) {
+  public PaymentMethodResponse findMethod(String referenceId, String authenticatedUser, String requestIP ) {
     return repository
         .findActiveMethod(
             referenceId,
@@ -135,4 +135,5 @@ public class PaymentMethodService {
     repository.deletePaymentMethodByReferenceIdAndStatusTypeEquals(
         referenceId, PaymentMethodStatusType.TEMP);
   }
+
 }

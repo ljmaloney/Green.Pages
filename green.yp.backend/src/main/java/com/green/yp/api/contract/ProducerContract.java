@@ -1,5 +1,7 @@
 package com.green.yp.api.contract;
 
+import com.green.yp.api.apitype.enumeration.CancelReasonType;
+import com.green.yp.api.apitype.enumeration.ProducerSubProcessType;
 import com.green.yp.api.apitype.producer.*;
 import com.green.yp.api.apitype.producer.enumeration.ProducerSubscriptionType;
 import com.green.yp.producer.service.ProducerLocationService;
@@ -53,6 +55,12 @@ public class ProducerContract {
 
   public void cancelSubscription(UUID accountId, String userId, String ipAddress) {
     subscriptionService.cancelSubscription(accountId, userId, ipAddress);
+  }
+
+  public void cancelSubscription(@NonNull @NotNull UUID producerId,
+                                 @NonNull @NotNull CancelReasonType cancelReasonType,
+                                 @NonNull @NotNull OffsetDateTime cancelDate, String cancelReason) {
+    subscriptionService.paymentFailedCancellation(producerId, cancelReasonType, cancelDate, cancelReason);
   }
 
   public ProducerResponse createProducer(CreateProducerRequest producer, String ipAddress) {
@@ -155,5 +163,17 @@ public class ProducerContract {
                               String userId,
                               String ipAddress) {
     return producerService.updateBillPaidDate(accountId, lastInvoiceDate, subscriptionPaidDate, userId, ipAddress);
+  }
+
+  public void initializePaymentProcessQueue() {
+    producerService.initializePaymentProcessQueue();
+  }
+
+  public List<ProducerResponse> getProducersToProcess(int maxNumberToProcess) {
+    return producerService.getProducersToProcess(maxNumberToProcess);
+  }
+
+  public void updateProcessStatus(@NonNull @NotNull UUID producerId, ProducerSubProcessType producerSubscriptionType) {
+    producerService.updateProcessStatus(producerId, producerSubscriptionType);
   }
 }
