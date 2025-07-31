@@ -234,7 +234,7 @@ public class AccountService {
   public void processMonthlyPayment(){
     log.info("Begin processing monthly producer / pro subscriptions");
 
-    producerContract.initalizePaymentProcessQueue();
+    producerContract.initializePaymentProcessQueue();
 
     List<ProducerResponse> producersToProcess = producerContract.getProducersToProcess(5);
     while(CollectionUtils.isNotEmpty(producersToProcess)){
@@ -355,7 +355,6 @@ public class AccountService {
     } catch (NotFoundException pfe) {
       log.info("No Primary location found for {}", producerId);
     }
-    if (account.primaryLocation() != null) {
       LocationRequest request = account.primaryLocation();
       if (locationResponse != null) {
         if (request.locationId() != null
@@ -366,18 +365,15 @@ public class AccountService {
         request = accountMapper.copyRequest(request, locationResponse.locationId());
       }
       locationResponse = locationContract.updatePrimaryLocation(producerId, request, ipAddress);
-    }
-    return locationResponse;
+      return locationResponse;
   }
 
   private void isValidPrimaryContact(CreateAccountRequest account) {
-    if (account.primaryContact() != null) {
       if (!account.primaryContact().producerContactType().isAccountCreation()) {
         log.info(
             "Attempt to create account with invalid contact, contact must be ADMIN or PRIMARY");
         throw new PreconditionFailedException("ContactType must be one of ADMIN or PRIMARY");
       }
-    }
   }
 
   private boolean isModifyingExistingCredentials(

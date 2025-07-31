@@ -1,6 +1,7 @@
 package com.green.yp.account.service;
 
 import com.green.yp.account.mapper.AccountPaymentMapper;
+import com.green.yp.api.apitype.enumeration.CancelReasonType;
 import com.green.yp.api.apitype.enumeration.EmailTemplateType;
 import com.green.yp.api.apitype.enumeration.ProducerSubProcessType;
 import com.green.yp.api.apitype.invoice.*;
@@ -189,6 +190,11 @@ public class AccountPaymentService {
               completedPayment.errorDetail());
       producerContract.updateProcessStatus(
               producer.producerId(), ProducerSubProcessType.PAYMENT_FAILED);
+
+      producerContract.cancelSubscription(producer.producerId(), CancelReasonType.PAYMENT_FAILED,
+              OffsetDateTime.now().plusMonths(1L), completedPayment.errorDetail());
+
+      sendPaymentFailed( getPrimaryContact(producer), invoice, producer,  completedPayment);
       return;
     }
 
@@ -276,8 +282,8 @@ public class AccountPaymentService {
    * The purpose of this method is to clean up records corresponding to any subscriptions started
    * but never finished or made active.
    *
-   * @param daysOld
-   * @return
+   * @param daysOld - removes abandoned/no initial payment accounts
+   * @return Amount of abandoned signup removed
    */
   @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
   public String cleanAbandonedAccounts(@NotNull @NonNull Integer daysOld, String ipAddress) {
@@ -438,4 +444,48 @@ public class AccountPaymentService {
               "Unexpected error sending confirmation email to {} ", producerResponse.producerId(), e);
     }
   }
+  private void sendPaymentFailed(
+          @NotNull ProducerContactResponse primaryContact,
+          @NotNull InvoiceResponse invoice,
+          @NotNull ProducerResponse producerResponse,
+          @NotNull PaymentTransactionResponse completedPayment) {
+    try {
+      emailService.sendEmailAsync(
+              EmailTemplateType.PRODUCER_PAYMENT_FAILED,
+              Collections.singletonList(primaryContact.emailAddress()),
+              EmailTemplateType.PRODUCER_PAYMENT_FAILED.getSubjectFormat(),
+              () -> {
+                Map<String, Object> map =
+                        new HashMap<>(
+                                Map.of(
+                                        "invoice",
+                                        invoice,
+                                        "invoiceNumber",
+                                        invoice.invoiceNumber(),
+                                        "invoiceDescription",
+                                        invoice.description(),
+                                        "producerId",
+                                        producerResponse.producerId(),
+                                        "lastName",
+                                        primaryContact.lastName(),
+                                        "firstName",
+                                        primaryContact.firstName(),
+                                        "transactionRef",
+                                        completedPayment.paymentRef(),
+                                        "receiptUrl",
+                                        completedPayment.receiptUrl(),
+                                        "timestamp",
+                                        OffsetDateTime.now()));
+                map.put("errorCode", completedPayment.errorStatusCode());
+                map.put("errorDetail", completedPayment.errorDetail());
+                map.put("invoiceLineItems", invoice.lineItems());
+                map.put("invoiceTotal", invoice.invoiceTotal());
+                return map;
+              });
+    } catch (Exception e) {
+      log.error(
+              "Unexpected error sending confirmation email to {} ", producerResponse.producerId(), e);
+    }
+  }
+
 }

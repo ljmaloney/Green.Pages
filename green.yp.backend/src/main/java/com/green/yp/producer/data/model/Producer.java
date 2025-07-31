@@ -1,5 +1,6 @@
 package com.green.yp.producer.data.model;
 
+import com.green.yp.api.apitype.enumeration.CancelReasonType;
 import com.green.yp.api.apitype.producer.enumeration.ProducerSubscriptionType;
 import com.green.yp.common.data.converter.BooleanConverter;
 import com.green.yp.common.data.embedded.Mutable;
@@ -29,6 +30,13 @@ public class Producer extends Mutable {
   @Column
   @Temporal(TemporalType.TIMESTAMP)
   private OffsetDateTime cancelDate;
+
+  @Column(name="cancel_type")
+  @Enumerated(EnumType.STRING)
+  private CancelReasonType cancelReasonType;
+
+  @Column(name="cancel_reason")
+  private String cancelReason;
 
   @Column(name = "last_bill_date")
   @Temporal(TemporalType.TIMESTAMP)

@@ -1,5 +1,6 @@
 package com.green.yp.api.contract;
 
+import com.green.yp.api.apitype.enumeration.CancelReasonType;
 import com.green.yp.api.apitype.enumeration.ProducerSubProcessType;
 import com.green.yp.api.apitype.producer.*;
 import com.green.yp.api.apitype.producer.enumeration.ProducerSubscriptionType;
@@ -54,6 +55,12 @@ public class ProducerContract {
 
   public void cancelSubscription(UUID accountId, String userId, String ipAddress) {
     subscriptionService.cancelSubscription(accountId, userId, ipAddress);
+  }
+
+  public void cancelSubscription(@NonNull @NotNull UUID producerId,
+                                 @NonNull @NotNull CancelReasonType cancelReasonType,
+                                 @NonNull @NotNull OffsetDateTime cancelDate, String cancelReason) {
+    subscriptionService.paymentFailedCancellation(producerId, cancelReasonType, cancelDate, cancelReason);
   }
 
   public ProducerResponse createProducer(CreateProducerRequest producer, String ipAddress) {
@@ -158,7 +165,7 @@ public class ProducerContract {
     return producerService.updateBillPaidDate(accountId, lastInvoiceDate, subscriptionPaidDate, userId, ipAddress);
   }
 
-  public void initalizePaymentProcessQueue() {
+  public void initializePaymentProcessQueue() {
     producerService.initializePaymentProcessQueue();
   }
 

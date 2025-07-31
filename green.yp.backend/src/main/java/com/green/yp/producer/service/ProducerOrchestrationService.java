@@ -352,7 +352,7 @@ public class ProducerOrchestrationService {
     }
   }
 
-  @Transactional
+  @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
   public void initializePaymentProcessQueue() {
     log.debug("Initializing producer / pro subscriptions processing queue");
 
@@ -373,7 +373,7 @@ public class ProducerOrchestrationService {
     log.debug("Initialized producer / pro subscriptions processing queue");
   }
 
-  @Transactional
+  @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
   public List<ProducerResponse> getProducersToProcess(int maxNumberToProcess) {
     List<ProducerSubscriptionProcess> subsToProcess = subProcessRepository.findItemsToProcess(maxNumberToProcess);
 

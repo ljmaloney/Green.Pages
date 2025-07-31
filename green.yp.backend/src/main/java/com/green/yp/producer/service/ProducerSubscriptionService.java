@@ -1,5 +1,6 @@
 package com.green.yp.producer.service;
 
+import com.green.yp.api.apitype.enumeration.CancelReasonType;
 import com.green.yp.api.apitype.producer.enumeration.InvoiceCycleType;
 import com.green.yp.api.apitype.producer.enumeration.ProducerSubscriptionType;
 import com.green.yp.api.contract.SubscriptionContract;
@@ -18,6 +19,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import jakarta.validation.constraints.NotNull;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -159,7 +163,23 @@ public class ProducerSubscriptionService {
         log.info("Cancelled producerId {} name {} on {}", producerId, producer.getName(), cancelDate);
     }
 
-    private Boolean isSubscriptionNotChanged(Producer producer, UUID newSubscriptionId){
+    public void paymentFailedCancellation(@NonNull @NotNull UUID producerId,
+                                          @NonNull @NotNull CancelReasonType cancelReasonType,
+                                          @NonNull @NotNull OffsetDateTime cancelDate, String cancelReason) {
+        log.info("Cancelling account {} for {} - {}", producerId, cancelReasonType, cancelReason);
+        producerRepository.findById(producerId)
+                .ifPresentOrElse(producer -> {
+              producer.setCancelDate(cancelDate);
+              producer.setCancelReason(cancelReason);
+              producer.setCancelReasonType(cancelReasonType);
+              producerRepository.saveAndFlush(producer);
+            },
+            () -> {
+              throw new NotFoundException(PRODUCER_ID, producerId);
+            });
+    }
+
+    private boolean isSubscriptionNotChanged(Producer producer, UUID newSubscriptionId){
         List<ProducerSubscriptionRecord> subscriptions = subscriptionRepository.findActiveSubscriptions(producer.getId(),
                 LocalDate.now(),
                 SubscriptionType.getPrimaries());
@@ -167,6 +187,6 @@ public class ProducerSubscriptionService {
         return subscriptions.stream()
                 .filter( s -> s.producerSubscription().getSubscriptionId().equals(newSubscriptionId))
                 .findFirst().map(s -> Boolean.TRUE)
-                .orElseGet( () -> Boolean.FALSE);
+                .orElse(Boolean.FALSE);
     }
 }

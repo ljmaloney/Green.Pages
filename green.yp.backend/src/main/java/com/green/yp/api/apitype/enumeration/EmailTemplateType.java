@@ -28,7 +28,10 @@ public enum EmailTemplateType {
           "GreenMarket - Subscriber Contact Email Confirmation"),
   PRODUCER_PAYMENT_CONFIRMATION("green.yp.sub.receipt",
           "email/producer-subscription-receipt.ftl",
-          "Green Market - Subscriber Payment Receipt" );
+          "Green Market - Subscriber Payment Receipt" ),
+  PRODUCER_PAYMENT_FAILED("green.yp.sub.payment-failed",
+          "email/producer-subscription-payfail.ftl" ,
+          "Green Market - Subscriber Credit Card Payment Failed" );
 
   private final String templateName;
   private final String templateFileName;
