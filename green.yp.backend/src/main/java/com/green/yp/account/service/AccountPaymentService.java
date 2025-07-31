@@ -91,7 +91,7 @@ public class AccountPaymentService {
       throw new PreconditionFailedException("Producer/Account is already active");
     }
 
-    ProducerContactResponse primaryContact = getPrimaryContact(paymentRequest, producerResponse);
+    ProducerContactResponse primaryContact = getPrimaryContact(producerResponse);
 
     var validation =
         emailContract.validateEmail(
@@ -128,7 +128,7 @@ public class AccountPaymentService {
         "system",
         requestIP);
 
-    sendPaymentCompleted(paymentRequest, requestIP, primaryContact, invoice, producerResponse, completedPayment);
+    sendPaymentCompleted( requestIP, primaryContact, invoice, producerResponse, completedPayment);
 
     return new ApiPaymentResponse(
         true, completedPayment.receiptNumber(), completedPayment.receiptUrl());
@@ -195,10 +195,13 @@ public class AccountPaymentService {
     invoiceContract.updatePayment(invoice.invoiceId(), completedPayment);
 
     producerContract.updatePaidDates(producer.producerId(),
-            completedPayment.createDate(), completedPayment.createDate(), "system", RequestUtil.getRequestIP());
+            invoice.createDate(), completedPayment.createDate(), "system", RequestUtil.getRequestIP());
 
     producerContract.updateProcessStatus(
         producer.producerId(), ProducerSubProcessType.PAYMENT_SUCCESS);
+
+    var primaryContact = getPrimaryContact(producer);
+    sendPaymentCompleted(RequestUtil.getRequestIP(),primaryContact,invoice, producer, completedPayment);
   }
 
   public PaymentMethodResponse replacePayment(
@@ -246,9 +249,9 @@ public class AccountPaymentService {
       producerContract.updatePaidDates(paymentRequest.referenceId(),
               completedPayment.createDate(), completedPayment.createDate(), authenticatedUser.userId(), requestIP);
 
-      var primaryContact = getPrimaryContact(paymentRequest, producer);
+      var primaryContact = getPrimaryContact(producer);
 
-      sendPaymentCompleted(paymentRequest,requestIP, primaryContact, unpaidInvoice, producer, completedPayment);
+      sendPaymentCompleted(requestIP, primaryContact, unpaidInvoice, producer, completedPayment);
     }
 
     return methodResponse;
@@ -379,21 +382,19 @@ public class AccountPaymentService {
     };
   }
 
-  private ProducerContactResponse getPrimaryContact(@NotNull ApiPaymentRequest paymentRequest,
-                                                    @NotNull ProducerResponse producerResponse) {
+  private ProducerContactResponse getPrimaryContact(@NotNull ProducerResponse producerResponse) {
     return contactContract.findAdminContacts(producerResponse.producerId()).stream()
         .filter(contact -> contact.producerContactType() == ProducerContactType.ADMIN)
         .findFirst()
         .orElseThrow(
             () -> {
-              log.error("No primary contact found for {}", paymentRequest.referenceId());
+              log.error("No primary contact found for {}", producerResponse.producerId());
               return new PreconditionFailedException(
-                  "No primary contact found for " + paymentRequest.referenceId());
+                  "No primary contact found for " + producerResponse.producerId());
             });
   }
 
   private void sendPaymentCompleted(
-      @NotNull ApiPaymentRequest paymentRequest,
       @NotNull String requestIP,
       @NotNull ProducerContactResponse primaryContact,
       @NotNull InvoiceResponse invoice,
@@ -434,7 +435,7 @@ public class AccountPaymentService {
               });
     } catch (Exception e) {
       log.error(
-              "Unexpected error sending confirmation email to {} ", paymentRequest.referenceId(), e);
+              "Unexpected error sending confirmation email to {} ", producerResponse.producerId(), e);
     }
   }
 }
