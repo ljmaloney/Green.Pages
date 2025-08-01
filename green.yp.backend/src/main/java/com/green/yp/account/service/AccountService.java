@@ -240,7 +240,7 @@ public class AccountService {
     }
   }
 
-  @Scheduled(fixedDelayString="${greenyp.classified.unpaid.clean.fixedDelay:180}",
+  @Scheduled(fixedDelayString="${green.yp.pro.subscription.renewal.fixedDelay:180}",
           timeUnit = TimeUnit.MINUTES)
   public void processMonthlyPayment(){
     log.info("Begin processing monthly producer / pro subscriptions");
