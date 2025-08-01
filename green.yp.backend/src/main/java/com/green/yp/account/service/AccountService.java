@@ -264,6 +264,7 @@ public class AccountService {
       }catch (Exception e) {
         log.error("Unexpected error while processing pro subscription renewal payments", e);
       }
+    log.info("Completed processing monthly producer / pro subscriptions");
   }
 
   private ProducerCredentialsResponse createOrUpdateCredentials(
