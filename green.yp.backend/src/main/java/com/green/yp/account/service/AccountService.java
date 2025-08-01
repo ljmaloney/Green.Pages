@@ -246,25 +246,27 @@ public class AccountService {
     log.info("Begin processing monthly producer / pro subscriptions");
 
     producerContract.initializePaymentProcessQueue();
-
       try (var threadPool = new ForkJoinPool(renewalThreads)) {
-        final List<ProducerResponse> producersToProcess = producerContract.getProducersToProcess(renewalThreads);
+        List<ProducerResponse> producersToProcess = producerContract.getProducersToProcess(renewalThreads);
         while(CollectionUtils.isNotEmpty(producersToProcess)){
-          var futureComplete = threadPool.submit( () -> producersToProcess.parallelStream().forEach(paymentService::processSubscriptionPayment));
-          while (!futureComplete.isDone()) {
-            try{
-            Thread.sleep(500);
-            }catch (InterruptedException ie){
-              log.warn("Interrupted while waiting for subscription payment");
-            }
-          }
-          producersToProcess.clear();
-          producersToProcess.addAll(producerContract.getProducersToProcess(renewalThreads));
+          processPayment(producersToProcess, threadPool);
+          producersToProcess = producerContract.getProducersToProcess(renewalThreads);
         }
       }catch (Exception e) {
         log.error("Unexpected error while processing pro subscription renewal payments", e);
       }
     log.info("Completed processing monthly producer / pro subscriptions");
+  }
+
+  private void processPayment(List<ProducerResponse> producersToProcess, ForkJoinPool threadPool) {
+    var futureComplete = threadPool.submit( () -> producersToProcess.parallelStream().forEach(paymentService::processSubscriptionPayment));
+    while (!futureComplete.isDone()) {
+      try{
+        Thread.sleep(500);
+      }catch (InterruptedException ie){
+        log.warn("Interrupted while waiting for subscription payment");
+      }
+    }
   }
 
   private ProducerCredentialsResponse createOrUpdateCredentials(
