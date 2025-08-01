@@ -1,0 +1,11 @@
+DROP PROCEDURE IF EXISTS `?`;
+DELIMITER //
+CREATE PROCEDURE `?`()
+BEGIN
+    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION BEGIN
+    END;
+    ALTER TABLE line_of_business ADD COLUMN url_lob varchar(50) after line_of_business;
+END //
+DELIMITER ;
+CALL `?`();
+DROP PROCEDURE `?`;
