@@ -11,9 +11,9 @@ import com.green.yp.api.apitype.producer.LocationRequest;
 import com.green.yp.api.apitype.producer.ProducerLocationResponse;
 import com.green.yp.api.apitype.producer.enumeration.ProducerLocationType;
 import com.green.yp.common.ServiceUtils;
+import com.green.yp.config.security.AuthenticatedUser;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
-import com.green.yp.geolocation.service.GeocodingService;
 import com.green.yp.producer.data.model.ProducerLocation;
 import com.green.yp.producer.data.repository.ProducerLocationRepository;
 import com.green.yp.producer.mapper.ProducerLocationMapper;
@@ -92,7 +92,7 @@ public class ProducerLocationService {
       objectType = AuditObjectType.PRODUCER_LOCATION,
       actionType = AuditActionType.UPDATE)
   public ProducerLocationResponse updateLocation(
-      LocationRequest updateLocationRequest, String userId, String requestIP) {
+          LocationRequest updateLocationRequest, AuthenticatedUser user, String requestIP) {
 
     log.info("Updating location {} from {}", updateLocationRequest.locationId(), requestIP);
 
@@ -115,6 +115,7 @@ public class ProducerLocationService {
     location.setState(updateLocationRequest.state());
     location.setPostalCode(updateLocationRequest.postalCode());
     location.setWebsiteUrl(updateLocationRequest.websiteUrl());
+
     if ( addressChanged ){
       GeocodeLocation geocodeLocation = geocodingService.geocodeLocation(location);
       location.setLatitude(geocodeLocation.latitude());

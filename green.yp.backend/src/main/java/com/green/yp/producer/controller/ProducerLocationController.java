@@ -4,9 +4,12 @@ import com.green.yp.api.apitype.PatchRequest;
 import com.green.yp.api.apitype.producer.LocationRequest;
 import com.green.yp.api.apitype.producer.ProducerLocationResponse;
 import com.green.yp.common.dto.ResponseApi;
+import com.green.yp.config.security.AuthUser;
+import com.green.yp.config.security.AuthenticatedUser;
 import com.green.yp.producer.service.ProducerLocationService;
 import com.green.yp.security.IsAnyAuthenticatedUser;
 import com.green.yp.util.RequestUtil;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -67,9 +70,10 @@ public class ProducerLocationController {
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ProducerLocationResponse> updateLocation(
-      @Valid @RequestBody LocationRequest locationRequest) {
+          @Valid @RequestBody LocationRequest locationRequest,
+          @Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser) {
     return new ResponseApi<>(
-        locationService.updateLocation(locationRequest, null, RequestUtil.getRequestIP()), null);
+        locationService.updateLocation(locationRequest, authenticatedUser, RequestUtil.getRequestIP()), null);
   }
 
   @IsAnyAuthenticatedUser

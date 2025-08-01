@@ -15,16 +15,19 @@ import com.green.yp.api.contract.*;
 import com.green.yp.email.service.EmailService;
 import com.green.yp.exception.*;
 import jakarta.validation.constraints.NotNull;
+import java.lang.Thread;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -53,6 +56,9 @@ public class AccountService {
   private final AccountPaymentService paymentService;
   private final AccountMapper accountMapper;
   private final ProducerContactContract producerContactContract;
+
+  @Value("${green.yp.pro.subscription.renewal.threads:5}")
+  private int renewalThreads;
 
   public AccountService(
           EmailService emailService,
@@ -234,19 +240,32 @@ public class AccountService {
     }
   }
 
-  @Scheduled(fixedDelayString="${greenyp.classified.unpaid.clean.fixedDelay:180}",
+  @Scheduled(fixedDelayString="${green.yp.pro.subscription.renewal.fixedDelay:180}",
           timeUnit = TimeUnit.MINUTES)
   public void processMonthlyPayment(){
     log.info("Begin processing monthly producer / pro subscriptions");
 
     producerContract.initializePaymentProcessQueue();
+      try (var threadPool = new ForkJoinPool(renewalThreads)) {
+        List<ProducerResponse> producersToProcess = producerContract.getProducersToProcess(renewalThreads);
+        while(CollectionUtils.isNotEmpty(producersToProcess)){
+          processPayment(producersToProcess, threadPool);
+          producersToProcess = producerContract.getProducersToProcess(renewalThreads);
+        }
+      }catch (Exception e) {
+        log.error("Unexpected error while processing pro subscription renewal payments", e);
+      }
+    log.info("Completed processing monthly producer / pro subscriptions");
+  }
 
-    List<ProducerResponse> producersToProcess = producerContract.getProducersToProcess(5);
-    while(CollectionUtils.isNotEmpty(producersToProcess)){
-
-      producersToProcess.forEach(paymentService::processSubscriptionPayment);
-
-      producersToProcess = producerContract.getProducersToProcess(5);
+  private void processPayment(List<ProducerResponse> producersToProcess, ForkJoinPool threadPool) {
+    var futureComplete = threadPool.submit( () -> producersToProcess.parallelStream().forEach(paymentService::processSubscriptionPayment));
+    while (!futureComplete.isDone()) {
+      try{
+        Thread.sleep(500);
+      }catch (InterruptedException ie){
+        log.warn("Interrupted while waiting for subscription payment");
+      }
     }
   }
 
