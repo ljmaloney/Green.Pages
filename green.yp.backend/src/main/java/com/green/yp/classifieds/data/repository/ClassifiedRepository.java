@@ -37,13 +37,13 @@ public interface ClassifiedRepository extends JpaRepository<Classified, UUID> {
         INNER JOIN ClassifiedAdType AS adType on adType.id = classified.adTypeId
         INNER JOIN ClassifiedCategory AS category on category.id = classified.categoryId
     WHERE
-       (:classifiedId IS NULL OR classified.id=:classifiedId)
+       (:categoryId IS NULL OR category.id=:categoryId)
        AND classified.lastActiveDate IS NOT NULL
        AND :currentDate BETWEEN classified.activeDate AND classified.lastActiveDate
      ORDER BY classified.createDate
 """)
   List<ClassifiedSearchProjection> getMostRecent(@NotNull @Param("currentDate") LocalDate currentDate,
-                                                 @Param("classifiedId") UUID categoryId, Limit limit);
+                                                 @Param("categoryId") UUID categoryId, Limit limit);
 
 
   @Query("""
