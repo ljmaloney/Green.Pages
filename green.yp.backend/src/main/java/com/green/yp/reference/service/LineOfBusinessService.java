@@ -59,6 +59,13 @@ public class LineOfBusinessService {
     return lineOfBusinessMapper.toDto(lob);
   }
 
+  @Cacheable("lineOfBusiness")
+  public LineOfBusinessDto getLineOfBusiness(String urlString){
+    return repository.findLineOfBusinessByUrlLob(urlString)
+            .map(lineOfBusinessMapper::toDto)
+            .orElseThrow(() -> new NotFoundException(LINE_OF_BUSINESS, urlString));
+  }
+
   @Cacheable("allLineOfBusiness")
   public List<LineOfBusinessDto> getAllLineOfBusiness() {
 

@@ -49,6 +49,14 @@ public class LineOfBusinessController {
     return new ResponseApi<>(lobMapper.toApi(lobService.getAllLineOfBusiness()), null);
   }
 
+  @Operation(summary = "Returns a list of the active lines of business")
+  @ApiResponse(responseCode = "200")
+  @ApiResponse(responseCode = "404", description = "No lines of business configured / active")
+  @GetMapping(value = "/lob/{urlLob}", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<LineOfBusinessDto> getLineOfBusiness(@PathVariable String urlLob) {
+    return new ResponseApi<>(lobService.getLineOfBusiness(urlLob), null);
+  }
+
   @Operation(summary = "Returns a list of the services offered by a line of business")
   @ApiResponse(responseCode = "200")
   @ApiResponse(responseCode = "404", description = "No services found for a line of business")

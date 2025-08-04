@@ -12,6 +12,7 @@ public record LineOfBusinessDto(
     OffsetDateTime createDate,
     OffsetDateTime lastUpdateDate,
     @NotNull String lineOfBusinessName,
+    String urlLob,
     LineOfBusinessCreateType createType,
     String createByReference,
     String shortDescription,
