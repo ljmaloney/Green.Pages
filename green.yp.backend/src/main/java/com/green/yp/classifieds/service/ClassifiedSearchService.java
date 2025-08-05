@@ -50,7 +50,7 @@ public class ClassifiedSearchService {
     }
 
     public List<ClassifiedSearchResponse> mostRecent(Integer maxCount, UUID categoryId, String categoryName, String requestIP) {
-        log.debug("Loading most {} recent classifieds for categoryId: {} requested from {}", maxCount, categoryId, requestIP );
+        log.info("Loading most {} recent classifieds for categoryId: {} requested from {}", maxCount, categoryId, requestIP );
 
         if ( StringUtils.isNotBlank(categoryName) && categoryId == null) {
             categoryId = categoryRepository
