@@ -138,6 +138,7 @@ public class ProducerOrchestrationService {
     producer.setName(producerUpdate.businessName());
     producer.setNarrative(producerUpdate.narrative());
     producer.setWebsiteUrl(producerUpdate.websiteUrl());
+    producer.setKeywords(producerUpdate.keywords());
     producer.setSubscriptionType(
         ProducerSubscriptionType.valueOf(producerUpdate.subscriptionType().name()));
 

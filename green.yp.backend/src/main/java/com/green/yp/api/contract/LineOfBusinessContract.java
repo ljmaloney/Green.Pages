@@ -1,7 +1,10 @@
 package com.green.yp.api.contract;
 
+import com.green.yp.reference.dto.LOBServiceDto;
 import com.green.yp.reference.dto.LineOfBusinessDto;
 import com.green.yp.reference.service.LineOfBusinessService;
+
+import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
@@ -20,4 +23,8 @@ public class LineOfBusinessContract {
   public LineOfBusinessDto findLineOfBusiness(String lobUrl) {
     return lineOfBusinessService.getLineOfBusiness(lobUrl);
   }
+
+    public List<LOBServiceDto> getServices(UUID lineOfBusinessId) {
+      return lineOfBusinessService.findServices(lineOfBusinessId);
+    }
 }

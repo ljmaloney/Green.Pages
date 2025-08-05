@@ -117,7 +117,7 @@ public class AccountService {
                       externalUserRef);
                   return new NotFoundException(
                       String.format(
-                          "No subscribtion found for user identified by %s", externalUserRef));
+                          "No subscription found for user identified by %s", externalUserRef));
                 })
             .producerId();
 

@@ -56,6 +56,9 @@ public class Producer extends Mutable {
   @Column(name = "icon_link_url")
   private String iconLink;
 
+    @Column(name = "keywords")
+    private String keywords;
+
   @Column(name = "narrative", length = 1024)
   private String narrative;
 

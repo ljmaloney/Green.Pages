@@ -3,6 +3,7 @@ package com.green.yp.api.apitype.producer;
 import com.green.yp.api.apitype.producer.enumeration.InvoiceCycleType;
 import com.green.yp.api.apitype.producer.enumeration.ProducerSubscriptionType;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.NonNull;
 
@@ -22,4 +23,7 @@ public record CreateProducerRequest(
     InvoiceCycleType invoiceCycleType,
     @Size(max = 200, message = "The website URL must be less than 200 characters in length")
         String websiteUrl,
+    @Size(max = 512)
+    @Pattern(regexp = "^[a-zA-Z0-9 ,]+$", message = "Keywords can only contain letters, numbers and spaces")
+    String keywords,
     @Size(max = 512) String narrative) {}

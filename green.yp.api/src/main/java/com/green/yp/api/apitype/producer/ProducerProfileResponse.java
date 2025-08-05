@@ -30,6 +30,7 @@ public record ProducerProfileResponse(
     BigDecimal latitude,
     BigDecimal longitude,
     String emailAddress,
+    String keywords,
     String websiteUrl,
     String businessNarrative,
     String iconLink,
