@@ -53,7 +53,8 @@ public class ClassifiedSearchController {
     @GetMapping(path="mostRecent", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseApi<List<ClassifiedSearchResponse>> mostRecent(@RequestParam(value = "number", defaultValue = "9") Integer maxCount,
                                                                   @RequestParam(value = "categoryId", required = false) UUID categoryId,
+                                                                  @RequestParam(value = "categoryName", required = false) String categoryName,
                                                                   HttpServletRequest httpRequest){
-    return new ResponseApi<>(searchService.mostRecent(maxCount, categoryId, RequestUtil.getRequestIP(httpRequest)), null);
+    return new ResponseApi<>(searchService.mostRecent(maxCount, categoryId, categoryName, RequestUtil.getRequestIP(httpRequest)), null);
     }
 }

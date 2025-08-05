@@ -5,6 +5,7 @@ import com.green.yp.classifieds.data.ClassifiedSearchDistanceProjection;
 import com.green.yp.classifieds.data.model.ClassifiedAdType;
 import com.green.yp.classifieds.data.model.ClassifiedImageGallery;
 import com.green.yp.classifieds.data.model.ClassifiedSearchProjection;
+import com.green.yp.classifieds.data.repository.ClassifiedCategoryRepository;
 import com.green.yp.classifieds.data.repository.ClassifiedImageGalleryRepository;
 import com.green.yp.classifieds.data.repository.ClassifiedRepository;
 import com.green.yp.classifieds.mapper.ClassifiedSearchMapper;
@@ -15,7 +16,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.green.yp.common.data.embedded.Mutable;
 import com.green.yp.common.dto.GenericPageableResponse;
+import com.green.yp.exception.NotFoundException;
 import com.green.yp.geolocation.service.GeocodingService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -30,22 +33,36 @@ public class ClassifiedSearchService {
 
     private static final double MILES_TO_METERS_RATIO = 1609.34d;
     private final ClassifiedRepository repository;
+    private final ClassifiedCategoryRepository categoryRepository;
     private final ClassifiedSearchMapper mapper;
     private final ClassifiedImageGalleryRepository imageGalleryRepository;
     private final GeocodingService geocodingService;
 
-    public ClassifiedSearchService(ClassifiedRepository repository,
+    public ClassifiedSearchService(ClassifiedRepository repository, ClassifiedCategoryRepository categoryRepository,
                                    ClassifiedSearchMapper mapper,
                                    ClassifiedImageGalleryRepository imageGalleryRepository,
                                    @Qualifier("defaultGeocodeServiceImpl") GeocodingService geocodingService) {
         this.repository = repository;
+        this.categoryRepository = categoryRepository;
         this.mapper = mapper;
         this.imageGalleryRepository = imageGalleryRepository;
         this.geocodingService = geocodingService;
     }
 
-    public List<ClassifiedSearchResponse> mostRecent(Integer maxCount, UUID categoryId, String requestIP) {
-        log.debug("Loading most {} recent classifieds for categoryId: {} requested from {}", maxCount, categoryId, requestIP );
+    public List<ClassifiedSearchResponse> mostRecent(Integer maxCount, UUID categoryId, String categoryName, String requestIP) {
+        log.info("Loading most {} recent classifieds for categoryId: {} categoryName{} requested from {}",
+                maxCount, categoryId, categoryName, requestIP );
+
+        if ( StringUtils.isNotBlank(categoryName) && categoryId == null) {
+            categoryId = categoryRepository
+              .findByUrlName(categoryName)
+              .map(Mutable::getId)
+              .orElseThrow(
+                  () -> {
+                    log.error("Category Name not found for {}", categoryName);
+                      return new NotFoundException("Category Name not found for " + categoryName);
+                  });
+        }
 
         List<ClassifiedSearchProjection> classifieds = repository.getMostRecent(LocalDate.now(), categoryId, Limit.of(maxCount));
 

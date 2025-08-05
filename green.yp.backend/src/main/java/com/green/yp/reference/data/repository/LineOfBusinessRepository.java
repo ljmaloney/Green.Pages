@@ -13,4 +13,6 @@ public interface LineOfBusinessRepository extends JpaRepository<LineOfBusiness, 
   }
 
   Optional<LineOfBusiness> findLineOfBusinessByLineOfBusinessName(String lineOfBusiness);
+
+  Optional<LineOfBusiness> findLineOfBusinessByUrlLob(String urlString);
 }

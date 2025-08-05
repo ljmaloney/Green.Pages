@@ -16,4 +16,8 @@ public class LineOfBusinessContract {
   public LineOfBusinessDto findLineOfBusiness(UUID lineOfBusinessId) {
     return lineOfBusinessService.getLineOfBusiness(lineOfBusinessId);
   }
+
+  public LineOfBusinessDto findLineOfBusiness(String lobUrl) {
+    return lineOfBusinessService.getLineOfBusiness(lobUrl);
+  }
 }

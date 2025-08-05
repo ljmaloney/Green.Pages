@@ -357,12 +357,15 @@ public class ProducerOrchestrationService {
   public void initializePaymentProcessQueue() {
     log.debug("Initializing producer / pro subscriptions processing queue");
 
+    log.info("Initializing producer / pro subscriptions interval type {} interval amount {}", intervalType, intervalAmount);
     OffsetDateTime invoiceDate = OffsetDateTime.now();
     if ( "days".equalsIgnoreCase(intervalType)){
-      invoiceDate = invoiceDate.minusDays(1);
+      invoiceDate = invoiceDate.minusDays(intervalAmount);
     } else {
       invoiceDate = invoiceDate.minusMonths(intervalAmount);
     }
+
+    log.info("Processing subscription payments for subscribers last paid before {}", invoiceDate);
 
     List<UUID> subsToProcess = subProcessRepository.getProducersToProcess(invoiceDate);
 
@@ -373,7 +376,7 @@ public class ProducerOrchestrationService {
               .processStep(ProducerSubProcessType.PREPARE)
               .build());
     });
-    log.debug("Initialized producer / pro subscriptions processing queue");
+    log.info("Initialized producer / pro subscriptions processing queue for subscribers last paid before {}", invoiceDate);
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
