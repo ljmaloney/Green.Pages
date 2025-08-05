@@ -42,6 +42,7 @@ class LineOfBusinessControllerTest {
             OffsetDateTime.now(),
             OffsetDateTime.now(),
             "lineofbusiness",
+            "lineofbusiness",
             LineOfBusinessCreateType.SYSTEM_DEFAULT,
             "",
             "short description",
