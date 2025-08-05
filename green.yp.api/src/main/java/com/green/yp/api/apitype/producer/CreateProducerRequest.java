@@ -22,4 +22,5 @@ public record CreateProducerRequest(
     InvoiceCycleType invoiceCycleType,
     @Size(max = 200, message = "The website URL must be less than 200 characters in length")
         String websiteUrl,
+    @Size(max = 512) String keywords,
     @Size(max = 512) String narrative) {}

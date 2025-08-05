@@ -2,12 +2,15 @@ package com.green.yp.producer.service.dataimp;
 
 import com.green.yp.api.apitype.producer.*;
 import com.green.yp.api.apitype.producer.enumeration.*;
+import com.green.yp.api.contract.LineOfBusinessContract;
 import com.green.yp.geolocation.service.GeocodingService;
 import com.green.yp.producer.service.ProducerContactOrchestrationService;
 import com.green.yp.producer.service.ProducerLocationService;
 import com.green.yp.producer.service.ProducerOrchestrationService;
 import java.util.Optional;
 import java.util.UUID;
+
+import com.green.yp.reference.dto.LineOfBusinessDto;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -21,16 +24,18 @@ public class ProducerImportService {
   private final ProducerLocationService producerLocationService;
   private final ProducerContactOrchestrationService contactOrchestrationService;
   private final GeocodingService geocodingService;
+  private final LineOfBusinessContract lobContract;
 
   public ProducerImportService(
-      ProducerOrchestrationService producerOrchestrationService,
-      ProducerLocationService producerLocationService,
-      ProducerContactOrchestrationService contactOrchestrationService,
-      @Qualifier("defaultGeocodeServiceImpl") GeocodingService geocodingService) {
+          ProducerOrchestrationService producerOrchestrationService,
+          ProducerLocationService producerLocationService,
+          ProducerContactOrchestrationService contactOrchestrationService,
+          @Qualifier("defaultGeocodeServiceImpl") GeocodingService geocodingService, LineOfBusinessContract lobContract) {
     this.producerOrchestrationService = producerOrchestrationService;
     this.producerLocationService = producerLocationService;
     this.contactOrchestrationService = contactOrchestrationService;
     this.geocodingService = geocodingService;
+      this.lobContract = lobContract;
   }
 
   @Transactional
@@ -38,6 +43,10 @@ public class ProducerImportService {
     var location =
         geocodingService.getCoordinates(
             importRecord.address, importRecord.city, importRecord.state, importRecord.zip);
+
+    var lineOfBusiness = lobContract.findLineOfBusiness(lineOfBusinessId);
+
+    String keywords = createKeywords(lineOfBusiness);
 
     // Use contact as company name if company is empty
     String businessName = StringUtils.getIfBlank(importRecord.company, () -> importRecord.contact);
@@ -50,6 +59,7 @@ public class ProducerImportService {
                 ProducerSubscriptionType.DATA_LOAD_UNPAID,
                 null,
                 null,
+                keywords,
                 null),
             null);
 
@@ -93,7 +103,15 @@ public class ProducerImportService {
     return producerResponse.producerId();
   }
 
-  public record ProducerCsvRecord(
+    private String createKeywords(LineOfBusinessDto lineOfBusiness) {
+      final StringBuilder keywordBuilder = new StringBuilder(lineOfBusiness.lineOfBusinessName());
+      keywordBuilder.append(" ").append(lineOfBusiness.shortDescription());
+      lobContract.getServices(lineOfBusiness.lineOfBusinessId())
+              .forEach(service -> keywordBuilder.append(" ").append(service.getServiceName()));
+      return keywordBuilder.toString();
+    }
+
+    public record ProducerCsvRecord(
       long recordNumber,
       String type,
       String licenseNumber,
