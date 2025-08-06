@@ -32,6 +32,6 @@ public class SearchController {
       @RequestParam(required = false) UUID serviceId) {
 
     Pageable pageable = PageRequest.of(page, limit);
-    return searchService.search(zipCode, distance, pageable, categoryId, serviceId);
+    return searchService.search(zipCode, distance, pageable, categoryId);
   }
 }
