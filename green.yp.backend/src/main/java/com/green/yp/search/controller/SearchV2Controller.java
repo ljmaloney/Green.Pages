@@ -27,7 +27,7 @@ public class SearchV2Controller {
     @GetMapping
     public PageableResponse<SearchResponse> search(
             @RequestParam String zipCode,
-            @RequestParam String keywords,
+            @RequestParam(required = false) String keywords,
             @RequestParam(required = false) UUID categoryRefId,
             @RequestParam(defaultValue = "25") Integer distance,
             @RequestParam(defaultValue = "0") Integer page,
