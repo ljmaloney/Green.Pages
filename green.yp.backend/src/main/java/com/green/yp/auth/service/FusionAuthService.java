@@ -4,6 +4,8 @@ import com.green.yp.api.apitype.account.AccountRoleType;
 import com.green.yp.api.apitype.producer.AuthenticatedUserCredentialsResponse;
 import com.green.yp.api.apitype.producer.UserCredentialsRequest;
 import com.green.yp.auth.model.AuthServiceResponse;
+import com.green.yp.exception.ErrorCodeType;
+import com.green.yp.exception.SystemException;
 import com.green.yp.exception.UserCredentialsException;
 import com.inversoft.error.Errors;
 import com.inversoft.rest.ClientResponse;
@@ -18,13 +20,15 @@ import io.fusionauth.domain.api.user.SearchRequest;
 import io.fusionauth.domain.api.user.SearchResponse;
 import io.fusionauth.domain.search.UserSearchCriteria;
 import jakarta.validation.constraints.NotNull;
+
+import java.net.UnknownHostException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -108,11 +112,15 @@ public class FusionAuthService implements AuthenticationService {
       log.debug("Found fusionAuth credentials : {}", externalAuthorizationServiceRef);
       return new AuthServiceResponse<>("", response.successResponse);
     } else {
-      // Handle errors
+      if ( response.getException() instanceof UnknownHostException) {
+          log.error("Could not contact fusionAuth service");
+          throw new SystemException("Could not contact fusionAuth service", HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodeType.SYSTEM_ERROR);
+      }
+        // Handle errors
       log.error(
           "Error occurred when retrieving credentials for {} : {}",
-          externalAuthorizationServiceRef,
-          response);
+          externalAuthorizationServiceRef, response.getErrorResponse() != null ? response.getErrorResponse() : response.getException());
+
       throw new UserCredentialsException(
           "Error when retrieving fusion auth credentials", response.exception);
     }
@@ -186,7 +194,7 @@ public class FusionAuthService implements AuthenticationService {
         fusionAuthClient.deleteUser(UUID.fromString(externalAuthorizationServiceRef));
     if (response.wasSuccessful()) {
       log.debug("Deleted fusion auth credentials for : {}", externalAuthorizationServiceRef);
-    } else if (response.getStatus() != HttpStatus.SC_NOT_FOUND) {
+    } else if (response.getStatus() != HttpStatus.NOT_FOUND.value()) {
       // Handle errors
       log.error(
           "Error occurred when deleting credentials for {} : {}",
