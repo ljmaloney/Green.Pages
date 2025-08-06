@@ -1,6 +1,7 @@
 package com.green.yp.producer.controller;
 
-import com.green.yp.api.apitype.search.SearchResponse;
+import com.green.yp.api.apitype.PageableResponse;
+import com.green.yp.api.apitype.search.ProducerSearchResponse;
 import com.green.yp.producer.service.ProducerSearchService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.UUID;
@@ -22,7 +23,7 @@ public class SearchController {
   }
 
   @GetMapping
-  public SearchResponse search(
+  public PageableResponse<ProducerSearchResponse> search(
       @RequestParam String zipCode,
       @RequestParam(defaultValue = "25") Integer distance,
       @RequestParam(defaultValue = "0") Integer page,

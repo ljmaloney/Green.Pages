@@ -12,6 +12,8 @@ BEGIN
                                 `producer_id`             binary(16),
                                 `location_id`             binary(16),
                                 `category_ref`            binary(16),
+                                `active`                  char(1),
+                                `last_active_date`        date,
                                 `record_type`             varchar(50),
                                 `keywords`                TEXT,
                                 `title`                    varchar(256),
