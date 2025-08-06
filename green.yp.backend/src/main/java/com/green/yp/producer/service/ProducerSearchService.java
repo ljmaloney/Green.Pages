@@ -1,6 +1,7 @@
 package com.green.yp.producer.service;
 
-import com.green.yp.api.apitype.search.SearchResponse;
+import com.green.yp.api.apitype.search.ProducerSearchResponse;
+import com.green.yp.api.apitype.PageableResponse;
 import com.green.yp.geolocation.service.GeocodingService;
 import com.green.yp.producer.data.record.ProducerLocationDistanceProjection;
 import com.green.yp.producer.data.repository.ProducerSearchRepository;
@@ -36,8 +37,8 @@ public class ProducerSearchService {
   }
 
   @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-  public SearchResponse search(
-      String zipCode, Integer distance, Pageable pageable, UUID categoryId, UUID serviceId) {
+  public PageableResponse<ProducerSearchResponse> search(
+      String zipCode, Integer distance, Pageable pageable, UUID categoryId) {
     log.info("Searching for producers near zipCode: {}, within {} miles", zipCode, distance);
 
     var coordinates = geocodingService.getCoordinates(zipCode);
@@ -46,8 +47,8 @@ public class ProducerSearchService {
     BigDecimal distanceMeters = BigDecimal.valueOf(distance).multiply(BigDecimal.valueOf(MILES_IN_METERS));
 
     var searchLocations =
-        searchRepository.findProducersWithinDistance(
-            wktPoint, distanceMeters, categoryId, pageable);
+              searchRepository.findProducersWithinDistance(
+                      wktPoint, distanceMeters, categoryId, pageable);
 
     List<UUID> locationIds =
         searchLocations.get().map(ProducerLocationDistanceProjection::getLocationId).toList();
@@ -64,7 +65,7 @@ public class ProducerSearchService {
         zipCode,
         distance);
 
-    return new SearchResponse(
+    return new PageableResponse<>(
         producerSearchMapper.toResponse(searchResults),
         (int) searchLocations.getTotalElements(),
         searchLocations.getNumber(),
