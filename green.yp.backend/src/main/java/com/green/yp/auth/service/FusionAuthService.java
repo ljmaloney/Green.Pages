@@ -112,7 +112,7 @@ public class FusionAuthService implements AuthenticationService {
       log.error(
           "Error occurred when retrieving credentials for {} : {}",
           externalAuthorizationServiceRef,
-          response.errorResponse.toString());
+          response);
       throw new UserCredentialsException(
           "Error when retrieving fusion auth credentials", response.exception);
     }
