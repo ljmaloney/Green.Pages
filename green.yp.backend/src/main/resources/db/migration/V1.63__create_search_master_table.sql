@@ -26,7 +26,7 @@ BEGIN
                                 `city`                     varchar(100)    not null,
                                 `state`                    char(2)         not null,
                                 `postal_code`              varchar(12)     not null,
-                                `email_address`            varchar(150)    not null,
+                                `email_address`            varchar(150),
                                 `phone_number`             varchar(15)     not null,
                                 `min_price`                decimal(10,2),
                                 `max_price`                decimal(10,2),

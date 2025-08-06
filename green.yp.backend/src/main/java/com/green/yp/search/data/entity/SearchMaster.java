@@ -99,12 +99,10 @@ public class SearchMaster extends Mutable {
   private String postalCode;
 
   @Size(max = 150)
-  @NotNull
   @Column(name = "email_address", nullable = false, length = 150)
   private String emailAddress;
 
   @Size(max = 15)
-  @NotNull
   @Column(name = "phone_number", nullable = false, length = 15)
   private String phoneNumber;
 
