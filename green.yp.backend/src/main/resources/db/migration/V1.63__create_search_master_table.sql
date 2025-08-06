@@ -7,7 +7,7 @@ BEGIN
     CREATE TABLE search_master (`id`                      BINARY(16)     NOT NULL,
                                 `version`                 VARCHAR(45)    NOT NULL,
                                 `create_date`             DATETIME       NOT NULL,
-                                `last_upd_date`           DATETIME       NOT NULL,
+                                `last_update_date`        DATETIME       NOT NULL,
                                 `extern_id`               BINARY(16),
                                 `producer_id`             binary(16),
                                 `location_id`             binary(16),
