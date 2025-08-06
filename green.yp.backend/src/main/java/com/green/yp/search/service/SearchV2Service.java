@@ -7,6 +7,7 @@ import com.green.yp.search.data.entity.SearchDistanceProjection;
 import com.green.yp.search.data.repository.SearchRepository;
 import com.green.yp.search.mapper.SearchMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -40,9 +41,9 @@ public class SearchV2Service {
 
         BigDecimal distanceMeters = BigDecimal.valueOf(distance).multiply(BigDecimal.valueOf(MILES_IN_METERS));
 
-        var searchLocations =
-                searchRepository.executeSearch(
-                        wktPoint, distanceMeters, categoryRefId, keywords, pageable);
+    var searchLocations =
+        searchRepository.executeSearch(
+            wktPoint, distanceMeters, categoryRefId, StringUtils.isBlank(keywords) ? null : keywords, pageable);
 
         List<UUID> searchIds =
                 searchLocations.get().map(SearchDistanceProjection::getId).toList();
