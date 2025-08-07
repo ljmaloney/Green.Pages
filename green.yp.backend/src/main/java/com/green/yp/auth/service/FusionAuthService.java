@@ -113,7 +113,7 @@ public class FusionAuthService implements AuthenticationService {
       return new AuthServiceResponse<>("", response.successResponse);
     } else {
       if ( response.getException() instanceof UnknownHostException) {
-          log.error("Could not contact fusionAuth service");
+          log.error("Could not contact fusionAuth service - {}", response.getException().getMessage());
           throw new SystemException("Could not contact fusionAuth service", HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodeType.SYSTEM_ERROR);
       }
         // Handle errors

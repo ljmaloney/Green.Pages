@@ -67,8 +67,8 @@ fusionauth:
   green:
     yp:
       apiKey: ${GYP_FA_API_KEY}
-      baseUrl: http://fusionauth-service.greenyp:9011
-      host: http://fusionauth-service.greenyp:9011
+      baseUrl: https://auth.greenyp.com
+      host: https://auth.greenyp.com
       client:
         id: ${GYP_FA_CLIENT_ID}
         secret: ${GYP_FA_CLIENT_SECRET}
