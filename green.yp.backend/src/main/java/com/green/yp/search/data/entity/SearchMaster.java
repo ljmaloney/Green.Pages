@@ -9,7 +9,6 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -39,17 +38,20 @@ public class SearchMaster extends Mutable {
   @Column(name = "category_ref", length = 16)
   private UUID categoryRef;
 
+  @Column(name = "category_name", length = 150)
+  private String categoryName;
+
   @Enumerated(EnumType.STRING)
   @Column(name = "record_type", length = 50)
   private SearchRecordType recordType;
 
-    @Convert(converter = BooleanConverter.class)
-    @Column(name = "active", nullable = false)
-    private Boolean active;
+  @Convert(converter = BooleanConverter.class)
+  @Column(name = "active", nullable = false)
+  private Boolean active;
 
-    @Temporal(TemporalType.DATE)
-    @Column(name="last_active_date")
-    private LocalDate lastActiveDate;
+  @Temporal(TemporalType.DATE)
+  @Column(name = "last_active_date")
+  private LocalDate lastActiveDate;
 
   @Lob
   @Column(name = "keywords")
@@ -128,19 +130,77 @@ public class SearchMaster extends Mutable {
   @Column(name = "description")
   private String description;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
 
-        if (o == null || getClass() != o.getClass()) return false;
+    if (o == null || getClass() != o.getClass()) return false;
 
-        SearchMaster that = (SearchMaster) o;
+    SearchMaster that = (SearchMaster) o;
 
-        return new EqualsBuilder().appendSuper(super.equals(o)).append(externId, that.externId).append(producerId, that.producerId).append(locationId, that.locationId).append(categoryRef, that.categoryRef).append(recordType, that.recordType).append(active, that.active).append(lastActiveDate, that.lastActiveDate).append(keywords, that.keywords).append(title, that.title).append(businessName, that.businessName).append(businessUrl, that.businessUrl).append(businessIconUrl, that.businessIconUrl).append(imageUrl, that.imageUrl).append(addressLine1, that.addressLine1).append(addressLine2, that.addressLine2).append(city, that.city).append(state, that.state).append(postalCode, that.postalCode).append(emailAddress, that.emailAddress).append(phoneNumber, that.phoneNumber).append(minPrice, that.minPrice).append(maxPrice, that.maxPrice).append(priceUnitsType, that.priceUnitsType).append(longitude, that.longitude).append(latitude, that.latitude).append(description, that.description).isEquals();
-    }
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(externId, that.externId)
+        .append(producerId, that.producerId)
+        .append(locationId, that.locationId)
+        .append(categoryRef, that.categoryRef)
+        .append(categoryName, that.categoryName)
+        .append(recordType, that.recordType)
+        .append(active, that.active)
+        .append(lastActiveDate, that.lastActiveDate)
+        .append(keywords, that.keywords)
+        .append(title, that.title)
+        .append(businessName, that.businessName)
+        .append(businessUrl, that.businessUrl)
+        .append(businessIconUrl, that.businessIconUrl)
+        .append(imageUrl, that.imageUrl)
+        .append(addressLine1, that.addressLine1)
+        .append(addressLine2, that.addressLine2)
+        .append(city, that.city)
+        .append(state, that.state)
+        .append(postalCode, that.postalCode)
+        .append(emailAddress, that.emailAddress)
+        .append(phoneNumber, that.phoneNumber)
+        .append(minPrice, that.minPrice)
+        .append(maxPrice, that.maxPrice)
+        .append(priceUnitsType, that.priceUnitsType)
+        .append(longitude, that.longitude)
+        .append(latitude, that.latitude)
+        .append(description, that.description)
+        .isEquals();
+  }
 
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(externId).append(producerId).append(locationId).append(categoryRef).append(recordType).append(active).append(lastActiveDate).append(keywords).append(title).append(businessName).append(businessUrl).append(businessIconUrl).append(imageUrl).append(addressLine1).append(addressLine2).append(city).append(state).append(postalCode).append(emailAddress).append(phoneNumber).append(minPrice).append(maxPrice).append(priceUnitsType).append(longitude).append(latitude).append(description).toHashCode();
-    }
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(externId)
+        .append(producerId)
+        .append(locationId)
+        .append(categoryRef)
+        .append(categoryName)
+        .append(recordType)
+        .append(active)
+        .append(lastActiveDate)
+        .append(keywords)
+        .append(title)
+        .append(businessName)
+        .append(businessUrl)
+        .append(businessIconUrl)
+        .append(imageUrl)
+        .append(addressLine1)
+        .append(addressLine2)
+        .append(city)
+        .append(state)
+        .append(postalCode)
+        .append(emailAddress)
+        .append(phoneNumber)
+        .append(minPrice)
+        .append(maxPrice)
+        .append(priceUnitsType)
+        .append(longitude)
+        .append(latitude)
+        .append(description)
+        .toHashCode();
+  }
 }

@@ -3,19 +3,19 @@ package com.green.yp.search.data.repository;
 import com.green.yp.search.data.entity.SearchDistanceProjection;
 import com.green.yp.search.data.entity.SearchMaster;
 import com.green.yp.search.data.entity.SearchRecord;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.UUID;
-
 public interface SearchRepository extends JpaRepository<SearchMaster, UUID> {
-    @Query(
-            value = """
+  @Query(
+      value =
+          """
               SELECT
                 bin_to_uuid(sm.id) as id,
                 bin_to_uuid(sm.producer_id) as producerId,
@@ -26,27 +26,29 @@ public interface SearchRepository extends JpaRepository<SearchMaster, UUID> {
                 AND (?3 IS NULL OR sm.category_ref = ?3)
                 AND (?4 IS NULL OR MATCH(keywords, title, description) AGAINST (?4))
                 AND (?2 IS NULL OR ST_Distance_Sphere(sm.location_geo_point, ST_GeomFromText(?1, 4326)) <= ?2 )
+                AND (sm.last_active_date is NULL OR sm.last_active_date >= current_date)
               ORDER BY distance ASC
               """,
-            countQuery =
-                    """
+      countQuery =
+          """
               SELECT COUNT(*)
               FROM search_master sm
              WHERE sm.active = 'Y'
                 AND (?3 IS NULL OR sm.category_ref = ?3)
                 AND (?4 IS NULL OR MATCH(keywords, title, description) AGAINST (?4))
                 AND (?2 IS NULL OR ST_Distance_Sphere(sm.location_geo_point, ST_GeomFromText(?1, 4326)) <= ?2 )
+                AND (sm.last_active_date is NULL OR sm.last_active_date >= current_date)
              """,
-            nativeQuery = true)
-    Page<SearchDistanceProjection> executeSearch(
-            @Param("wktPoint") String wktPoint,
-            @Param("distanceFilter") BigDecimal distanceFilter,
-            @Param("categoryId") UUID categoryId,
-            @Param("keywords")  String keywords,
-            Pageable pageable);
+      nativeQuery = true)
+  Page<SearchDistanceProjection> executeSearch(
+      @Param("wktPoint") String wktPoint,
+      @Param("distanceFilter") BigDecimal distanceFilter,
+      @Param("categoryId") UUID categoryId,
+      @Param("keywords") String keywords,
+      Pageable pageable);
 
-    @Query(
-            """
+  @Query(
+      """
               SELECT new com.green.yp.search.data.entity.SearchRecord(
                   search,
                   CAST(ROUND((3959.0 * acos(cos(radians(:latitude)) * cos(radians(search.latitude)) *
@@ -62,8 +64,8 @@ public interface SearchRepository extends JpaRepository<SearchMaster, UUID> {
               sin(radians(:latitude)) * sin(radians(search.latitude)))) ASC,
               search.businessName ASC
           """)
-    List<SearchRecord> loadSearchResults(
-            @Param("searchMasterIds") List<UUID> searchIds,
-            @Param("latitude") Double latitude,
-            @Param("longitude") Double longitude);
+  List<SearchRecord> loadSearchResults(
+      @Param("searchMasterIds") List<UUID> searchIds,
+      @Param("latitude") Double latitude,
+      @Param("longitude") Double longitude);
 }
