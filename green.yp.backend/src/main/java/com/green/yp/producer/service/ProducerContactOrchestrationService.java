@@ -151,19 +151,24 @@ public class ProducerContactOrchestrationService {
           "Contact must have either a generic name or a firstName + lastName");
     }
 
-    var validation = emailContract.validateEmail(producerId.toString(), createContactRequest.emailAddress());
+    String validationToken = null;
+    if (!createContactRequest.importFlag()) {
+        var validation = emailContract.validateEmail(producerId.toString(), createContactRequest.emailAddress());
+        validationToken = validation.token();
+    }
 
     ProducerContact contact = producerContactMapper.toEntity(createContactRequest);
     contact.setProducerId(producerId);
     contact.setProducerLocationId(locationId);
     if (StringUtils.isNotBlank(contact.getEmailAddress())) {
-      contact.setEmailConfirmationToken(validation.token());
+      contact.setEmailConfirmationToken(validationToken);
       contact.setEmailConfirmed(false);
     }
 
     ProducerContact savedContact = contactRepository.saveAndFlush(contact);
 
-    if (StringUtils.isNotBlank(contact.getEmailAddress())) {
+    final String token = validationToken;
+    if (!createContactRequest.importFlag() && StringUtils.isNotBlank(contact.getEmailAddress())) {
       var contactName = StringUtils.isNotBlank(createContactRequest.genericContactName())
               ? createContactRequest.genericContactName()
               : String.join(" ", createContactRequest.firstName(), createContactRequest.lastName());
@@ -175,7 +180,7 @@ public class ProducerContactOrchestrationService {
                 Map<String, Object> templateData = new HashMap<>();
                 templateData.put("contactName", contactName);
                 templateData.put("title", "Subscriber Contact Created");
-                templateData.put("emailValidationToken", validation.token());
+                templateData.put("emailValidationToken", token);
                 templateData.put("ipAddress", ipAddress);
                 templateData.put("timestamp", contact.getCreateDate());
                 return templateData;
