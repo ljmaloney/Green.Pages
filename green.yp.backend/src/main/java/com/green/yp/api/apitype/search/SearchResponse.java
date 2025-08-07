@@ -10,6 +10,7 @@ public record SearchResponse(
         String producerId,
         String locationId,
         String categoryRef,
+        String categoryName,
         SearchRecordType recordType,
         Boolean active,
         LocalDate lastActiveDate,

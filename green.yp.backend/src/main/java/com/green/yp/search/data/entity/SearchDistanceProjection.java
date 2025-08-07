@@ -4,8 +4,11 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public interface SearchDistanceProjection {
-    UUID getId();
-    UUID getProducerId();
-    UUID getLocationId();
-    BigDecimal getDistance();
+  UUID getId();
+
+  UUID getProducerId();
+
+  UUID getLocationId();
+
+  BigDecimal getDistance();
 }
