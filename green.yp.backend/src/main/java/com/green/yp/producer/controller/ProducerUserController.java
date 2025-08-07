@@ -64,7 +64,7 @@ public class ProducerUserController {
             null,
             credentialsRequest.businessPhone(),
             credentialsRequest.cellPhone(),
-            credentialsRequest.emailAddress()),
+            credentialsRequest.emailAddress(), false),
         Optional.of(credentialsRequest),
         producerId,
         null,

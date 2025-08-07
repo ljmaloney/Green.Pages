@@ -95,7 +95,7 @@ public class ProducerImportService {
             null,
             importRecord.phone,
             null,
-            null),
+            null, true),
         Optional.empty(),
         producerResponse.producerId(),
         locationResponse.locationId(),

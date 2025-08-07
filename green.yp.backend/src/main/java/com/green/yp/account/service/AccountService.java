@@ -300,7 +300,7 @@ public class AccountService {
                       null,
                       request.businessPhone(),
                       request.cellPhone(),
-                      request.emailAddress()),
+                      request.emailAddress(), false),
                   producerResponse.producerId(),
                   contactResponse.producerLocationId(),
                   ipAddress);

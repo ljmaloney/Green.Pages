@@ -26,4 +26,5 @@ public record ProducerContactRequest(
         String cellPhoneNumber,
     @Email(message = "The email address is not correctly formatted")
         @Size(max = 150, message = "The maximum length of an email address is 150 characters")
-        String emailAddress) {}
+        String emailAddress,
+        Boolean importFlag) {}
