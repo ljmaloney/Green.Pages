@@ -30,12 +30,30 @@ public class AsyncConfig implements AsyncConfigurer {
   @Value("${green.yp.email.maxQueueSize:150}")
   private Integer maxQueueSize;
 
+    @Value("${green.yp.search.coreThreads:2}")
+    private Integer searchCoreThreads;
+
+    @Value("${green.yp.search.maxThreads:20}")
+    private Integer searchMaxThreads;
+
+    @Value("${green.yp.search.maxQueueSize:150}")
+    private Integer searchAuditQueueSize;
+
   @Override
   public Executor getAsyncExecutor() {
     ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
     threadPoolTaskExecutor.initialize();
     return threadPoolTaskExecutor;
   }
+
+    @Bean(name = "threadPoolSearchTaskExecutor")
+    public Executor threadPoolSearchTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(searchCoreThreads);
+        executor.setMaxPoolSize(searchMaxThreads);
+        executor.setQueueCapacity(searchAuditQueueSize);
+        return executor;
+    }
 
   @Bean(name = "threadPoolAuditTaskExecutor")
   public Executor threadPoolTaskExecutor() {

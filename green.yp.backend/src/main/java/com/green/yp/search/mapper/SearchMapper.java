@@ -1,8 +1,12 @@
 package com.green.yp.search.mapper;
 
+import com.green.yp.api.apitype.search.SearchMasterRequest;
 import com.green.yp.api.apitype.search.SearchResponse;
+import com.green.yp.search.data.entity.SearchMaster;
 import com.green.yp.search.data.entity.SearchRecord;
 import java.util.List;
+
+import jakarta.validation.constraints.NotNull;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -43,4 +47,11 @@ public interface SearchMapper {
   @Mapping(target = "latitude", source = "searchMaster.latitude")
   @Mapping(target = "description", source = "searchMaster.description")
   SearchResponse toResponse(SearchRecord searchResult);
+
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "version", ignore = true)
+  @Mapping(target = "createDate", ignore = true)
+  @Mapping(target = "lastUpdateDate", ignore = true)
+  @Mapping(target = "active", ignore = true)
+    SearchMaster toEntity(@NotNull SearchMasterRequest request);
 }

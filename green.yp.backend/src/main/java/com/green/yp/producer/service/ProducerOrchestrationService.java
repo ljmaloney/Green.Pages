@@ -46,8 +46,9 @@ public class ProducerOrchestrationService {
 
   private static final String PRODUCER_ID = "ProducerId";
   private static final long MONTH_INCREMENT = 1L;
+    private final ProducerSearchService producerSearchService;
 
-  @Value("${green.yp.pro.subscription.interval.type:month}")
+    @Value("${green.yp.pro.subscription.interval.type:month}")
   private String intervalType;
 
   @Value("${green.yp.pro.subscription.interval.amount:1}")
@@ -76,7 +77,7 @@ public class ProducerOrchestrationService {
           ProducerLobRepository producerLobRepository,
           ProducerSubscriptionRepository subscriptionRepository, ProducerSubProcessRepository subProcessRepository,
           SubscriptionContract subscriptionContract,
-          ProducerSubscriptionService subscriptionService) {
+          ProducerSubscriptionService subscriptionService, ProducerSearchService producerSearchService) {
     this.lobContract = lobContract;
     this.producerMapper = producerMapper;
     this.producerRepository = producerRepository;
@@ -85,6 +86,7 @@ public class ProducerOrchestrationService {
       this.subProcessRepository = subProcessRepository;
       this.subscriptionContract = subscriptionContract;
     this.subscriptionService = subscriptionService;
+      this.producerSearchService = producerSearchService;
   }
 
   @AuditRequest(
@@ -154,8 +156,8 @@ public class ProducerOrchestrationService {
                             producerUpdate.producerId())));
 
     if (!producerLob.getLineOfBusinessId().equals(producerUpdate.lineOfBusinessId())) {
-      producerLob.setPrimaryLob(false);
-      producer.addLineOfBusiness(
+        producer.getLinesOfBusiness().clear();
+        producer.addLineOfBusiness(
           ProducerLineOfBusiness.builder()
               .producer(producer)
               .producerId(producer.getId())
@@ -172,8 +174,14 @@ public class ProducerOrchestrationService {
             : null);
 
     Producer savedProducer = producerRepository.saveAndFlush(producer);
+
+      ProducerResponse response = producerMapper.fromEntity(savedProducer, lobDto);
+
+      producerSearchService.updateProducer(response);
+
     log.info("Updated producer/subscriber record for {}", savedProducer.getId());
-    return producerMapper.fromEntity(savedProducer, lobDto);
+
+      return response;
   }
 
   Producer findActiveProducer(@NonNull UUID producerId) {
@@ -282,6 +290,8 @@ public class ProducerOrchestrationService {
             });
 
     producerRepository.saveAndFlush(producer);
+
+    producerSearchService.activateProducer(producerId);
 
     return findProducer(producerId);
   }
