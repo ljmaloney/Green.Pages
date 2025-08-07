@@ -62,7 +62,7 @@ public interface SearchRepository extends JpaRepository<SearchMaster, UUID> {
               (3959.0 * acos(cos(radians(:latitude)) * cos(radians(search.latitude)) *
               cos(radians(search.longitude) - radians(:longitude)) +
               sin(radians(:latitude)) * sin(radians(search.latitude)))) ASC,
-              search.businessName ASC
+              search.businessName ASC, search.recordType ASC
           """)
   List<SearchRecord> loadSearchResults(
       @Param("searchMasterIds") List<UUID> searchIds,
