@@ -152,7 +152,7 @@ public class ProducerContactOrchestrationService {
     }
 
     String validationToken = null;
-    if (!createContactRequest.importFlag()) {
+    if (!createContactRequest.importFlag() && StringUtils.isNotBlank(createContactRequest.emailAddress())) {
         var validation = emailContract.validateEmail(producerId.toString(), createContactRequest.emailAddress());
         validationToken = validation.token();
     }
