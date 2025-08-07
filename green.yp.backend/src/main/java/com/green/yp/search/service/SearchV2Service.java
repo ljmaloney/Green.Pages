@@ -1,14 +1,19 @@
 package com.green.yp.search.service;
 
 import com.green.yp.api.apitype.PageableResponse;
+import com.green.yp.api.apitype.search.SearchMasterRequest;
 import com.green.yp.api.apitype.search.SearchResponse;
 import com.green.yp.geolocation.service.GeocodingService;
 import com.green.yp.search.data.entity.SearchDistanceProjection;
 import com.green.yp.search.data.repository.SearchRepository;
 import com.green.yp.search.mapper.SearchMapper;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -69,4 +74,27 @@ public class SearchV2Service {
         searchLocations.getNumber(),
         searchLocations.getTotalPages());
   }
+
+  public UUID createSearchMaster(@NotNull SearchMasterRequest request) {
+      log.info("Creating search master record for externRef {} recordType {}",
+              request.externId(), request.recordType());
+
+      var searchMaster = searchRepository.saveAndFlush(searchMapper.toEntity(request));
+
+      return  searchMaster.getId();
+  }
+
+  public void deleteSearchMaster(@NotNull UUID externRefId) {
+    log.info("Deleting search master record for externRef {}", externRefId);
+    searchRepository.deleteSearchMasterByExternId(externRefId);
+  }
+  public void disableProducerSearch(@NotNull UUID producerId, LocalDate lastActiveDate) {
+      log.info("Disabling search master for producer with id {} as of lastActiveDate {}", producerId, lastActiveDate);
+      int count = searchRepository.disableSearch(producerId, lastActiveDate, OffsetDateTime.now());
+      log.info("{} GREEN_PRO records disabled for {} as of {}", count, producerId, lastActiveDate);
+  }
+
+    public void createSearchMaster(List<SearchMasterRequest> searchList) {
+      searchList.forEach(this::createSearchMaster);
+    }
 }

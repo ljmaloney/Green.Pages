@@ -1,20 +1,27 @@
 package com.green.yp.api.apitype.search;
 
 import com.green.yp.api.apitype.enumeration.SearchRecordType;
+import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
-public record SearchResponse(
-        String externId,
-        String producerId,
-        String locationId,
-        String categoryRef,
+@Builder
+public record SearchMasterRequest(
+        @NotNull @NotNull
+        UUID externId,
+        UUID producerId,
+        UUID locationId,
+        UUID categoryRef,
+        @NotNull @NotNull
         String categoryName,
+        @NotNull @NotNull
         SearchRecordType recordType,
-        Boolean active,
         LocalDate lastActiveDate,
         String keywords,
+        @NotNull @NotNull
         String title,
         String businessName,
         String businessUrl,
@@ -30,7 +37,8 @@ public record SearchResponse(
         BigDecimal minPrice,
         BigDecimal maxPrice,
         String priceUnitsType,
+        @NotNull @NotNull
         BigDecimal longitude,
+        @NotNull @NotNull
         BigDecimal latitude,
-        BigDecimal distance,
         String description) {}

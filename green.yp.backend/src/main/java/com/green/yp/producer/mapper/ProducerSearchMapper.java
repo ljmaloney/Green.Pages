@@ -3,13 +3,14 @@ package com.green.yp.producer.mapper;
 import com.green.yp.api.apitype.producer.LocationHoursResponse;
 import com.green.yp.api.apitype.producer.ProducerProfileResponse;
 import com.green.yp.api.apitype.search.ProducerSearchResponse;
+import com.green.yp.api.apitype.search.SearchMasterRequest;
 import com.green.yp.api.apitype.search.TruncatedProducerResponse;
-import com.green.yp.producer.data.model.ProducerLocationHours;
-import com.green.yp.producer.data.model.ProducerSubscription;
+import com.green.yp.producer.data.model.*;
 import com.green.yp.producer.data.record.ProducerSearchRecord;
 import java.util.List;
 import java.util.UUID;
 
+import com.green.yp.reference.dto.LineOfBusinessDto;
 import org.apache.commons.collections4.CollectionUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -78,6 +79,7 @@ public interface ProducerSearchMapper {
   @Mapping(target = "postalCode", source = "location.postalCode")
   @Mapping(target = "iconLink", source = "producer.iconLink")
   @Mapping(target = "subscriptionIds", source ="producer.subscriptionList")
+  @Mapping(target = "keywords", source = "producer.keywords")
   ProducerProfileResponse toProfileResponse(ProducerSearchRecord searchRecord);
 
   default List<UUID> toSubscriptionIds(List<ProducerSubscription> producerSubscriptions){
@@ -90,4 +92,37 @@ public interface ProducerSearchMapper {
   List<LocationHoursResponse> toHoursResponse(List<ProducerLocationHours> locationHours);
 
   LocationHoursResponse toResponse(ProducerLocationHours locationHours);
+
+  @Mapping(target = "externId", source = "location.id")
+  @Mapping(target = "producerId", source = "producer.id")
+  @Mapping(target = "locationId", source = "location.id")
+  @Mapping(target = "categoryRef", source = "lob.lineOfBusinessId")
+  @Mapping(target = "categoryName", source = "lob.lineOfBusinessName")
+  @Mapping(target = "recordType", constant = "GREEN_PRO")
+  @Mapping(target = "lastActiveDate", ignore = true)
+  @Mapping(target = "keywords", source = "profileKeywords")
+  @Mapping(target = "title", source = "location.locationName")
+  @Mapping(target = "businessName", source = "producer.name")
+  @Mapping(target = "businessUrl", source = "location.websiteUrl")
+  @Mapping(target = "businessIconUrl", source = "producer.iconLink")
+  @Mapping(target = "imageUrl", ignore = true)
+  @Mapping(target = "addressLine1", source = "location.addressLine1")
+  @Mapping(target = "addressLine2", source = "location.addressLine2")
+  @Mapping(target = "city", source = "location.city")
+  @Mapping(target = "state", source = "location.state")
+  @Mapping(target = "postalCode", source = "location.postalCode")
+  @Mapping(target = "emailAddress", source = "contact.emailAddress")
+  @Mapping(target = "phoneNumber", source = "contact.phoneNumber")
+  @Mapping(target = "minPrice", ignore = true)
+  @Mapping(target = "maxPrice", ignore = true)
+  @Mapping(target = "priceUnitsType", ignore = true)
+  @Mapping(target = "longitude", source = "location.longitude")
+  @Mapping(target = "latitude", source = "location.latitude")
+  @Mapping(target = "description", source = "producer.narrative")
+  SearchMasterRequest toSearchMaster(
+      Producer producer,
+      ProducerLocation location,
+      ProducerContact contact,
+      LineOfBusinessDto lob,
+      String profileKeywords);
 }

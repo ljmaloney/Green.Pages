@@ -4,14 +4,21 @@ import com.green.yp.search.data.entity.SearchDistanceProjection;
 import com.green.yp.search.data.entity.SearchMaster;
 import com.green.yp.search.data.entity.SearchRecord;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
+
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface SearchRepository extends JpaRepository<SearchMaster, UUID> {
   @Query(
       value =
@@ -68,4 +75,16 @@ public interface SearchRepository extends JpaRepository<SearchMaster, UUID> {
       @Param("searchMasterIds") List<UUID> searchIds,
       @Param("latitude") Double latitude,
       @Param("longitude") Double longitude);
+
+  @Modifying
+  void deleteSearchMasterByExternId(@NotNull UUID externRefId);
+
+  @Modifying
+  @Query("""
+          UPDATE SearchMaster sm SET sm.lastActiveDate =:lastActiveDate, sm.lastUpdateDate = :updateDate
+          WHERE sm.producerId =:producerId
+    """)
+  int disableSearch(@NotNull @Param("producerId}")UUID producerId,
+                    @Param("lastActiveDate") LocalDate lastActiveDate,
+                    @Param("updateDate")OffsetDateTime updateDate);
 }

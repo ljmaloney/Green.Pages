@@ -31,11 +31,11 @@ public class Producer extends Mutable {
   @Temporal(TemporalType.TIMESTAMP)
   private OffsetDateTime cancelDate;
 
-  @Column(name="cancel_type")
+  @Column(name = "cancel_type")
   @Enumerated(EnumType.STRING)
   private CancelReasonType cancelReasonType;
 
-  @Column(name="cancel_reason")
+  @Column(name = "cancel_reason")
   private String cancelReason;
 
   @Column(name = "last_bill_date")
@@ -56,8 +56,8 @@ public class Producer extends Mutable {
   @Column(name = "icon_link_url")
   private String iconLink;
 
-    @Column(name = "keywords")
-    private String keywords;
+  @Column(name = "keywords")
+  private String keywords;
 
   @Column(name = "narrative", length = 1024)
   private String narrative;
