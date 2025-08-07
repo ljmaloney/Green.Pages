@@ -156,8 +156,8 @@ public class ProducerOrchestrationService {
                             producerUpdate.producerId())));
 
     if (!producerLob.getLineOfBusinessId().equals(producerUpdate.lineOfBusinessId())) {
-      producerLob.setPrimaryLob(false);
-      producer.addLineOfBusiness(
+        producer.getLinesOfBusiness().clear();
+        producer.addLineOfBusiness(
           ProducerLineOfBusiness.builder()
               .producer(producer)
               .producerId(producer.getId())
@@ -174,8 +174,14 @@ public class ProducerOrchestrationService {
             : null);
 
     Producer savedProducer = producerRepository.saveAndFlush(producer);
+
+      ProducerResponse response = producerMapper.fromEntity(savedProducer, lobDto);
+
+      producerSearchService.updateProducer(response);
+
     log.info("Updated producer/subscriber record for {}", savedProducer.getId());
-    return producerMapper.fromEntity(savedProducer, lobDto);
+
+      return response;
   }
 
   Producer findActiveProducer(@NonNull UUID producerId) {
