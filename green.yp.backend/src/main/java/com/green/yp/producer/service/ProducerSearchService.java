@@ -1,6 +1,7 @@
 package com.green.yp.producer.service;
 
 import com.green.yp.api.apitype.producer.ProducerResponse;
+import com.green.yp.api.apitype.producer.enumeration.ProducerLocationType;
 import com.green.yp.api.apitype.search.ProducerSearchResponse;
 import com.green.yp.api.apitype.PageableResponse;
 import com.green.yp.api.apitype.search.SearchMasterRequest;
@@ -11,6 +12,7 @@ import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.geolocation.service.GeocodingService;
 import com.green.yp.producer.data.model.Producer;
 import com.green.yp.producer.data.record.ProducerLocationDistanceProjection;
+import com.green.yp.producer.data.repository.ProducerLocationRepository;
 import com.green.yp.producer.data.repository.ProducerRepository;
 import com.green.yp.producer.data.repository.ProducerSearchRepository;
 import com.green.yp.producer.mapper.ProducerSearchMapper;
@@ -32,6 +34,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import static java.lang.Boolean.TRUE;
+
 @Slf4j
 @Service
 @Validated
@@ -39,21 +43,20 @@ public class ProducerSearchService {
 
   private static final double MILES_IN_METERS = 1609.34d;
   private final ProducerSearchRepository searchRepository;
-  private final ProducerLocationService producerLocationService;
-  private final ProducerRepository producerRepository;
+  private final ProducerLocationRepository locationRepository;
   private final GeocodingService geocodingService;
   private final ProducerSearchMapper producerSearchMapper;
   private final SearchContract searchContract;
   private final LineOfBusinessContract lobContract;
 
   public ProducerSearchService(
-          ProducerSearchRepository searchRepository, ProducerLocationService producerLocationService, ProducerRepository producerRepository,
+          ProducerSearchRepository searchRepository,
+          ProducerLocationRepository locationRepository,
           @Qualifier("defaultGeocodeServiceImpl") GeocodingService geocodingService,
           ProducerSearchMapper producerSearchMapper,
           SearchContract searchContract, LineOfBusinessContract lobContract) {
     this.searchRepository = searchRepository;
-      this.producerLocationService = producerLocationService;
-      this.producerRepository = producerRepository;
+      this.locationRepository = locationRepository;
       this.geocodingService = geocodingService;
     this.producerSearchMapper = producerSearchMapper;
       this.searchContract = searchContract;
@@ -99,8 +102,15 @@ public class ProducerSearchService {
     @Async("threadPoolSearchTaskExecutor")
     public void activateProducer(UUID producerId) {
         log.info("Activating producer search master record for  producerId: {}", producerId);
-        var primaryLocation = producerLocationService.findPrimaryLocation(producerId);
-        createLocationSearchRecords(primaryLocation.locationId());
+        log.info("Loading primary location for producer account - {}", producerId);
+        locationRepository
+                .findLocation(producerId, TRUE, ProducerLocationType.HOME_OFFICE_PRIMARY)
+                .ifPresentOrElse( loc -> {
+                    createLocationSearchRecords(loc.getId());
+                }, () -> {
+                    log.info("Primary location was not found or is not active for {}", producerId);
+                    throw new NotFoundException(String.format("Primary location not found for %s", producerId));
+                });
     }
 
     @Async("threadPoolSearchTaskExecutor")
