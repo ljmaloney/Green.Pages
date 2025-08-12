@@ -128,39 +128,55 @@ public class ProducerContactService {
     return producerContactMapper.fromEntity(contacts);
   }
 
-  public void validateContact(@NotNull @NonNull UUID producerId,
-                              @NotNull @NonNull UUID contactId,
-                              @NotNull @NonNull String validationToken) {
-    contactRepository.findById(contactId).ifPresentOrElse( contact -> {
-      if (contact.isValidEmailToken(validationToken)) {
-        contact.setEmailConfirmed(true);
-        contact.setEmailConfirmedDate(OffsetDateTime.now());
-        contactRepository.save(contact);
-      } else {
-        log.warn("Invalid email token {} for {}", validationToken, contactId);
-        throw new BusinessException("Invalid email validation token", HttpStatus.BAD_REQUEST, ErrorCodeType.BUSINESS_VALIDATION_ERROR);
-      }
-    }, () -> {
-      log.warn("No contact found for {}", contactId);
-      throw new NotFoundException("No contact found for " + contactId);
-    });
+  public void validateContact(
+      @NotNull @NonNull UUID producerId,
+      @NotNull @NonNull UUID contactId,
+      @NotNull @NonNull String validationToken) {
+    contactRepository
+        .findById(contactId)
+        .ifPresentOrElse(
+            contact -> {
+              if (contact.isValidEmailToken(validationToken)) {
+                contact.setEmailConfirmed(true);
+                contact.setEmailConfirmedDate(OffsetDateTime.now());
+                contactRepository.save(contact);
+              } else {
+                log.warn("Invalid email token {} for {}", validationToken, contactId);
+                throw new BusinessException(
+                    "Invalid email validation token",
+                    HttpStatus.BAD_REQUEST,
+                    ErrorCodeType.BUSINESS_VALIDATION_ERROR);
+              }
+            },
+            () -> {
+              log.warn("No contact found for {}", contactId);
+              throw new NotFoundException("No contact found for " + contactId);
+            });
   }
 
-  public void validateEmail(@NotNull @NonNull UUID accountId,
-                            @NotNull @NonNull String email,
-                            @NotNull @NonNull String validationToken) {
-    contactRepository.findByProducerIdAndEmailAddress(accountId, email).ifPresentOrElse( contact -> {
-      if (contact.isValidEmailToken(validationToken)) {
-        contact.setEmailConfirmed(true);
-        contact.setEmailConfirmedDate(OffsetDateTime.now());
-        contactRepository.save(contact);
-      } else {
-        log.warn("Invalid email token {} for {}", validationToken, email);
-        throw new BusinessException("Invalid email validation token", HttpStatus.BAD_REQUEST, ErrorCodeType.BUSINESS_VALIDATION_ERROR);
-      }
-    }, () -> {
-      log.warn("No contact found for {}", email);
-      throw new NotFoundException("No contact found for " + email);
-    });
+  public void validateEmail(
+      @NotNull @NonNull UUID accountId,
+      @NotNull @NonNull String email,
+      @NotNull @NonNull String validationToken) {
+    contactRepository
+        .findByProducerIdAndEmailAddress(accountId, email)
+        .ifPresentOrElse(
+            contact -> {
+              if (contact.isValidEmailToken(validationToken)) {
+                contact.setEmailConfirmed(true);
+                contact.setEmailConfirmedDate(OffsetDateTime.now());
+                contactRepository.save(contact);
+              } else {
+                log.warn("Invalid email token {} for {}", validationToken, email);
+                throw new BusinessException(
+                    "Invalid email validation token",
+                    HttpStatus.BAD_REQUEST,
+                    ErrorCodeType.BUSINESS_VALIDATION_ERROR);
+              }
+            },
+            () -> {
+              log.warn("No contact found for {}", email);
+              throw new NotFoundException("No contact found for " + email);
+            });
   }
 }

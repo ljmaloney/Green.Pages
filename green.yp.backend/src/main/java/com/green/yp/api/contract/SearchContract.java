@@ -1,5 +1,6 @@
 package com.green.yp.api.contract;
 
+import com.green.yp.api.apitype.enumeration.SearchRecordType;
 import com.green.yp.api.apitype.search.SearchMasterRequest;
 import com.green.yp.search.service.SearchV2Service;
 import jakarta.validation.constraints.NotNull;
@@ -39,5 +40,9 @@ public class SearchContract {
 
     public void deleteSearchMaster(List<UUID> producerIds, String ipAddress) {
         searchV2Service.deleteProducerSearchMaster(producerIds);
+    }
+
+    public void deleteSearchMaster(UUID externId, SearchRecordType recordType) {
+        searchV2Service.deleteProducerSearchMaster(externId, recordType);
     }
 }

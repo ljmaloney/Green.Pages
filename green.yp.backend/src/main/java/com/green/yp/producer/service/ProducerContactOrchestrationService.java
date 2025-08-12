@@ -20,7 +20,6 @@ import com.green.yp.producer.mapper.ProducerContactMapper;
 import jakarta.validation.constraints.NotNull;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;

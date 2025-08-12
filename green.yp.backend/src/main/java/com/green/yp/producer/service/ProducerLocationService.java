@@ -92,7 +92,7 @@ public class ProducerLocationService {
       objectType = AuditObjectType.PRODUCER_LOCATION,
       actionType = AuditActionType.UPDATE)
   public ProducerLocationResponse updateLocation(
-          LocationRequest updateLocationRequest, AuthenticatedUser user, String requestIP) {
+      LocationRequest updateLocationRequest, AuthenticatedUser user, String requestIP) {
 
     log.info("Updating location {} from {}", updateLocationRequest.locationId(), requestIP);
 
@@ -101,8 +101,8 @@ public class ProducerLocationService {
             .findById(updateLocationRequest.locationId())
             .orElseThrow(
                 () -> new NotFoundException(PRODUCER_LOCATION, updateLocationRequest.locationId()));
-    
-   boolean addressChanged = addressChanged(location, updateLocationRequest);
+
+    boolean addressChanged = addressChanged(location, updateLocationRequest);
 
     location.setLocationName(updateLocationRequest.locationName());
     location.setLocationType(updateLocationRequest.locationType());
@@ -116,7 +116,7 @@ public class ProducerLocationService {
     location.setPostalCode(updateLocationRequest.postalCode());
     location.setWebsiteUrl(updateLocationRequest.websiteUrl());
 
-    if ( addressChanged ){
+    if (addressChanged) {
       GeocodeLocation geocodeLocation = geocodingService.geocodeLocation(location);
       location.setLatitude(geocodeLocation.latitude());
       location.setLongitude(geocodeLocation.longitude());
@@ -126,7 +126,8 @@ public class ProducerLocationService {
 
   private boolean addressChanged(ProducerLocation location, LocationRequest updateLocationRequest) {
     return !StringUtils.equals(location.getAddressLine1(), updateLocationRequest.addressLine1())
-        || !StringUtils.equals(StringUtils.trimToEmpty(location.getAddressLine2()), 
+        || !StringUtils.equals(
+            StringUtils.trimToEmpty(location.getAddressLine2()),
             StringUtils.trimToEmpty(updateLocationRequest.addressLine2()))
         || !StringUtils.equals(location.getCity(), updateLocationRequest.city())
         || !StringUtils.equals(location.getState(), updateLocationRequest.state())

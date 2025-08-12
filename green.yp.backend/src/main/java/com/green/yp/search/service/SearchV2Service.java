@@ -95,6 +95,10 @@ public class SearchV2Service {
       searchRepository.deleteSearchMasterByProducerIds(producerIds);
   }
 
+    public  void deleteProducerSearchMaster(UUID externId, SearchRecordType recordType) {
+      log.info("Deleting search master record for externRef {} recordType {}", externId, recordType);
+        searchRepository.deleteSearchMasterByExternIdAndRecordType(externId, recordType);
+    }
 
   public void disableProducerSearch(@NotNull UUID producerId, LocalDate lastActiveDate) {
       log.info("Disabling search master for producer with id {} as of lastActiveDate {}", producerId, lastActiveDate);
@@ -142,4 +146,6 @@ public class SearchV2Service {
               .get();
 
     }
+
+
 }

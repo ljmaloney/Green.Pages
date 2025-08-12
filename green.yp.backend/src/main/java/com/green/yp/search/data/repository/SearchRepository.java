@@ -1,5 +1,6 @@
 package com.green.yp.search.data.repository;
 
+import com.green.yp.api.apitype.enumeration.SearchRecordType;
 import com.green.yp.search.data.entity.SearchDistanceProjection;
 import com.green.yp.search.data.entity.SearchMaster;
 import com.green.yp.search.data.entity.SearchRecord;
@@ -110,4 +111,5 @@ public interface SearchRepository extends JpaRepository<SearchMaster, UUID> {
     @Query("DELETE FROM SearchMaster sm WHERE sm.producerId IN :producerIds")
     void deleteSearchMasterByProducerIds(@Param("producerIds") List<UUID> producerIds);
 
+    void deleteSearchMasterByExternIdAndRecordType(UUID externId, SearchRecordType recordType);
 }

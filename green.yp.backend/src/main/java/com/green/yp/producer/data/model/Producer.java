@@ -123,4 +123,9 @@ public class Producer extends Mutable {
         .append(subscriptionList)
         .toHashCode();
   }
+
+    public ProducerLineOfBusiness getPrimaryLineOfBusiness() {
+      return linesOfBusiness.stream().filter(ProducerLineOfBusiness::getPrimaryLob)
+              .findFirst().orElse(null);
+    }
 }

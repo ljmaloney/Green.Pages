@@ -1,15 +1,12 @@
 package com.green.yp.producer.service;
 
 import com.green.yp.api.AuditRequest;
-import com.green.yp.api.apitype.PatchRequest;
 import com.green.yp.api.apitype.enumeration.AuditActionType;
 import com.green.yp.api.apitype.enumeration.AuditObjectType;
 import com.green.yp.api.apitype.producer.CreateProductRequest;
 import com.green.yp.api.apitype.producer.DiscontinueProductRequest;
 import com.green.yp.api.apitype.producer.ProducerProductRequest;
 import com.green.yp.api.apitype.producer.ProducerProductResponse;
-import com.green.yp.common.ServiceUtils;
-import com.green.yp.exception.BusinessException;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.producer.data.model.Producer;
@@ -18,14 +15,11 @@ import com.green.yp.producer.data.repository.ProducerProductRepository;
 import com.green.yp.producer.mapper.ProducerProductMapper;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Supplier;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.stereotype.Service;
 
 @Service
