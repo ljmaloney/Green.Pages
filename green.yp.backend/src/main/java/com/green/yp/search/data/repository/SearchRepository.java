@@ -100,7 +100,7 @@ public interface SearchRepository extends JpaRepository<SearchMaster, UUID> {
             SELECT sm
             FROM SearchMaster sm
             WHERE sm.externId=:externId AND sm.producerId=:producerId
-                  AND sm.locationId=:locationId AND sm.customerRef=:customerRef
+                  AND sm.locationId=:locationId AND sm.categoryRef=:categoryRef
         """)
   Optional<SearchMaster> findSearchMaster(@NotNull @NotNull @Param("externId") UUID externId,
                         @NotNull @NotNull @Param("producerId") UUID producerId,
