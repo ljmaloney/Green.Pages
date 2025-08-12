@@ -164,7 +164,7 @@ public interface ProducerSearchMapper {
                           String keywords);
 
     @Mapping(target = "externId", source = "product.productId")
-    @Mapping(target = "producerId", source = "producer.producerId")
+    @Mapping(target = "producerId", source = "product.producerId")
     @Mapping(target = "locationId", source = "product.producerLocationId")
     @Mapping(target = "categoryRef", source = "lob.lineOfBusinessId")
     @Mapping(target = "categoryName", source = "lob.lineOfBusinessName")
