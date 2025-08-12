@@ -13,21 +13,20 @@ import com.green.yp.api.apitype.payment.PaymentTransactionResponse;
 import com.green.yp.api.contract.EmailContract;
 import com.green.yp.api.contract.InvoiceContract;
 import com.green.yp.api.contract.ProducerPaymentContract;
+import com.green.yp.api.contract.SearchContract;
 import com.green.yp.classifieds.data.model.Classified;
-import com.green.yp.classifieds.data.model.ClassifiedCustomer;
 import com.green.yp.classifieds.data.model.ClassifiedCustomerProjection;
-import com.green.yp.classifieds.data.repository.ClassifiedCustomerRepository;
+import com.green.yp.classifieds.data.model.ClassifiedImageGallery;
+import com.green.yp.classifieds.data.repository.ClassifiedImageGalleryRepository;
 import com.green.yp.classifieds.data.repository.ClassifiedRepository;
+import com.green.yp.classifieds.mapper.ClassifiedMapper;
 import com.green.yp.classifieds.mapper.ClassifiedPaymentMapper;
-import com.green.yp.email.service.EmailService;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.util.TokenUtils;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -39,11 +38,13 @@ import org.springframework.stereotype.Service;
 public class ClassifiedPaymentService {
   private final ProducerPaymentContract producerPaymentContract;
   private final ClassifiedPaymentMapper paymentMapper;
+  private final ClassifiedMapper classifiedMapper;
   private final ClassifiedRepository classifiedRepository;
   private final ClassifiedAdTypeService adTypeService;
   private final ClassifiedCategoryService classifiedCategoryService;
-  private final ClassifiedCustomerRepository customerRepository;
+  private final ClassifiedImageGalleryRepository imageGalleryRepository;
   private final InvoiceContract invoiceContract;
+  private final SearchContract searchContract;
   private final EmailContract emailService;
 
   private static final String PAYMENT_NOTE_FORMAT = """
@@ -58,22 +59,23 @@ public class ClassifiedPaymentService {
   private String classifiedUrl;
 
   public ClassifiedPaymentService(
-      ProducerPaymentContract producerPaymentContract,
-      ClassifiedRepository classifiedRepository,
-      ClassifiedCustomerRepository customerRepository,
-      ClassifiedAdTypeService adTypeService,
-      ClassifiedCategoryService classifiedCategoryService,
-      EmailContract emailService,
-      InvoiceContract invoiceContract,
-      ClassifiedPaymentMapper paymentMapper) {
+          ProducerPaymentContract producerPaymentContract, ClassifiedMapper classifiedMapper,
+          ClassifiedRepository classifiedRepository,
+          ClassifiedAdTypeService adTypeService,
+          ClassifiedCategoryService classifiedCategoryService,
+          EmailContract emailService,
+          InvoiceContract invoiceContract,
+          ClassifiedPaymentMapper paymentMapper, ClassifiedImageGalleryRepository imageGalleryRepository, SearchContract searchContract) {
     this.producerPaymentContract = producerPaymentContract;
-    this.paymentMapper = paymentMapper;
+      this.classifiedMapper = classifiedMapper;
+      this.paymentMapper = paymentMapper;
     this.adTypeService = adTypeService;
     this.classifiedCategoryService = classifiedCategoryService;
     this.classifiedRepository = classifiedRepository;
     this.emailService = emailService;
-    this.customerRepository = customerRepository;
     this.invoiceContract = invoiceContract;
+      this.imageGalleryRepository = imageGalleryRepository;
+      this.searchContract = searchContract;
   }
 
   public ClassifiedPaymentResponse processPayment(
@@ -135,6 +137,8 @@ public class ClassifiedPaymentService {
     classified.classified().setLastActiveDate(LocalDate.now().plusMonths(1));
     classifiedRepository.save(classified.classified());
 
+    createSearchMaster(classified, category);
+
     return new ClassifiedPaymentResponse(classified.classified().getId(),
             classified.classified().getTitle(),
             paymentResponse.status(),
@@ -142,7 +146,31 @@ public class ClassifiedPaymentService {
             paymentResponse.orderRef(), paymentResponse.receiptNumber(), null, null);
   }
 
-  private void sendConfirmationEmail(String requestIP, ClassifiedAdTypeResponse adType, ClassifiedCustomerProjection classified, ClassifiedCategoryResponse category, String directLink, PaymentTransactionResponse paymentResponse) {
+    private void createSearchMaster(ClassifiedCustomerProjection classified, ClassifiedCategoryResponse category) {
+      log.info("Creating search master for classified {}", classified.classified().getId());
+
+        var image = imageGalleryRepository.findFirstByClassifiedId(classified.classified().getId())
+                .map(ClassifiedImageGallery::getUrl)
+                .orElse(null);
+
+      var searchRequest = classifiedMapper.toSearchRequest(classified.classified(),
+              classified.customer(),
+              category,
+              image,
+              createKeywords(classified, category));
+
+      searchContract.upsertSearchMaster(List.of(searchRequest), classified.classified().getId());
+
+  }
+
+    private String createKeywords(ClassifiedCustomerProjection classified, ClassifiedCategoryResponse category) {
+      return String.join(" ", category.name(),
+              category.shortDescription(),
+              classified.classified().getTitle(),
+              classified.classified().getDescription());
+    }
+
+    private void sendConfirmationEmail(String requestIP, ClassifiedAdTypeResponse adType, ClassifiedCustomerProjection classified, ClassifiedCategoryResponse category, String directLink, PaymentTransactionResponse paymentResponse) {
     String subject = String.format("Greenyp - %s classified ad confirmation", adType.adTypeName());
     emailService.sendEmail(EmailTemplateType.CLASSIFIED_CONFIRMATION,
             Collections.singletonList(classified.classified().getEmailAddress()),
