@@ -5,6 +5,7 @@ import com.green.yp.api.apitype.PatchRequest;
 import com.green.yp.api.apitype.ProducerServiceResponse;
 import com.green.yp.api.apitype.enumeration.AuditActionType;
 import com.green.yp.api.apitype.enumeration.AuditObjectType;
+import com.green.yp.api.apitype.enumeration.SearchRecordType;
 import com.green.yp.api.apitype.producer.ProducerServiceDeleteRequest;
 import com.green.yp.api.apitype.producer.ProducerServiceRequest;
 import com.green.yp.api.apitype.producer.ProducerServiceUpdateRequest;
@@ -29,14 +30,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProducerServicesService {
 
   private final ProducerServiceMapper serviceMapper;
-
   private final ProducerServiceRepository serviceRepository;
+  private final ProducerSearchService searchService;
 
   public ProducerServicesService(
-          ProducerServiceMapper serviceMapper,
-          ProducerServiceRepository serviceRepository) {
+      ProducerServiceMapper serviceMapper,
+      ProducerServiceRepository serviceRepository,
+      ProducerSearchService searchService) {
     this.serviceMapper = serviceMapper;
     this.serviceRepository = serviceRepository;
+    this.searchService = searchService;
   }
 
   public List<ProducerServiceResponse> findServices(
@@ -78,27 +81,35 @@ public class ProducerServicesService {
 
     ProducerService producerService = serviceRepository.saveAndFlush(service);
 
-    return serviceMapper.fromEntity(producerService);
+    var response = serviceMapper.fromEntity(producerService);
+    searchService.upsertProducerService(response);
+    return response;
   }
 
   @AuditRequest(
-          requestParameter = "updateRequest",
-          objectType = AuditObjectType.PRODUCER_SERVICE,
-          actionType = AuditActionType.UPDATE)
+      requestParameter = "updateRequest",
+      objectType = AuditObjectType.PRODUCER_SERVICE,
+      actionType = AuditActionType.UPDATE)
   @Transactional
-  public ProducerServiceResponse updateService(ProducerServiceUpdateRequest updateRequest, String requestIP) {
+  public ProducerServiceResponse updateService(
+      ProducerServiceUpdateRequest updateRequest, String requestIP) {
     log.info("Updating service {}", updateRequest.serviceId());
 
-    var service = serviceRepository.findById(updateRequest.serviceId()).orElseThrow(() -> {
-      log.warn("No producer service found for id {}",updateRequest.serviceId());
-        return new NotFoundException("ProducerService", updateRequest.serviceId());
-    });
+    var service =
+        serviceRepository
+            .findById(updateRequest.serviceId())
+            .orElseThrow(
+                () -> {
+                  log.warn("No producer service found for id {}", updateRequest.serviceId());
+                  return new NotFoundException("ProducerService", updateRequest.serviceId());
+                });
 
     ServiceUtils.updateFromRecord(service, updateRequest, "serviceId");
 
     ProducerService producerService = serviceRepository.saveAndFlush(service);
-
-    return serviceMapper.fromEntity(producerService);
+    var response = serviceMapper.fromEntity(producerService);
+    searchService.upsertProducerService(response);
+    return response;
   }
 
   @AuditRequest(
@@ -120,11 +131,12 @@ public class ProducerServicesService {
       ServiceUtils.patchEntity(
           patchRequest,
           producerService,
-          (name, value) -> switch (name) {
-              case "minServicePrice" -> BigDecimal.valueOf((Double) value);
-              case "maxServicePrice" -> BigDecimal.valueOf((Double) value);
-              default -> value;
-          });
+          (name, value) ->
+              switch (name) {
+                case "minServicePrice" -> BigDecimal.valueOf((Double) value);
+                case "maxServicePrice" -> BigDecimal.valueOf((Double) value);
+                default -> value;
+              });
       return serviceMapper.fromEntity(serviceRepository.save(producerService));
 
     } catch (Exception e) {
@@ -136,15 +148,19 @@ public class ProducerServicesService {
   public void deleteService(@NotNull @NonNull UUID serviceId, String userId, String requestIP) {
     log.info("Deleting service {} from {}", serviceId, requestIP);
     serviceRepository.deleteById(serviceId);
+    searchService.deleteSearch(serviceId, SearchRecordType.GREEN_PRO_SERVICE);
   }
 
   @Transactional
   public void discontinueService(ProducerServiceDeleteRequest deleteRequest) {
-    var service = serviceRepository.findById(deleteRequest.serviceId())
-            .orElseThrow(() -> {
-              log.warn("No service found for id {}", deleteRequest.serviceId());
-              throw new NotFoundException("ProducerService", deleteRequest.serviceId());
-            });
+    var service =
+        serviceRepository
+            .findById(deleteRequest.serviceId())
+            .orElseThrow(
+                () -> {
+                  log.warn("No service found for id {}", deleteRequest.serviceId());
+                  throw new NotFoundException("ProducerService", deleteRequest.serviceId());
+                });
 
     service.setDiscontinued(true);
     service.setDiscontinueDate(deleteRequest.discontinueDate());

@@ -1,9 +1,13 @@
 package com.green.yp.producer.service;
 
+import static java.lang.Boolean.TRUE;
+
+import com.green.yp.api.apitype.PageableResponse;
+import com.green.yp.api.apitype.ProducerServiceResponse;
+import com.green.yp.api.apitype.enumeration.SearchRecordType;
 import com.green.yp.api.apitype.producer.ProducerResponse;
 import com.green.yp.api.apitype.producer.enumeration.ProducerLocationType;
 import com.green.yp.api.apitype.search.ProducerSearchResponse;
-import com.green.yp.api.apitype.PageableResponse;
 import com.green.yp.api.apitype.search.SearchMasterRequest;
 import com.green.yp.api.contract.LineOfBusinessContract;
 import com.green.yp.api.contract.SearchContract;
@@ -12,16 +16,16 @@ import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.geolocation.service.GeocodingService;
 import com.green.yp.producer.data.model.ProducerLocation;
 import com.green.yp.producer.data.record.ProducerLocationDistanceProjection;
+import com.green.yp.producer.data.record.ProducerSearchRecord;
 import com.green.yp.producer.data.repository.ProducerLocationRepository;
 import com.green.yp.producer.data.repository.ProducerSearchRepository;
 import com.green.yp.producer.mapper.ProducerSearchMapper;
+import com.green.yp.reference.dto.LineOfBusinessDto;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import com.green.yp.reference.dto.LineOfBusinessDto;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -33,8 +37,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-
-import static java.lang.Boolean.TRUE;
 
 @Slf4j
 @Service
@@ -133,8 +135,42 @@ public class ProducerSearchService {
       searchContract.upsertSearchMaster(searchRequests, producerResponse.producerId());
     }
 
+    public void deleteSearch(@NotNull @NonNull UUID serviceId,
+                             @NotNull @NonNull SearchRecordType recordType) {
+        log.info("Deleting product / service {} type {}", serviceId, recordType);
+        searchContract.deleteSearchMaster(serviceId, recordType);
+    }
+
+    public void upsertProducerService(ProducerServiceResponse response) {
+        log.info("Upserting producer service: {}", response);
+
+        var profile = getProducerProfile(response.producerLocationId());
+        var lob = lobContract.findLineOfBusiness(profile.producer().getPrimaryLineOfBusiness().getLineOfBusinessId());
+        String keywordsBuilder = lob.lineOfBusinessName() + " " +
+                                 response.shortDescription();
+        searchContract.upsertSearchMaster(List.of(producerSearchMapper
+                .toSearchMaster(response, profile.producer(), profile.location(), profile.contact(), lob, keywordsBuilder)),response.producerId());
+    }
+
     @NotNull
     private List<SearchMasterRequest> createSearchRequests(@NotNull UUID locationId) {
+        var profile = getProducerProfile(locationId);
+
+        return profile.producer().getLinesOfBusiness().parallelStream()
+            .map(
+            pline -> {
+              var lob = lobContract.findLineOfBusiness(pline.getLineOfBusinessId());
+              return producerSearchMapper.toSearchMaster(
+                  profile.producer(),
+                  profile.location(),
+                  profile.contact(),
+                  lob,
+                  createProfileKeywords(profile.producer().getKeywords(), lob));
+            })
+            .toList();
+    }
+
+    private ProducerSearchRecord getProducerProfile(UUID locationId) {
         var profile = searchRepository.findProducerProfile(locationId)
                 .orElseThrow(()-> {
                     log.error("No producer profile found for location {}", locationId);
@@ -146,19 +182,7 @@ public class ProducerSearchService {
                     locationId, profile.producer().getCancelDate());
             throw new PreconditionFailedException("Error creating search master record for location, producer cancelled " + locationId);
         }
-
-    return profile.producer().getLinesOfBusiness().parallelStream()
-        .map(
-            pline -> {
-              var lob = lobContract.findLineOfBusiness(pline.getLineOfBusinessId());
-              return producerSearchMapper.toSearchMaster(
-                  profile.producer(),
-                  profile.location(),
-                  profile.contact(),
-                  lob,
-                  createProfileKeywords(profile.producer().getKeywords(), lob));
-            })
-        .toList();
+        return profile;
     }
 
     private String createProfileKeywords(String keywords, LineOfBusinessDto lob) {
@@ -167,5 +191,4 @@ public class ProducerSearchService {
         services.forEach(service -> keywordsBuilder.append(service.getServiceName()).append(" "));
         return keywordsBuilder.toString();
     }
-
 }

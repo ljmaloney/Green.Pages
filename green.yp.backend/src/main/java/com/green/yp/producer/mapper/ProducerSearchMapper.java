@@ -1,5 +1,6 @@
 package com.green.yp.producer.mapper;
 
+import com.green.yp.api.apitype.ProducerServiceResponse;
 import com.green.yp.api.apitype.producer.LocationHoursResponse;
 import com.green.yp.api.apitype.producer.ProducerProfileResponse;
 import com.green.yp.api.apitype.search.ProducerSearchResponse;
@@ -126,4 +127,38 @@ public interface ProducerSearchMapper {
       ProducerContact contact,
       LineOfBusinessDto lob,
       String profileKeywords);
+
+    @Mapping(target = "externId", source = "service.producerServiceId")
+    @Mapping(target = "producerId", source = "service.producerId")
+    @Mapping(target = "locationId", source = "service.producerLocationId")
+    @Mapping(target = "categoryRef", source = "lob.lineOfBusinessId")
+    @Mapping(target = "categoryName", source = "lob.lineOfBusinessName")
+    @Mapping(target = "recordType", constant = "GREEN_PRO_SERVICE")
+    @Mapping(target = "lastActiveDate", ignore = true)
+    @Mapping(target = "keywords", source = "keywords")
+    @Mapping(target = "title", source = "service.shortDescription")
+    @Mapping(target = "businessName", source = "producer.name")
+    @Mapping(target = "businessUrl", source = "location.websiteUrl")
+    @Mapping(target = "businessIconUrl", source = "producer.iconLink")
+    @Mapping(target = "imageUrl", ignore = true)
+    @Mapping(target = "addressLine1", source = "location.addressLine1")
+    @Mapping(target = "addressLine2", source = "location.addressLine2")
+    @Mapping(target = "city", source = "location.city")
+    @Mapping(target = "state", source = "location.state")
+    @Mapping(target = "postalCode", source = "location.postalCode")
+    @Mapping(target = "emailAddress", source = "contact.emailAddress")
+    @Mapping(target = "phoneNumber", source = "contact.phoneNumber")
+    @Mapping(target = "minPrice", source = "service.minServicePrice")
+    @Mapping(target = "maxPrice", source = "service.maxServicePrice")
+    @Mapping(target = "priceUnitsType",source = "service.priceUnitsType")
+    @Mapping(target = "longitude", source = "location.longitude")
+    @Mapping(target = "latitude", source = "location.latitude")
+    @Mapping(target = "description", source = "service.description")
+    @Mapping(target = "customerRef", ignore = true)
+    SearchMasterRequest toSearchMaster(ProducerServiceResponse service,
+                          Producer producer,
+                          ProducerLocation location,
+                          ProducerContact contact,
+                          LineOfBusinessDto lob,
+                          String keywords);
 }
