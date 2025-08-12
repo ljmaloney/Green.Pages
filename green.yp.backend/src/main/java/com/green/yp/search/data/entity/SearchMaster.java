@@ -22,8 +22,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Table(name = "search_master", schema = "greenyp")
 public class SearchMaster extends Mutable {
 
-  @Size(max = 16)
-  @Column(name = "extern_id", length = 16)
+    @Column(name = "extern_id", length = 16)
   private UUID externId;
 
   @Column(name = "customer_ref")
