@@ -100,15 +100,8 @@ public class ProducerProductService {
 
     validateProducerActive(product.getProducerId(), product.getProducerLocationId());
 
-    product.setName(productRequest.name());
-    product.setPrice(productRequest.price());
-    product.setAvailableQuantity(productRequest.availableQuantity());
-    product.setContainerSize(productRequest.containerSize());
-    product.setBotanicalGroup(productRequest.botanicalGroup());
-    product.setDiscontinued(productRequest.discontinued());
-    product.setProductType(productRequest.productType());
-    product.setDescription(productRequest.description());
-    product.setAttributes(productRequest.attributeMap());
+    mapper.updateEntity(productRequest, product);
+
     if (Boolean.TRUE.equals(productRequest.discontinued())) {
       product.setDiscontinueDate(productRequest.discontinueDate());
       product.setLastOrderDate(productRequest.lastOrderDate());

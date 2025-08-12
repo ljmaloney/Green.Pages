@@ -117,6 +117,10 @@ public class ClassifiedSearchService {
                 searchPageResults.getTotalPages());
     }
 
+    public void createSearchMaster(){
+
+    }
+
     private Optional<ClassifiedImageGallery> findImage(List<ClassifiedImageGallery> images, UUID classifiedId) {
         return images.stream()
                 .filter( image -> image.getClassifiedId().equals(classifiedId))

@@ -47,6 +47,9 @@ public class ProducerProduct extends Mutable {
   @Column(name = "price")
   private BigDecimal price;
 
+  @Column(name="price_per")
+  private String pricePerType;
+
   @Column(name = "available_quantity")
   private BigInteger availableQuantity;
 

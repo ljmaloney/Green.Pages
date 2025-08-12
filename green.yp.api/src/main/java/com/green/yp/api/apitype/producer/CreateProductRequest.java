@@ -16,6 +16,7 @@ public record CreateProductRequest(
     String botanicalGroup,
     @NotNull @NonNull String name,
     BigDecimal price,
+    String pricePerType,
     BigInteger availableQuantity,
     String containerSize,
     String description,
