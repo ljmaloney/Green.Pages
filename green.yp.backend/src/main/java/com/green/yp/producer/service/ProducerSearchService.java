@@ -105,9 +105,8 @@ public class ProducerSearchService {
         log.info("Loading primary location for producer account - {}", producerId);
         locationRepository
                 .findLocation(producerId, TRUE, ProducerLocationType.HOME_OFFICE_PRIMARY)
-                .ifPresentOrElse( loc -> {
-                    createLocationSearchRecords(loc.getId());
-                }, () -> {
+                .ifPresentOrElse( loc -> createLocationSearchRecords(loc.getId()),
+                        () -> {
                     log.info("Primary location was not found or is not active for {}", producerId);
                     throw new NotFoundException(String.format("Primary location not found for %s", producerId));
                 });

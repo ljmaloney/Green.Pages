@@ -91,6 +91,11 @@ public class SearchV2Service {
     searchRepository.deleteSearchMasterByExternId(externRefId);
   }
 
+  public void deleteProducerSearchMaster(List<UUID> producerIds) {
+      searchRepository.deleteSearchMasterByProducerIds(producerIds);
+  }
+
+
   public void disableProducerSearch(@NotNull UUID producerId, LocalDate lastActiveDate) {
       log.info("Disabling search master for producer with id {} as of lastActiveDate {}", producerId, lastActiveDate);
       int count = searchRepository.disableSearch(producerId, lastActiveDate, OffsetDateTime.now());

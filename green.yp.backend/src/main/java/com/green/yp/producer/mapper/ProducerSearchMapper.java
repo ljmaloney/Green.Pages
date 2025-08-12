@@ -119,6 +119,7 @@ public interface ProducerSearchMapper {
   @Mapping(target = "longitude", source = "location.longitude")
   @Mapping(target = "latitude", source = "location.latitude")
   @Mapping(target = "description", source = "producer.narrative")
+  @Mapping(target = "customerRef", ignore = true)
   SearchMasterRequest toSearchMaster(
       Producer producer,
       ProducerLocation location,

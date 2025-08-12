@@ -37,4 +37,7 @@ public class SearchContract {
         searchV2Service.upsertSearchMaster(searchRequests,custonerRefId);
     }
 
+    public void deleteSearchMaster(List<UUID> producerIds, String ipAddress) {
+        searchV2Service.deleteProducerSearchMaster(producerIds);
+    }
 }

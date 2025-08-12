@@ -89,7 +89,11 @@ public interface SearchRepository extends JpaRepository<SearchMaster, UUID> {
                     @Param("lastActiveDate") LocalDate lastActiveDate,
                     @Param("updateDate")OffsetDateTime updateDate);
 
-    Optional<SearchMaster> findSearchMaster(@NotNull @NotNull UUID externId, String customerRef);
+  @Query(""" 
+     SELECT sm FROM SearchMaster sm WHERE sm.externId=:externId AND sm.customerRef=:customerRef
+   """)
+  Optional<SearchMaster> findSearchMaster(@NotNull @NotNull @Param("externId") UUID externId,
+                                          @NotNull @NotNull @Param("customerRef") String customerRef);
 
   @Query("""
             SELECT sm
@@ -101,4 +105,9 @@ public interface SearchRepository extends JpaRepository<SearchMaster, UUID> {
                         @NotNull @NotNull @Param("producerId") UUID producerId,
                         @NotNull @NotNull @Param("locationId") UUID locationId,
                         @NotNull @NotNull @Param("categoryRef") UUID categoryRef);
+
+    @Modifying
+    @Query("DELETE FROM SearchMaster sm WHERE sm.producerId IN :producerIds")
+    void deleteSearchMasterByProducerIds(@Param("producerIds") List<UUID> producerIds);
+
 }
