@@ -29,15 +29,12 @@ public class SearchMaster extends Mutable {
   @Column(name = "customer_ref")
   private String customerRef;
 
-  @Size(max = 16)
   @Column(name = "producer_id", length = 16)
   private UUID producerId;
 
-  @Size(max = 16)
   @Column(name = "location_id", length = 16)
   private UUID locationId;
 
-  @Size(max = 16)
   @Column(name = "category_ref", length = 16)
   private UUID categoryRef;
 
