@@ -44,36 +44,40 @@ public class ProducerCsvImportService {
       List<CSVRecord> records = csvParser.getRecords();
 
       var customThreadPool = new ForkJoinPool(importThreads);
-      customThreadPool.submit(() ->
-      records.parallelStream()
-          .filter(csvRecord -> csvRecord.getRecordNumber() != 1)
-              .map(csvRecord -> new ProducerImportService.ProducerCsvRecord(
-                      csvRecord.getRecordNumber(),
-                      csvRecord.get(0),
-                      csvRecord.get(1),
-                      csvRecord.get(2),
-                      csvRecord.get(3),
-                      csvRecord.get(4),
-                      csvRecord.get(5),
-                      csvRecord.get(6),
-                      csvRecord.get(7),
-                      csvRecord.get(8),
-                      StringUtils.truncate(csvRecord.get(9), 12)))
-              .forEach( parsedRecord -> {
-                  try{
-                    UUID createdProducerId = importService.importProducer(lineOfBusinessId, parsedRecord);
-                    createdProducerIds.add(createdProducerId);
-                    log.info("Imported : {}", parsedRecord);
-                } catch (Exception e) {
-                  log.error("Error processing {}", parsedRecord, e);
-                  throw new SystemException(
-                      "Failed to process csv record: " + parsedRecord.recordNumber(), e);
-                }
-              }));
-    }catch (SystemException se){
+      customThreadPool.submit(
+          () ->
+              records.parallelStream()
+                  .filter(csvRecord -> csvRecord.getRecordNumber() != 1)
+                  .map(
+                      csvRecord ->
+                          new ProducerImportService.ProducerCsvRecord(
+                              csvRecord.getRecordNumber(),
+                              csvRecord.get(0),
+                              csvRecord.get(1),
+                              csvRecord.get(2),
+                              csvRecord.get(3),
+                              csvRecord.get(4),
+                              csvRecord.get(5),
+                              csvRecord.get(6),
+                              csvRecord.get(7),
+                              csvRecord.get(8),
+                              StringUtils.truncate(csvRecord.get(9), 12)))
+                  .forEach(
+                      parsedRecord -> {
+                        try {
+                          UUID createdProducerId =
+                              importService.importProducer(lineOfBusinessId, parsedRecord);
+                          createdProducerIds.add(createdProducerId);
+                          log.info("Imported : {}", parsedRecord);
+                        } catch (Exception e) {
+                          log.error("Error processing {}", parsedRecord, e);
+                          throw new SystemException(
+                              "Failed to process csv record: " + parsedRecord.recordNumber(), e);
+                        }
+                      }));
+    } catch (SystemException se) {
       throw se;
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.error("Error processing CSV file", e);
       throw new SystemException("Failed to process CSV file: " + e.getMessage(), e);
     }

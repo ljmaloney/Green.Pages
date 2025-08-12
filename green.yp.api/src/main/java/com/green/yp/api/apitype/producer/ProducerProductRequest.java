@@ -15,6 +15,7 @@ public record ProducerProductRequest(
         String botanicalGroup,
         String name,
         BigDecimal price,
+        String pricePerType,
         BigInteger availableQuantity,
         String containerSize,
         String description,

@@ -52,18 +52,19 @@ public class AccountPaymentService {
   private final PaymentContract paymentContract;
 
   private final AccountPaymentMapper paymentMapper;
+    private final SearchContract searchContract;
 
-  public AccountPaymentService(
-      EmailService emailService,
-      InvoiceContract invoiceContract,
-      ProducerInvoiceContract producerInvoiceContract,
-      ProducerContract producerContract,
-      EmailContract emailContract,
-      ProducerPaymentContract producerPaymentContract,
-      ProducerContactContract contactContract,
-      ProducerLocationContract locationContract,
-      PaymentContract paymentContract,
-      AccountPaymentMapper paymentMapper) {
+    public AccountPaymentService(
+          EmailService emailService,
+          InvoiceContract invoiceContract,
+          ProducerInvoiceContract producerInvoiceContract,
+          ProducerContract producerContract,
+          EmailContract emailContract,
+          ProducerPaymentContract producerPaymentContract,
+          ProducerContactContract contactContract,
+          ProducerLocationContract locationContract,
+          PaymentContract paymentContract,
+          AccountPaymentMapper paymentMapper, SearchContract searchContract) {
     this.emailService = emailService;
     this.invoiceContract = invoiceContract;
     this.producerInvoiceContract = producerInvoiceContract;
@@ -74,7 +75,8 @@ public class AccountPaymentService {
     this.locationContract = locationContract;
     this.paymentContract = paymentContract;
     this.paymentMapper = paymentMapper;
-  }
+        this.searchContract = searchContract;
+    }
 
   /**
    * Applies the first subscription payment and makes the account go "live".
@@ -316,6 +318,9 @@ public class AccountPaymentService {
     log.info("Removed / deleted locations for {}", producerIds);
 
     producerContract.deleteProducers(producerIds, ipAddress);
+
+    searchContract.deleteSearchMaster(producerIds, ipAddress);
+
     log.info("Removed / deleted producer records for {}", producerIds);
 
     log.info("Removed {} unpaid account subscriptions", producerIds.size());

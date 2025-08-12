@@ -1,15 +1,12 @@
 package com.green.yp.producer.service;
 
 import com.green.yp.api.AuditRequest;
-import com.green.yp.api.apitype.PatchRequest;
 import com.green.yp.api.apitype.enumeration.AuditActionType;
 import com.green.yp.api.apitype.enumeration.AuditObjectType;
 import com.green.yp.api.apitype.producer.CreateProductRequest;
 import com.green.yp.api.apitype.producer.DiscontinueProductRequest;
 import com.green.yp.api.apitype.producer.ProducerProductRequest;
 import com.green.yp.api.apitype.producer.ProducerProductResponse;
-import com.green.yp.common.ServiceUtils;
-import com.green.yp.exception.BusinessException;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.producer.data.model.Producer;
@@ -18,14 +15,11 @@ import com.green.yp.producer.data.repository.ProducerProductRepository;
 import com.green.yp.producer.mapper.ProducerProductMapper;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Supplier;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -37,18 +31,21 @@ public class ProducerProductService {
 
   private final ProducerLocationService locationService;
 
+  private final ProducerSearchService searchService;
+
   private final ProducerProductRepository productRepository;
 
   private final ProducerProductMapper mapper;
 
   public ProducerProductService(
-      ProducerOrchestrationService producerService,
-      ProducerLocationService locationService,
-      ProducerProductRepository productRepository,
-      ProducerProductMapper mapper) {
+          ProducerOrchestrationService producerService,
+          ProducerLocationService locationService, ProducerSearchService searchService,
+          ProducerProductRepository productRepository,
+          ProducerProductMapper mapper) {
     this.producerService = producerService;
     this.locationService = locationService;
-    this.productRepository = productRepository;
+      this.searchService = searchService;
+      this.productRepository = productRepository;
     this.mapper = mapper;
   }
 
@@ -81,8 +78,9 @@ public class ProducerProductService {
         productRequest.producerLocationId());
 
     validateProducerActive(productRequest.producerId(), productRequest.producerLocationId());
-
-    return mapper.fromEntity(productRepository.saveAndFlush(mapper.toEntity(productRequest)));
+    var response = mapper.fromEntity(productRepository.saveAndFlush(mapper.toEntity(productRequest)));
+    searchService.upsertProduct(response);
+    return response;
   }
 
   @AuditRequest(
@@ -102,21 +100,16 @@ public class ProducerProductService {
 
     validateProducerActive(product.getProducerId(), product.getProducerLocationId());
 
-    product.setName(productRequest.name());
-    product.setPrice(productRequest.price());
-    product.setAvailableQuantity(productRequest.availableQuantity());
-    product.setContainerSize(productRequest.containerSize());
-    product.setBotanicalGroup(productRequest.botanicalGroup());
-    product.setDiscontinued(productRequest.discontinued());
-    product.setProductType(productRequest.productType());
-    product.setDescription(productRequest.description());
-    product.setAttributes(productRequest.attributeMap());
+    mapper.updateEntity(productRequest, product);
+
     if (Boolean.TRUE.equals(productRequest.discontinued())) {
       product.setDiscontinueDate(productRequest.discontinueDate());
       product.setLastOrderDate(productRequest.lastOrderDate());
     }
 
-    return mapper.fromEntity(productRepository.saveAndFlush(product));
+      var response = mapper.fromEntity(productRepository.saveAndFlush(product));
+      searchService.upsertProduct(response);
+      return response;
   }
 
   public void discontinueImmediate(
@@ -133,7 +126,6 @@ public class ProducerProductService {
       actionType = AuditActionType.DISCONTINUE_PRODUCT)
   public ProducerProductResponse discontinue(
       @Valid DiscontinueProductRequest discontinueRequest, String userId, String requestIP) {
-
     log.info("Discontinue product : {}", discontinueRequest);
 
     final ProducerProduct product =
@@ -152,7 +144,9 @@ public class ProducerProductService {
     product.setDiscontinueDate(discontinueRequest.discontinueDate());
     product.setLastOrderDate(discontinueRequest.lastOrderDate());
 
-    return mapper.fromEntity(productRepository.saveAndFlush(product));
+    var response = mapper.fromEntity(productRepository.saveAndFlush(product));
+    searchService.upsertProduct(response);
+    return response;
   }
 
   private boolean discontinueDatesChanged(

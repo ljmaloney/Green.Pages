@@ -37,7 +37,8 @@ import org.springframework.transaction.annotation.Propagation;
 @Service
 public class ProducerUserService {
 
-  public static final String CREATE_MASTER_ADMIN_USER_LOG_MESSAGE = "Create master admin user as {} for {}";
+  public static final String CREATE_MASTER_ADMIN_USER_LOG_MESSAGE =
+      "Create master admin user as {} for {}";
   final ProducerOrchestrationService producerService;
 
   final ProducerAuthUserMapper authUserMapper;
@@ -55,14 +56,14 @@ public class ProducerUserService {
   private final AuthenticationContract authenticationContract;
 
   public ProducerUserService(
-          ProducerOrchestrationService producerService,
-          ProducerAuthUserMapper authUserMapper,
-          ProducerContactService contactService,
-          ProducerUserCredentialsRepository credentialsRepository,
-          InvalidCredentialsCounterRepository credentialsCounterRepository,
-          CredentialsConfig credentialsConfig,
-          AuditContract auditContract,
-          AuthenticationContract authenticationContract) {
+      ProducerOrchestrationService producerService,
+      ProducerAuthUserMapper authUserMapper,
+      ProducerContactService contactService,
+      ProducerUserCredentialsRepository credentialsRepository,
+      InvalidCredentialsCounterRepository credentialsCounterRepository,
+      CredentialsConfig credentialsConfig,
+      AuditContract auditContract,
+      AuthenticationContract authenticationContract) {
     this.producerService = producerService;
     this.authUserMapper = authUserMapper;
     this.contactService = contactService;
@@ -99,14 +100,11 @@ public class ProducerUserService {
   }
 
   ProducerCredentialsResponse createCredentials(
-          @NonNull @NotNull
-          UserCredentialsRequest credentialsRequest,
+      @NonNull @NotNull UserCredentialsRequest credentialsRequest,
       Boolean accountMaster,
       String emailAddress,
-      @NonNull @NotNull
-      UUID producerId,
-      @NonNull @NotNull
-      UUID contactId,
+      @NonNull @NotNull UUID producerId,
+      @NonNull @NotNull UUID contactId,
       String ipAddress)
       throws NoSuchAlgorithmException {
     log.info(CREATE_MASTER_ADMIN_USER_LOG_MESSAGE, credentialsRequest.userName(), producerId);
@@ -118,7 +116,8 @@ public class ProducerUserService {
     }
 
     AuthServiceResponse<RegistrationResponse> response =
-        authenticationContract.registerUser(producerId, contactId, accountMaster, credentialsRequest);
+        authenticationContract.registerUser(
+            producerId, contactId, accountMaster, credentialsRequest);
 
     ProducerUserCredentials authorizedUser = authUserMapper.toEntity(credentialsRequest);
     authorizedUser.setPassword(createPasswordHash(credentialsRequest.credentials()));
@@ -138,7 +137,6 @@ public class ProducerUserService {
 
     return authUserMapper.fromEntity(savedCredentials);
   }
-
 
   public ProducerCredentialsResponse authorizeUser(
       @NonNull String userId, @NonNull String password, @NonNull String ipAddress)
@@ -198,34 +196,43 @@ public class ProducerUserService {
     credentialsCounterRepository.saveAndFlush(counter);
   }
 
-  public List<ProducerCredentialsResponse> findUsers(@NotNull @NonNull UUID producerId,
-      String firstName, String lastName, String ipAddress) {
+  public List<ProducerCredentialsResponse> findUsers(
+      @NotNull @NonNull UUID producerId, String firstName, String lastName, String ipAddress) {
     log.info("Return credentialed users for {} filtered by {} {}", producerId, firstName, lastName);
     firstName = StringUtils.isBlank(firstName) ? null : firstName;
     lastName = StringUtils.isBlank(lastName) ? null : lastName;
-    return credentialsRepository.findUsers(producerId, firstName, lastName)
-            .stream()
-            .map(authUserMapper::fromEntity)
-            .toList();
+    return credentialsRepository.findUsers(producerId, firstName, lastName).stream()
+        .map(authUserMapper::fromEntity)
+        .toList();
   }
 
-  public Optional<ProducerCredentialsResponse> findCredentials(String userName, String emailAddress){
-    log.debug("Find existing credentials by userName {} or emailAddress {}", userName, emailAddress);
+  public Optional<ProducerCredentialsResponse> findCredentials(
+      String userName, String emailAddress) {
+    log.debug(
+        "Find existing credentials by userName {} or emailAddress {}", userName, emailAddress);
 
-   return credentialsRepository.findCredentialsByUserName(userName, emailAddress)
-           .map(authUserMapper::fromEntity)
-           .or( () -> {
-             authenticationContract.findUser(userName, emailAddress)
-                     .ifPresent( creds -> authenticationContract.removeUser(creds.externalAuthorizationServiceRef()));
+    return credentialsRepository
+        .findCredentialsByUserName(userName, emailAddress)
+        .map(authUserMapper::fromEntity)
+        .or(
+            () -> {
+              authenticationContract
+                  .findUser(userName, emailAddress)
+                  .ifPresent(
+                      creds ->
+                          authenticationContract.removeUser(
+                              creds.externalAuthorizationServiceRef()));
               return Optional.empty();
-           });
-  }
-  public Optional<ProducerCredentialsResponse> findCredentialByRef(String externalUserRef, String ipAddress) {
-    log.debug("Attempting to find credentials for ref {}", externalUserRef);
-    return credentialsRepository.findByExternalAuthorizationServiceRef(externalUserRef)
-            .map(authUserMapper::fromEntity);
+            });
   }
 
+  public Optional<ProducerCredentialsResponse> findCredentialByRef(
+      String externalUserRef, String ipAddress) {
+    log.debug("Attempting to find credentials for ref {}", externalUserRef);
+    return credentialsRepository
+        .findByExternalAuthorizationServiceRef(externalUserRef)
+        .map(authUserMapper::fromEntity);
+  }
 
   public ProducerCredentialsResponse findMasterUserCredentials(UUID producerId) {
     log.info("Loading master user credentials for producer {}", producerId);

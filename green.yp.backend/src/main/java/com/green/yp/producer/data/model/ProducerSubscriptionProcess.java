@@ -5,7 +5,6 @@ import com.green.yp.common.data.embedded.Mutable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
-
 import lombok.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;

@@ -57,7 +57,7 @@ public interface ProducerSearchRepository extends JpaRepository<Producer, UUID> 
   @Query(
       """
         SELECT new com.green.yp.producer.data.record.ProducerSearchRecord(
-            producer, location, contact,
+            producer, location, contact,null,
             CAST(ROUND((3959.0 * acos(cos(radians(:latitude)) * cos(radians(location.latitude)) *
                         cos(radians(location.longitude) - radians(:longitude)) +
                        sin(radians(:latitude)) * sin(radians(location.latitude)))), 2)
@@ -84,7 +84,7 @@ public interface ProducerSearchRepository extends JpaRepository<Producer, UUID> 
       value =
           """
     SELECT new com.green.yp.producer.data.record.ProducerSearchRecord(
-        producer, location, contact, null)
+        producer, location, contact,null, null)
     FROM Producer producer
     JOIN ProducerLocation location ON producer.id = location.producerId
     JOIN ProducerContact contact ON contact.producerLocationId = location.id
@@ -101,9 +101,25 @@ public interface ProducerSearchRepository extends JpaRepository<Producer, UUID> 
   List<ProducerSearchRecord> findMostRecentProfiles(
       @Param("lineOfBusinessId") UUID lineOfBusinessId, Limit limit);
 
+    @Query(
+            """
+          SELECT new com.green.yp.producer.data.record.ProducerSearchRecord(producer, location, contact, lob, null)
+          FROM Producer producer
+          JOIN ProducerLocation location ON producer.id = location.producerId
+          JOIN ProducerContact contact ON contact.producerLocationId = location.id
+          JOIN ProducerLineOfBusiness pline ON pline.producerId = producer.id
+          JOIN LineOfBusiness lob ON lob.id = pline.lineOfBusinessId
+          WHERE producer.id = :producerId
+          AND location.active = true
+          AND contact.displayContactType != com.green.yp.api.apitype.producer.enumeration.ProducerDisplayContactType.NO_DISPLAY
+          AND contact.producerContactType = com.green.yp.api.apitype.producer.enumeration.ProducerContactType.PRIMARY
+          """)
+    List<ProducerSearchRecord> findProducerProfileLines(
+            @Param("producerId") UUID producerId);
+
   @Query(
       """
-    SELECT new com.green.yp.producer.data.record.ProducerSearchRecord(producer, location, contact, null)
+    SELECT new com.green.yp.producer.data.record.ProducerSearchRecord(producer, location, contact, null, null)
     FROM Producer producer
     JOIN ProducerLocation location ON producer.id = location.producerId
     JOIN ProducerContact contact ON contact.producerLocationId = location.id

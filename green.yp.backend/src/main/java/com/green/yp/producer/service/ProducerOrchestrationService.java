@@ -3,6 +3,7 @@ package com.green.yp.producer.service;
 import com.green.yp.api.AuditRequest;
 import com.green.yp.api.apitype.enumeration.AuditActionType;
 import com.green.yp.api.apitype.enumeration.AuditObjectType;
+import com.green.yp.api.apitype.enumeration.ProducerSubProcessType;
 import com.green.yp.api.apitype.producer.*;
 import com.green.yp.api.apitype.producer.enumeration.InvoiceCycleType;
 import com.green.yp.api.apitype.producer.enumeration.ProducerSubscriptionType;
@@ -14,7 +15,6 @@ import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.producer.data.model.Producer;
 import com.green.yp.producer.data.model.ProducerLineOfBusiness;
-import com.green.yp.api.apitype.enumeration.ProducerSubProcessType;
 import com.green.yp.producer.data.model.ProducerSubscriptionProcess;
 import com.green.yp.producer.data.record.ProducerSubscriptionRecord;
 import com.green.yp.producer.data.repository.ProducerLobRepository;
@@ -29,7 +29,6 @@ import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
-
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,8 +45,9 @@ public class ProducerOrchestrationService {
 
   private static final String PRODUCER_ID = "ProducerId";
   private static final long MONTH_INCREMENT = 1L;
+    private final ProducerSearchService producerSearchService;
 
-  @Value("${green.yp.pro.subscription.interval.type:month}")
+    @Value("${green.yp.pro.subscription.interval.type:month}")
   private String intervalType;
 
   @Value("${green.yp.pro.subscription.interval.amount:1}")
@@ -76,7 +76,7 @@ public class ProducerOrchestrationService {
           ProducerLobRepository producerLobRepository,
           ProducerSubscriptionRepository subscriptionRepository, ProducerSubProcessRepository subProcessRepository,
           SubscriptionContract subscriptionContract,
-          ProducerSubscriptionService subscriptionService) {
+          ProducerSubscriptionService subscriptionService, ProducerSearchService producerSearchService) {
     this.lobContract = lobContract;
     this.producerMapper = producerMapper;
     this.producerRepository = producerRepository;
@@ -85,6 +85,7 @@ public class ProducerOrchestrationService {
       this.subProcessRepository = subProcessRepository;
       this.subscriptionContract = subscriptionContract;
     this.subscriptionService = subscriptionService;
+      this.producerSearchService = producerSearchService;
   }
 
   @AuditRequest(
@@ -142,27 +143,11 @@ public class ProducerOrchestrationService {
     producer.setSubscriptionType(
         ProducerSubscriptionType.valueOf(producerUpdate.subscriptionType().name()));
 
-    ProducerLineOfBusiness producerLob =
         producer.getLinesOfBusiness().stream()
             .filter(ProducerLineOfBusiness::getPrimaryLob)
             .findFirst()
-            .orElseThrow(
-                () ->
-                    new BusinessException(
-                        String.format(
-                            "Producer %s missing primary line of business",
-                            producerUpdate.producerId())));
-
-    if (!producerLob.getLineOfBusinessId().equals(producerUpdate.lineOfBusinessId())) {
-      producerLob.setPrimaryLob(false);
-      producer.addLineOfBusiness(
-          ProducerLineOfBusiness.builder()
-              .producer(producer)
-              .producerId(producer.getId())
-              .lineOfBusinessId(producerUpdate.lineOfBusinessId())
-              .primaryLob(true)
-              .build());
-    }
+                .ifPresentOrElse( plob -> plob.setLineOfBusinessId(producerUpdate.lineOfBusinessId()),
+                () -> new BusinessException(String.format("Producer %s missing primary line of business", producerUpdate.producerId())));
 
     subscriptionService.updateSubscription(
         producer,
@@ -172,8 +157,14 @@ public class ProducerOrchestrationService {
             : null);
 
     Producer savedProducer = producerRepository.saveAndFlush(producer);
+
+      ProducerResponse response = producerMapper.fromEntity(savedProducer, lobDto);
+
+      producerSearchService.updateProducer(response);
+
     log.info("Updated producer/subscriber record for {}", savedProducer.getId());
-    return producerMapper.fromEntity(savedProducer, lobDto);
+
+      return response;
   }
 
   Producer findActiveProducer(@NonNull UUID producerId) {
@@ -282,6 +273,8 @@ public class ProducerOrchestrationService {
             });
 
     producerRepository.saveAndFlush(producer);
+
+    producerSearchService.activateProducer(producerId);
 
     return findProducer(producerId);
   }

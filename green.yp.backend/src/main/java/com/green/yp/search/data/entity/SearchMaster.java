@@ -22,19 +22,18 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Table(name = "search_master", schema = "greenyp")
 public class SearchMaster extends Mutable {
 
-  @Size(max = 16)
-  @Column(name = "extern_id", length = 16)
+    @Column(name = "extern_id", length = 16)
   private UUID externId;
 
-  @Size(max = 16)
+  @Column(name = "customer_ref")
+  private String customerRef;
+
   @Column(name = "producer_id", length = 16)
   private UUID producerId;
 
-  @Size(max = 16)
   @Column(name = "location_id", length = 16)
   private UUID locationId;
 
-  @Size(max = 16)
   @Column(name = "category_ref", length = 16)
   private UUID categoryRef;
 
@@ -120,11 +119,11 @@ public class SearchMaster extends Mutable {
 
   @NotNull
   @Column(name = "longitude", nullable = false)
-  private Double longitude;
+  private BigDecimal longitude;
 
   @NotNull
   @Column(name = "latitude", nullable = false)
-  private Double latitude;
+  private BigDecimal latitude;
 
   @Lob
   @Column(name = "description")
