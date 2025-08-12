@@ -163,6 +163,7 @@ public class ProducerSearchService {
         var productList = List.of(producerSearchMapper
                 .toSearchMaster(response, profile.producer(), profile.location(), profile.contact(), lob, keywordsBuilder));
 
+        searchContract.upsertSearchMaster(productList, response.producerId());
     }
 
     @NotNull
@@ -189,13 +190,16 @@ public class ProducerSearchService {
                     log.error("No producer profile found for location {}", locationId);
                     return new IllegalStateException("No producer profile found for location " + locationId);
                 });
+        validateNotCancelled(locationId, profile);
+        return profile;
+    }
 
-        if ( profile.producer().getCancelDate().isBefore(OffsetDateTime.now())){
+    private static void validateNotCancelled(UUID locationId, ProducerSearchRecord profile) {
+        if (profile.producer().getCancelDate() == null || profile.producer().getCancelDate().isBefore(OffsetDateTime.now())){
             log.error("Error creating search master record for  location {} - cancelDate {} is in the past",
                     locationId, profile.producer().getCancelDate());
             throw new PreconditionFailedException("Error creating search master record for location, producer cancelled " + locationId);
         }
-        return profile;
     }
 
     private String createProfileKeywords(String keywords, LineOfBusinessDto lob) {
