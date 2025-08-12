@@ -59,7 +59,7 @@ public interface ClassifiedMapper {
     @Mapping(target = "longitude", source = "classified.longitude")
     @Mapping(target = "latitude", source = "classified.latitude")
     @Mapping(target = "description", source = "classified.description")
-    @Mapping(target = "customerRef", ignore = true)
+    @Mapping(target = "customerRef", source = "customer.id")
     SearchMasterRequest toSearchRequest(Classified classified,
                                         ClassifiedCustomer customer,
                                         ClassifiedCategoryResponse category,

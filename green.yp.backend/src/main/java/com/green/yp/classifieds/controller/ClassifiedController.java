@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @Validated
-@RequestMapping("classified")
+@RequestMapping("/classified/")
 @Tag(name = "REST endpoints to create / delete / update / view classified ad")
 public class ClassifiedController {
   private final ClassifiedService service;

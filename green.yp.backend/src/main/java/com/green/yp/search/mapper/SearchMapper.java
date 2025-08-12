@@ -4,6 +4,8 @@ import com.green.yp.api.apitype.search.SearchMasterRequest;
 import com.green.yp.api.apitype.search.SearchResponse;
 import com.green.yp.search.data.entity.SearchMaster;
 import com.green.yp.search.data.entity.SearchRecord;
+
+import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.validation.constraints.NotNull;
@@ -50,7 +52,7 @@ public interface SearchMapper {
   @Mapping(target = "version", ignore = true)
   @Mapping(target = "createDate", ignore = true)
   @Mapping(target = "lastUpdateDate", ignore = true)
-  @Mapping(target = "active", ignore = true)
+  @Mapping(target = "active", expression = "java(isActive(request))")
     SearchMaster toEntity(@NotNull SearchMasterRequest request);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -59,7 +61,7 @@ public interface SearchMapper {
     @Mapping(target = "lastUpdateDate", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "externId",  ignore = true)
-    @Mapping(target = "customerRef", ignore = true)
+    @Mapping(target = "active", expression = "java(isActive(request))")
     void upsertClassified(SearchMasterRequest request, @MappingTarget SearchMaster sm);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -72,5 +74,10 @@ public interface SearchMapper {
     @Mapping(target = "locationId", ignore = true)
     @Mapping(target = "categoryRef", ignore = true)
     @Mapping(target = "customerRef", ignore = true)
+    @Mapping(target = "active", expression = "java(isActive(request))")
     void upsertProducer(SearchMasterRequest request, @MappingTarget SearchMaster sm);
+
+    default Boolean isActive(SearchMasterRequest request) {
+        return request.lastActiveDate() == null || request.lastActiveDate().isAfter(LocalDate.now());
+    }
 }
