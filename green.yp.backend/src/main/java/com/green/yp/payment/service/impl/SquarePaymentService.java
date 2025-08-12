@@ -23,7 +23,8 @@ import org.springframework.stereotype.Service;
     havingValue = "square",
     matchIfMissing = true)
 public class SquarePaymentService implements PaymentService {
-  private final SquareResponseMapper squareResponseMapper;
+    public static final String ERROR_CREATING_NEW_SUBSCRIBER_CUSTOMER = "Error creating new subscriber customer";
+    private final SquareResponseMapper squareResponseMapper;
 
   private final SquareClient squareClient;
   private final SquareResponseMapper responseMapper;
@@ -121,7 +122,7 @@ public class SquarePaymentService implements PaymentService {
               log.warn(
                   "There was an error creating customer for paymentMethodId {}", paymentMethodId);
               return new SystemException(
-                  "Error creating new subscriber customer",
+                      ERROR_CREATING_NEW_SUBSCRIBER_CUSTOMER,
                   HttpStatus.INTERNAL_SERVER_ERROR,
                   ErrorCodeType.PAYMENT_CUSTOMER_ERROR);
             });
@@ -156,9 +157,9 @@ public class SquarePaymentService implements PaymentService {
         .orElseThrow(
             () -> {
               log.warn(
-                  "There was an error creating customer for paymentMethodId {}", paymentMethodId);
+                  "There was an error updating customer for paymentMethodId {}", paymentMethodId);
               return new SystemException(
-                  "Error creating new subscriber customer",
+                      ERROR_CREATING_NEW_SUBSCRIBER_CUSTOMER,
                   HttpStatus.INTERNAL_SERVER_ERROR,
                   ErrorCodeType.PAYMENT_CUSTOMER_ERROR);
             });
@@ -223,9 +224,9 @@ public class SquarePaymentService implements PaymentService {
         .orElseThrow(
             () -> {
               log.warn(
-                  "There was an error creating customer for paymentMethodId {}", paymentMethodId);
+                  "There was an error creating card on file for customer for paymentMethodId {}", paymentMethodId);
               return new SystemException(
-                  "Error creating new subscriber customer",
+                      ERROR_CREATING_NEW_SUBSCRIBER_CUSTOMER,
                   HttpStatus.INTERNAL_SERVER_ERROR,
                   ErrorCodeType.PAYMENT_CUSTOMER_ERROR);
             });
