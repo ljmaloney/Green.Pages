@@ -126,7 +126,6 @@ public class ProducerProductService {
       actionType = AuditActionType.DISCONTINUE_PRODUCT)
   public ProducerProductResponse discontinue(
       @Valid DiscontinueProductRequest discontinueRequest, String userId, String requestIP) {
-
     log.info("Discontinue product : {}", discontinueRequest);
 
     final ProducerProduct product =
@@ -145,7 +144,9 @@ public class ProducerProductService {
     product.setDiscontinueDate(discontinueRequest.discontinueDate());
     product.setLastOrderDate(discontinueRequest.lastOrderDate());
 
-    return mapper.fromEntity(productRepository.saveAndFlush(product));
+    var response = mapper.fromEntity(productRepository.saveAndFlush(product));
+    searchService.upsertProduct(response);
+    return response;
   }
 
   private boolean discontinueDatesChanged(
