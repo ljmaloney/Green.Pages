@@ -12,6 +12,7 @@ import java.util.UUID;
 public record SearchMasterRequest(
         @NotNull @NotNull
         UUID externId,
+        UUID customerRef,
         UUID producerId,
         UUID locationId,
         UUID categoryRef,

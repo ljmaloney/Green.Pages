@@ -1,10 +1,12 @@
 package com.green.yp.search.service;
 
 import com.green.yp.api.apitype.PageableResponse;
+import com.green.yp.api.apitype.enumeration.SearchRecordType;
 import com.green.yp.api.apitype.search.SearchMasterRequest;
 import com.green.yp.api.apitype.search.SearchResponse;
 import com.green.yp.geolocation.service.GeocodingService;
 import com.green.yp.search.data.entity.SearchDistanceProjection;
+import com.green.yp.search.data.entity.SearchMaster;
 import com.green.yp.search.data.repository.SearchRepository;
 import com.green.yp.search.mapper.SearchMapper;
 import java.math.BigDecimal;
@@ -79,7 +81,7 @@ public class SearchV2Service {
       log.info("Creating search master record for externRef {} recordType {}",
               request.externId(), request.recordType());
 
-      var searchMaster = searchRepository.saveAndFlush(searchMapper.toEntity(request));
+      var searchMaster = upsertSearchMaster(request);
 
       return  searchMaster.getId();
   }
@@ -97,5 +99,42 @@ public class SearchV2Service {
 
     public void createSearchMaster(List<SearchMasterRequest> searchList) {
       searchList.forEach(this::createSearchMaster);
+    }
+
+    public void upsertSearchMaster(List<SearchMasterRequest> searchRequests, UUID producerId) {
+        log.info("Upserting search master records for customer ref {}", producerId);
+        searchRequests.forEach(this::upsertSearchMaster);
+    }
+
+    private SearchMaster upsertSearchMaster(SearchMasterRequest request) {
+      if (request.recordType() == SearchRecordType.CLASSIFIED) {
+          return searchRepository.findSearchMaster(request.externId(), request.customerRef().toString())
+                  .map( sm -> {
+                      searchMapper.upsertClassified(request, sm);
+                      log.debug("Updated search master record for externRef {}", request.externId());
+                      return searchRepository.saveAndFlush(sm);})
+                  .or(() -> {
+                    var sm = searchMapper.toEntity(request);
+                    log.debug("Created search master record for externRef {}", request.externId());
+                    return java.util.Optional.of(searchRepository.saveAndFlush(sm));
+                  }).get();
+
+      }
+
+      return searchRepository.findSearchMaster(request.externId(), request.producerId(), request.locationId(), request.categoryRef())
+              .map( sm -> {
+                  searchMapper.upsertProducer(request, sm);
+                  log.debug("Updated search master record for externId - {} , producerId - {}, locationId {}",
+                          request.externId(),  request.producerId(), request.locationId());
+                  return searchRepository.saveAndFlush(sm);
+              })
+              .or( () -> {
+                  var sm = searchMapper.toEntity(request);
+                  log.debug("Created search master record for externId - {}, producerId - {}, locationId - {}, categoryRef - {}",
+                    request.externId(), request.producerId(), request.locationId(), request.categoryRef());
+                  return java.util.Optional.of(searchRepository.saveAndFlush(sm));
+              })
+              .get();
+
     }
 }

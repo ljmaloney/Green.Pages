@@ -1,8 +1,6 @@
 package com.green.yp.api.contract;
 
 import com.green.yp.api.apitype.search.SearchMasterRequest;
-import com.green.yp.producer.data.model.Producer;
-import com.green.yp.reference.dto.LineOfBusinessDto;
 import com.green.yp.search.service.SearchV2Service;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Component;
@@ -35,7 +33,8 @@ public class SearchContract {
         searchV2Service.createSearchMaster(searchList);
     }
 
-//    public void updateProducer(Producer producer, LineOfBusinessDto lob, String profileKeywords) {
-//        searchV2Service.updateProducer(producer, profileKeywords);
-//    }
+  public void upsertSearchMaster(List<SearchMasterRequest> searchRequests, UUID custonerRefId) {
+        searchV2Service.upsertSearchMaster(searchRequests,custonerRefId);
+    }
+
 }

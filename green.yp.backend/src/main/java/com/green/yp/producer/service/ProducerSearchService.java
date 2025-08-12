@@ -10,14 +10,14 @@ import com.green.yp.api.contract.SearchContract;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.geolocation.service.GeocodingService;
-import com.green.yp.producer.data.model.Producer;
+import com.green.yp.producer.data.model.ProducerLocation;
 import com.green.yp.producer.data.record.ProducerLocationDistanceProjection;
 import com.green.yp.producer.data.repository.ProducerLocationRepository;
-import com.green.yp.producer.data.repository.ProducerRepository;
 import com.green.yp.producer.data.repository.ProducerSearchRepository;
 import com.green.yp.producer.mapper.ProducerSearchMapper;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,7 +49,7 @@ public class ProducerSearchService {
   private final SearchContract searchContract;
   private final LineOfBusinessContract lobContract;
 
-  public ProducerSearchService(
+    public ProducerSearchService(
           ProducerSearchRepository searchRepository,
           ProducerLocationRepository locationRepository,
           @Qualifier("defaultGeocodeServiceImpl") GeocodingService geocodingService,
@@ -61,7 +61,7 @@ public class ProducerSearchService {
     this.producerSearchMapper = producerSearchMapper;
       this.searchContract = searchContract;
       this.lobContract = lobContract;
-  }
+    }
 
   @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
   public PageableResponse<ProducerSearchResponse> search(
@@ -124,13 +124,14 @@ public class ProducerSearchService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void updateProducer(ProducerResponse producerResponse) {
       log.info("Updating producer search master record for  id: {}", producerResponse);
-//      Producer producer = producerRepository.findById(producerResponse.producerId()).orElseThrow(() -> {
-//          return new NotFoundException("producer not found");
-//      });
-//      producer.getLinesOfBusiness().forEach(line -> {
-//          var lob = lobContract.findLineOfBusiness(line.getLineOfBusinessId());
-//          searchContract.updateProducer(producer, lob, createProfileKeywords(producer.getKeywords(), lob));
-//      });
+
+      List<ProducerLocation> locations = locationRepository.findActiveLocations(producerResponse.producerId(), true);
+
+      List<SearchMasterRequest> searchRequests = locations.parallelStream()
+              .map(loc -> createSearchRequests(loc.getId()))
+              .collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll);
+
+      searchContract.upsertSearchMaster(searchRequests, producerResponse.producerId());
     }
 
     @NotNull

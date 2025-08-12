@@ -7,6 +7,7 @@ import com.green.yp.search.data.entity.SearchRecord;
 import java.util.List;
 
 import jakarta.validation.constraints.NotNull;
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -54,4 +55,25 @@ public interface SearchMapper {
   @Mapping(target = "lastUpdateDate", ignore = true)
   @Mapping(target = "active", ignore = true)
     SearchMaster toEntity(@NotNull SearchMasterRequest request);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createDate", ignore = true)
+    @Mapping(target = "lastUpdateDate", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "externId",  ignore = true)
+    @Mapping(target = "customerRef", ignore = true)
+    void upsertClassified(SearchMasterRequest request, SearchMaster sm);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createDate", ignore = true)
+    @Mapping(target = "lastUpdateDate", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "externId",  ignore = true)
+    @Mapping(target = "producerId", ignore = true)
+    @Mapping(target = "locationId", ignore = true)
+    @Mapping(target = "categoryRef", ignore = true)
+    @Mapping(target = "customerRef", ignore = true)
+    void upsertProducer(SearchMasterRequest request, SearchMaster sm);
 }

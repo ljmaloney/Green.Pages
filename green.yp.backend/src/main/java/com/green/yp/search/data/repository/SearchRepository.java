@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import jakarta.validation.constraints.NotNull;
@@ -87,4 +88,17 @@ public interface SearchRepository extends JpaRepository<SearchMaster, UUID> {
   int disableSearch(@NotNull @Param("producerId}")UUID producerId,
                     @Param("lastActiveDate") LocalDate lastActiveDate,
                     @Param("updateDate")OffsetDateTime updateDate);
+
+    Optional<SearchMaster> findSearchMaster(@NotNull @NotNull UUID externId, String customerRef);
+
+  @Query("""
+            SELECT sm
+            FROM SearchMaster sm
+            WHERE sm.externId=:externId AND sm.producerId=:producerId
+                  AND sm.locationId=:locationId AND sm.customerRef=:customerRef
+        """)
+  Optional<SearchMaster> findSearchMaster(@NotNull @NotNull @Param("externId") UUID externId,
+                        @NotNull @NotNull @Param("producerId") UUID producerId,
+                        @NotNull @NotNull @Param("locationId") UUID locationId,
+                        @NotNull @NotNull @Param("categoryRef") UUID categoryRef);
 }

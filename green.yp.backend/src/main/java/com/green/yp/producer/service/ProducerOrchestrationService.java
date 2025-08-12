@@ -144,27 +144,11 @@ public class ProducerOrchestrationService {
     producer.setSubscriptionType(
         ProducerSubscriptionType.valueOf(producerUpdate.subscriptionType().name()));
 
-    ProducerLineOfBusiness producerLob =
         producer.getLinesOfBusiness().stream()
             .filter(ProducerLineOfBusiness::getPrimaryLob)
             .findFirst()
-            .orElseThrow(
-                () ->
-                    new BusinessException(
-                        String.format(
-                            "Producer %s missing primary line of business",
-                            producerUpdate.producerId())));
-
-    if (!producerLob.getLineOfBusinessId().equals(producerUpdate.lineOfBusinessId())) {
-        producer.getLinesOfBusiness().clear();
-        producer.addLineOfBusiness(
-          ProducerLineOfBusiness.builder()
-              .producer(producer)
-              .producerId(producer.getId())
-              .lineOfBusinessId(producerUpdate.lineOfBusinessId())
-              .primaryLob(true)
-              .build());
-    }
+                .ifPresentOrElse( plob -> plob.setLineOfBusinessId(producerUpdate.lineOfBusinessId()),
+                () -> new BusinessException(String.format("Producer %s missing primary line of business", producerUpdate.producerId())));
 
     subscriptionService.updateSubscription(
         producer,

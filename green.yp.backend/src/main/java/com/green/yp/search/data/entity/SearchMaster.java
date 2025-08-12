@@ -26,6 +26,9 @@ public class SearchMaster extends Mutable {
   @Column(name = "extern_id", length = 16)
   private UUID externId;
 
+  @Column("customer_ref")
+  private String customerRef;
+
   @Size(max = 16)
   @Column(name = "producer_id", length = 16)
   private UUID producerId;
