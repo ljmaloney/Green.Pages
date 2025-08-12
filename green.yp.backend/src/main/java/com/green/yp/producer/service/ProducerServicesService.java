@@ -137,7 +137,9 @@ public class ProducerServicesService {
                 case "maxServicePrice" -> BigDecimal.valueOf((Double) value);
                 default -> value;
               });
-      return serviceMapper.fromEntity(serviceRepository.save(producerService));
+      var response = serviceMapper.fromEntity(serviceRepository.save(producerService));
+      searchService.upsertProducerService(response);
+      return response;
 
     } catch (Exception e) {
       log.error("Exception occurred while updating producer service id: {}", serviceId, e);

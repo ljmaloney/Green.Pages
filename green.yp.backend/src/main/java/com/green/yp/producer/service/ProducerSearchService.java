@@ -5,6 +5,7 @@ import static java.lang.Boolean.TRUE;
 import com.green.yp.api.apitype.PageableResponse;
 import com.green.yp.api.apitype.ProducerServiceResponse;
 import com.green.yp.api.apitype.enumeration.SearchRecordType;
+import com.green.yp.api.apitype.producer.ProducerProductResponse;
 import com.green.yp.api.apitype.producer.ProducerResponse;
 import com.green.yp.api.apitype.producer.enumeration.ProducerLocationType;
 import com.green.yp.api.apitype.search.ProducerSearchResponse;
@@ -150,6 +151,18 @@ public class ProducerSearchService {
                                  response.shortDescription();
         searchContract.upsertSearchMaster(List.of(producerSearchMapper
                 .toSearchMaster(response, profile.producer(), profile.location(), profile.contact(), lob, keywordsBuilder)),response.producerId());
+    }
+
+    public void upsertProduct(ProducerProductResponse response) {
+        log.info("Upserting producer product: {}", response);
+
+        var profile = getProducerProfile(response.producerLocationId());
+        var lob = lobContract.findLineOfBusiness(profile.producer().getPrimaryLineOfBusiness().getLineOfBusinessId());
+        String keywordsBuilder = lob.lineOfBusinessName() + " " +
+                                 response.name();
+        var productList = List.of(producerSearchMapper
+                .toSearchMaster(response, profile.producer(), profile.location(), profile.contact(), lob, keywordsBuilder));
+
     }
 
     @NotNull

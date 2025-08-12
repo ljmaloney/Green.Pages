@@ -31,18 +31,21 @@ public class ProducerProductService {
 
   private final ProducerLocationService locationService;
 
+  private final ProducerSearchService searchService;
+
   private final ProducerProductRepository productRepository;
 
   private final ProducerProductMapper mapper;
 
   public ProducerProductService(
-      ProducerOrchestrationService producerService,
-      ProducerLocationService locationService,
-      ProducerProductRepository productRepository,
-      ProducerProductMapper mapper) {
+          ProducerOrchestrationService producerService,
+          ProducerLocationService locationService, ProducerSearchService searchService,
+          ProducerProductRepository productRepository,
+          ProducerProductMapper mapper) {
     this.producerService = producerService;
     this.locationService = locationService;
-    this.productRepository = productRepository;
+      this.searchService = searchService;
+      this.productRepository = productRepository;
     this.mapper = mapper;
   }
 
@@ -75,8 +78,9 @@ public class ProducerProductService {
         productRequest.producerLocationId());
 
     validateProducerActive(productRequest.producerId(), productRequest.producerLocationId());
-
-    return mapper.fromEntity(productRepository.saveAndFlush(mapper.toEntity(productRequest)));
+    var response = mapper.fromEntity(productRepository.saveAndFlush(mapper.toEntity(productRequest)));
+    searchService.upsertProduct(response);
+    return response;
   }
 
   @AuditRequest(
@@ -110,7 +114,9 @@ public class ProducerProductService {
       product.setLastOrderDate(productRequest.lastOrderDate());
     }
 
-    return mapper.fromEntity(productRepository.saveAndFlush(product));
+      var response = mapper.fromEntity(productRepository.saveAndFlush(product));
+      searchService.upsertProduct(response);
+      return response;
   }
 
   public void discontinueImmediate(

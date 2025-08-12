@@ -2,6 +2,7 @@ package com.green.yp.producer.mapper;
 
 import com.green.yp.api.apitype.ProducerServiceResponse;
 import com.green.yp.api.apitype.producer.LocationHoursResponse;
+import com.green.yp.api.apitype.producer.ProducerProductResponse;
 import com.green.yp.api.apitype.producer.ProducerProfileResponse;
 import com.green.yp.api.apitype.search.ProducerSearchResponse;
 import com.green.yp.api.apitype.search.SearchMasterRequest;
@@ -161,4 +162,38 @@ public interface ProducerSearchMapper {
                           ProducerContact contact,
                           LineOfBusinessDto lob,
                           String keywords);
+
+    @Mapping(target = "externId", source = "product.productId")
+    @Mapping(target = "producerId", source = "producer.producerId")
+    @Mapping(target = "locationId", source = "product.producerLocationId")
+    @Mapping(target = "categoryRef", source = "lob.lineOfBusinessId")
+    @Mapping(target = "categoryName", source = "lob.lineOfBusinessName")
+    @Mapping(target = "recordType", constant = "GREEN_PRO_PRODUCT")
+    @Mapping(target = "lastActiveDate", ignore = true)
+    @Mapping(target = "keywords", source = "keywords")
+    @Mapping(target = "title", source = "product.name")
+    @Mapping(target = "businessName", source = "producer.name")
+    @Mapping(target = "businessUrl", source = "location.websiteUrl")
+    @Mapping(target = "businessIconUrl", source = "producer.iconLink")
+    @Mapping(target = "imageUrl", ignore = true)
+    @Mapping(target = "addressLine1", source = "location.addressLine1")
+    @Mapping(target = "addressLine2", source = "location.addressLine2")
+    @Mapping(target = "city", source = "location.city")
+    @Mapping(target = "state", source = "location.state")
+    @Mapping(target = "postalCode", source = "location.postalCode")
+    @Mapping(target = "emailAddress", source = "contact.emailAddress")
+    @Mapping(target = "phoneNumber", source = "contact.phoneNumber")
+    @Mapping(target = "minPrice", source = "product.price")
+    @Mapping(target = "maxPrice", ignore = true)
+    @Mapping(target = "priceUnitsType", ignore = true)
+    @Mapping(target = "longitude", source = "location.longitude")
+    @Mapping(target = "latitude", source = "location.latitude")
+    @Mapping(target = "description", source = "product.description")
+    @Mapping(target = "customerRef", ignore = true)
+    SearchMasterRequest toSearchMaster(ProducerProductResponse product,
+                                       Producer producer,
+                                       ProducerLocation location,
+                                       ProducerContact contact,
+                                       LineOfBusinessDto lob,
+                                       String keywords);
 }
