@@ -12,6 +12,7 @@ import com.green.yp.security.IsAdmin;
 import com.green.yp.util.DateUtils;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -45,7 +46,7 @@ public class ContactController {
   public ResponseApi<List<ContactMessageResponse>> getContactMessages(@RequestParam("startDate") String startDate,
                                                                       @RequestParam("endDate") String endDate,
                                                                       @RequestParam("requestType") ContactMessageRequestType requestType,
-                                                                      @AuthUser AuthenticatedUser authenticatedUser) {
+                                                                      @Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser) {
       return new ResponseApi<>(dataService.getMessages(DateUtils.parseDate(startDate, LocalDate.class),
               DateUtils.parseDate(endDate, LocalDate.class), requestType), null);
   }

@@ -11,6 +11,7 @@ import com.green.yp.security.IsSubscriberAdminOrAdmin;
 import com.green.yp.util.DateUtils;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,6 +43,7 @@ public class InvoiceController {
     public ResponseApi<List<InvoiceResponse>> findProducerInvoices(@PathVariable("producerId") String producerId,
                                                                    @RequestParam("startDate") String startDate,
                                                                    @RequestParam("endDate") String endDate,
+                                                                   @Parameter(hidden = true)
                                                                    @AuthUser AuthenticatedUser authenticatedUser,
                                                                    HttpServletRequest request) throws Exception {
         return new ResponseApi<>(invoiceService.findInvoices(InvoiceType.SUBSCRIPTION, producerId,
@@ -56,6 +58,7 @@ public class InvoiceController {
     @GetMapping(path = "classifieds/search", produces= MediaType.APPLICATION_JSON_VALUE)
     public ResponseApi<List<InvoiceResponse>> findClassifiedInvoices(@RequestParam("startDate") String startDate,
                                                                         @RequestParam("endDate") String endDate,
+                                                                      @Parameter(hidden = true)
                                                                       @AuthUser AuthenticatedUser authenticatedUser,
                                                                       HttpServletRequest request) {
         return new ResponseApi<>(invoiceService.findInvoices(InvoiceType.CLASSIFIED, null,

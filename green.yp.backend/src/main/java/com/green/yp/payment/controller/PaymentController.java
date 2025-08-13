@@ -11,6 +11,7 @@ import com.green.yp.payment.service.PaymentOrchestrationService;
 import com.green.yp.security.IsSubscriberAdminOrAdmin;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,7 +50,7 @@ public class PaymentController {
       path = "replace",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseApi<PaymentMethodResponse> replacePaymentMethod(@AuthUser AuthenticatedUser authenticatedUser,
+  public ResponseApi<PaymentMethodResponse> replacePaymentMethod(@Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser,
                                                                  @RequestParam(name = "createNew", defaultValue = "false") boolean createNew,
                                                                  @RequestBody ApiPaymentRequest methodRequest, HttpServletRequest request) {
     return new ResponseApi<>(orchestrationService.replaceCardOnFile(methodRequest,  authenticatedUser, createNew, RequestUtil.getRequestIP(request)), null);
