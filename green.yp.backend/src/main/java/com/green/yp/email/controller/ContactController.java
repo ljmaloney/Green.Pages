@@ -1,7 +1,7 @@
 package com.green.yp.email.controller;
 
 import com.green.yp.api.apitype.contact.ContactMessageRequest;
-import com.green.yp.email.service.ContactMessageService;
+import com.green.yp.email.service.MessageService;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class ContactController {
 
-    private final ContactMessageService service;
-    public ContactController(ContactMessageService service){
+    private final MessageService service;
+    public ContactController(MessageService service){
         this.service = service;
     }
 

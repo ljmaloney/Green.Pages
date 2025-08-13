@@ -18,11 +18,11 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class ContactMessageDataService {
+public class MessageDataService {
     private final ContactMessageRepository repository;
     private final ContactMapper mapper;
 
-    public ContactMessageDataService(ContactMessageRepository repository, ContactMapper mapper) {
+    public MessageDataService(ContactMessageRepository repository, ContactMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
     }
@@ -39,7 +39,7 @@ public class ContactMessageDataService {
                                                        String requestIP) {
         log.info("Creating new subscriber -> customer contact message - {} for {} at {} - IP {}",
                 request.subject(), producer.producerId(), location.locationId(), requestIP);
-        var contactMessage = mapper.requestToEntity(request, producer, location, contact);
+        var contactMessage = mapper.toEntity(request, producer, location, contact, requestIP);
         contactMessage.setSourceIpAddress(requestIP);
         contactMessage.setSmsEmailType("email");
         contactMessage.setAddresseeName(getContactName(contact));
@@ -56,7 +56,7 @@ public class ContactMessageDataService {
         log.info("Creating new classified ad -> customer contact message for classified id {}",
                 request.classifiedRequest().classifiedId());
 
-        var contactMessage = mapper.requestToEntity(request, classified);
+        var contactMessage = mapper.toEntity(request, classified, requestIP);
         contactMessage.setAddresseeName(String.join(" ", classified.customer().firstName(),classified.customer().lastName()));
         contactMessage.setSourceIpAddress(requestIP);
         contactMessage.setSmsEmailType("email");
@@ -68,7 +68,7 @@ public class ContactMessageDataService {
                                                        String emailAddress,
                                                        String requestIP) {
         log.info("Creating new generic contact message for {}", emailAddress);
-        var contactMessage = mapper.requestToEntity(request);
+        var contactMessage = mapper.toEntity(request, requestIP);
         contactMessage.setAddresseeName(emailAddress);
         contactMessage.setSourceIpAddress(requestIP);
         contactMessage.setSmsEmailType("email");

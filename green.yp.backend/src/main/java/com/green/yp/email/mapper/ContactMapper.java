@@ -26,23 +26,29 @@ public interface ContactMapper {
   @Mapping(target = "fromEmail", source = "request.emailAddress")
   @Mapping(target = "fromPhone", source = "request.phoneNumber")
   @Mapping(target = "producerId", source= "producer.producerId")
-   ContactMessage requestToEntity(ContactMessageRequest request,
-                                   ProducerResponse producer,
-                                   ProducerLocationResponse location,
-                                   ProducerContactResponse contact);
+  @Mapping(target = "sourceIpAddress", source = "ipAddress")
+   ContactMessage toEntity(ContactMessageRequest request,
+                           ProducerResponse producer,
+                           ProducerLocationResponse location,
+                           ProducerContactResponse contact,
+                           String ipAddress);
 
     @Mapping(target="createDate", ignore=true)
     @Mapping(target = "lastUpdateDate", ignore = true)
     @Mapping(target = "title", source = "request.subject")
     @Mapping(target = "fromEmail", source = "request.emailAddress")
     @Mapping(target = "fromPhone", source = "request.phoneNumber")
-    ContactMessage requestToEntity(ContactMessageRequest request,
-                                   ClassifiedAdCustomerResponse classified);
+    @Mapping(target = "sourceIpAddress", source = "ipAddress")
+    ContactMessage toEntity(ContactMessageRequest request,
+                            ClassifiedAdCustomerResponse classified,
+                            String ipAddress);
 
     @Mapping(target="createDate", ignore=true)
     @Mapping(target = "lastUpdateDate", ignore = true)
-    @Mapping(target = "title", source = "subject")
-    @Mapping(target = "fromEmail", source = "emailAddress")
-    @Mapping(target = "fromPhone", source = "phoneNumber")
-    ContactMessage requestToEntity(ContactMessageRequest request);
+    @Mapping(target = "title", source = "request.subject")
+    @Mapping(target = "fromEmail", source = "request.emailAddress")
+    @Mapping(target = "fromPhone", source = "request.phoneNumber")
+    @Mapping(target = "sourceIpAddress", source = "ipAddress")
+    ContactMessage toEntity(ContactMessageRequest request,
+                            String ipAddress);
 }

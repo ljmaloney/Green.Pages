@@ -1,7 +1,7 @@
 package com.green.yp.email.data.model;
 
+import com.green.yp.api.apitype.contact.ContactMessageRequestType;
 import com.green.yp.common.data.embedded.Mutable;
-import com.green.yp.api.apitype.contact.ProducerContactRequestType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -32,7 +32,7 @@ public class ContactMessage extends Mutable {
   @NotNull
   @Enumerated(EnumType.STRING)
   @Column(name = "contact_request_type", nullable = false, length = 50)
-  private ProducerContactRequestType contactRequestType;
+  private ContactMessageRequestType contactRequestType;
 
   @Column (name = "producer_id")
   private UUID producerId;
