@@ -28,6 +28,7 @@ public interface ContactMapper {
   @Mapping(target = "fromPhone", source = "request.phoneNumber")
   @Mapping(target = "producerId", source = "producer.producerId")
   @Mapping(target = "sourceIpAddress", source = "ipAddress")
+  @Mapping(target = "contactRequestType", source = "request.requestType")
   ContactMessage toEntity(
       ContactMessageRequest request,
       ProducerResponse producer,
@@ -42,6 +43,7 @@ public interface ContactMapper {
   @Mapping(target = "fromPhone", source = "request.phoneNumber")
   @Mapping(target = "sourceIpAddress", source = "ipAddress")
   @Mapping(target = "destination", source = "classified.classified.emailAddress")
+  @Mapping(target = "contactRequestType", source = "request.requestType")
   ContactMessage toEntity(
       ContactMessageRequest request, ClassifiedAdCustomerResponse classified, String ipAddress);
 
@@ -51,5 +53,6 @@ public interface ContactMapper {
   @Mapping(target = "fromEmail", source = "request.emailAddress")
   @Mapping(target = "fromPhone", source = "request.phoneNumber")
   @Mapping(target = "sourceIpAddress", source = "ipAddress")
+  @Mapping(target = "contactRequestType", source = "request.requestType")
   ContactMessage toEntity(ContactMessageRequest request, String ipAddress);
 }
