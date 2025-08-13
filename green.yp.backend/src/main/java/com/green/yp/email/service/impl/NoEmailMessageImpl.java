@@ -6,13 +6,13 @@ import com.green.yp.email.mapper.ContactMapper;
 import com.green.yp.email.service.MessageDataService;
 import com.green.yp.email.service.MessageSendService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Slf4j
-@Qualifier("noEmail")
+@Service("noEmail")
 public class NoEmailMessageImpl implements MessageSendService {
 
     @Value("${greenyp.support.email:noemail}")

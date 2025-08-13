@@ -3,11 +3,11 @@ package com.green.yp.email.service.impl;
 import com.green.yp.api.apitype.contact.ContactMessageRequest;
 import com.green.yp.api.apitype.contact.ContactMessageResponse;
 import com.green.yp.email.service.MessageSendService;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-@Qualifier("serviceMessage")
+@Service("serviceMessage")
 public class ServiceMessageImpl implements MessageSendService{
 
     @Override
