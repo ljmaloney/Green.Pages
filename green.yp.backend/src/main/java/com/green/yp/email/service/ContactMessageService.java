@@ -1,4 +1,4 @@
-package com.green.yp.contact.service;
+package com.green.yp.email.service;
 
 import com.green.yp.api.apitype.contact.ContactMessageRequest;
 import com.green.yp.api.apitype.contact.ContactMessageResponse;
@@ -7,8 +7,6 @@ import com.green.yp.api.contract.*;
 import com.green.yp.exception.PreconditionFailedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -35,8 +33,9 @@ public class ContactMessageService {
     }
     public void sendMessage(ContactMessageRequest contactMessageRequest, String requestIP) {
         ContactMessageResponse messageResponse;
+
         if ( contactMessageRequest.leadContactRequest() != null){
-            var producer = producerContract.findProducer(contactMessageRequest.leadContactRequest().producerId());
+          var producer = producerContract.findProducer(contactMessageRequest.leadContactRequest().producerId());
 
           var location = locationContract.findLocation(contactMessageRequest.leadContactRequest().locationId());
 

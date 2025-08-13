@@ -1,7 +1,7 @@
-package com.green.yp.contact.controller;
+package com.green.yp.email.controller;
 
 import com.green.yp.api.apitype.contact.ContactMessageRequest;
-import com.green.yp.contact.service.ContactMessageService;
+import com.green.yp.email.service.ContactMessageService;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
-@RequestMapping("contact")
+@RequestMapping("/email/contact")
 @Validated
 @Tag(name = "Endpoint for submitting contact request / sending contact messages")
 @RestController

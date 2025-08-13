@@ -1,10 +1,7 @@
-package com.green.yp.contact.data.model;
+package com.green.yp.email.data.model;
 
-import com.green.yp.classifieds.data.model.Classified;
 import com.green.yp.common.data.embedded.Mutable;
-import com.green.yp.producer.data.model.Producer;
 import com.green.yp.api.apitype.contact.ProducerContactRequestType;
-import com.green.yp.producer.data.model.ProducerLocation;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -17,7 +14,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "contact_message", schema = "greenyp")
+@Table(name = "email_contact_message", schema = "greenyp")
 public class ContactMessage extends Mutable {
 
   @Column(name = "message_sent_date")

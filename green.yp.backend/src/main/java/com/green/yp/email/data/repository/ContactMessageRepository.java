@@ -1,7 +1,7 @@
-package com.green.yp.contact.data.repository;
+package com.green.yp.email.data.repository;
 
 import com.green.yp.api.apitype.contact.ContactMessageResponse;
-import com.green.yp.contact.data.model.ContactMessage;
+import com.green.yp.email.data.model.ContactMessage;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

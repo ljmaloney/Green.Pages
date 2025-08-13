@@ -1,4 +1,4 @@
-package com.green.yp.contact.mapper;
+package com.green.yp.email.mapper;
 
 import com.green.yp.api.apitype.classified.ClassifiedAdCustomerResponse;
 import com.green.yp.api.apitype.contact.ContactMessageRequest;
@@ -6,7 +6,7 @@ import com.green.yp.api.apitype.contact.ContactMessageResponse;
 import com.green.yp.api.apitype.producer.ProducerContactResponse;
 import com.green.yp.api.apitype.producer.ProducerLocationResponse;
 import com.green.yp.api.apitype.producer.ProducerResponse;
-import com.green.yp.contact.data.model.ContactMessage;
+import com.green.yp.email.data.model.ContactMessage;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
