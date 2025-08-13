@@ -24,12 +24,9 @@ public class ContactMessage extends Mutable {
   private String sourceIpAddress;
 
   @Size(max = 50)
-  @NotNull
   @Column(name = "sms_email_type", nullable = false, length = 50)
   private String smsEmailType;
 
-  @Size(max = 50)
-  @NotNull
   @Enumerated(EnumType.STRING)
   @Column(name = "contact_request_type", nullable = false, length = 50)
   private ContactMessageRequestType contactRequestType;
@@ -43,7 +40,6 @@ public class ContactMessage extends Mutable {
   @Column(name = "classified_id")
   private UUID classifiedId;
 
-  @Size(max = 16)
   @Column(name = "product_service_ref", length = 16)
   private UUID productServiceRef;
 
