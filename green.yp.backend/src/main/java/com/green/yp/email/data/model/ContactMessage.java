@@ -1,23 +1,19 @@
-package com.green.yp.contact.data.model;
+package com.green.yp.email.data.model;
 
-import com.green.yp.classifieds.data.model.Classified;
+import com.green.yp.api.apitype.contact.ContactMessageRequestType;
 import com.green.yp.common.data.embedded.Mutable;
-import com.green.yp.producer.data.model.Producer;
-import com.green.yp.api.apitype.contact.ProducerContactRequestType;
-import com.green.yp.producer.data.model.ProducerLocation;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.OffsetDateTime;
 import java.util.UUID;
-
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "contact_message", schema = "greenyp")
+@Table(name = "email_contact_message", schema = "greenyp")
 public class ContactMessage extends Mutable {
 
   @Column(name = "message_sent_date")
@@ -27,15 +23,12 @@ public class ContactMessage extends Mutable {
   private String sourceIpAddress;
 
   @Size(max = 50)
-  @NotNull
   @Column(name = "sms_email_type", nullable = false, length = 50)
   private String smsEmailType;
 
-  @Size(max = 50)
-  @NotNull
   @Enumerated(EnumType.STRING)
   @Column(name = "contact_request_type", nullable = false, length = 50)
-  private ProducerContactRequestType contactRequestType;
+  private ContactMessageRequestType contactRequestType;
 
   @Column (name = "producer_id")
   private UUID producerId;
@@ -46,9 +39,11 @@ public class ContactMessage extends Mutable {
   @Column(name = "classified_id")
   private UUID classifiedId;
 
-  @Size(max = 16)
   @Column(name = "product_service_ref", length = 16)
   private UUID productServiceRef;
+
+  @Column(name="requestor_name", length = 150)
+  private String requestorName;
 
   @Column(name="addressee_name")
   private String addresseeName;

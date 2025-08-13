@@ -20,19 +20,19 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Controller supporting email and email addresses including validation token")
 public class EmailController {
 
-    private final EmailValidationService validationService;
+  private final EmailValidationService validationService;
 
-    public EmailController(EmailValidationService validationService) {
-        this.validationService = validationService;
-    }
+  public EmailController(EmailValidationService validationService) {
+    this.validationService = validationService;
+  }
 
-    @ApiResponse(
-            responseCode = org.apache.hc.core5.http.HttpStatus.SC_NO_CONTENT + "",
-            description = "Validates email address using a token")
-    @PostMapping(path="validate", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void validateEmail(@RequestBody @Valid EmailValidationRequest validationRequest,
-                              HttpServletRequest request) {
-        validationService.validateEmail(validationRequest, RequestUtil.getRequestIP(request));
-    }
+  @ApiResponse(
+      responseCode = org.apache.hc.core5.http.HttpStatus.SC_NO_CONTENT + "",
+      description = "Validates email address using a token")
+  @PostMapping(path = "validate", consumes = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void validateEmail(
+      @RequestBody @Valid EmailValidationRequest validationRequest, HttpServletRequest request) {
+    validationService.validateEmail(validationRequest, RequestUtil.getRequestIP(request));
+  }
 }

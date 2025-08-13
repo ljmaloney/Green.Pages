@@ -31,7 +31,10 @@ public enum EmailTemplateType {
           "Green Market - Subscriber Payment Receipt" ),
   PRODUCER_PAYMENT_FAILED("green.yp.sub.payment-failed",
           "email/producer-subscription-payfail.ftl" ,
-          "Green Market - Subscriber Credit Card Payment Failed" );
+          "Green Market - Subscriber Credit Card Payment Failed" ),
+    CLASSIFIED_CONTACT_INFO("green.yp.classified.info",
+            "email/classified-ad-email.ftl" ,
+            "Green Market Classifieds - %s");
 
   private final String templateName;
   private final String templateFileName;
@@ -41,5 +44,8 @@ public enum EmailTemplateType {
     this.templateName = templateName;
     this.templateFileName = templateFileName;
     this.subjectFormat = subjectFormat;
+  }
+  public String formatSubject(String... params) {
+      return String.format(subjectFormat, params);
   }
 }

@@ -1,30 +1,34 @@
-package com.green.yp.contact.service;
+package com.green.yp.email.service;
 
 import com.green.yp.api.apitype.classified.ClassifiedAdCustomerResponse;
+import com.green.yp.api.apitype.contact.ContactMessageRequest;
 import com.green.yp.api.apitype.contact.ContactMessageRequestType;
 import com.green.yp.api.apitype.contact.ContactMessageResponse;
-import com.green.yp.api.apitype.contact.ContactMessageRequest;
 import com.green.yp.api.apitype.producer.ProducerContactResponse;
 import com.green.yp.api.apitype.producer.ProducerLocationResponse;
 import com.green.yp.api.apitype.producer.ProducerResponse;
-import com.green.yp.contact.data.model.ContactMessage;
-import com.green.yp.contact.data.repository.ContactMessageRepository;
-import com.green.yp.contact.mapper.ContactMapper;
+import com.green.yp.email.data.repository.ContactMessageRepository;
+import com.green.yp.email.mapper.ContactMapper;
 import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.List;
+
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
-import java.util.List;
-
 @Slf4j
 @Service
-public class ContactMessageDataService {
+public class MessageDataService {
     private final ContactMessageRepository repository;
     private final ContactMapper mapper;
 
-    public ContactMessageDataService(ContactMessageRepository repository, ContactMapper mapper) {
+    public MessageDataService(ContactMessageRepository repository, ContactMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
     }
@@ -41,7 +45,7 @@ public class ContactMessageDataService {
                                                        String requestIP) {
         log.info("Creating new subscriber -> customer contact message - {} for {} at {} - IP {}",
                 request.subject(), producer.producerId(), location.locationId(), requestIP);
-        var contactMessage = mapper.requestToEntity(request, producer, location, contact);
+        var contactMessage = mapper.toEntity(request, producer, location, contact, requestIP);
         contactMessage.setSourceIpAddress(requestIP);
         contactMessage.setSmsEmailType("email");
         contactMessage.setAddresseeName(getContactName(contact));
@@ -58,7 +62,7 @@ public class ContactMessageDataService {
         log.info("Creating new classified ad -> customer contact message for classified id {}",
                 request.classifiedRequest().classifiedId());
 
-        var contactMessage = mapper.requestToEntity(request, classified);
+        var contactMessage = mapper.toEntity(request, classified, requestIP);
         contactMessage.setAddresseeName(String.join(" ", classified.customer().firstName(),classified.customer().lastName()));
         contactMessage.setSourceIpAddress(requestIP);
         contactMessage.setSmsEmailType("email");
@@ -70,7 +74,7 @@ public class ContactMessageDataService {
                                                        String emailAddress,
                                                        String requestIP) {
         log.info("Creating new generic contact message for {}", emailAddress);
-        var contactMessage = mapper.requestToEntity(request);
+        var contactMessage = mapper.toEntity(request, requestIP);
         contactMessage.setAddresseeName(emailAddress);
         contactMessage.setSourceIpAddress(requestIP);
         contactMessage.setSmsEmailType("email");
@@ -84,4 +88,18 @@ public class ContactMessageDataService {
                 : String.join(" ", contact.firstName(),contact.lastName());
     }
 
+    public List<ContactMessageResponse> getMessages(@NotNull @NonNull LocalDate startDate,
+                                                    @NotNull @NonNull LocalDate endDate,
+                                                    @NotNull @NonNull ContactMessageRequestType requestType) {
+        log.info("Getting contact messages between {} and {} for {}", startDate, endDate, requestType);
+
+        OffsetDateTime startDateTime = OffsetDateTime.of(startDate, LocalTime.MIDNIGHT, ZoneOffset.UTC);
+        OffsetDateTime endDateTime = OffsetDateTime.of(endDate, LocalTime.MIDNIGHT, ZoneOffset.UTC);
+
+        return repository
+            .findContactMessages(startDateTime,endDateTime,requestType)
+            .stream()
+            .map(mapper::toDto)
+            .toList();
+    }
 }
