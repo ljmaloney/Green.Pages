@@ -2,6 +2,7 @@ package com.green.yp.email.service;
 
 import com.green.yp.api.apitype.classified.ClassifiedAdCustomerResponse;
 import com.green.yp.api.apitype.contact.ContactMessageRequest;
+import com.green.yp.api.apitype.contact.ContactMessageRequestType;
 import com.green.yp.api.apitype.contact.ContactMessageResponse;
 import com.green.yp.api.apitype.producer.ProducerContactResponse;
 import com.green.yp.api.apitype.producer.ProducerLocationResponse;
@@ -9,8 +10,14 @@ import com.green.yp.api.apitype.producer.ProducerResponse;
 import com.green.yp.email.data.repository.ContactMessageRepository;
 import com.green.yp.email.mapper.ContactMapper;
 import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
+
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -81,4 +88,18 @@ public class MessageDataService {
                 : String.join(" ", contact.firstName(),contact.lastName());
     }
 
+    public List<ContactMessageResponse> getMessages(@NotNull @NonNull LocalDate startDate,
+                                                    @NotNull @NonNull LocalDate endDate,
+                                                    @NotNull @NonNull ContactMessageRequestType requestType) {
+        log.info("Getting contact messages between {} and {} for {}", startDate, endDate, requestType);
+
+        OffsetDateTime startDateTime = OffsetDateTime.of(startDate, LocalTime.MIDNIGHT, ZoneOffset.UTC);
+        OffsetDateTime endDateTime = OffsetDateTime.of(endDate, LocalTime.MIDNIGHT, ZoneOffset.UTC);
+
+        return repository
+            .findContactMessages(startDateTime,endDateTime,requestType)
+            .stream()
+            .map(mapper::toDto)
+            .toList();
+    }
 }
