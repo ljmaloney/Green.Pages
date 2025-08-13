@@ -8,14 +8,13 @@ import com.green.yp.email.data.repository.ContactMessageRepository;
 import com.green.yp.email.mapper.ContactMapper;
 import com.green.yp.email.service.EmailService;
 import com.green.yp.email.service.MessageSendService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service("classifiedMessage")

@@ -17,7 +17,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Table(name = "email_validation", schema = "greenyp")
 public class EmailValidation extends Mutable {
 
-    @Temporal(TemporalType.TIMESTAMP)
+  @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "email_validation_date")
   private OffsetDateTime emailValidationDate;
 
@@ -50,11 +50,27 @@ public class EmailValidation extends Mutable {
 
     EmailValidation that = (EmailValidation) o;
 
-    return new EqualsBuilder().appendSuper(super.equals(o)).append(emailValidationDate, that.emailValidationDate).append(validationStatus, that.validationStatus).append(ipAddress, that.ipAddress).append(externRef, that.externRef).append(emailToken, that.emailToken).append(emailAddress, that.emailAddress).isEquals();
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(emailValidationDate, that.emailValidationDate)
+        .append(validationStatus, that.validationStatus)
+        .append(ipAddress, that.ipAddress)
+        .append(externRef, that.externRef)
+        .append(emailToken, that.emailToken)
+        .append(emailAddress, that.emailAddress)
+        .isEquals();
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(emailValidationDate).append(validationStatus).append(ipAddress).append(externRef).append(emailToken).append(emailAddress).toHashCode();
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(emailValidationDate)
+        .append(validationStatus)
+        .append(ipAddress)
+        .append(externRef)
+        .append(emailToken)
+        .append(emailAddress)
+        .toHashCode();
   }
 }

@@ -14,8 +14,9 @@ public interface EmailValidationRepository extends JpaRepository<EmailValidation
   Optional<EmailValidation> findByEmailAddress(String emailAddress);
 
   @Modifying
-  @Query("""
-    DELETE FROM EmailValidation ev WHERE ev.externRef=:externRef 
+  @Query(
+"""
+    DELETE FROM EmailValidation ev WHERE ev.externRef=:externRef
 """)
   void deleteByExternRef(@Param("externRef") String externRef);
 

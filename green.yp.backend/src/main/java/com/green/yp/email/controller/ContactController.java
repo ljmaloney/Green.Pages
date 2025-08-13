@@ -17,14 +17,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class ContactController {
 
-    private final MessageService service;
-    public ContactController(MessageService service){
-        this.service = service;
-    }
+  private final MessageService service;
 
-    @PostMapping( consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public void processContactRequest(@RequestBody ContactMessageRequest contactMessageRequest){
-        service.sendMessage(contactMessageRequest, RequestUtil.getRequestIP());
-    }
+  public ContactController(MessageService service) {
+    this.service = service;
+  }
+
+  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public void processContactRequest(@RequestBody ContactMessageRequest contactMessageRequest) {
+    service.sendMessage(contactMessageRequest, RequestUtil.getRequestIP());
+  }
 }

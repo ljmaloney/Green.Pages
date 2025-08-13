@@ -67,7 +67,7 @@ public class EmailValidationService {
         .map(mapper::fromEntity)
         .or(
             () -> {
-                log.info("Creating new email validation entry for externRef {}", externRef);
+              log.info("Creating new email validation entry for externRef {}", externRef);
               EmailValidation emailValidation = new EmailValidation();
               emailValidation.setExternRef(externRef);
               emailValidation.setValidationStatus(EmailValidationStatusType.NOT_VALIDATED);
@@ -78,9 +78,9 @@ public class EmailValidationService {
         .get();
   }
 
-    @Transactional
-    public void deleteValidation(String externRef) {
-      log.info("Delete email validation record for {}", externRef);
-      repository.deleteByExternRef(externRef);
-    }
+  @Transactional
+  public void deleteValidation(String externRef) {
+    log.info("Delete email validation record for {}", externRef);
+    repository.deleteByExternRef(externRef);
+  }
 }

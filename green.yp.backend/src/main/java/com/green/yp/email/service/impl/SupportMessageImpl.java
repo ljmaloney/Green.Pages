@@ -2,14 +2,12 @@ package com.green.yp.email.service.impl;
 
 import com.green.yp.api.apitype.contact.ContactMessageRequest;
 import com.green.yp.api.apitype.contact.ContactMessageResponse;
-import com.green.yp.email.mapper.ContactMapper;
 import com.green.yp.email.service.MessageDataService;
 import com.green.yp.email.service.MessageSendService;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Slf4j
 @Service("supportMessage")

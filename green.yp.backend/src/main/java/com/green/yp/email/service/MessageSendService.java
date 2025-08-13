@@ -8,7 +8,8 @@ import java.util.UUID;
 
 @Service
 public interface MessageSendService {
-    ContactMessageResponse createContactMessage(ContactMessageRequest contactMessageRequest, String requestIP);
-    void sendMessage(UUID contactMessageId);
-}
+  ContactMessageResponse createContactMessage(
+      ContactMessageRequest contactMessageRequest, String requestIP);
 
+  void sendMessage(UUID contactMessageId);
+}

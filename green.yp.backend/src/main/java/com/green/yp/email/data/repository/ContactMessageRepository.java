@@ -12,7 +12,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ContactMessageRepository extends JpaRepository<ContactMessage, UUID> {
-    @Query("SELECT c FROM ContactMessage c WHERE c.createDate BETWEEN :startDate AND :endDate ORDER BY c.createDate DESC")
-    List<ContactMessageResponse> findMessages(@NotNull @Param("startDate") OffsetDateTime startDate,
-                                              @NotNull @Param("endDate") OffsetDateTime endDate);
+  @Query(
+      "SELECT c FROM ContactMessage c WHERE c.createDate BETWEEN :startDate AND :endDate ORDER BY c.createDate DESC")
+  List<ContactMessageResponse> findMessages(
+      @NotNull @Param("startDate") OffsetDateTime startDate,
+      @NotNull @Param("endDate") OffsetDateTime endDate);
 }

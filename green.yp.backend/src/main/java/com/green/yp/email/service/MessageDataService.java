@@ -1,20 +1,19 @@
 package com.green.yp.email.service;
 
 import com.green.yp.api.apitype.classified.ClassifiedAdCustomerResponse;
-import com.green.yp.api.apitype.contact.ContactMessageResponse;
 import com.green.yp.api.apitype.contact.ContactMessageRequest;
+import com.green.yp.api.apitype.contact.ContactMessageResponse;
 import com.green.yp.api.apitype.producer.ProducerContactResponse;
 import com.green.yp.api.apitype.producer.ProducerLocationResponse;
 import com.green.yp.api.apitype.producer.ProducerResponse;
 import com.green.yp.email.data.repository.ContactMessageRepository;
 import com.green.yp.email.mapper.ContactMapper;
 import jakarta.validation.constraints.NotNull;
+import java.time.OffsetDateTime;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
-
-import java.time.OffsetDateTime;
-import java.util.List;
 
 @Slf4j
 @Service

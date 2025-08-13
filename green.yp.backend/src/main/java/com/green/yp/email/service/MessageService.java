@@ -11,21 +11,26 @@ import java.util.Map;
 @Service
 public class MessageService {
 
-    private final Map<String, MessageSendService> senders;
+  private final Map<String, MessageSendService> senders;
 
-    public MessageService(Map<String, MessageSendService> senders) {
-        this.senders = senders;
-        log.info("Initialized MessageService with {} senders", senders.size());
+  public MessageService(Map<String, MessageSendService> senders) {
+    this.senders = senders;
+    log.info("Initialized MessageService with {} senders", senders.size());
+  }
+
+  public void sendMessage(ContactMessageRequest contactRequest, String requestIP) {
+    log.info(
+        "Sending {} message re {} from {}",
+        contactRequest.requestType(),
+        contactRequest.subject(),
+        requestIP);
+    MessageSendService sender = senders.get(contactRequest.requestType().getEmailSender());
+    if (sender == null) {
+      log.info("No sender registered for {}", contactRequest.requestType());
     }
+    ContactMessageResponse contactMessageResponse =
+        sender.createContactMessage(contactRequest, requestIP);
 
-    public void sendMessage(ContactMessageRequest contactRequest, String requestIP) {
-        log.info("Sending {} message re {} from {}", contactRequest.requestType(), contactRequest.subject(), requestIP);
-        MessageSendService sender = senders.get(contactRequest.requestType().getEmailSender());
-        if (sender == null) {
-            log.info("No sender registered for {}", contactRequest.requestType());
-        }
-        ContactMessageResponse contactMessageResponse = sender.createContactMessage(contactRequest, requestIP);
-
-        sender.sendMessage(contactMessageResponse.emailMessageId());
-    }
+    sender.sendMessage(contactMessageResponse.emailMessageId());
+  }
 }
