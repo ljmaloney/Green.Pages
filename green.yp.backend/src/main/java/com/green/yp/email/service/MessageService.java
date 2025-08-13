@@ -15,6 +15,7 @@ public class MessageService {
 
     public MessageService(Map<String, MessageSendService> senders) {
         this.senders = senders;
+        log.info("Initialized MessageService with {} senders", senders.size());
     }
 
     public void sendMessage(ContactMessageRequest contactRequest, String requestIP) {
