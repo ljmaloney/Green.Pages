@@ -19,11 +19,9 @@ public class NoEmailMessageImpl implements MessageSendService {
     private String supportEmail;
 
     private final MessageDataService messageDataService;
-    private final ContactMapper contactMapper;
 
-    public NoEmailMessageImpl(MessageDataService messageDataService, ContactMapper contactMapper) {
+    public NoEmailMessageImpl(MessageDataService messageDataService) {
         this.messageDataService = messageDataService;
-        this.contactMapper = contactMapper;
     }
 
     @Override

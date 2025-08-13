@@ -19,11 +19,9 @@ public class SupportMessageImpl implements MessageSendService {
   private String supportEmail;
 
     private final MessageDataService messageDataService;
-    private final ContactMapper contactMapper;
 
-    public SupportMessageImpl(MessageDataService messageDataService, ContactMapper contactMapper) {
+    public SupportMessageImpl(MessageDataService messageDataService) {
         this.messageDataService = messageDataService;
-        this.contactMapper = contactMapper;
     }
 
     @Override

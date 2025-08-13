@@ -18,5 +18,4 @@ public class GenericMessageImpl implements MessageSendService {
     public void sendMessage(UUID contactMessageId) {
 
     }
-
 }
