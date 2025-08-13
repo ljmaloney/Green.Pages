@@ -56,7 +56,7 @@
                             ${requestorName} has sent a message regarding your classified ad <strong>${classifiedTitle}</strong> as below:
                         </p>
                         <div style="text-align: center;display: inline-block; margin: 20px 0; padding: 10px 20px; background-color: #f3f4f6; color: #111827; font-weight: bold; border-radius: 6px; font-size: 16px;">
-                            ${subject}.
+                            ${messageSubject}.
                         </div>
                         <br/>
                         <div style="text-align: center;display: inline-block; margin: 20px 0; padding: 10px 20px; background-color: #f3f4f6; color: #111827; font-weight: bold; border-radius: 6px; font-size: 16px;">

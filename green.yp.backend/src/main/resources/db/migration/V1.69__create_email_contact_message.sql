@@ -9,7 +9,7 @@ BEGIN
         id                   binary(16)   not null primary key,
         version              varchar(45)  not null,
         create_date          datetime     not null,
-        last_upd_date        datetime     not null,
+        last_update_date     datetime     not null,
         message_sent_date    datetime     null,
         source_ip_address    varchar(16)  not null,
         sms_email_type       varchar(50)  not null,

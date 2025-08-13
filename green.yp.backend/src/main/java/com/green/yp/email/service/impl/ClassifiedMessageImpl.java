@@ -70,7 +70,7 @@ public class ClassifiedMessageImpl implements MessageSendService {
                 "link", directLink,
                 "classifiedTitle", classified.classified().title(),
                 "requestorName", message.getRequestorName(),
-                "subject", message.getTitle(),
+                "messageSubject", message.getTitle(),
                 "message", message.getMessage(),
                 "contactEmail", message.getFromEmail(),
                 "contactPhone", message.getFromPhone(),
