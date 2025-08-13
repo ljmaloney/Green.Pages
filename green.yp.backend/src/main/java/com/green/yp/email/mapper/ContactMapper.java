@@ -18,6 +18,8 @@ import org.mapstruct.ReportingPolicy;
     injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface ContactMapper {
 
+    @Mapping(target = "emailMessageId", source = "id")
+    @Mapping(target = "requestType", source = "contactRequestType")
   ContactMessageResponse toDto(ContactMessage contactMessage);
 
   @Mapping(target = "createDate", ignore = true)
@@ -27,6 +29,7 @@ public interface ContactMapper {
   @Mapping(target = "fromEmail", source = "request.emailAddress")
   @Mapping(target = "fromPhone", source = "request.phoneNumber")
   @Mapping(target = "producerId", source = "producer.producerId")
+  @Mapping(target = "locationId", source="location.locationId")
   @Mapping(target = "sourceIpAddress", source = "ipAddress")
   @Mapping(target = "contactRequestType", source = "request.requestType")
   ContactMessage toEntity(
@@ -44,6 +47,8 @@ public interface ContactMapper {
   @Mapping(target = "sourceIpAddress", source = "ipAddress")
   @Mapping(target = "destination", source = "classified.classified.emailAddress")
   @Mapping(target = "contactRequestType", source = "request.requestType")
+  @Mapping(target = "requestorName", source = "request.name")
+  @Mapping(target = "classifiedId", source="classified.classified.classifiedId")
   ContactMessage toEntity(
       ContactMessageRequest request, ClassifiedAdCustomerResponse classified, String ipAddress);
 
@@ -54,5 +59,6 @@ public interface ContactMapper {
   @Mapping(target = "fromPhone", source = "request.phoneNumber")
   @Mapping(target = "sourceIpAddress", source = "ipAddress")
   @Mapping(target = "contactRequestType", source = "request.requestType")
+  @Mapping(target = "requestorName", source = "request.name")
   ContactMessage toEntity(ContactMessageRequest request, String ipAddress);
 }

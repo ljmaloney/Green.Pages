@@ -48,9 +48,8 @@
                         </p>
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
                             Thank you for placing your classified ad
-                            <span style="text-decoration-style: double; text-decoration: #15803d">${classifiedTitle}</span> with us.
-                            <br/>
-                            The direct link to the classified ad is
+                            <span style="text-decoration-style: double; text-decoration: #15803d">${classifiedTitle}</span> with us. The direct link to the classified ad is
+                            <br/><br/>
                             <a href="${link}" target="_blank">${link}</a>.
                         </p>
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
@@ -59,13 +58,13 @@
                         <div style="text-align: center;display: inline-block; margin: 20px 0; padding: 10px 20px; background-color: #f3f4f6; color: #111827; font-weight: bold; border-radius: 6px; font-size: 16px;">
                             ${subject}.
                         </div>
+                        <br/>
                         <div style="text-align: center;display: inline-block; margin: 20px 0; padding: 10px 20px; background-color: #f3f4f6; color: #111827; font-weight: bold; border-radius: 6px; font-size: 16px;">
                             ${message}
                         </div>
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
                             Reply back to ${requestorName} at ${contactEmail} or ${contactPhone}.
                         </p>
-                        <br/><br/>
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
                             The classified ad was placed from ip address ${ipAddress} at ${timestamp}.
                         </p>

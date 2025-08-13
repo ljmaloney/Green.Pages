@@ -10,6 +10,7 @@ import com.green.yp.email.service.EmailService;
 import com.green.yp.email.service.MessageSendService;
 import java.time.OffsetDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -63,21 +64,25 @@ public class ClassifiedMessageImpl implements MessageSendService {
 
         var directLink = String.format("%s/classifieds/%s", classifiedUrl, classified.classified().classifiedId());
 
+        var params = new HashMap<String,Object>(Map.of(
+                "firstName", classified.customer().firstName(),
+                "lastName", classified.customer().lastName(),
+                "link", directLink,
+                "classifiedTitle", classified.classified().title(),
+                "requestorName", message.getRequestorName(),
+                "subject", message.getTitle(),
+                "message", message.getMessage(),
+                "contactEmail", message.getFromEmail(),
+                "contactPhone", message.getFromPhone(),
+                "ipAddress", message.getSourceIpAddress()));
+        params.put("timestamp", OffsetDateTime.now());
+
         emailService.sendEmailAsync(EmailTemplateType.CLASSIFIED_CONTACT_INFO,
                 Collections.singletonList(message.getDestination()),
                 EmailTemplateType.CLASSIFIED_CONTACT_INFO.formatSubject(classified.classified().title()),
-                () -> Map.of(
-                        "firstName", classified.customer().firstName(),
-                        "lastName", classified.customer().lastName(),
-                        "directLink", directLink,
-                        "classifiedTitle", classified.classified().title(),
-                        "requestorName", message.getRequestorName(),
-                        "subject", message.getTitle(),
-                        "message", message.getMessage(),
-                        "contactEmail", message.getFromEmail(),
-                        "contactPhone", message.getFromPhone(),
-                        "ipAddress", message.getSourceIpAddress()));
+                () -> params);
 
         message.setMessageSentDate(OffsetDateTime.now());
+        repository.saveAndFlush(message);
     }
 }
