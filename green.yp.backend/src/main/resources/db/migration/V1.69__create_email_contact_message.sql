@@ -18,6 +18,7 @@ BEGIN
         location_id          binary(16)   null,
         classified_id        binary(16)   null,
         product_service_ref  binary(16)   null,
+        requestor_name       varchar(150) not null,
         addressee_name       varchar(150) null,
         destination          varchar(150) not null,
         from_email           varchar(150) not null,

@@ -47,6 +47,9 @@ public class ContactMessage extends Mutable {
   @Column(name = "product_service_ref", length = 16)
   private UUID productServiceRef;
 
+  @Column(name="requestor_name", length = 150)
+  private String requestorName;
+
   @Column(name="addressee_name")
   private String addresseeName;
 

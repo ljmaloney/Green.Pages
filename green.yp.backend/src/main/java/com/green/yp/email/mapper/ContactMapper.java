@@ -23,6 +23,7 @@ public interface ContactMapper {
   @Mapping(target="createDate", ignore=true)
   @Mapping(target = "lastUpdateDate", ignore = true)
   @Mapping(target = "title", source = "request.subject")
+  @Mapping(target = "requestorName", source = "request.name")
   @Mapping(target = "fromEmail", source = "request.emailAddress")
   @Mapping(target = "fromPhone", source = "request.phoneNumber")
   @Mapping(target = "producerId", source= "producer.producerId")
@@ -39,6 +40,7 @@ public interface ContactMapper {
     @Mapping(target = "fromEmail", source = "request.emailAddress")
     @Mapping(target = "fromPhone", source = "request.phoneNumber")
     @Mapping(target = "sourceIpAddress", source = "ipAddress")
+    @Mapping(target = "destination", source = "classified.classified.emailAddress")
     ContactMessage toEntity(ContactMessageRequest request,
                             ClassifiedAdCustomerResponse classified,
                             String ipAddress);
