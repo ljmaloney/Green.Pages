@@ -40,8 +40,8 @@ public class ProducerProfileController {
 
   @GetMapping(path = "profiles", produces = MediaType.APPLICATION_JSON_VALUE)
   ResponseApi<List<TruncatedProducerResponse>> getProducerProfile(
-      @RequestParam(value = "lineOfBusinessId") UUID lobId,
-      @RequestParam(value = "lobUrl") String lobUrl,
+      @RequestParam(value = "lineOfBusinessId", required = false) UUID lobId,
+      @RequestParam(value = "lobUrl", required = false) String lobUrl,
       @RequestParam(name = "mostRecent", defaultValue = "true") Boolean mostRecent,
       @RequestParam(name = "number", defaultValue = "6") Integer maxProducers) {
     return new ResponseApi<>(
