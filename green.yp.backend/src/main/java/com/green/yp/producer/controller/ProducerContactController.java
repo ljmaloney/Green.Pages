@@ -10,6 +10,7 @@ import com.green.yp.producer.service.ProducerContactService;
 import com.green.yp.security.IsAnyAuthenticatedUser;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -69,7 +70,8 @@ public class ProducerContactController {
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ProducerContactResponse> createContact(
-          @PathVariable("locationId") UUID locationId, @AuthUser AuthenticatedUser authenticatedUser,
+          @PathVariable("locationId") UUID locationId,
+          @Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser,
           @Valid @RequestBody ProducerContactRequest createContactRequest, HttpServletRequest request) throws Exception {
     return new ResponseApi<>(
         contactOrchestrationService.createContact(locationId, createContactRequest, RequestUtil.getRequestIP(request)), null);
