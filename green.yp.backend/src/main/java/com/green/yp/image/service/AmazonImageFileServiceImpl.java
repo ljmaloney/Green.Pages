@@ -25,6 +25,9 @@ public class AmazonImageFileServiceImpl extends AbstractImageFileService
   @Value("${greenyp.image.service.bucket}")
   private String s3BucketName;
 
+  @Value("${greenyp.image.service.acl:noacl}")
+  private String awsBucketAcl;
+
   @Value("${greenyp.image.service.host:}")
   private String imageHostname;
 
@@ -44,12 +47,7 @@ public class AmazonImageFileServiceImpl extends AbstractImageFileService
     log.info("Uploading file {} to bucket {} as {}", multipartFile.getOriginalFilename(), s3BucketName, key);
     try {
       s3Client.putObject(
-          PutObjectRequest.builder()
-              .bucket(s3BucketName)
-              .key(key)
-              .acl("public-read") // Required if using S3 public objects
-              .contentType(multipartFile.getContentType())
-              .build(),
+              createObject(key, multipartFile.getContentType()),
           RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));
       return createUrl(imageHostname, pathString, fileName);
     } catch (IOException | S3Exception e) {
@@ -68,6 +66,22 @@ public class AmazonImageFileServiceImpl extends AbstractImageFileService
       log.warn("Failed to delete object from S3: {}", key, e);
       throw new SystemException("Unexpected error deleting image from S3", e);
     }
+  }
+
+  private PutObjectRequest createObject(String key, String contentType) {
+      if ( "noacl".equals(awsBucketAcl)) {
+          return PutObjectRequest.builder()
+                  .bucket(s3BucketName)
+                  .key(key)
+                  .contentType(contentType)
+                  .build();
+      }
+      return PutObjectRequest.builder()
+              .bucket(s3BucketName)
+              .key(key)
+              .acl("public-read") // Required if using S3 public objects
+              .contentType(contentType)
+              .build();
   }
 
   private String createKey(String path, String fileName) {
