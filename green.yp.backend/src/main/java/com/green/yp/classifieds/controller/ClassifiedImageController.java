@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
-@RequestMapping("classified/images")
+@RequestMapping("classified")
 @Validated
 @Tag(name = "Endpoints for managing images uploaded for a classified ad")
 @RestController
@@ -27,14 +27,14 @@ public class ClassifiedImageController {
     this.imageService = imageService;
   }
 
-  @GetMapping(path = "{classifiedId}/gallery", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(path = "{classifiedId}/image/gallery", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<List<ClassifiedImageResponse>> getImages(
       @PathVariable("classifiedId") UUID producerId) {
     return new ResponseApi<>(imageService.getGalleryImages(producerId), null);
   }
 
   @PostMapping(
-      path = "{classifiedId}/gallery",
+      path = "{classifiedId}/image/gallery",
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.ACCEPTED)
@@ -47,7 +47,7 @@ public class ClassifiedImageController {
     imageService.uploadGalleryImage(classifiedId, imageFilename, imageDescription, file);
   }
 
-  @DeleteMapping(path = "{classifiedId}/gallery")
+  @DeleteMapping(path = "{classifiedId}/image/gallery")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteGalleryImage(
       @PathVariable("classifiedId") UUID classifiedId,
