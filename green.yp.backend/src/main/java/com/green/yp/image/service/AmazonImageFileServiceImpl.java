@@ -41,6 +41,7 @@ public class AmazonImageFileServiceImpl extends AbstractImageFileService
   @Override
   protected String saveImageFile(MultipartFile multipartFile, String pathString, String fileName) {
     String key = createKey(pathString, fileName);
+    log.info("Uploading file {} to bucket {} as {}", multipartFile.getOriginalFilename(), s3BucketName, key);
     try {
       s3Client.putObject(
           PutObjectRequest.builder()
@@ -59,6 +60,7 @@ public class AmazonImageFileServiceImpl extends AbstractImageFileService
 
   @Override
   protected void deleteFile(String pathKey, String fileName) {
+    log.info("Deleted file {} from bucket {} path {}", fileName, s3BucketName, pathKey);
     String key = (fileName == null) ? pathKey : createKey(pathKey, fileName);
     try {
       s3Client.deleteObject(DeleteObjectRequest.builder().bucket(s3BucketName).key(key).build());

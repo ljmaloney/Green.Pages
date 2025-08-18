@@ -71,6 +71,9 @@ fusionauth:
       readTimeout: 2000
 logging:
   level:
+    com:
+      green:
+        yp: DEBUG
     org:
       springframework:
         security: DEBUG

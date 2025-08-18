@@ -47,7 +47,12 @@ spring:
           issuer-uri: http://auth.greenyp.com/
 logging:
   level:
+    com:
+      green:
+        yp: DEBUG
     org:
+      springframework:
+        security: INFO
       hibernate:
         SQL: INFO
         type:
