@@ -41,6 +41,7 @@ public class AmazonImageFileServiceImpl extends AbstractImageFileService
   @Override
   protected String saveImageFile(MultipartFile multipartFile, String pathString, String fileName) {
     String key = createKey(pathString, fileName);
+    log.info("Uploading file {} to bucket {} as {}", multipartFile.getOriginalFilename(), s3BucketName, key);
     try {
       s3Client.putObject(
           PutObjectRequest.builder()
