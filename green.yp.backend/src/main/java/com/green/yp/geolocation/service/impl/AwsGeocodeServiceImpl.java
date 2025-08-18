@@ -29,6 +29,7 @@ public class AwsGeocodeServiceImpl  implements LiveGeocodeService {
 
     @Override
     public GeocodeLocation getCoordinates(String zipCode) {
+        log.debug("Getting geocode location for zip code {}", zipCode);
         return repository.findById(zipCode)
                 .map(pc -> new GeocodeLocation(pc.getLatitude(), pc.getLongitude()))
                 .orElseThrow( () -> new NotFoundException("PostalCodeGeocode", zipCode));

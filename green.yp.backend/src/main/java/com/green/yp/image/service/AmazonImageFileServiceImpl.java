@@ -60,6 +60,7 @@ public class AmazonImageFileServiceImpl extends AbstractImageFileService
 
   @Override
   protected void deleteFile(String pathKey, String fileName) {
+    log.info("Deleted file {} from bucket {} path {}", fileName, s3BucketName, pathKey);
     String key = (fileName == null) ? pathKey : createKey(pathKey, fileName);
     try {
       s3Client.deleteObject(DeleteObjectRequest.builder().bucket(s3BucketName).key(key).build());
