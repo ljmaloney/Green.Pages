@@ -55,13 +55,21 @@
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
                             ${requestorName} has sent a message regarding your classified ad <strong>${classifiedTitle}</strong> as below:
                         </p>
-                        <div style="text-align: center;display: inline-block; margin: 20px 0; padding: 10px 20px; background-color: #f3f4f6; color: #111827; font-weight: bold; border-radius: 6px; font-size: 16px;">
-                            ${messageSubject}.
-                        </div>
+                        <table>
+                            <tr><th>Message Subject:</th></tr>
+                            <tr><td><div style="text-align: center;display: inline-block; margin: 20px 0; padding: 10px 20px; background-color: #f3f4f6; color: #111827; font-weight: bold; border-radius: 6px; font-size: 14px;">
+                                        ${messageSubject}.
+                                    </div></td></tr>
+                            <tr><th>Message Body:</th></tr>
+                            <tr><td>
+                                    <div style="text-align: center;display: inline-block; margin: 20px 0; padding: 10px 20px; background-color: #f3f4f6; color: #111827; font-weight: bold; border-radius: 6px; font-size: 14px;">
+                                        ${message}
+                                    </div>
+                             </td></tr>
+                        </table>
+
                         <br/>
-                        <div style="text-align: center;display: inline-block; margin: 20px 0; padding: 10px 20px; background-color: #f3f4f6; color: #111827; font-weight: bold; border-radius: 6px; font-size: 16px;">
-                            ${message}
-                        </div>
+
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
                             Reply back to ${requestorName} at ${contactEmail} or ${contactPhone}.
                         </p>

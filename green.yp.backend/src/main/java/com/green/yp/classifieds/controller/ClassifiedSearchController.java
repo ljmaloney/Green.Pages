@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequestMapping("classified")
 @Validated
-@Tag(name = "Endpoints for managing images uploaded for a classified ad")
+@Tag(name = "Endpoints for search classified ads")
 @RestController
 public class ClassifiedSearchController {
 
