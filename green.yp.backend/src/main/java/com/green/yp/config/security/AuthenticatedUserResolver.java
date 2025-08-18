@@ -38,7 +38,7 @@ public class AuthenticatedUserResolver implements HandlerMethodArgumentResolver 
       List<String> roles = jwt.getClaimAsStringList("roles");
       return new AuthenticatedUser(userId, email, roles, jwt);
     }
-
+    log.warn("AuthenticatedUserResolver - Unable to extract user from security context");
     throw new IllegalStateException("Unable to extract user from security context");
   }
 }

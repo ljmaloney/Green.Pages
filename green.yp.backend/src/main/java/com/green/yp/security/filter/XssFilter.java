@@ -36,10 +36,10 @@ public class XssFilter extends HttpFilter implements Filter {
 
     if (EXCLUDED_URL_LIST.stream().anyMatch(path::startsWith)) {
 
-      log.debug("Ignoring XSSContentFilter for {}", path);
+      log.trace("Ignoring XSSContentFilter for {}", path);
       filterchain.doFilter(request, response);
     } else {
-      log.debug("Sanitizing content using XSSRequestWrapper", path);
+      log.trace("Sanitizing content using XSSRequestWrapper - {}", path);
       filterchain.doFilter(new XSSRequestWrapper(request), response);
     }
   }
