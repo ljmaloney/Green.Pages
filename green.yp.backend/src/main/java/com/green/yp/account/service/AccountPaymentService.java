@@ -33,6 +33,8 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.naming.Referenceable;
+
 @Slf4j
 @Service
 public class AccountPaymentService {
@@ -55,16 +57,16 @@ public class AccountPaymentService {
     private final SearchContract searchContract;
 
     public AccountPaymentService(
-          EmailService emailService,
-          InvoiceContract invoiceContract,
-          ProducerInvoiceContract producerInvoiceContract,
-          ProducerContract producerContract,
-          EmailContract emailContract,
-          ProducerPaymentContract producerPaymentContract,
-          ProducerContactContract contactContract,
-          ProducerLocationContract locationContract,
-          PaymentContract paymentContract,
-          AccountPaymentMapper paymentMapper, SearchContract searchContract) {
+            EmailService emailService,
+            InvoiceContract invoiceContract,
+            ProducerInvoiceContract producerInvoiceContract,
+            ProducerContract producerContract,
+            EmailContract emailContract,
+            ProducerPaymentContract producerPaymentContract,
+            ProducerContactContract contactContract,
+            ProducerLocationContract locationContract,
+            PaymentContract paymentContract,
+            AccountPaymentMapper paymentMapper, SearchContract searchContract, Referenceable referenceable) {
     this.emailService = emailService;
     this.invoiceContract = invoiceContract;
     this.producerInvoiceContract = producerInvoiceContract;
@@ -135,7 +137,9 @@ public class AccountPaymentService {
     sendPaymentCompleted( requestIP, primaryContact, invoice, producerResponse, completedPayment);
 
     return new ApiPaymentResponse(
-        true, completedPayment.receiptNumber(), completedPayment.receiptUrl());
+        true, producerResponse.producerId(),
+            completedPayment.receiptNumber(),
+            completedPayment.receiptUrl());
   }
 
   public ApiPaymentResponse applyPayment(
@@ -157,7 +161,9 @@ public class AccountPaymentService {
         producerPaymentContract.applyPayment(paymentRequest, userId, requestIP);
 
     return new ApiPaymentResponse(
-        true, producerPaymentResponse.responseCode(), producerPaymentResponse.responseText());
+        true, paymentRequest.producerId(),
+            producerPaymentResponse.responseCode(),
+            producerPaymentResponse.responseText());
   }
 
   public void processSubscriptionPayment(ProducerResponse producer) {
