@@ -27,4 +27,9 @@ public record ProducerContactRequest(
     @Email(message = "The email address is not correctly formatted")
         @Size(max = 150, message = "The maximum length of an email address is 150 characters")
         String emailAddress,
-        Boolean importFlag) {}
+        Boolean importFlag) {
+
+    public boolean isNotImported(){
+        return importFlag != null ? !importFlag : Boolean.TRUE;
+    }
+}
