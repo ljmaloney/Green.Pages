@@ -76,8 +76,10 @@ public class SquarePaymentService implements PaymentService {
                     .build());
 
     customerRef.ifPresent(squarePayment::customerId);
+    var squareRequest = squarePayment.build();
+    log.debug("Square payment request : {}", squareRequest.toString());
 
-    var squarePaymentResponse = squareClient.payments().create(squarePayment.build());
+    var squarePaymentResponse = squareClient.payments().create(squareRequest);
 
     return squarePaymentResponse
         .getPayment()

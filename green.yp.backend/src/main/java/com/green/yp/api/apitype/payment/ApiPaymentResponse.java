@@ -4,6 +4,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
 
 public record ApiPaymentResponse(
-    @NotNull @NonNull Boolean success,
-    @NotNull @NonNull String reasonCode,
-    @NotNull @NonNull String responseText) {}
+        @NotNull @NonNull Boolean success,
+        java.util.UUID referenceId, @NotNull @NonNull String reasonCode,
+        @NotNull @NonNull String responseText) {}

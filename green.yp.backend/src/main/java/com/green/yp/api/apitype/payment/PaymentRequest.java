@@ -7,6 +7,7 @@ import lombok.NonNull;
 
 @Builder
 public record PaymentRequest(@NotNull @NonNull String paymentToken,
+                             String paymentNonce,
                              @NotNull String verificationToken,
                              String referenceId,
                              String ipAddress,
