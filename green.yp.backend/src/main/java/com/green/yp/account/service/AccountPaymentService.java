@@ -39,7 +39,9 @@ import javax.naming.Referenceable;
 @Service
 public class AccountPaymentService {
 
-  private final EmailService emailService;
+    public static final String PAYMENT_COMPLETED = "COMPLETED";
+    public static final String SYSTEM_USER_ID = "system";
+    private final EmailService emailService;
 
   private final InvoiceContract invoiceContract;
   private final ProducerInvoiceContract producerInvoiceContract;
@@ -66,7 +68,7 @@ public class AccountPaymentService {
             ProducerContactContract contactContract,
             ProducerLocationContract locationContract,
             PaymentContract paymentContract,
-            AccountPaymentMapper paymentMapper, SearchContract searchContract, Referenceable referenceable) {
+            AccountPaymentMapper paymentMapper, SearchContract searchContract) {
     this.emailService = emailService;
     this.invoiceContract = invoiceContract;
     this.producerInvoiceContract = producerInvoiceContract;
@@ -125,13 +127,23 @@ public class AccountPaymentService {
             Optional.of(savedCustomerCard.externCustRef()),
             true);
 
+      if ( !PAYMENT_COMPLETED.equals(completedPayment.status()) ) {
+          log.warn("Subscription payment failed for {} due to {} - {}",
+                  paymentRequest.referenceId(),
+                  completedPayment.errorStatusCode(),
+                  completedPayment.errorDetail());
+
+          sendPaymentFailed( getPrimaryContact(producerResponse), invoice, producerResponse,  completedPayment);
+          throw new PaymentFailedException(completedPayment.errorStatusCode(), completedPayment.errorDetail());
+      }
+
     invoiceContract.updatePayment(invoice.invoiceId(), completedPayment);
 
     producerContract.activateProducer(
         paymentRequest.referenceId(),
         completedPayment.createDate(),
         completedPayment.createDate(),
-        "system",
+            SYSTEM_USER_ID,
         requestIP);
 
     sendPaymentCompleted( requestIP, primaryContact, invoice, producerResponse, completedPayment);
@@ -192,7 +204,7 @@ public class AccountPaymentService {
                     Optional.of(paymentMethod.externCustRef()),
                     true);
 
-    if ( !"COMPLETED".equals(completedPayment.status()) ) {
+    if ( !PAYMENT_COMPLETED.equals(completedPayment.status()) ) {
       log.warn("Subscription payment failed for {} due to {} - {}",
               producer.producerId(),
               completedPayment.errorStatusCode(),
@@ -210,13 +222,13 @@ public class AccountPaymentService {
     invoiceContract.updatePayment(invoice.invoiceId(), completedPayment);
 
     producerContract.updatePaidDates(producer.producerId(),
-            invoice.createDate(), completedPayment.createDate(), "system", "system");
+            invoice.createDate(), completedPayment.createDate(), SYSTEM_USER_ID, SYSTEM_USER_ID);
 
     producerContract.updateProcessStatus(
         producer.producerId(), ProducerSubProcessType.PAYMENT_SUCCESS);
 
     var primaryContact = getPrimaryContact(producer);
-    sendPaymentCompleted("system",primaryContact,invoice, producer, completedPayment);
+    sendPaymentCompleted(SYSTEM_USER_ID,primaryContact,invoice, producer, completedPayment);
   }
 
   public PaymentMethodResponse replacePayment(
@@ -251,7 +263,7 @@ public class AccountPaymentService {
                       Optional.of(methodResponse.externCustRef()),
                       true);
 
-      if ( !"COMPLETED".equals(completedPayment.status()) ) {
+      if ( !PAYMENT_COMPLETED.equals(completedPayment.status()) ) {
         log.warn("Payment method saved for {} but outstanding invoice could not be paid due to {} - {}",
                 paymentRequest.referenceId(),
                 completedPayment.errorStatusCode(),
@@ -447,7 +459,7 @@ public class AccountPaymentService {
                                         "timestamp",
                                         OffsetDateTime.now(),
                                         "ipAddress",
-                                        StringUtils.isNotBlank(requestIP) ? requestIP : "system"));
+                                        StringUtils.isNotBlank(requestIP) ? requestIP : SYSTEM_USER_ID));
                 map.put("invoiceLineItems", invoice.lineItems());
                 map.put("invoiceTotal", invoice.invoiceTotal());
                 return map;

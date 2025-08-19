@@ -55,6 +55,7 @@ public class PaymentOrchestrationService {
     try {
 
       var tempMethod = methodService.createTempCustomer(methodRequest);
+
       var newCustomer = paymentService.createCustomer(methodRequest, tempMethod.paymentMethodId());
 
       tempMethod = methodService.updateSavedCustomer(tempMethod, newCustomer.externCustRef());

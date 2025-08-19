@@ -26,6 +26,7 @@ public interface AccountPaymentMapper {
 
   @Mapping(target = "referenceId", source = "paymentRequest.referenceId")
   @Mapping(target = "paymentToken", source = "savedCard.cardRef")
+  @Mapping(target = "paymentNonce", source="paymentRequest.paymentToken")
   @Mapping(target = "paymentAmount", source = "invoice.invoiceTotal")
   @Mapping(target = "totalAmount", source = "invoice.invoiceTotal")
   @Mapping(target = "note", source = "invoice.invoiceNumber")
