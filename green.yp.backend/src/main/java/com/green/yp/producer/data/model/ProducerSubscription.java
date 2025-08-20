@@ -5,6 +5,7 @@ import com.green.yp.common.data.embedded.Mutable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.time.chrono.ChronoLocalDate;
 import java.util.UUID;
 import lombok.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -54,6 +55,11 @@ public class ProducerSubscription extends Mutable {
   @Enumerated(EnumType.STRING)
   @Column(name = "invoice_cycle_type", nullable = false)
   private InvoiceCycleType invoiceCycleType;
+
+  public boolean isSubscriptionActive(ChronoLocalDate today){
+        return (getStartDate().isBefore(today) || getStartDate().isEqual(today))
+               && (getEndDate() == null || getEndDate().isAfter(today));
+    }
 
   @Override
   public boolean equals(Object o) {

@@ -181,8 +181,7 @@ public class ProducerImageService {
         producer.getSubscriptionList().stream()
             .filter(sub -> {
                 log.debug("subscription {} startDate {} endDate {}", sub.getSubscriptionId(), sub.getStartDate(), sub.getEndDate());
-                return sub.getStartDate().isBefore(today)
-                       && (sub.getEndDate() == null || sub.getEndDate().isAfter(today));
+                return sub.isSubscriptionActive(today);
             })
             .filter(sub -> {
                 log.debug("determine if subscription {} is in set", sub.getSubscriptionId());
