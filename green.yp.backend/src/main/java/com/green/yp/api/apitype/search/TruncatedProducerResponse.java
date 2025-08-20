@@ -11,5 +11,6 @@ public record TruncatedProducerResponse(
     String phone,
     String city,
     String state,
+    String postalCode,
     String websiteUrl,
     String iconLink) {}

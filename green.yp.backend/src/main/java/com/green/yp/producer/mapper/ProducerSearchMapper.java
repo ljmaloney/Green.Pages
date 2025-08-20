@@ -53,6 +53,7 @@ public interface ProducerSearchMapper {
   @Mapping(target = "phone", source = "contact.phoneNumber")
   @Mapping(target = "city", source = "location.city")
   @Mapping(target = "state", source = "location.state")
+  @Mapping(target = "postalCode", source="location.postalCode")
   @Mapping(target = "iconLink", source = "producer.iconLink")
   TruncatedProducerResponse limitedOutputResponse(ProducerSearchRecord searchRecord);
 
