@@ -175,16 +175,16 @@ public class ProducerImageService {
         subscriptions.stream()
             .map(SubscriptionDto::subscriptionId)
             .collect(Collectors.toUnmodifiableSet());
-    log.debug("subscriptionSet {}", subscriptionSet);
+    log.trace("subscriptionSet {}", subscriptionSet);
 
     var producerSubscription =
         producer.getSubscriptionList().stream()
             .filter(sub -> {
-                log.debug("subscription {} startDate {} endDate {}", sub.getSubscriptionId(), sub.getStartDate(), sub.getEndDate());
+                log.trace("subscription {} startDate {} endDate {}", sub.getSubscriptionId(), sub.getStartDate(), sub.getEndDate());
                 return sub.isSubscriptionActive(today);
             })
             .filter(sub -> {
-                log.debug("determine if subscription {} is in set", sub.getSubscriptionId());
+                log.trace("determine if subscription {} is in set", sub.getSubscriptionId());
                 return subscriptionSet.contains(sub.getSubscriptionId());
             })
             .findFirst()
