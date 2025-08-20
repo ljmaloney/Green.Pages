@@ -51,6 +51,7 @@ logging:
       green:
         yp: DEBUG
         yp.payment: INFO
+        yp.producer: DEBUG
     org:
       springframework:
         security: INFO

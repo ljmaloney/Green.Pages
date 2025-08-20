@@ -65,7 +65,7 @@ public class Producer extends Mutable {
   @OneToMany(mappedBy = "producer", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   private List<ProducerLineOfBusiness> linesOfBusiness;
 
-  @OneToMany(mappedBy = "producer", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "producer", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   private List<ProducerSubscription> subscriptionList;
 
   public void addLineOfBusiness(ProducerLineOfBusiness lob) {

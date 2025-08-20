@@ -168,17 +168,26 @@ public class ProducerImageService {
 
   private SubscriptionDto getTopSubscription(Producer producer) {
     var today = ChronoLocalDate.from(LocalDateTime.now());
+
     var subscriptions = subscriptionContract.getAllSubscriptions(SubscriptionType.TOP_LEVEL, true);
+
     var subscriptionSet =
         subscriptions.stream()
             .map(SubscriptionDto::subscriptionId)
             .collect(Collectors.toUnmodifiableSet());
+    log.debug("subscriptionSet {}", subscriptionSet);
 
     var producerSubscription =
         producer.getSubscriptionList().stream()
-            .filter(sub -> sub.getStartDate().isBefore(today)
-                           && (sub.getEndDate() == null || sub.getEndDate().isAfter(today)))
-            .filter(sub -> subscriptionSet.contains(sub.getSubscriptionId()))
+            .filter(sub -> {
+                log.debug("subscription {} startDate {} endDate {}", sub.getSubscriptionId(), sub.getStartDate(), sub.getEndDate());
+                return sub.getStartDate().isBefore(today)
+                       && (sub.getEndDate() == null || sub.getEndDate().isAfter(today));
+            })
+            .filter(sub -> {
+                log.debug("determine if subscription {} is in set", sub.getSubscriptionId());
+                return subscriptionSet.contains(sub.getSubscriptionId());
+            })
             .findFirst()
             .orElseThrow(
                 () -> {
