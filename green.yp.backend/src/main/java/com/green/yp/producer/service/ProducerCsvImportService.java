@@ -1,7 +1,5 @@
 package com.green.yp.producer.service;
 
-import com.green.yp.api.apitype.producer.*;
-import com.green.yp.api.apitype.producer.enumeration.*;
 import com.green.yp.exception.SystemException;
 import com.green.yp.producer.service.dataimp.ProducerImportService;
 import java.io.BufferedReader;

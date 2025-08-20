@@ -24,12 +24,14 @@ public class SubscriptionContract {
     return subscriptionService.findActiveSubscription(subscriptionId);
   }
 
-  public List<SubscriptionDto> getAllSubscriptions(SubscriptionType subscriptionType, boolean active) {
+  public List<SubscriptionDto> getAllSubscriptions(
+      SubscriptionType subscriptionType, boolean active) {
     var today = new Date();
-    return subscriptionService.findActiveSubscription()
-            .stream()
-            .filter( sub -> sub.subscriptionType() == subscriptionType)
-            .filter( sub -> !active || ( active && sub.startDate().before(today) && sub.endDate().after(today)) )
-            .toList();
+    return subscriptionService.findActiveSubscription().stream()
+        .filter(sub -> sub.subscriptionType() == subscriptionType)
+        .filter(
+            sub ->
+                !active || (active && sub.startDate().before(today) && sub.endDate().after(today)))
+        .toList();
   }
 }

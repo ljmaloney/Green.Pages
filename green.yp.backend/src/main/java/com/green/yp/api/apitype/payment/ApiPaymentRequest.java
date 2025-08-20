@@ -1,9 +1,8 @@
 package com.green.yp.api.apitype.payment;
 
 import jakarta.validation.constraints.*;
-import lombok.NonNull;
-
 import java.util.UUID;
+import lombok.NonNull;
 
 public record ApiPaymentRequest(@NotNull @NonNull UUID referenceId,
                                 @NotNull @NonNull String paymentToken,

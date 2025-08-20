@@ -13,8 +13,10 @@ public record UpdateSubscriptionRequest(
     @NotNull @NonNull UUID subscriptionId,
     UUID lineOfBusinessId,
     @NotNull @NonNull SubscriptionType subscriptionType,
-    @NotNull @NonNull  @Size(min = 0, max = 30, message = "The service name must be less than 30 characters")
-    String displayName,
+    @NotNull
+        @NonNull
+        @Size(min = 0, max = 30, message = "The service name must be less than 30 characters")
+        String displayName,
     @NotNull Date endDate,
     String lineOfBusiness,
     @NotNull BigDecimal monthlyAutopayAmount,

@@ -5,6 +5,7 @@ import com.green.yp.api.apitype.producer.enumeration.InvoiceCycleType;
 import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
 
-public record ApiProducerPayment(String paymentMethod,
-                                 @NotNull @NonNull PaymentActionType actionType,
-                                 @NotNull @NonNull InvoiceCycleType cycleType) {}
+public record ApiProducerPayment(
+    String paymentMethod,
+    @NotNull @NonNull PaymentActionType actionType,
+    @NotNull @NonNull InvoiceCycleType cycleType) {}

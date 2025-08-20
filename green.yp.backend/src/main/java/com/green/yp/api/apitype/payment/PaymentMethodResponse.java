@@ -2,7 +2,6 @@ package com.green.yp.api.apitype.payment;
 
 import com.green.yp.payment.data.enumeration.PaymentMethodStatusType;
 import com.green.yp.payment.data.json.Card;
-
 import java.time.OffsetDateTime;
 import java.util.UUID;
 

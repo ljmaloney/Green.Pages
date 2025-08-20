@@ -1,6 +1,5 @@
 package com.green.yp.producer.controller;
 
-import com.green.yp.api.apitype.PatchRequest;
 import com.green.yp.api.apitype.producer.CreateProductRequest;
 import com.green.yp.api.apitype.producer.DiscontinueProductRequest;
 import com.green.yp.api.apitype.producer.ProducerProductRequest;

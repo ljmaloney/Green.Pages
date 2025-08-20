@@ -33,8 +33,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.naming.Referenceable;
-
 @Slf4j
 @Service
 public class AccountPaymentService {
@@ -128,7 +126,7 @@ public class AccountPaymentService {
             true);
 
       if ( !PAYMENT_COMPLETED.equals(completedPayment.status()) ) {
-          log.warn("Subscription payment failed for {} due to {} - {}",
+          log.warn("Initial subscription payment failed for {} due to {} - {}",
                   paymentRequest.referenceId(),
                   completedPayment.errorStatusCode(),
                   completedPayment.errorDetail());
@@ -253,7 +251,7 @@ public class AccountPaymentService {
     var methodResponse = paymentContract.replaceCardOnFile(
         paymentRequest, authenticatedUser, createNew, requestIP);
 
-    if ( producer.lastBillPaidDate() == null ) {
+    if ( producer.lastBillPaidDate() == null || paymentReinstate(producer)) {
       var unpaidInvoice = invoiceContract.findUnpaidInvoice(paymentRequest.referenceId(), authenticatedUser, requestIP)
               .orElseGet( () -> createInvoiceForPayment(producer));
 
@@ -284,9 +282,7 @@ public class AccountPaymentService {
     return methodResponse;
   }
 
-
-
-  @Async
+    @Async
   public void cleanAbandonedAccounts(int daysOld){
     log.info("Removing unpaid (abandoned signup) account records and credentials");
 
@@ -423,6 +419,10 @@ public class AccountPaymentService {
                   "No primary contact found for " + producerResponse.producerId());
             });
   }
+
+    private boolean paymentReinstate(ProducerResponse producer) {
+       return producer.cancelDate() != null && producer.cancelReason() == CancelReasonType.PAYMENT_FAILED;
+    }
 
   private void sendPaymentCompleted(
       @NotNull String requestIP,

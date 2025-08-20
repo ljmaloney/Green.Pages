@@ -5,11 +5,11 @@ import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record TruncatedProducerResponse(
-        UUID producerId,
-        UUID producerLocationId,
-        String businessName,
-        String phone,
-        String city,
-        String state,
-        String websiteUrl,
-        String iconLink) {}
+    UUID producerId,
+    UUID producerLocationId,
+    String businessName,
+    String phone,
+    String city,
+    String state,
+    String websiteUrl,
+    String iconLink) {}

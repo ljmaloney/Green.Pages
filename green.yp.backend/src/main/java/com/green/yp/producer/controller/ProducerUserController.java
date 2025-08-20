@@ -8,8 +8,6 @@ import com.green.yp.api.apitype.producer.enumeration.ProducerDisplayContactType;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.producer.service.ProducerContactOrchestrationService;
 import com.green.yp.producer.service.ProducerUserService;
-import com.green.yp.security.IsAdmin;
-import com.green.yp.security.IsSubscriberAdmin;
 import com.green.yp.security.IsSubscriberAdminOrAdmin;
 import com.green.yp.security.IsSubscriberOrAdmin;
 import com.green.yp.util.RequestUtil;

@@ -3,8 +3,10 @@ package com.green.yp.account.mapper;
 import com.green.yp.api.apitype.account.CreateAccountRequest;
 import com.green.yp.api.apitype.account.CreateAccountResponse;
 import com.green.yp.api.apitype.account.UpdateAccountRequest;
-import com.green.yp.api.apitype.producer.*;
+
 import java.util.UUID;
+
+import com.green.yp.api.apitype.producer.*;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

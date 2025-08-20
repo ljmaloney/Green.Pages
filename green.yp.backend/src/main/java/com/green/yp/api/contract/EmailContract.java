@@ -7,11 +7,10 @@ import com.green.yp.email.service.EmailService;
 import com.green.yp.email.service.EmailValidationService;
 import com.green.yp.producer.data.model.ProducerContact;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import org.springframework.stereotype.Service;
 
 @Service
 public class EmailContract {

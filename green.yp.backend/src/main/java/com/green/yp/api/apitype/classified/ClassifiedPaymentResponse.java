@@ -2,9 +2,8 @@ package com.green.yp.api.apitype.classified;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
-
 import java.util.UUID;
+import lombok.Builder;
 
 @Builder
 public record ClassifiedPaymentResponse(UUID classifiedId,
