@@ -182,7 +182,7 @@ public class ProducerImageService {
             .findFirst()
             .orElseThrow(
                 () -> {
-                  log.warn(SUBSCRIPTION_VALIDATION_WARNING);
+                  log.warn("The producer {} subscription could not be found or is not active", producer.getId());
                   return new PreconditionFailedException(SUBSCRIPTION_VALIDATION_WARNING);
                 });
 
@@ -192,7 +192,7 @@ public class ProducerImageService {
         .orElseThrow(
             () -> {
               // note this really should not happen ...
-              log.warn(SUBSCRIPTION_VALIDATION_WARNING);
+              log.warn("Subscription {} could not be found or is not active", producerSubscription.getSubscriptionId());
               return new PreconditionFailedException(SUBSCRIPTION_VALIDATION_WARNING);
             });
   }
