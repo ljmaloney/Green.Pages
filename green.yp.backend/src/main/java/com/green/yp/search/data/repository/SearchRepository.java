@@ -112,4 +112,13 @@ public interface SearchRepository extends JpaRepository<SearchMaster, UUID> {
     void deleteSearchMasterByProducerIds(@Param("producerIds") List<UUID> producerIds);
 
     void deleteSearchMasterByExternIdAndRecordType(UUID externId, SearchRecordType recordType);
+
+  @Modifying
+  @Query("UPDATE SearchMaster sm SET sm.businessIconUrl=:urlPath WHERE sm.producerId=:producerId")
+  void updateBusinessIconUrl(
+      @Param("producerIds") UUID producerId, @Param("urlPath") String urlPath);
+
+    @Modifying
+    @Query("UPDATE SearchMaster sm SET sm.businessIconUrl=NULL WHERE sm.producerId=:producerId")
+    void deleteBusinessIconUrl(@Param("producerIds") UUID producerId);
 }

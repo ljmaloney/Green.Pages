@@ -1,6 +1,7 @@
 package com.green.yp.producer.service;
 
 import com.green.yp.api.apitype.producer.ProducerImageResponse;
+import com.green.yp.api.contract.SearchContract;
 import com.green.yp.api.contract.SubscriptionContract;
 import com.green.yp.exception.NotFoundException;
 import com.green.yp.exception.PreconditionFailedException;
@@ -12,6 +13,7 @@ import com.green.yp.producer.data.repository.ProducerRepository;
 import com.green.yp.producer.mapper.ImageGalleryMapper;
 import com.green.yp.reference.data.enumeration.SubscriptionType;
 import com.green.yp.reference.dto.SubscriptionDto;
+import com.green.yp.util.RequestUtil;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDate;
@@ -22,6 +24,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
@@ -40,18 +43,20 @@ public class ProducerImageService {
   private final ImageGalleryMapper imageGalleryMapper;
   private final ImageFileService imageFileService;
   private final SubscriptionContract subscriptionContract;
+  private final SearchContract searchContract;
 
   public ProducerImageService(
-      ProducerRepository producerRepository,
-      ImageGalleryRepository imageGalleryRepository,
-      ImageGalleryMapper imageGalleryMapper,
-      ImageFileService imageFileService,
-      SubscriptionContract subscriptionContract) {
+          ProducerRepository producerRepository,
+          ImageGalleryRepository imageGalleryRepository,
+          ImageGalleryMapper imageGalleryMapper,
+          ImageFileService imageFileService,
+          SubscriptionContract subscriptionContract, SearchContract searchContract) {
     this.producerRepository = producerRepository;
     this.imageGalleryRepository = imageGalleryRepository;
     this.imageGalleryMapper = imageGalleryMapper;
     this.imageFileService = imageFileService;
     this.subscriptionContract = subscriptionContract;
+      this.searchContract = searchContract;
   }
 
   public List<ProducerImageResponse> getGalleryImages(@NonNull @NotNull UUID producerId) {
@@ -61,8 +66,13 @@ public class ProducerImageService {
     return imageGalleryMapper.mapToResponse(images);
   }
 
+    @Transactional
   public void uploadLogoImage(UUID producerId, String logoFileName, MultipartFile file) {
-    Producer producer =
+      if ( RequestUtil.isInValidFileName(logoFileName)) {
+          log.warn("Attempting to upload an invalid logoFileName {} by {}", logoFileName, producerId);
+          throw new PreconditionFailedException("Invalid filename " + logoFileName);
+      }
+      Producer producer =
         producerRepository
             .findById(producerId)
             .orElseThrow(() -> new NotFoundException("producer", producerId));
@@ -77,11 +87,17 @@ public class ProducerImageService {
 
     producer.setIconLink(urlPath);
     producerRepository.saveAndFlush(producer);
+    searchContract.upsertIconLink(producer.getId(), urlPath);
   }
 
+    @Transactional
   public void uploadGalleryImage(
       UUID producerId, String imageFilename, String description, MultipartFile file) {
-    var producer =
+    if ( RequestUtil.isInValidFileName(imageFilename)) {
+        log.warn("Attempting to upload an invalid filename {} by {}", imageFilename, producerId);
+        throw new PreconditionFailedException("Invalid filename " + imageFilename);
+    }
+      var producer =
         producerRepository
             .findById(producerId)
             .orElseThrow(() -> new NotFoundException("producer", producerId));
@@ -116,6 +132,7 @@ public class ProducerImageService {
         producer.getIconLink());
   }
 
+    @Transactional
   public void deleteLogo(UUID producerId, String requestIP) {
     Producer producer =
         producerRepository
@@ -127,10 +144,17 @@ public class ProducerImageService {
     producerRepository.saveAndFlush(producer);
   }
 
-  public void deleteGallaryImage(UUID producerId, String imageFilename, String requestIP) {
-    producerRepository
+  @Transactional
+  public void deleteGalleryImage(@NotNull @NonNull UUID producerId,
+                                 @NotNull @NonNull String imageFilename, String requestIP) {
+      if ( StringUtils.isBlank(imageFilename)){
+          log.warn("No imageFileName specified for deletion for {}", producerId);
+          throw new PreconditionFailedException("No imageFileName specified for deletion");
+      }
+      producerRepository
         .findById(producerId)
         .orElseThrow(() -> new NotFoundException("producer", producerId));
+      log.info("Deleting gallery image {} for producer {} from {}", imageFilename,producerId, requestIP);
     imageFileService.deleteImage(producerId, imageFilename);
     imageGalleryRepository.deleteImageGalleryByProducerIdAndImageFilename(
         producerId, imageFilename);
@@ -147,7 +171,7 @@ public class ProducerImageService {
     var subscriptions = subscriptionContract.getAllSubscriptions(SubscriptionType.TOP_LEVEL, true);
     var subscriptionSet =
         subscriptions.stream()
-            .map(sub -> sub.subscriptionId())
+            .map(SubscriptionDto::subscriptionId)
             .collect(Collectors.toUnmodifiableSet());
 
     var producerSubscription =

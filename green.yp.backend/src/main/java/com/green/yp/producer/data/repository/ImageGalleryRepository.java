@@ -4,6 +4,7 @@ import com.green.yp.producer.data.model.ImageGallery;
 import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 
 import java.util.List;
 import java.util.UUID;
@@ -11,5 +12,6 @@ import java.util.UUID;
 public interface ImageGalleryRepository extends JpaRepository<ImageGallery, UUID> {
   List<ImageGallery> findImageGalleriesByProducerId(@NonNull @NotNull UUID producerId);
 
+  @Modifying
   void deleteImageGalleryByProducerIdAndImageFilename(UUID producerId, String imageFilename);
 }

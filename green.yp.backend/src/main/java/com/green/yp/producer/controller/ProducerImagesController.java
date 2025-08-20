@@ -8,6 +8,8 @@ import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
+
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -71,9 +73,9 @@ public class ProducerImagesController {
   @IsAnyAuthenticatedUser
   @DeleteMapping(path = "{producerId}/logo")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void deleteLogo(@PathVariable("producerId") UUID producerId) {
+  public void deleteLogo(@PathVariable("producerId") UUID producerId, HttpServletRequest request) {
     log.info("Deleting logo for producer {}", producerId);
-    imageService.deleteLogo(producerId, RequestUtil.getRequestIP());
+    imageService.deleteLogo(producerId, RequestUtil.getRequestIP(request));
   }
 
   @IsAnyAuthenticatedUser
@@ -81,8 +83,9 @@ public class ProducerImagesController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteGalleryImage(
       @PathVariable("producerId") UUID producerId,
-      @RequestParam(name = "imageFilename", required = true) String imageFilename) {
+      @RequestParam(name = "imageFilename") String imageFilename,
+      HttpServletRequest request) {
     log.info("Deleting image {} for {} gallery", imageFilename, producerId);
-    imageService.deleteGallaryImage(producerId, imageFilename, RequestUtil.getRequestIP());
+    imageService.deleteGalleryImage(producerId, imageFilename, RequestUtil.getRequestIP(request));
   }
 }
