@@ -7,12 +7,13 @@ import java.util.UUID;
 import lombok.Builder;
 
 @Builder
-public record InvoiceRequest(String externalRef,
-        UUID paymentTransactionId,
-        InvoiceType invoiceType,
-        String description,
-        OffsetDateTime paidDate,
-        String paymentReceiptNumber,
-        String paymentReceiptUrl,
-        BigDecimal invoiceTotal,
-        List<InvoiceLineItemRequest> lineItems) {}
+public record InvoiceRequest(
+    String externalRef,
+    UUID paymentTransactionId,
+    InvoiceType invoiceType,
+    String description,
+    OffsetDateTime paidDate,
+    String paymentReceiptNumber,
+    String paymentReceiptUrl,
+    BigDecimal invoiceTotal,
+    List<InvoiceLineItemRequest> lineItems) {}

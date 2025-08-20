@@ -7,7 +7,6 @@ import com.green.yp.auth.service.FusionAuthService;
 import io.fusionauth.domain.api.UserResponse;
 import io.fusionauth.domain.api.user.RegistrationResponse;
 import jakarta.validation.constraints.NotNull;
-
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;

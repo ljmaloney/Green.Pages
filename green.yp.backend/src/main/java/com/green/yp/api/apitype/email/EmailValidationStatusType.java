@@ -1,15 +1,17 @@
 package com.green.yp.api.apitype.email;
 
 public enum EmailValidationStatusType {
-    NOT_VALIDATED(false),
-    VALIDATED(true),
-    INVALID_BOUNCING(false);
+  NOT_VALIDATED(false),
+  VALIDATED(true),
+  INVALID_BOUNCING(false);
 
-    boolean valid;
-    private EmailValidationStatusType(boolean valid){
-        this.valid = valid;
-    }
-    public boolean isValidated(){
-        return valid;
-    }
+  boolean valid;
+
+  EmailValidationStatusType(boolean valid) {
+    this.valid = valid;
+  }
+
+  public boolean isValidated() {
+    return valid;
+  }
 }

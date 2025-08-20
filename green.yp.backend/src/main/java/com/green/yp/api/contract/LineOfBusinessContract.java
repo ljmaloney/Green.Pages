@@ -24,7 +24,7 @@ public class LineOfBusinessContract {
     return lineOfBusinessService.getLineOfBusiness(lobUrl);
   }
 
-    public List<LOBServiceDto> getServices(UUID lineOfBusinessId) {
-      return lineOfBusinessService.findServices(lineOfBusinessId);
-    }
+  public List<LOBServiceDto> getServices(UUID lineOfBusinessId) {
+    return lineOfBusinessService.findServices(lineOfBusinessId);
+  }
 }

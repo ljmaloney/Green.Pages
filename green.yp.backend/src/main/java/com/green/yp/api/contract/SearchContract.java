@@ -4,11 +4,10 @@ import com.green.yp.api.apitype.enumeration.SearchRecordType;
 import com.green.yp.api.apitype.search.SearchMasterRequest;
 import com.green.yp.search.service.SearchV2Service;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.stereotype.Component;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.stereotype.Component;
 
 @Component
 public class SearchContract {
