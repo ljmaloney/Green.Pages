@@ -68,7 +68,7 @@ public class ProducerImportService {
                 null,
                 businessName,
                 ProducerLocationType.HOME_OFFICE_PRIMARY,
-                LocationDisplayType.CITY_STATE_ZIP,
+                LocationDisplayType.FULL_ADDRESS,
                 true,
                 importRecord.address,
                 null,
