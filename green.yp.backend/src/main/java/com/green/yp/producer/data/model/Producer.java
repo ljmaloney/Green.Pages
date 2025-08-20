@@ -62,7 +62,7 @@ public class Producer extends Mutable {
   @Column(name = "narrative", length = 1024)
   private String narrative;
 
-  @OneToMany(mappedBy = "producer", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "producer", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   private List<ProducerLineOfBusiness> linesOfBusiness;
 
   @OneToMany(mappedBy = "producer", cascade = CascadeType.ALL)

@@ -69,6 +69,7 @@ public class AuthenticationConfig {
                         "/producer/*/location/*/services",
                         "/producer/*/location/*/products",
                         "/producer/location/product/**",
+                        "/subscriber/**",
                         "/search",
                             "/v2/search")
                     .permitAll()

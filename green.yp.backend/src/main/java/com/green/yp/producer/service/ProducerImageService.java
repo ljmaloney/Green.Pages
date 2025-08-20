@@ -152,7 +152,8 @@ public class ProducerImageService {
 
     var producerSubscription =
         producer.getSubscriptionList().stream()
-            .filter(sub -> sub.getStartDate().isBefore(today) && sub.getEndDate().isAfter(today))
+            .filter(sub -> sub.getStartDate().isBefore(today)
+                           && (sub.getEndDate() == null || sub.getEndDate().isAfter(today)))
             .filter(sub -> subscriptionSet.contains(sub.getSubscriptionId()))
             .findFirst()
             .orElseThrow(
