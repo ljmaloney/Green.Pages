@@ -2,10 +2,14 @@ package com.green.yp.util;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
+import java.util.regex.Pattern;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+@Slf4j
 public class RequestUtil {
   private static final String[] IP_HEADER_CANDIDATES = {
     "X-Forwarded-For",
@@ -21,7 +25,10 @@ public class RequestUtil {
     "REMOTE_ADDR"
   };
 
-  private RequestUtil() {}
+    // Allow alphanumeric, dash, underscore, and dot
+    private static final Pattern SAFE_FILENAME = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9._-]{0,254}$");
+
+    private RequestUtil() {}
 
   public static String getRequestIP() {
     return getRequestIP(null);
@@ -40,7 +47,7 @@ public class RequestUtil {
     try {
       ip = InetAddress.getLocalHost().getHostAddress();
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
     if (!StringUtils.isEmpty(ip)) return ip;
 
@@ -53,4 +60,13 @@ public class RequestUtil {
 
     return request.getRemoteAddr();
   }
+
+    public static boolean isInValidFileName(String filename) {
+        if (filename == null || filename.contains("..") || filename.contains("/") || filename.contains("\\")) {
+            return true;
+        }
+        // Must match safe characters
+        return !SAFE_FILENAME.matcher(filename).matches();
+    }
+
 }

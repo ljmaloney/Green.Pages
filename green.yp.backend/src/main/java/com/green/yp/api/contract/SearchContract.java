@@ -44,4 +44,8 @@ public class SearchContract {
     public void deleteSearchMaster(UUID externId, SearchRecordType recordType) {
         searchV2Service.deleteProducerSearchMaster(externId, recordType);
     }
+
+    public void upsertIconLink(UUID producerId, String urlPath) {
+        searchV2Service.upsertProducerIconLink(producerId, urlPath);
+    }
 }
