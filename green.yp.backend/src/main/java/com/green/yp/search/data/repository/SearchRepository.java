@@ -116,7 +116,7 @@ public interface SearchRepository extends JpaRepository<SearchMaster, UUID> {
   @Modifying
   @Query("UPDATE SearchMaster sm SET sm.businessIconUrl=:urlPath WHERE sm.producerId=:producerId")
   void updateBusinessIconUrl(
-      @Param("producerIds") UUID producerId, @Param("urlPath") String urlPath);
+      @Param("producerId") UUID producerId, @Param("urlPath") String urlPath);
 
     @Modifying
     @Query("UPDATE SearchMaster sm SET sm.businessIconUrl=NULL WHERE sm.producerId=:producerId")
