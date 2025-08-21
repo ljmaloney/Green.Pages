@@ -61,10 +61,11 @@ public class SquarePaymentService implements PaymentService {
             .statementDescriptionIdentifier(
                 StringUtils.truncate(paymentRequest.statementDescription(), 20))
             .buyerEmailAddress(paymentRequest.emailAddress())
-            .buyerPhoneNumber(paymentRequest.phoneNumber())
+                .buyerPhoneNumber(normalizePhone(paymentRequest.phoneNumber()))
             .amountMoney(createMoney(paymentRequest.paymentAmount()))
             .appFeeMoney(createMoney(BigDecimal.ZERO))
             .tipMoney(createMoney(BigDecimal.ZERO))
+             .customerDetails(CustomerDetails.builder().sellerKeyedIn(false).build())
             .billingAddress(
                 Address.builder()
                     .addressLine1(paymentRequest.address())
@@ -114,6 +115,8 @@ public class SquarePaymentService implements PaymentService {
             .referenceId(methodRequest.referenceId())
             .build();
 
+    log.debug("Calling square to crate new customer {} for paymentMethodId {}", squareCustomer, paymentMethodId);
+
     var custResponse = squareClient.customers().create(squareCustomer);
 
     return custResponse
@@ -138,20 +141,23 @@ public class SquarePaymentService implements PaymentService {
         externCustId,
         methodRequest.referenceId());
 
+    var updateRequest = UpdateCustomerRequest.builder()
+            .customerId(externCustId)
+            .referenceId(methodRequest.referenceId())
+            .companyName(methodRequest.companyName())
+            .givenName(methodRequest.firstName())
+            .familyName(methodRequest.lastName())
+            .emailAddress(methodRequest.emailAddress())
+            .phoneNumber(methodRequest.phoneNumber())
+            .address(createAddress(methodRequest))
+            .build();
+
+      log.debug("Calling square to update existing cutomer - {}", updateRequest);
+
     var custResponse =
         squareClient
             .customers()
-            .update(
-                UpdateCustomerRequest.builder()
-                    .customerId(externCustId)
-                    .referenceId(methodRequest.referenceId())
-                    .companyName(methodRequest.companyName())
-                    .givenName(methodRequest.firstName())
-                    .familyName(methodRequest.lastName())
-                    .emailAddress(methodRequest.emailAddress())
-                    .phoneNumber(methodRequest.phoneNumber())
-                    .address(createAddress(methodRequest))
-                    .build());
+            .update(updateRequest);
 
     return custResponse
         .getCustomer()
@@ -216,7 +222,7 @@ public class SquarePaymentService implements PaymentService {
             .verificationToken(methodRequest.verificationToken())
             .build();
 
-    log.debug("Square request data :  {}", squareCard);
+    log.debug("Calling square to create / save new card on file :  {}", squareCard);
 
     var squareCardResponse = squareClient.cards().create(squareCard);
 
@@ -257,4 +263,13 @@ public class SquarePaymentService implements PaymentService {
         .country(Country.US)
         .build();
   }
+    private String normalizePhone(String phoneNumber){
+        String phone =phoneNumber.replaceAll("\\D", "");
+        if ( phone.length() == 11 || phone.length() > 11 ) {
+            return String.join("+", "",phone);
+        } else if ( phone.length() == 10 ) {
+            return String.join("+1", "",phone);
+        }
+        return phone;
+    }
 }
