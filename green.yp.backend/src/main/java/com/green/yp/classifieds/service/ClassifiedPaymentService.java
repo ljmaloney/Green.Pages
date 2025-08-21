@@ -22,6 +22,7 @@ import com.green.yp.classifieds.data.repository.ClassifiedRepository;
 import com.green.yp.classifieds.mapper.ClassifiedMapper;
 import com.green.yp.classifieds.mapper.ClassifiedPaymentMapper;
 import com.green.yp.exception.NotFoundException;
+import com.green.yp.exception.PaymentFailedException;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.util.TokenUtils;
 import jakarta.validation.Valid;
@@ -112,14 +113,11 @@ public class ClassifiedPaymentService {
             Optional.empty(), false);
 
     if ( !"COMPLETED".equals(paymentResponse.status()) ) {
-      log.warn("Attempted to process payment of classified ad {} failed", classified.classified().getId());
-      return ClassifiedPaymentResponse.builder()
-              .classifiedId(classified.classified().getId())
-              .classifiedTitle(classified.classified().getTitle())
-              .paymentStatus(paymentResponse.status())
-              .errorStatusCode(paymentResponse.errorStatusCode())
-              .errorDetail(paymentResponse.errorDetail())
-              .build();
+      log.warn("Attempted to process payment of classified ad {} failed - {} detail {}",
+              classified.classified().getId(),
+              paymentResponse.errorStatusCode(),
+              paymentResponse.errorDetail());
+      throw new PaymentFailedException("Classified Payment Failed",paymentResponse.errorDetail());
     }
 
     var token = TokenUtils.generateCode(10);
