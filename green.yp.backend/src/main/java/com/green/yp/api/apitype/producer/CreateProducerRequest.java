@@ -27,4 +27,4 @@ public record CreateProducerRequest(
             regexp = "^[a-zA-Z0-9 ,]+$",
             message = "Keywords can only contain letters, numbers and spaces")
         String keywords,
-    @Size(max = 512) String narrative) {}
+    @Size(max = 2048) String narrative) {}
