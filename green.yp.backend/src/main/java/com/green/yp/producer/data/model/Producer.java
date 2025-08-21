@@ -59,6 +59,7 @@ public class Producer extends Mutable {
   @Column(name = "keywords")
   private String keywords;
 
+  @Lob
   @Column(name = "narrative", length = 1024)
   private String narrative;
 
