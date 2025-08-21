@@ -149,13 +149,19 @@ public class FusionAuthService implements AuthenticationService {
                       .firstName(user.firstName)
                       .emailAddress(user.email)
                       .build());
-    } else {
+    } else if ( response.errorResponse != null ) {
       // Handle errors
       log.error(
               "Error occurred while searching for username {} emailAddress {}, error : {}",
               userName, emailAddress, response.errorResponse.toString());
       throw new UserCredentialsException(
               "Error when retrieving fusion auth credentials", response.exception);
+    } else {
+        log.error(
+                "Error occurred while searching for username {} emailAddress {}, response : {}",
+                userName, emailAddress, response);
+        throw new UserCredentialsException(
+                "Error when retrieving fusion auth credentials", response.exception);
     }
   }
 
@@ -189,7 +195,7 @@ public class FusionAuthService implements AuthenticationService {
   }
 
   public void removeUser(String externalAuthorizationServiceRef) {
-    log.info("Remove/Revolk user from FusionAuth for {}", externalAuthorizationServiceRef);
+    log.info("Remove/Revoke user from FusionAuth for {}", externalAuthorizationServiceRef);
     ClientResponse<Void, Errors> response =
         fusionAuthClient.deleteUser(UUID.fromString(externalAuthorizationServiceRef));
     if (response.wasSuccessful()) {
