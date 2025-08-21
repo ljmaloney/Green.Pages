@@ -138,12 +138,12 @@ public class AccountController {
 
   @IsAnyAuthenticatedUser
   @Operation(summary = "Update the subscriber / producer account business profile")
-  @PutMapping(
-      name = "/account",
+  @PutMapping(path = "/{accountId}",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public ResponseApi<AccountResponse> updateAccount(
+         @PathVariable(name="accountId") UUID accountId,
       @Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser,
       @RequestBody @Valid UpdateAccountRequest account) {
     try {
