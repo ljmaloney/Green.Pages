@@ -106,7 +106,7 @@
                             </tbody>
                         </table>
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
-                            The classified ad was placed from ip address ${ipAddress} at ${timestamp}.
+                            The subscription account was created from ip address ${ipAddress} at ${timestamp}.
                         </p>
                     </td>
                 </tr>
