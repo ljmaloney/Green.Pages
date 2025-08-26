@@ -74,7 +74,7 @@ public class ProducerServicesController {
   }
 
   @IsAnyAuthenticatedUser
-  @DeleteMapping(path = "localtion/service/discontinue",
+  @DeleteMapping(path = "location/service/discontinue",
   consumes = MediaType.APPLICATION_JSON_VALUE,
   produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)

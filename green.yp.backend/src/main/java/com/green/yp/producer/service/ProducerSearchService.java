@@ -5,6 +5,7 @@ import static java.lang.Boolean.TRUE;
 import com.green.yp.api.apitype.PageableResponse;
 import com.green.yp.api.apitype.ProducerServiceResponse;
 import com.green.yp.api.apitype.enumeration.SearchRecordType;
+import com.green.yp.api.apitype.producer.ProducerLocationResponse;
 import com.green.yp.api.apitype.producer.ProducerProductResponse;
 import com.green.yp.api.apitype.producer.ProducerResponse;
 import com.green.yp.api.apitype.producer.enumeration.ProducerLocationType;
@@ -27,9 +28,10 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
@@ -136,6 +138,17 @@ public class ProducerSearchService {
       searchContract.upsertSearchMaster(searchRequests, producerResponse.producerId());
     }
 
+    @Async("threadPoolSearchTaskExecutor")
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void upsertProducerLocation(@NotNull @NonNull UUID producerId,
+                                       @NotNull @NonNull ProducerLocationResponse locationResponse, String requestIP) {
+        log.info("Upserting producer location search records producerId: {} locationId: {}",
+                producerId, locationResponse.locationId());
+        searchContract.upsertSearchMaster(createSearchRequests(locationResponse.locationId()), producerId);
+
+        searchContract.updateLocation(producerSearchMapper.toSearchLocationUpdate(locationResponse));
+    }
+
     public void deleteSearch(@NotNull @NonNull UUID serviceId,
                              @NotNull @NonNull SearchRecordType recordType) {
         log.info("Deleting product / service {} type {}", serviceId, recordType);
@@ -168,6 +181,7 @@ public class ProducerSearchService {
 
     @NotNull
     private List<SearchMasterRequest> createSearchRequests(@NotNull UUID locationId) {
+        log.debug("Create search master record for  location: {}", locationId);
         var profile = getProducerProfile(locationId);
 
         return profile.producer().getLinesOfBusiness().parallelStream()

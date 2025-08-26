@@ -2,10 +2,12 @@ package com.green.yp.producer.mapper;
 
 import com.green.yp.api.apitype.ProducerServiceResponse;
 import com.green.yp.api.apitype.producer.LocationHoursResponse;
+import com.green.yp.api.apitype.producer.ProducerLocationResponse;
 import com.green.yp.api.apitype.producer.ProducerProductResponse;
 import com.green.yp.api.apitype.producer.ProducerProfileResponse;
 import com.green.yp.api.apitype.search.ProducerSearchResponse;
 import com.green.yp.api.apitype.search.SearchMasterRequest;
+import com.green.yp.api.apitype.search.SearchLocationUpdateRequest;
 import com.green.yp.api.apitype.search.TruncatedProducerResponse;
 import com.green.yp.producer.data.model.*;
 import com.green.yp.producer.data.record.ProducerSearchRecord;
@@ -13,6 +15,8 @@ import java.util.List;
 import java.util.UUID;
 
 import com.green.yp.reference.dto.LineOfBusinessDto;
+import jakarta.validation.constraints.NotNull;
+import lombok.NonNull;
 import org.apache.commons.collections4.CollectionUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -197,4 +201,19 @@ public interface ProducerSearchMapper {
                                        ProducerContact contact,
                                        LineOfBusinessDto lob,
                                        String keywords);
+
+
+    @Mapping(target = "externId", source = "locationId")
+    @Mapping(target = "producerId", source = "producerId")
+    @Mapping(target = "locationId", source = "locationId")
+    @Mapping(target = "title", source = "locationName")
+    @Mapping(target = "businessUrl", source = "websiteUrl")
+    @Mapping(target = "addressLine1", source = "addressLine1")
+    @Mapping(target = "addressLine2", source = "addressLine2")
+    @Mapping(target = "city", source = "city")
+    @Mapping(target = "state", source = "state")
+    @Mapping(target = "postalCode", source = "postalCode")
+    @Mapping(target = "longitude", source = "longitude")
+    @Mapping(target = "latitude", source = "latitude")
+    SearchLocationUpdateRequest toSearchLocationUpdate(@NotNull @NonNull ProducerLocationResponse location);
 }

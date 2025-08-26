@@ -1,5 +1,6 @@
 package com.green.yp.search.mapper;
 
+import com.green.yp.api.apitype.search.SearchLocationUpdateRequest;
 import com.green.yp.api.apitype.search.SearchMasterRequest;
 import com.green.yp.api.apitype.search.SearchResponse;
 import com.green.yp.search.data.entity.SearchMaster;
@@ -80,4 +81,30 @@ public interface SearchMapper {
     default Boolean isActive(SearchMasterRequest request) {
         return request.lastActiveDate() == null || request.lastActiveDate().isAfter(LocalDate.now());
     }
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createDate", ignore = true)
+    @Mapping(target = "lastUpdateDate", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "externId",  ignore = true)
+    @Mapping(target = "producerId", ignore = true)
+    @Mapping(target = "locationId", ignore = true)
+    @Mapping(target = "categoryRef", ignore = true)
+    @Mapping(target = "customerRef", ignore = true)
+    @Mapping(target = "categoryName", ignore = true)
+    @Mapping(target = "recordType", ignore = true)
+    @Mapping(target = "active", ignore = true)
+    @Mapping(target = "lastActiveDate", ignore = true)
+    @Mapping(target = "keywords", ignore = true)
+    @Mapping(target = "businessName", ignore = true)
+    @Mapping(target = "businessIconUrl", ignore = true)
+    @Mapping(target = "imageUrl", ignore=true)
+    @Mapping(target = "emailAddress", ignore = true)
+    @Mapping(target = "phoneNumber",  ignore = true)
+    @Mapping(target = "minPrice", ignore = true)
+    @Mapping(target = "maxPrice", ignore = true)
+    @Mapping(target = "priceUnitsType", ignore = true)
+    @Mapping(target = "description", ignore = true)
+    void updateLocation(@MappingTarget SearchMaster sm, SearchLocationUpdateRequest searchLocationUpdate);
 }

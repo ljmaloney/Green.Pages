@@ -62,8 +62,21 @@ public class ProducerImportService {
                 null),
             null);
 
+      var contact = new ProducerContactRequest(
+              null,
+              null,
+              ProducerContactType.PRIMARY,
+              ProducerDisplayContactType.GENERIC_NAME_PHONE_EMAIL,
+              StringUtils.getIfBlank(importRecord.contact, () -> "Primary"),
+              null,
+              null,
+              null,
+              importRecord.phone,
+              null,
+              null, true);
+
     ProducerLocationResponse locationResponse =
-        producerLocationService.createLocation(
+        producerLocationService.createLocation(new CreateLocationRequest(
             new LocationRequest(
                 null,
                 businessName,
@@ -78,27 +91,27 @@ public class ProducerImportService {
                 importRecord.zip,
                 location.latitude(),
                 location.longitude(),
-                null),
+                null), contact),
             producerResponse.producerId(),
             null);
 
-    contactOrchestrationService.createContact(
-        new ProducerContactRequest(
-            null,
-            locationResponse.locationId(),
-            ProducerContactType.PRIMARY,
-            ProducerDisplayContactType.GENERIC_NAME_PHONE_EMAIL,
-            StringUtils.getIfBlank(importRecord.contact, () -> "Primary"),
-            null,
-            null,
-            null,
-            importRecord.phone,
-            null,
-            null, true),
-        Optional.empty(),
-        producerResponse.producerId(),
-        locationResponse.locationId(),
-        null);
+//    contactOrchestrationService.createContact(
+//        new ProducerContactRequest(
+//            null,
+//            locationResponse.locationId(),
+//            ProducerContactType.PRIMARY,
+//            ProducerDisplayContactType.GENERIC_NAME_PHONE_EMAIL,
+//            StringUtils.getIfBlank(importRecord.contact, () -> "Primary"),
+//            null,
+//            null,
+//            null,
+//            importRecord.phone,
+//            null,
+//            null, true),
+//        Optional.empty(),
+//        producerResponse.producerId(),
+//        locationResponse.locationId(),
+//        null);
     return producerResponse.producerId();
   }
 
