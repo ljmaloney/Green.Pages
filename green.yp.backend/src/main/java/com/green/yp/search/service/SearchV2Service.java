@@ -2,6 +2,7 @@ package com.green.yp.search.service;
 
 import com.green.yp.api.apitype.PageableResponse;
 import com.green.yp.api.apitype.enumeration.SearchRecordType;
+import com.green.yp.api.apitype.search.SearchLocationUpdateRequest;
 import com.green.yp.api.apitype.search.SearchMasterRequest;
 import com.green.yp.api.apitype.search.SearchResponse;
 import com.green.yp.geolocation.service.GeocodingService;
@@ -21,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -117,6 +119,19 @@ public class SearchV2Service {
         searchRequests.forEach(this::upsertSearchMaster);
     }
 
+    public void updateLocation(SearchLocationUpdateRequest searchLocationUpdate) {
+      log.debug("Updating search master for location {}", searchLocationUpdate);
+
+      searchRepository.findSearchMaster(searchLocationUpdate.externId(),
+              searchLocationUpdate.producerId(),
+              searchLocationUpdate.locationId(), SearchRecordType.GREEN_PRO_SERVICE, SearchRecordType.GREEN_PRO_PRODUCT)
+              .forEach( sm -> {
+                  searchMapper.updateLocation(sm, searchLocationUpdate);
+                  searchRepository.saveAndFlush(sm);
+              });
+
+    }
+
     @Transactional
     public void upsertProducerIconLink(UUID producerId, String urlPath) {
         log.info("Upserting producer {} icon link {}", producerId, urlPath);
@@ -168,4 +183,6 @@ public class SearchV2Service {
             })
         .get();
     }
+
+
 }

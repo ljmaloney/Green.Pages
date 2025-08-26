@@ -77,7 +77,7 @@ public class ProducerContract {
   }
 
   public ProducerLocationResponse createLocation(
-      LocationRequest createLocationRequest, UUID producerId, String ipAddress) {
+      CreateLocationRequest createLocationRequest, UUID producerId, String ipAddress) {
     return producerLocationService.createLocation(createLocationRequest, producerId, ipAddress);
   }
 

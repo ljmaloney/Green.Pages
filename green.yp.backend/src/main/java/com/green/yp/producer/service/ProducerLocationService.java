@@ -7,8 +7,7 @@ import com.green.yp.api.apitype.PatchRequest;
 import com.green.yp.api.apitype.common.GeocodeLocation;
 import com.green.yp.api.apitype.enumeration.AuditActionType;
 import com.green.yp.api.apitype.enumeration.AuditObjectType;
-import com.green.yp.api.apitype.producer.LocationRequest;
-import com.green.yp.api.apitype.producer.ProducerLocationResponse;
+import com.green.yp.api.apitype.producer.*;
 import com.green.yp.api.apitype.producer.enumeration.ProducerLocationType;
 import com.green.yp.common.ServiceUtils;
 import com.green.yp.config.security.AuthenticatedUser;
@@ -17,6 +16,7 @@ import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.producer.data.model.ProducerLocation;
 import com.green.yp.producer.data.repository.ProducerLocationRepository;
 import com.green.yp.producer.mapper.ProducerLocationMapper;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
@@ -35,38 +35,36 @@ public class ProducerLocationService {
   private static final String PRODUCER_LOCATION = "ProducerLocation";
 
   final ProducerLocationMapper producerLocationMapper;
-
   final ProducerLocationRepository locationRepository;
-
   final ProducerOrchestrationService producerService;
-
   final ProducerLocationHoursService hoursService;
-
   private final ProducerGeocodeService geocodingService;
 
   public ProducerLocationService(
-      ProducerLocationMapper producerLocationMapper,
-      ProducerLocationRepository locationRepository,
-      ProducerOrchestrationService producerService,
-      ProducerLocationHoursService hoursService,
-      ProducerGeocodeService gecodeService) {
+          ProducerLocationMapper producerLocationMapper,
+          ProducerLocationRepository locationRepository,
+          ProducerOrchestrationService producerService,
+          ProducerLocationHoursService hoursService,
+          ProducerGeocodeService gecodeService) {
     this.producerLocationMapper = producerLocationMapper;
     this.locationRepository = locationRepository;
     this.producerService = producerService;
     this.hoursService = hoursService;
-    this.geocodingService = gecodeService;
+      this.geocodingService = gecodeService;
   }
+
+
 
   @AuditRequest(
       requestParameter = "createLocationRequest",
       objectType = AuditObjectType.PRODUCER_LOCATION,
       actionType = AuditActionType.CREATE)
   public ProducerLocationResponse createLocation(
-      LocationRequest createLocationRequest, UUID producerId, String ipAddress) {
+          @Valid CreateLocationRequest createLocationRequest, UUID producerId, String ipAddress) {
 
     producerService.findActiveProducer(producerId);
 
-    ProducerLocation location = producerLocationMapper.toEntity(createLocationRequest);
+    ProducerLocation location = producerLocationMapper.toEntity(createLocationRequest.locationRequest());
     location.setProducerId(producerId);
     location.setActive(true);
 

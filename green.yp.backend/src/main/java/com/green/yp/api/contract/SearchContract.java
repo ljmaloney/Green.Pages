@@ -1,6 +1,7 @@
 package com.green.yp.api.contract;
 
 import com.green.yp.api.apitype.enumeration.SearchRecordType;
+import com.green.yp.api.apitype.search.SearchLocationUpdateRequest;
 import com.green.yp.api.apitype.search.SearchMasterRequest;
 import com.green.yp.search.service.SearchV2Service;
 import jakarta.validation.constraints.NotNull;
@@ -15,10 +16,6 @@ public class SearchContract {
 
     public SearchContract(SearchV2Service searchV2Service) {
         this.searchV2Service = searchV2Service;
-    }
-
-    public UUID createSearchMaster(@NotNull SearchMasterRequest request) {
-        return searchV2Service.createSearchMaster(request);
     }
 
     public void deleteSearchMaster(@NotNull UUID externRefId) {
@@ -47,5 +44,9 @@ public class SearchContract {
 
     public void upsertIconLink(UUID producerId, String urlPath) {
         searchV2Service.upsertProducerIconLink(producerId, urlPath);
+    }
+
+    public void updateLocation(SearchLocationUpdateRequest searchLocationUpdate) {
+        searchV2Service.updateLocation(searchLocationUpdate);
     }
 }

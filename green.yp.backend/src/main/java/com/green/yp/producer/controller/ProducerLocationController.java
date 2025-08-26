@@ -1,11 +1,13 @@
 package com.green.yp.producer.controller;
 
 import com.green.yp.api.apitype.PatchRequest;
+import com.green.yp.api.apitype.producer.CreateLocationRequest;
 import com.green.yp.api.apitype.producer.LocationRequest;
 import com.green.yp.api.apitype.producer.ProducerLocationResponse;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.config.security.AuthUser;
 import com.green.yp.config.security.AuthenticatedUser;
+import com.green.yp.producer.service.LocationOrchestrationService;
 import com.green.yp.producer.service.ProducerLocationService;
 import com.green.yp.security.IsAnyAuthenticatedUser;
 import com.green.yp.util.RequestUtil;
@@ -28,9 +30,12 @@ import org.springframework.web.bind.annotation.*;
 public class ProducerLocationController {
 
   private final ProducerLocationService locationService;
+  private final LocationOrchestrationService locationOrchestrationService;
 
-  public ProducerLocationController(ProducerLocationService locationService) {
+  public ProducerLocationController(ProducerLocationService locationService,
+                                    LocationOrchestrationService locationOrchestrationService) {
     this.locationService = locationService;
+      this.locationOrchestrationService = locationOrchestrationService;
   }
 
   @GetMapping(path = "/location/{locationId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -57,10 +62,10 @@ public class ProducerLocationController {
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ProducerLocationResponse> createLocation(
-      @Valid @RequestBody LocationRequest locationRequest,
+      @Valid @RequestBody CreateLocationRequest locationRequest,
       @PathVariable("producerId") UUID producerId) {
     return new ResponseApi<>(
-        locationService.createLocation(locationRequest, producerId, RequestUtil.getRequestIP()),
+            locationOrchestrationService.createLocation(locationRequest, producerId, RequestUtil.getRequestIP()),
         null);
   }
 
@@ -73,7 +78,7 @@ public class ProducerLocationController {
           @Valid @RequestBody LocationRequest locationRequest,
           @Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser) {
     return new ResponseApi<>(
-        locationService.updateLocation(locationRequest, authenticatedUser, RequestUtil.getRequestIP()), null);
+            locationOrchestrationService.updateLocation(locationRequest, authenticatedUser, RequestUtil.getRequestIP()), null);
   }
 
   @IsAnyAuthenticatedUser

@@ -107,6 +107,17 @@ public interface SearchRepository extends JpaRepository<SearchMaster, UUID> {
                         @NotNull @NotNull @Param("locationId") UUID locationId,
                         @NotNull @NotNull @Param("categoryRef") UUID categoryRef);
 
+    @Query("""
+            SELECT sm
+            FROM SearchMaster sm
+            WHERE sm.externId=:externId AND sm.producerId=:producerId
+                  AND sm.locationId=:locationId AND sm.recordType IN (:recordTypes)
+        """)
+    List<SearchMaster> findSearchMaster(@NotNull @NotNull @Param("externId") UUID externId,
+                                            @NotNull @NotNull @Param("producerId") UUID producerId,
+                                            @NotNull @NotNull @Param("locationId") UUID locationId,
+            @NotNull @NotNull @Param("recordTypes") SearchRecordType...recordTypes);
+
     @Modifying
     @Query("DELETE FROM SearchMaster sm WHERE sm.producerId IN :producerIds")
     void deleteSearchMasterByProducerIds(@Param("producerIds") List<UUID> producerIds);
@@ -121,4 +132,6 @@ public interface SearchRepository extends JpaRepository<SearchMaster, UUID> {
     @Modifying
     @Query("UPDATE SearchMaster sm SET sm.businessIconUrl=NULL WHERE sm.producerId=:producerId")
     void deleteBusinessIconUrl(@Param("producerIds") UUID producerId);
+
+
 }
