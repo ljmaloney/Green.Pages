@@ -91,7 +91,7 @@ public class ProducerImportService {
                 importRecord.zip,
                 location.latitude(),
                 location.longitude(),
-                null), Optional.of(contact)),
+                null), contact),
             producerResponse.producerId(),
             null);
 

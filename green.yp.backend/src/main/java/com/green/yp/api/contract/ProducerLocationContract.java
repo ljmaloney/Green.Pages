@@ -30,7 +30,7 @@ public class ProducerLocationContract {
 
     if (primaryLocation.locationId() == null) {
       return locationService.createLocation(
-          new CreateLocationRequest(primaryLocation, Optional.empty()), producerId, ipAddress);
+          new CreateLocationRequest(primaryLocation, null), producerId, ipAddress);
     }
     locationService.findPrimaryLocation(producerId);
     return locationService.updateLocation(primaryLocation, null, ipAddress);

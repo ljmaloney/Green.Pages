@@ -4,4 +4,4 @@ import java.io.Serializable;
 import java.util.Optional;
 
 public record CreateLocationRequest(LocationRequest locationRequest,
-                                    Optional<ProducerContactRequest> contactRequest) implements Serializable {}
+                                    ProducerContactRequest contactRequest) implements Serializable {}

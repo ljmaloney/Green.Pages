@@ -211,13 +211,16 @@ public class ProducerLocationService {
     locationRepository
         .findById(locationId)
         .filter(loc -> loc.getLocationType() != ProducerLocationType.HOME_OFFICE_PRIMARY)
-        .ifPresentOrElse(
-            loc -> {
-              loc.setActive(false);
-              locationRepository.save(loc);
-              log.info("Location identified by {} deleted ", locationId);
-            },
-            () -> log.info("Location identified by {} already deleted or is Primary", locationId));
+            .map( loc -> {
+                        loc.setActive(false);
+                        locationRepository.save(loc);
+                        log.info("Location identified by {} deleted ", locationId);
+                        return true;
+                })
+            .orElseGet( () -> {
+                log.info("Location identified by {} already deleted or is Primary", locationId);
+                      return false;
+            });
   }
 
   @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
