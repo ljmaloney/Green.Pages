@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.jsoup.safety.Safelist;
 import org.owasp.esapi.ESAPI;
 
@@ -19,10 +20,11 @@ public final class XSSRequestWrapper extends HttpServletRequestWrapper {
 
   // Avoid null characters
   private static final Pattern PATTERN_NULL = Pattern.compile("\0");
+  private static final Document.OutputSettings outputSettings = new Document.OutputSettings();
 
   public XSSRequestWrapper(final HttpServletRequest servletRequest) {
-
     super(servletRequest);
+    outputSettings.prettyPrint(false);
   }
 
   @Override
@@ -129,7 +131,7 @@ public final class XSSRequestWrapper extends HttpServletRequestWrapper {
 
     if (StringUtils.isNotEmpty(value)) {
       String stripedValue = getCanonicalizedString(value);
-      return Jsoup.clean(stripedValue, Safelist.simpleText());
+      return Jsoup.clean(stripedValue, "", Safelist.basicWithImages(), outputSettings);
     }
     return value;
   }

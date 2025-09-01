@@ -15,9 +15,8 @@ import org.owasp.esapi.Encoder;
 
 /**
  * Provides a Buffered ServletInputStream for the purpose of sanitization of JSON documents.
- * Considerations: This class is intended to work documents less than 512 bytes to 2kb. This
- * technique can have performance and memory impacts. The class attempts to parse the JSON stream
- * into a Map<String,Object>, and then sanitizes the values in the Map before writing back out.
+ * Considerations: This class buffers the JSON body while performing sanitization of
+ * JSON Payload.
  *
  * @author luther.maloney
  */
@@ -54,7 +53,7 @@ public class BufferedXssJsonInputStream extends ServletInputStream {
     StringBuilder stringBuilder = new StringBuilder(contentSize);
     StringBuilder stringToSanitize = new StringBuilder();
 
-    int count = 0, ch, prevCh = 0;
+    int ch, prevCh = 0;
     boolean foundString = false;
     while ((ch = inputStream.read()) != -1) {
       if (JSON_STRING_DELIMITER == (char) ch && !foundString) { // test for start delimiter
@@ -72,7 +71,12 @@ public class BufferedXssJsonInputStream extends ServletInputStream {
         continue;
       }
       if (foundString) { // test for outside delimiter
-        stringToSanitize.append((char) ch);
+          if ( '\\' == (char)prevCh && 'n' == (char)ch){
+              stringToSanitize.setLength(stringToSanitize.length()-1);
+              stringToSanitize.append("<br/>");
+          }else{
+              stringToSanitize.append((char) ch);
+          }
       } else {
         stringBuilder.append((char) ch);
       }
@@ -84,7 +88,7 @@ public class BufferedXssJsonInputStream extends ServletInputStream {
   public static String cleanXSS(String value) {
     if (StringUtils.isNotEmpty(value)) {
       String stripedValue = getCanonicalizedString(value);
-      return Jsoup.clean(stripedValue, Safelist.simpleText());
+      return Jsoup.clean(stripedValue, Safelist.basicWithImages());
     }
     return value;
   }
