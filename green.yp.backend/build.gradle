@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'groovy'
-    id 'org.springframework.boot' version '3.5.5'
+    id 'org.springframework.boot' version '3.4.5'
     id 'io.spring.dependency-management' version '1.1.2'
     id("org.springdoc.openapi-gradle-plugin") version "1.6.0"
     id 'com.google.cloud.tools.jib' version '3.4.5'
@@ -35,12 +35,14 @@ repositories {
 }
 
 ext {
+    awsBomVersion="2.25.24"
     springCloudVersion = "2024.0.1"
     springDocVersion = "2.8.5"
     lombokVersion = "1.18.38"
     hikariVersion="6.3.0"
     squareVersion="45.0.0.20250618"
-    esapiVersion="2.7.0.0'"
+    esapiVersion="2.7.0.0"
+    resilienceVersion="2.2.0"
 }
 
 dependencies {
@@ -57,16 +59,16 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-batch'
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-    implementation 'org.springframework.boot:spring-boot-starter-freemarker:3.5.5'
+    implementation 'org.springframework.boot:spring-boot-starter-freemarker:3.4.5'
     implementation "com.zaxxer:HikariCP:${hikariVersion}"
     implementation 'commons-io:commons-io:2.14.0'
     implementation 'io.fusionauth:fusionauth-java-client:1.57.0'
     implementation("org.locationtech.jts:jts-core:1.20.0")
 
-    implementation("io.github.resilience4j:resilience4j-spring-boot3:2.3.0")
-    implementation("io.github.resilience4j:resilience4j-circuitbreaker:2.3.0")
-    implementation("io.github.resilience4j:resilience4j-ratelimiter:2.3.0")
-    implementation("io.github.resilience4j:resilience4j-retry:2.3.0")
+    implementation("io.github.resilience4j:resilience4j-spring-boot3:${resilienceVersion}")
+    implementation("io.github.resilience4j:resilience4j-circuitbreaker:${resilienceVersion}")
+    implementation("io.github.resilience4j:resilience4j-ratelimiter:${resilienceVersion}")
+    implementation("io.github.resilience4j:resilience4j-retry:${resilienceVersion}")
 
     implementation "com.squareup:square:${squareVersion}"
 
@@ -103,7 +105,7 @@ dependencies {
     implementation 'io.hypersistence:hypersistence-utils-hibernate-62:3.5.1'
     implementation 'org.testng:testng:7.7.0'
 
-    implementation platform('software.amazon.awssdk:bom:2.25.24') // Use the latest stable version
+    implementation platform("software.amazon.awssdk:bom:${awsBomVersion}") // Use the latest stable version
     implementation 'software.amazon.awssdk:s3'
     implementation 'software.amazon.awssdk:auth'
     implementation 'software.amazon.awssdk:regions'
