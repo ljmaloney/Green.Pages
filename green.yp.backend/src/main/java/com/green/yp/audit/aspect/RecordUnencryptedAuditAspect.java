@@ -40,6 +40,17 @@ public class RecordUnencryptedAuditAspect {
     log.info("before calling method annotated with audit request");
   }
 
+  @Around(value = "methodAnnotatedWithAuditRequest()")
+  public Object around(JoinPoint joinPoint) {
+    long startTime = System.currentTimeMillis();
+    var result joinPoint.proceed();
+    log.info("Elapsed time for {} - {} is : {}", 
+             joinPoint.getSignature().getDeclaringTypeName(), 
+             joinPoint.getSignature().getName(), 
+             (System.currentTimeMillis() - startTime));
+    return result;
+  }
+
   @AfterReturning(pointcut = "methodAnnotatedWithAuditRequest()")
   public void writeAuditLog(JoinPoint joinPoint) {
     log.info("called method annotated with audit request");
