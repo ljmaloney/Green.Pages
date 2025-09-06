@@ -12,10 +12,8 @@ import java.lang.reflect.Method;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
@@ -38,6 +36,19 @@ public class RecordUnencryptedAuditAspect {
   @Before(value = "methodAnnotatedWithAuditRequest()")
   public void before(JoinPoint joinPoint) {
     log.info("before calling method annotated with audit request");
+  }
+
+  @Around(value = "methodAnnotatedWithAuditRequest()")
+  public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
+    long startTime = System.currentTimeMillis();
+    try{
+        return joinPoint.proceed();
+    }  finally {
+        log.info("Elapsed time for {} - {} is : {}",
+                joinPoint.getSignature().getDeclaringTypeName(),
+                joinPoint.getSignature().getName(),
+                (System.currentTimeMillis() - startTime));
+    }
   }
 
   @AfterReturning(pointcut = "methodAnnotatedWithAuditRequest()")

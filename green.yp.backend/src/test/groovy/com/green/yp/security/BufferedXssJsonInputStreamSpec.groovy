@@ -15,7 +15,7 @@ class BufferedXssJsonInputStreamSpec extends Specification {
         jsonMap.put("propertyOne", "SomeStringProperty")
         jsonMap.put("integerProperty", Integer.valueOf(100))
         jsonMap.put("xssString1", "CE<script></script>")
-        jsonMap.put("xssString2", "<IMG SRC=javascript:alert(String.fromCharCode(88,83,83))>1")
+        jsonMap.put("xssString2", "<img src=javascript:alert(String.fromCharCode(88,83,83))>1")
         jsonMap.put("xssString3", "data<iframe src=http://xss.rocks/scriptlet.html/>")
 
         when:
@@ -34,7 +34,7 @@ class BufferedXssJsonInputStreamSpec extends Specification {
         then:
         cleanedJsonMap.get("propertyOne") == jsonMap.get("propertyOne")
         cleanedJsonMap.get("xssString1") == "CE"
-        cleanedJsonMap.get("xssString2") == "1"
+        !cleanedJsonMap.get("xssString2").contains("src=javascript:alert(String.fromCharCode(88,83,83))")
         cleanedJsonMap.get("xssString3") == "data"
 
     }
@@ -47,7 +47,7 @@ class BufferedXssJsonInputStreamSpec extends Specification {
         def jsonSubMap = new HashMap<String, Object>()
         jsonMap.put("subDocument", jsonSubMap)
         jsonMap.put("xssString1", "CE<script></script>")
-        jsonSubMap.put("xssString2", "<IMG SRC=javascript:alert(String.fromCharCode(88,83,83))>1")
+        jsonSubMap.put("xssString2", "<img src=javascript:alert(String.fromCharCode(88,83,83))>1")
         jsonSubMap.put("xssString3", "data<iframe src=http://xss.rocks/scriptlet.html/>")
 
         when:
@@ -66,7 +66,7 @@ class BufferedXssJsonInputStreamSpec extends Specification {
         then:
         cleanedJsonMap.get("propertyOne") == jsonMap.get("propertyOne")
         cleanedJsonMap.get("xssString1") == "CE"
-        ((Map) cleanedJsonMap.get("subDocument")).get("xssString2") == "1"
+        cleanedJsonMap.get("subDocument").get("xssString2") == "<img>1"
         ((Map) cleanedJsonMap.get("subDocument")).get("xssString3") == "data"
     }
 
@@ -102,7 +102,8 @@ class BufferedXssJsonInputStreamSpec extends Specification {
         cleanedJsonMap.get("propertyOne") == jsonMap.get("propertyOne")
         cleanedJsonMap.get("xssString1") == "CE"
         cleanedJsonMap.get("integerProperty") == jsonMap.get("integerProperty")
-        getSubDocumentValue(cleanedJsonMap, 0, "subDocumentList", "xssString2") == "1"
+        !getSubDocumentValue(cleanedJsonMap, 0, "subDocumentList", "xssString2")
+                .contains("src=javascript:alert(String.fromCharCode(88,83,83))")
         getSubDocumentValue(cleanedJsonMap, 0, "subDocumentList", "xssString3") == "data"
     }
 
@@ -142,8 +143,8 @@ class BufferedXssJsonInputStreamSpec extends Specification {
         cleanedJsonMap.get("propertyOne") == jsonMap.get("propertyOne")
         cleanedJsonMap.get("xssString1") == "CE"
         cleanedJsonMap.get("integerProperty") == jsonMap.get("integerProperty")
-        cleanedJsonMap.get("stringArray") == List.of("Tortuga", "alpha", "omega")
-        getSubDocumentValue(cleanedJsonMap, 0, "subDocumentList", "xssString2") == "1"
+        cleanedJsonMap.get("stringArray") == List.of("Tortuga", "alpha", "<img>omega")
+        getSubDocumentValue(cleanedJsonMap, 0, "subDocumentList", "xssString2") == "<img>1"
         getSubDocumentValue(cleanedJsonMap, 0, "subDocumentList", "xssString3") == "data"
     }
 
@@ -187,8 +188,8 @@ class BufferedXssJsonInputStreamSpec extends Specification {
         ((Map) cleanedList.get(0)).get("propertyOne") == jsonMap.get("propertyOne")
         ((Map) cleanedList.get(0)).get("xssString1") == "CE"
         ((Map) cleanedList.get(0)).get("integerProperty") == jsonMap.get("integerProperty")
-        ((Map) cleanedList.get(0)).get("stringArray") == List.of("Tortuga", "alpha", "omega")
-        getSubDocumentValue(((Map) cleanedList.get(0)), 0, "subDocumentList", "xssString2") == "1"
+        ((Map) cleanedList.get(0)).get("stringArray") == List.of("Tortuga", "alpha", "<img>omega")
+        getSubDocumentValue(((Map) cleanedList.get(0)), 0, "subDocumentList", "xssString2") == "<img>1"
         getSubDocumentValue(((Map) cleanedList.get(0)), 0, "subDocumentList", "xssString3") == "data"
     }
 

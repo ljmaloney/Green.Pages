@@ -35,11 +35,14 @@ repositories {
 }
 
 ext {
+    awsBomVersion="2.25.24"
     springCloudVersion = "2024.0.1"
     springDocVersion = "2.8.5"
     lombokVersion = "1.18.38"
     hikariVersion="6.3.0"
     squareVersion="45.0.0.20250618"
+    esapiVersion="2.7.0.0"
+    resilienceVersion="2.2.0"
 }
 
 dependencies {
@@ -56,16 +59,16 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-batch'
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-    implementation 'org.springframework.boot:spring-boot-starter-freemarker:3.5.3'
+    implementation 'org.springframework.boot:spring-boot-starter-freemarker:3.4.5'
     implementation "com.zaxxer:HikariCP:${hikariVersion}"
     implementation 'commons-io:commons-io:2.14.0'
     implementation 'io.fusionauth:fusionauth-java-client:1.57.0'
-    implementation("org.locationtech.jts:jts-core:1.18.2")
+    implementation("org.locationtech.jts:jts-core:1.20.0")
 
-    implementation("io.github.resilience4j:resilience4j-spring-boot3:2.2.0")
-    implementation("io.github.resilience4j:resilience4j-circuitbreaker:2.2.0")
-    implementation("io.github.resilience4j:resilience4j-ratelimiter:2.2.0")
-    implementation("io.github.resilience4j:resilience4j-retry:2.2.0")
+    implementation("io.github.resilience4j:resilience4j-spring-boot3:${resilienceVersion}")
+    implementation("io.github.resilience4j:resilience4j-circuitbreaker:${resilienceVersion}")
+    implementation("io.github.resilience4j:resilience4j-ratelimiter:${resilienceVersion}")
+    implementation("io.github.resilience4j:resilience4j-retry:${resilienceVersion}")
 
     implementation "com.squareup:square:${squareVersion}"
 
@@ -82,18 +85,18 @@ dependencies {
     implementation 'com.jayway.jsonpath:json-path:2.9.0'
     implementation 'org.apache.commons:commons-csv:1.10.0'
     implementation 'org.apache.logging.log4j:log4j-1.2-api'
-    implementation 'org.apache.commons:commons-collections4:4.4'
+    implementation 'org.apache.commons:commons-collections4:4.5.0'
     implementation 'com.googlecode.libphonenumber:libphonenumber:8.12.26'
     implementation "org.apache.commons:commons-lang3"
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     implementation 'commons-discovery:commons-discovery:0.5'
-    implementation 'org.jsoup:jsoup:1.15.4'
+    implementation 'org.jsoup:jsoup:1.21.2'
 
-    implementation 'org.apache.logging.log4j:log4j-core:2.24.3'
-    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
-    implementation 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+    implementation 'org.apache.logging.log4j:log4j-core:2.25.1'
+    implementation 'org.mapstruct:mapstruct:1.6.3'
+    implementation 'org.mapstruct:mapstruct-processor:1.6.3'
 
 //    implementation 'org.apache.httpcomponents:httpclient'
     implementation 'io.github.openfeign:feign-httpclient'
@@ -102,7 +105,7 @@ dependencies {
     implementation 'io.hypersistence:hypersistence-utils-hibernate-62:3.5.1'
     implementation 'org.testng:testng:7.7.0'
 
-    implementation platform('software.amazon.awssdk:bom:2.25.24') // Use the latest stable version
+    implementation platform("software.amazon.awssdk:bom:${awsBomVersion}") // Use the latest stable version
     implementation 'software.amazon.awssdk:s3'
     implementation 'software.amazon.awssdk:auth'
     implementation 'software.amazon.awssdk:regions'
@@ -131,15 +134,15 @@ dependencies {
     }
     testImplementation 'org.awaitility:awaitility'
 
-    implementation('org.owasp.esapi:esapi:2.6.0.0') {
+    implementation('org.owasp.esapi:esapi:2.7.0.0') {
         exclude(module: 'slf4j-simple')
         exclude(module: 'xml-apis')
     }
 
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
-    testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+    testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
 }
 
