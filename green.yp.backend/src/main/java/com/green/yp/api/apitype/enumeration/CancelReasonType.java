@@ -5,5 +5,5 @@ public enum CancelReasonType {
   USER_REQUEST,
   OTHER,
   CARD_EXPIRED,
-    FRAUD_SUSPECTED
+  FRAUD_SUSPECTED
 }
