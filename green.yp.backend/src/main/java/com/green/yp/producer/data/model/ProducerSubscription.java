@@ -56,10 +56,10 @@ public class ProducerSubscription extends Mutable {
   @Column(name = "invoice_cycle_type", nullable = false)
   private InvoiceCycleType invoiceCycleType;
 
-  public boolean isSubscriptionActive(ChronoLocalDate today){
-        return (getStartDate().isBefore(today) || getStartDate().isEqual(today))
-               && (getEndDate() == null || getEndDate().isAfter(today));
-    }
+  public boolean isSubscriptionActive(ChronoLocalDate today) {
+    return (getStartDate().isBefore(today) || getStartDate().isEqual(today))
+        && (getEndDate() == null || getEndDate().isAfter(today));
+  }
 
   @Override
   public boolean equals(Object o) {

@@ -26,19 +26,27 @@ public class ProducerSubscriptionProcess extends Mutable {
   @Column(name = "process_step", length = 50)
   private ProducerSubProcessType processStep;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
 
-        if (o == null || getClass() != o.getClass()) return false;
+    if (o == null || getClass() != o.getClass()) return false;
 
-        ProducerSubscriptionProcess that = (ProducerSubscriptionProcess) o;
+    ProducerSubscriptionProcess that = (ProducerSubscriptionProcess) o;
 
-        return new EqualsBuilder().appendSuper(super.equals(o)).append(producerId, that.producerId).append(processStep, that.processStep).isEquals();
-    }
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(producerId, that.producerId)
+        .append(processStep, that.processStep)
+        .isEquals();
+  }
 
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(producerId).append(processStep).toHashCode();
-    }
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(producerId)
+        .append(processStep)
+        .toHashCode();
+  }
 }

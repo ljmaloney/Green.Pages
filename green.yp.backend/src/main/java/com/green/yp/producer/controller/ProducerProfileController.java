@@ -32,9 +32,12 @@ public class ProducerProfileController {
     return new ResponseApi<>(producerProfileService.getProducerProfile(producerLocationId), null);
   }
 
-  @GetMapping(path = "profile/{producerId}/location/{producerLocationId}", produces = MediaType.APPLICATION_JSON_VALUE)
-  ResponseApi<ProducerProfileResponse> getProducerProfile( @PathVariable("producerId") UUID producerId,
-                                                           @PathVariable("producerLocationId") UUID producerLocationId) {
+  @GetMapping(
+      path = "profile/{producerId}/location/{producerLocationId}",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  ResponseApi<ProducerProfileResponse> getProducerProfile(
+      @PathVariable("producerId") UUID producerId,
+      @PathVariable("producerLocationId") UUID producerLocationId) {
     return new ResponseApi<>(producerProfileService.getProducerProfile(producerLocationId), null);
   }
 

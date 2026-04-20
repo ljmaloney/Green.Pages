@@ -48,9 +48,9 @@ public class ProducerOrchestrationService {
 
   private static final String PRODUCER_ID = "ProducerId";
   private static final long MONTH_INCREMENT = 1L;
-    private final ProducerSearchService producerSearchService;
+  private final ProducerSearchService producerSearchService;
 
-    @Value("${green.yp.pro.subscription.interval.type:month}")
+  @Value("${green.yp.pro.subscription.interval.type:month}")
   private String intervalType;
 
   @Value("${green.yp.pro.subscription.interval.amount:1}")
@@ -73,22 +73,24 @@ public class ProducerOrchestrationService {
   private final ProducerSubscriptionService subscriptionService;
 
   public ProducerOrchestrationService(
-          LineOfBusinessContract lobContract,
-          ProducerMapper producerMapper,
-          ProducerRepository producerRepository,
-          ProducerLobRepository producerLobRepository,
-          ProducerSubscriptionRepository subscriptionRepository, ProducerSubProcessRepository subProcessRepository,
-          SubscriptionContract subscriptionContract,
-          ProducerSubscriptionService subscriptionService, ProducerSearchService producerSearchService) {
+      LineOfBusinessContract lobContract,
+      ProducerMapper producerMapper,
+      ProducerRepository producerRepository,
+      ProducerLobRepository producerLobRepository,
+      ProducerSubscriptionRepository subscriptionRepository,
+      ProducerSubProcessRepository subProcessRepository,
+      SubscriptionContract subscriptionContract,
+      ProducerSubscriptionService subscriptionService,
+      ProducerSearchService producerSearchService) {
     this.lobContract = lobContract;
     this.producerMapper = producerMapper;
     this.producerRepository = producerRepository;
     this.producerLobRepository = producerLobRepository;
     this.subscriptionRepository = subscriptionRepository;
-      this.subProcessRepository = subProcessRepository;
-      this.subscriptionContract = subscriptionContract;
+    this.subProcessRepository = subProcessRepository;
+    this.subscriptionContract = subscriptionContract;
     this.subscriptionService = subscriptionService;
-      this.producerSearchService = producerSearchService;
+    this.producerSearchService = producerSearchService;
   }
 
   @AuditRequest(
@@ -111,7 +113,8 @@ public class ProducerOrchestrationService {
             .primaryLob(true)
             .build());
 
-    subscriptionService.updateSubscription(producer, newProducer.subscriptionId(), newProducer.invoiceCycleType());
+    subscriptionService.updateSubscription(
+        producer, newProducer.subscriptionId(), newProducer.invoiceCycleType());
 
     Producer savedProducer = producerRepository.saveAndFlush(producer);
 
@@ -125,7 +128,8 @@ public class ProducerOrchestrationService {
   public ProducerResponse updateProducer(ProducerRequest producerUpdate) {
     log.info(
         "Updating producer {} identified by {}",
-        producerUpdate.businessName(), producerUpdate.producerId());
+        producerUpdate.businessName(),
+        producerUpdate.producerId());
 
     Producer producer =
         producerRepository
@@ -146,11 +150,16 @@ public class ProducerOrchestrationService {
     producer.setSubscriptionType(
         ProducerSubscriptionType.valueOf(producerUpdate.subscriptionType().name()));
 
-        producer.getLinesOfBusiness().stream()
-            .filter(ProducerLineOfBusiness::getPrimaryLob)
-            .findFirst()
-                .ifPresentOrElse( plob -> plob.setLineOfBusinessId(producerUpdate.lineOfBusinessId()),
-                () -> new BusinessException(String.format("Producer %s missing primary line of business", producerUpdate.producerId())));
+    producer.getLinesOfBusiness().stream()
+        .filter(ProducerLineOfBusiness::getPrimaryLob)
+        .findFirst()
+        .ifPresentOrElse(
+            plob -> plob.setLineOfBusinessId(producerUpdate.lineOfBusinessId()),
+            () ->
+                new BusinessException(
+                    String.format(
+                        "Producer %s missing primary line of business",
+                        producerUpdate.producerId())));
 
     subscriptionService.updateSubscription(
         producer,
@@ -161,13 +170,13 @@ public class ProducerOrchestrationService {
 
     Producer savedProducer = producerRepository.saveAndFlush(producer);
 
-      ProducerResponse response = producerMapper.fromEntity(savedProducer, lobDto);
+    ProducerResponse response = producerMapper.fromEntity(savedProducer, lobDto);
 
-      producerSearchService.updateProducer(response);
+    producerSearchService.updateProducer(response);
 
     log.info("Updated producer/subscriber record for {}", savedProducer.getId());
 
-      return response;
+    return response;
   }
 
   Producer findActiveProducer(@NonNull UUID producerId) {
@@ -185,8 +194,6 @@ public class ProducerOrchestrationService {
     }
     return producer;
   }
-
-
 
   public ProducerResponse findProducer(@NonNull @NotNull UUID producerId) {
     log.info("Loading producer/account data for {}", producerId);
@@ -249,7 +256,8 @@ public class ProducerOrchestrationService {
       OffsetDateTime subscriptionPaidDate,
       String userId,
       String ipAddress) {
-    log.info("Making producer {} active by user {} from ipAddress {}", producerId, userId, ipAddress);
+    log.info(
+        "Making producer {} active by user {} from ipAddress {}", producerId, userId, ipAddress);
     Producer producer =
         producerRepository
             .findById(producerId)
@@ -269,9 +277,12 @@ public class ProducerOrchestrationService {
     producer.setCancelDate(null);
     producer.setLastBillDate(lastInvoiceDate);
     producer.setLastBillPaidDate(subscriptionPaidDate);
-    producer.getSubscriptionList()
-            .forEach(subscription -> {
-              subscription.setNextInvoiceDate(lastInvoiceDate.plusMonths(MONTH_INCREMENT).toLocalDate());
+    producer
+        .getSubscriptionList()
+        .forEach(
+            subscription -> {
+              subscription.setNextInvoiceDate(
+                  lastInvoiceDate.plusMonths(MONTH_INCREMENT).toLocalDate());
               subscription.setEndDate(null);
             });
 
@@ -283,10 +294,16 @@ public class ProducerOrchestrationService {
   }
 
   public List<ProducerResponse> findLastModified(
-          Integer daysOld, ProducerSubscriptionType producerSubscriptionType, int maxRecords) {
-    if ( maxRecords > 0 ){
-      return producerRepository.findByLastUpdateDateBeforeAndSubscriptionType(OffsetDateTime.now().minusDays(daysOld), producerSubscriptionType, Limit.of(maxRecords))
-              .stream().map(producerMapper::fromEntity).toList();
+      Integer daysOld, ProducerSubscriptionType producerSubscriptionType, int maxRecords) {
+    if (maxRecords > 0) {
+      return producerRepository
+          .findByLastUpdateDateBeforeAndSubscriptionType(
+              OffsetDateTime.now().minusDays(daysOld),
+              producerSubscriptionType,
+              Limit.of(maxRecords))
+          .stream()
+          .map(producerMapper::fromEntity)
+          .toList();
     }
     return producerRepository
         .findLastModified(OffsetDateTime.now().minusDays(daysOld), producerSubscriptionType)
@@ -296,26 +313,34 @@ public class ProducerOrchestrationService {
   }
 
   @Transactional
-  public ProducerResponse updateBillPaidDate(@NonNull @NotNull UUID producerId,
-                                             @NonNull @NotNull OffsetDateTime lastInvoiceDate,
-                                             @NonNull @NotNull OffsetDateTime subscriptionPaidDate,
-                                             @NonNull @NotNull String userId,
-                                             String ipAddress) {
-    log.info("Updating bill paid date for {} by user {} from ip address {}", producerId, userId, ipAddress);
+  public ProducerResponse updateBillPaidDate(
+      @NonNull @NotNull UUID producerId,
+      @NonNull @NotNull OffsetDateTime lastInvoiceDate,
+      @NonNull @NotNull OffsetDateTime subscriptionPaidDate,
+      @NonNull @NotNull String userId,
+      String ipAddress) {
+    log.info(
+        "Updating bill paid date for {} by user {} from ip address {}",
+        producerId,
+        userId,
+        ipAddress);
     Producer producer =
-            producerRepository
-                    .findById(producerId)
-                    .orElseThrow(() -> new NotFoundException(PRODUCER_ID, producerId));
+        producerRepository
+            .findById(producerId)
+            .orElseThrow(() -> new NotFoundException(PRODUCER_ID, producerId));
 
     producer.setCancelDate(null);
     producer.setSubscriptionType(ProducerSubscriptionType.LIVE_ACTIVE);
     producer.setLastBillDate(lastInvoiceDate);
     producer.setLastBillPaidDate(subscriptionPaidDate);
-    producer.getSubscriptionList()
-            .forEach( subscription ->{
-                      subscription.setNextInvoiceDate(lastInvoiceDate.plusMonths(MONTH_INCREMENT).toLocalDate());
-                      subscription.setEndDate(null);
-                    });
+    producer
+        .getSubscriptionList()
+        .forEach(
+            subscription -> {
+              subscription.setNextInvoiceDate(
+                  lastInvoiceDate.plusMonths(MONTH_INCREMENT).toLocalDate());
+              subscription.setEndDate(null);
+            });
 
     producerRepository.saveAndFlush(producer);
 
@@ -354,9 +379,12 @@ public class ProducerOrchestrationService {
   public void initializePaymentProcessQueue() {
     log.debug("Initializing producer / pro subscriptions processing queue");
 
-    log.info("Initializing producer / pro subscriptions interval type {} interval amount {}", intervalType, intervalAmount);
+    log.info(
+        "Initializing producer / pro subscriptions interval type {} interval amount {}",
+        intervalType,
+        intervalAmount);
     OffsetDateTime invoiceDate = OffsetDateTime.now();
-    if ( "days".equalsIgnoreCase(intervalType)){
+    if ("days".equalsIgnoreCase(intervalType)) {
       invoiceDate = invoiceDate.minusDays(intervalAmount);
     } else {
       invoiceDate = invoiceDate.minusMonths(intervalAmount);
@@ -366,34 +394,41 @@ public class ProducerOrchestrationService {
 
     List<UUID> subsToProcess = subProcessRepository.getProducersToProcess(invoiceDate);
 
-    subsToProcess.forEach(producer -> {
-      subProcessRepository.deleteByProducerId(producer);
-      subProcessRepository.saveAndFlush(ProducerSubscriptionProcess.builder()
-              .producerId(producer)
-              .processStep(ProducerSubProcessType.PREPARE)
-              .build());
-    });
-    log.info("Initialized producer / pro subscriptions processing queue for subscribers last paid before {}", invoiceDate);
+    subsToProcess.forEach(
+        producer -> {
+          subProcessRepository.deleteByProducerId(producer);
+          subProcessRepository.saveAndFlush(
+              ProducerSubscriptionProcess.builder()
+                  .producerId(producer)
+                  .processStep(ProducerSubProcessType.PREPARE)
+                  .build());
+        });
+    log.info(
+        "Initialized producer / pro subscriptions processing queue for subscribers last paid before {}",
+        invoiceDate);
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
   public List<ProducerResponse> getProducersToProcess(int maxNumberToProcess) {
-    List<ProducerSubscriptionProcess> subsToProcess = subProcessRepository.findItemsToProcess(maxNumberToProcess);
+    List<ProducerSubscriptionProcess> subsToProcess =
+        subProcessRepository.findItemsToProcess(maxNumberToProcess);
 
-    List<UUID> producerIds = subsToProcess.stream()
-            .map(ProducerSubscriptionProcess::getProducerId)
-            .toList();
+    List<UUID> producerIds =
+        subsToProcess.stream().map(ProducerSubscriptionProcess::getProducerId).toList();
 
     subProcessRepository.updateStatus(producerIds, ProducerSubProcessType.PROCESS_STARTED);
 
     return producerIds.stream().map(this::findProducer).toList();
-
   }
 
-  public void updateProcessStatus(@NonNull @NotNull UUID producerId, ProducerSubProcessType producerSubscriptionType) {
-    subProcessRepository.findByProducerId(producerId).ifPresent(s -> {
-      s.setProcessStep(producerSubscriptionType);
-      subProcessRepository.saveAndFlush(s);
-    });
-    }
+  public void updateProcessStatus(
+      @NonNull @NotNull UUID producerId, ProducerSubProcessType producerSubscriptionType) {
+    subProcessRepository
+        .findByProducerId(producerId)
+        .ifPresent(
+            s -> {
+              s.setProcessStep(producerSubscriptionType);
+              subProcessRepository.saveAndFlush(s);
+            });
+  }
 }

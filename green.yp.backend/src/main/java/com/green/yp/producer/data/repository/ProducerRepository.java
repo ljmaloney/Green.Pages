@@ -43,7 +43,6 @@ public interface ProducerRepository extends JpaRepository<Producer, UUID> {
       @NotNull @NonNull @Param("producerSubscriptionType")
           ProducerSubscriptionType producerSubscriptionType);
 
-  List<Producer> findByLastUpdateDateBeforeAndSubscriptionType(OffsetDateTime offsetDateTime,
-                                                               ProducerSubscriptionType producerSubscriptionType,
-                                                               Limit of);
+  List<Producer> findByLastUpdateDateBeforeAndSubscriptionType(
+      OffsetDateTime offsetDateTime, ProducerSubscriptionType producerSubscriptionType, Limit of);
 }

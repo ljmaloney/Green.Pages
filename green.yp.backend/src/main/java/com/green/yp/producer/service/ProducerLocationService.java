@@ -41,30 +41,29 @@ public class ProducerLocationService {
   private final ProducerGeocodeService geocodingService;
 
   public ProducerLocationService(
-          ProducerLocationMapper producerLocationMapper,
-          ProducerLocationRepository locationRepository,
-          ProducerOrchestrationService producerService,
-          ProducerLocationHoursService hoursService,
-          ProducerGeocodeService gecodeService) {
+      ProducerLocationMapper producerLocationMapper,
+      ProducerLocationRepository locationRepository,
+      ProducerOrchestrationService producerService,
+      ProducerLocationHoursService hoursService,
+      ProducerGeocodeService gecodeService) {
     this.producerLocationMapper = producerLocationMapper;
     this.locationRepository = locationRepository;
     this.producerService = producerService;
     this.hoursService = hoursService;
-      this.geocodingService = gecodeService;
+    this.geocodingService = gecodeService;
   }
-
-
 
   @AuditRequest(
       requestParameter = "createLocationRequest",
       objectType = AuditObjectType.PRODUCER_LOCATION,
       actionType = AuditActionType.CREATE)
   public ProducerLocationResponse createLocation(
-          @Valid CreateLocationRequest createLocationRequest, UUID producerId, String ipAddress) {
+      @Valid CreateLocationRequest createLocationRequest, UUID producerId, String ipAddress) {
 
     producerService.findActiveProducer(producerId);
 
-    ProducerLocation location = producerLocationMapper.toEntity(createLocationRequest.locationRequest());
+    ProducerLocation location =
+        producerLocationMapper.toEntity(createLocationRequest.locationRequest());
     location.setProducerId(producerId);
     location.setActive(true);
 
@@ -211,15 +210,17 @@ public class ProducerLocationService {
     locationRepository
         .findById(locationId)
         .filter(loc -> loc.getLocationType() != ProducerLocationType.HOME_OFFICE_PRIMARY)
-            .map( loc -> {
-                        loc.setActive(false);
-                        locationRepository.save(loc);
-                        log.info("Location identified by {} deleted ", locationId);
-                        return true;
-                })
-            .orElseGet( () -> {
-                log.info("Location identified by {} already deleted or is Primary", locationId);
-                      return false;
+        .map(
+            loc -> {
+              loc.setActive(false);
+              locationRepository.save(loc);
+              log.info("Location identified by {} deleted ", locationId);
+              return true;
+            })
+        .orElseGet(
+            () -> {
+              log.info("Location identified by {} already deleted or is Primary", locationId);
+              return false;
             });
   }
 

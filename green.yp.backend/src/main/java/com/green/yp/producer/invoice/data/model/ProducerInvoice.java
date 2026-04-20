@@ -61,11 +61,29 @@ public class ProducerInvoice extends Mutable {
 
     ProducerInvoice producerInvoice = (ProducerInvoice) o;
 
-    return new EqualsBuilder().appendSuper(super.equals(o)).append(producerId, producerInvoice.producerId).append(subscriptionId, producerInvoice.subscriptionId).append(producerSubscriptionId, producerInvoice.producerSubscriptionId).append(paidDate, producerInvoice.paidDate).append(printedInvoiceId, producerInvoice.printedInvoiceId).append(invoiceTotal, producerInvoice.invoiceTotal).append(lineItems, producerInvoice.lineItems).isEquals();
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(producerId, producerInvoice.producerId)
+        .append(subscriptionId, producerInvoice.subscriptionId)
+        .append(producerSubscriptionId, producerInvoice.producerSubscriptionId)
+        .append(paidDate, producerInvoice.paidDate)
+        .append(printedInvoiceId, producerInvoice.printedInvoiceId)
+        .append(invoiceTotal, producerInvoice.invoiceTotal)
+        .append(lineItems, producerInvoice.lineItems)
+        .isEquals();
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(producerId).append(subscriptionId).append(producerSubscriptionId).append(paidDate).append(printedInvoiceId).append(invoiceTotal).append(lineItems).toHashCode();
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(producerId)
+        .append(subscriptionId)
+        .append(producerSubscriptionId)
+        .append(paidDate)
+        .append(printedInvoiceId)
+        .append(invoiceTotal)
+        .append(lineItems)
+        .toHashCode();
   }
 }

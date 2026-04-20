@@ -101,8 +101,8 @@ public interface ProducerSearchRepository extends JpaRepository<Producer, UUID> 
   List<ProducerSearchRecord> findMostRecentProfiles(
       @Param("lineOfBusinessId") UUID lineOfBusinessId, Limit limit);
 
-    @Query(
-            """
+  @Query(
+      """
           SELECT new com.green.yp.producer.data.record.ProducerSearchRecord(producer, location, contact, lob, null)
           FROM Producer producer
           JOIN ProducerLocation location ON producer.id = location.producerId
@@ -114,8 +114,7 @@ public interface ProducerSearchRepository extends JpaRepository<Producer, UUID> 
           AND contact.displayContactType != com.green.yp.api.apitype.producer.enumeration.ProducerDisplayContactType.NO_DISPLAY
           AND contact.producerContactType = com.green.yp.api.apitype.producer.enumeration.ProducerContactType.PRIMARY
           """)
-    List<ProducerSearchRecord> findProducerProfileLines(
-            @Param("producerId") UUID producerId);
+  List<ProducerSearchRecord> findProducerProfileLines(@Param("producerId") UUID producerId);
 
   @Query(
       """

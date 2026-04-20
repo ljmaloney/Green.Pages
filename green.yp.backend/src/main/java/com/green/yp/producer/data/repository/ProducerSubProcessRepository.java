@@ -14,10 +14,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ProducerSubProcessRepository extends JpaRepository<ProducerSubscriptionProcess, UUID> {
+public interface ProducerSubProcessRepository
+    extends JpaRepository<ProducerSubscriptionProcess, UUID> {
 
   @Query(
-      value = """
+      value =
+          """
         SELECT producer.id
         FROM
           Producer producer
@@ -35,7 +37,8 @@ public interface ProducerSubProcessRepository extends JpaRepository<ProducerSubs
 
   @Query(
       nativeQuery = true,
-      value = """
+      value =
+          """
            SELECT *
            FROM producer_subscription_process
            WHERE process_step='PREPARE'
@@ -46,11 +49,13 @@ public interface ProducerSubProcessRepository extends JpaRepository<ProducerSubs
       @Param("maxNumberToProcess") int maxNumberToProcess);
 
   @Modifying
-  @Query("""
+  @Query(
+"""
         UPDATE ProducerSubscriptionProcess SET processStep = :processStep WHERE producerId in (:producerIds)
 """)
-  void updateStatus(@Param("producerIds") List<UUID> producerIds,
-                    @Param("processStep") ProducerSubProcessType producerSubProcessType);
+  void updateStatus(
+      @Param("producerIds") List<UUID> producerIds,
+      @Param("processStep") ProducerSubProcessType producerSubProcessType);
 
   Optional<ProducerSubscriptionProcess> findByProducerId(@NonNull @NotNull UUID producerId);
 }

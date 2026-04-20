@@ -41,5 +41,6 @@ public interface ProducerInvoiceRepository extends JpaRepository<ProducerInvoice
   Integer getCountByDate(
       @Param("startDate") OffsetDateTime startDate, @Param("endDate") OffsetDateTime endDate);
 
-    List<ProducerInvoice> findByProducerIdAndCreateDateBetween(UUID producerId, OffsetDateTime startDate, OffsetDateTime endDate, Sort createDateSort);
+  List<ProducerInvoice> findByProducerIdAndCreateDateBetween(
+      UUID producerId, OffsetDateTime startDate, OffsetDateTime endDate, Sort createDateSort);
 }
