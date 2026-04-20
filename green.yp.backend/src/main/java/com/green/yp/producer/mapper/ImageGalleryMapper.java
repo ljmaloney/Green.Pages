@@ -8,10 +8,11 @@ import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(
-        componentModel = "spring",
-        unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        injectionStrategy = InjectionStrategy.CONSTRUCTOR)
+    componentModel = "spring",
+    unmappedTargetPolicy = ReportingPolicy.IGNORE,
+    injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface ImageGalleryMapper {
-    List<ProducerImageResponse> mapToResponse(List<ImageGallery> images);
-    ProducerImageResponse mapToResponse(ImageGallery image);
+  List<ProducerImageResponse> mapToResponse(List<ImageGallery> images);
+
+  ProducerImageResponse mapToResponse(ImageGallery image);
 }

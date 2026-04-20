@@ -38,19 +38,20 @@ public class ProducerProductService {
   private final ProducerProductMapper mapper;
 
   public ProducerProductService(
-          ProducerOrchestrationService producerService,
-          ProducerLocationService locationService, ProducerSearchService searchService,
-          ProducerProductRepository productRepository,
-          ProducerProductMapper mapper) {
+      ProducerOrchestrationService producerService,
+      ProducerLocationService locationService,
+      ProducerSearchService searchService,
+      ProducerProductRepository productRepository,
+      ProducerProductMapper mapper) {
     this.producerService = producerService;
     this.locationService = locationService;
-      this.searchService = searchService;
-      this.productRepository = productRepository;
+    this.searchService = searchService;
+    this.productRepository = productRepository;
     this.mapper = mapper;
   }
 
-  public List<ProducerProductResponse> findAllProducts(@NotNull @NonNull UUID producerId,
-                                                       @NotNull @NonNull UUID locationId) {
+  public List<ProducerProductResponse> findAllProducts(
+      @NotNull @NonNull UUID producerId, @NotNull @NonNull UUID locationId) {
     log.info("Loading all products for location {}", locationId);
     return mapper.fromEntity(productRepository.findAllByProducerLocationId(locationId));
   }
@@ -78,7 +79,8 @@ public class ProducerProductService {
         productRequest.producerLocationId());
 
     validateProducerActive(productRequest.producerId(), productRequest.producerLocationId());
-    var response = mapper.fromEntity(productRepository.saveAndFlush(mapper.toEntity(productRequest)));
+    var response =
+        mapper.fromEntity(productRepository.saveAndFlush(mapper.toEntity(productRequest)));
     searchService.upsertProduct(response);
     return response;
   }
@@ -107,9 +109,9 @@ public class ProducerProductService {
       product.setLastOrderDate(productRequest.lastOrderDate());
     }
 
-      var response = mapper.fromEntity(productRepository.saveAndFlush(product));
-      searchService.upsertProduct(response);
-      return response;
+    var response = mapper.fromEntity(productRepository.saveAndFlush(product));
+    searchService.upsertProduct(response);
+    return response;
   }
 
   public void discontinueImmediate(
@@ -132,7 +134,8 @@ public class ProducerProductService {
         productRepository
             .findById(discontinueRequest.productId())
             .orElseThrow(
-                () -> new NotFoundException(PRODUCER_PRODUCT_ENTITY, discontinueRequest.productId()));
+                () ->
+                    new NotFoundException(PRODUCER_PRODUCT_ENTITY, discontinueRequest.productId()));
 
     if (product.isDiscontinued() && !discontinueDatesChanged(product, discontinueRequest)) {
       return mapper.fromEntity(product);
@@ -163,12 +166,12 @@ public class ProducerProductService {
 
     if (producer.getCancelDate() != null) {
       log.warn(
-              "ProducerAccount {} is being cancelled as of {}, cannot create/update product",
-              producer.getId(),
-              producer.getCancelDate());
+          "ProducerAccount {} is being cancelled as of {}, cannot create/update product",
+          producer.getId(),
+          producer.getCancelDate());
       throw new PreconditionFailedException(
-              "ProducerAccount %s is being cancelled as of %s, cannot create/update products",
-              producer.getId(), producer.getCancelDate());
+          "ProducerAccount %s is being cancelled as of %s, cannot create/update products",
+          producer.getId(), producer.getCancelDate());
     }
 
     locationService.findActiveLocation(producerLocationId);

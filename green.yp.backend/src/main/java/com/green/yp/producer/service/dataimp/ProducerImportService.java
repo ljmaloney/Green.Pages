@@ -8,7 +8,6 @@ import com.green.yp.producer.service.ProducerContactOrchestrationService;
 import com.green.yp.producer.service.ProducerLocationService;
 import com.green.yp.producer.service.ProducerOrchestrationService;
 import com.green.yp.reference.dto.LineOfBusinessDto;
-import java.util.Optional;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,15 +25,16 @@ public class ProducerImportService {
   private final LineOfBusinessContract lobContract;
 
   public ProducerImportService(
-          ProducerOrchestrationService producerOrchestrationService,
-          ProducerLocationService producerLocationService,
-          ProducerContactOrchestrationService contactOrchestrationService,
-          @Qualifier("defaultGeocodeServiceImpl") GeocodingService geocodingService, LineOfBusinessContract lobContract) {
+      ProducerOrchestrationService producerOrchestrationService,
+      ProducerLocationService producerLocationService,
+      ProducerContactOrchestrationService contactOrchestrationService,
+      @Qualifier("defaultGeocodeServiceImpl") GeocodingService geocodingService,
+      LineOfBusinessContract lobContract) {
     this.producerOrchestrationService = producerOrchestrationService;
     this.producerLocationService = producerLocationService;
     this.contactOrchestrationService = contactOrchestrationService;
     this.geocodingService = geocodingService;
-      this.lobContract = lobContract;
+    this.lobContract = lobContract;
   }
 
   @Transactional
@@ -62,68 +62,73 @@ public class ProducerImportService {
                 null),
             null);
 
-      var contact = new ProducerContactRequest(
-              null,
-              null,
-              ProducerContactType.PRIMARY,
-              ProducerDisplayContactType.GENERIC_NAME_PHONE_EMAIL,
-              StringUtils.getIfBlank(importRecord.contact, () -> "Primary"),
-              null,
-              null,
-              null,
-              importRecord.phone,
-              null,
-              null, true);
+    var contact =
+        new ProducerContactRequest(
+            null,
+            null,
+            ProducerContactType.PRIMARY,
+            ProducerDisplayContactType.GENERIC_NAME_PHONE_EMAIL,
+            StringUtils.getIfBlank(importRecord.contact, () -> "Primary"),
+            null,
+            null,
+            null,
+            importRecord.phone,
+            null,
+            null,
+            true);
 
     ProducerLocationResponse locationResponse =
-        producerLocationService.createLocation(new CreateLocationRequest(
-            new LocationRequest(
-                null,
-                businessName,
-                ProducerLocationType.HOME_OFFICE_PRIMARY,
-                LocationDisplayType.FULL_ADDRESS,
-                true,
-                importRecord.address,
-                null,
-                null,
-                importRecord.city,
-                importRecord.state,
-                importRecord.zip,
-                location.latitude(),
-                location.longitude(),
-                null), contact),
+        producerLocationService.createLocation(
+            new CreateLocationRequest(
+                new LocationRequest(
+                    null,
+                    businessName,
+                    ProducerLocationType.HOME_OFFICE_PRIMARY,
+                    LocationDisplayType.FULL_ADDRESS,
+                    true,
+                    importRecord.address,
+                    null,
+                    null,
+                    importRecord.city,
+                    importRecord.state,
+                    importRecord.zip,
+                    location.latitude(),
+                    location.longitude(),
+                    null),
+                contact),
             producerResponse.producerId(),
             null);
 
-//    contactOrchestrationService.createContact(
-//        new ProducerContactRequest(
-//            null,
-//            locationResponse.locationId(),
-//            ProducerContactType.PRIMARY,
-//            ProducerDisplayContactType.GENERIC_NAME_PHONE_EMAIL,
-//            StringUtils.getIfBlank(importRecord.contact, () -> "Primary"),
-//            null,
-//            null,
-//            null,
-//            importRecord.phone,
-//            null,
-//            null, true),
-//        Optional.empty(),
-//        producerResponse.producerId(),
-//        locationResponse.locationId(),
-//        null);
+    //    contactOrchestrationService.createContact(
+    //        new ProducerContactRequest(
+    //            null,
+    //            locationResponse.locationId(),
+    //            ProducerContactType.PRIMARY,
+    //            ProducerDisplayContactType.GENERIC_NAME_PHONE_EMAIL,
+    //            StringUtils.getIfBlank(importRecord.contact, () -> "Primary"),
+    //            null,
+    //            null,
+    //            null,
+    //            importRecord.phone,
+    //            null,
+    //            null, true),
+    //        Optional.empty(),
+    //        producerResponse.producerId(),
+    //        locationResponse.locationId(),
+    //        null);
     return producerResponse.producerId();
   }
 
-    private String createKeywords(LineOfBusinessDto lineOfBusiness) {
-      final StringBuilder keywordBuilder = new StringBuilder(lineOfBusiness.lineOfBusinessName());
-      keywordBuilder.append(" ").append(lineOfBusiness.shortDescription());
-      lobContract.getServices(lineOfBusiness.lineOfBusinessId())
-              .forEach(service -> keywordBuilder.append(" ").append(service.getServiceName()));
-      return keywordBuilder.toString();
-    }
+  private String createKeywords(LineOfBusinessDto lineOfBusiness) {
+    final StringBuilder keywordBuilder = new StringBuilder(lineOfBusiness.lineOfBusinessName());
+    keywordBuilder.append(" ").append(lineOfBusiness.shortDescription());
+    lobContract
+        .getServices(lineOfBusiness.lineOfBusinessId())
+        .forEach(service -> keywordBuilder.append(" ").append(service.getServiceName()));
+    return keywordBuilder.toString();
+  }
 
-    public record ProducerCsvRecord(
+  public record ProducerCsvRecord(
       long recordNumber,
       String type,
       String licenseNumber,

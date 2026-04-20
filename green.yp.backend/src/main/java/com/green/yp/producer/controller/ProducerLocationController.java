@@ -32,10 +32,11 @@ public class ProducerLocationController {
   private final ProducerLocationService locationService;
   private final LocationOrchestrationService locationOrchestrationService;
 
-  public ProducerLocationController(ProducerLocationService locationService,
-                                    LocationOrchestrationService locationOrchestrationService) {
+  public ProducerLocationController(
+      ProducerLocationService locationService,
+      LocationOrchestrationService locationOrchestrationService) {
     this.locationService = locationService;
-      this.locationOrchestrationService = locationOrchestrationService;
+    this.locationOrchestrationService = locationOrchestrationService;
   }
 
   @GetMapping(path = "/location/{locationId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -65,7 +66,8 @@ public class ProducerLocationController {
       @Valid @RequestBody CreateLocationRequest locationRequest,
       @PathVariable("producerId") UUID producerId) {
     return new ResponseApi<>(
-            locationOrchestrationService.createLocation(locationRequest, producerId, RequestUtil.getRequestIP()),
+        locationOrchestrationService.createLocation(
+            locationRequest, producerId, RequestUtil.getRequestIP()),
         null);
   }
 
@@ -75,10 +77,12 @@ public class ProducerLocationController {
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ProducerLocationResponse> updateLocation(
-          @Valid @RequestBody LocationRequest locationRequest,
-          @Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser) {
+      @Valid @RequestBody LocationRequest locationRequest,
+      @Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser) {
     return new ResponseApi<>(
-            locationOrchestrationService.updateLocation(locationRequest, authenticatedUser, RequestUtil.getRequestIP()), null);
+        locationOrchestrationService.updateLocation(
+            locationRequest, authenticatedUser, RequestUtil.getRequestIP()),
+        null);
   }
 
   @IsAnyAuthenticatedUser

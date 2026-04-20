@@ -87,7 +87,7 @@ public class ProducerContactOrchestrationService {
                 ipAddress);
           } catch (NoSuchAlgorithmException e) {
             log.error("Unable to create credentials due to an unexpected error");
-            throw new SystemException("Unable to create credentials due to an unexpected error",e);
+            throw new SystemException("Unable to create credentials due to an unexpected error", e);
           }
         });
 
@@ -99,7 +99,9 @@ public class ProducerContactOrchestrationService {
       objectType = AuditObjectType.PRODUCER_CONTACT,
       actionType = AuditActionType.CREATE)
   public ProducerContactResponse createContact(
-      @NotNull @NonNull UUID locationId, ProducerContactRequest createContactRequest, String ipAddress) {
+      @NotNull @NonNull UUID locationId,
+      ProducerContactRequest createContactRequest,
+      String ipAddress) {
     log.info(
         "Attempt to create contact {} for locationId {}",
         StringUtils.isNotBlank(createContactRequest.genericContactName())
@@ -141,7 +143,7 @@ public class ProducerContactOrchestrationService {
       @NotNull @NonNull UUID producerId,
       @NotNull @NonNull UUID locationId,
       @NotNull @NonNull ProducerContactRequest createContactRequest,
-      String ipAddress)  {
+      String ipAddress) {
 
     if (StringUtils.isBlank(createContactRequest.genericContactName())
         && StringUtils.isBlank(createContactRequest.firstName())
@@ -151,10 +153,11 @@ public class ProducerContactOrchestrationService {
     }
 
     String validationToken = null;
-    if ( createContactRequest.isNotImported()
-         && StringUtils.isNotBlank(createContactRequest.emailAddress())) {
-        var validation = emailContract.validateEmail(producerId.toString(), createContactRequest.emailAddress());
-        validationToken = validation.token();
+    if (createContactRequest.isNotImported()
+        && StringUtils.isNotBlank(createContactRequest.emailAddress())) {
+      var validation =
+          emailContract.validateEmail(producerId.toString(), createContactRequest.emailAddress());
+      validationToken = validation.token();
     }
 
     ProducerContact contact = producerContactMapper.toEntity(createContactRequest);
@@ -169,22 +172,23 @@ public class ProducerContactOrchestrationService {
 
     final String token = validationToken;
     if (!createContactRequest.importFlag() && StringUtils.isNotBlank(contact.getEmailAddress())) {
-      var contactName = StringUtils.isNotBlank(createContactRequest.genericContactName())
+      var contactName =
+          StringUtils.isNotBlank(createContactRequest.genericContactName())
               ? createContactRequest.genericContactName()
               : String.join(" ", createContactRequest.firstName(), createContactRequest.lastName());
       emailContract.sendEmail(
-              EmailTemplateType.CONTACT_EMAIL_CONFIRMATION,
-              Collections.singletonList(contact.getEmailAddress()),
-              EmailTemplateType.CONTACT_EMAIL_CONFIRMATION.getSubjectFormat(),
-              () -> {
-                Map<String, Object> templateData = new HashMap<>();
-                templateData.put("contactName", contactName);
-                templateData.put("title", "Subscriber Contact Created");
-                templateData.put("emailValidationToken", token);
-                templateData.put("ipAddress", ipAddress);
-                templateData.put("timestamp", contact.getCreateDate());
-                return templateData;
-              });
+          EmailTemplateType.CONTACT_EMAIL_CONFIRMATION,
+          Collections.singletonList(contact.getEmailAddress()),
+          EmailTemplateType.CONTACT_EMAIL_CONFIRMATION.getSubjectFormat(),
+          () -> {
+            Map<String, Object> templateData = new HashMap<>();
+            templateData.put("contactName", contactName);
+            templateData.put("title", "Subscriber Contact Created");
+            templateData.put("emailValidationToken", token);
+            templateData.put("ipAddress", ipAddress);
+            templateData.put("timestamp", contact.getCreateDate());
+            return templateData;
+          });
     }
 
     log.info(
@@ -255,7 +259,7 @@ public class ProducerContactOrchestrationService {
   public void deleteContacts(List<UUID> producerIds) {
     log.info("Deleting contacts for producers {}", producerIds);
     producerIds.parallelStream()
-            .forEach(producerId -> emailContract.deleteValidation(producerId.toString()));
+        .forEach(producerId -> emailContract.deleteValidation(producerId.toString()));
     contactRepository.deleteContacts(producerIds);
   }
 }

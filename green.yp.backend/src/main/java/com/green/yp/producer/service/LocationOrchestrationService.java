@@ -6,20 +6,13 @@ import com.green.yp.api.apitype.enumeration.AuditObjectType;
 import com.green.yp.api.apitype.producer.CreateLocationRequest;
 import com.green.yp.api.apitype.producer.LocationRequest;
 import com.green.yp.api.apitype.producer.ProducerLocationResponse;
-import com.green.yp.api.apitype.producer.enumeration.ProducerLocationType;
 import com.green.yp.config.security.AuthenticatedUser;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service

@@ -39,10 +39,10 @@ public class ProducerInvoiceService {
   private final ProducerInvoiceRepository invoiceRepository;
 
   public ProducerInvoiceService(
-          ProducerContract producerContract,
-          ProducerInvoiceMapper producerInvoiceMapper,
-          ProducerInvoiceRepository producerInvoiceRepository,
-          SubscriptionContract subscriptionContract) {
+      ProducerContract producerContract,
+      ProducerInvoiceMapper producerInvoiceMapper,
+      ProducerInvoiceRepository producerInvoiceRepository,
+      SubscriptionContract subscriptionContract) {
     this.producerContract = producerContract;
     this.producerInvoiceMapper = producerInvoiceMapper;
     this.invoiceRepository = producerInvoiceRepository;
@@ -89,7 +89,9 @@ public class ProducerInvoiceService {
             .toList();
 
     addOnSubscriptions.stream()
-        .forEach(addOn -> createLineItem(producerInvoice, addOn, producerInvoice.getLineItems().size() + 1));
+        .forEach(
+            addOn ->
+                createLineItem(producerInvoice, addOn, producerInvoice.getLineItems().size() + 1));
 
     final ProducerInvoice savedProducerInvoice = invoiceRepository.saveAndFlush(producerInvoice);
 
@@ -99,7 +101,8 @@ public class ProducerInvoiceService {
         producerId,
         savedProducerInvoice.getInvoiceTotal());
 
-    return producerInvoiceMapper.fromEntity(invoiceRepository.findById(savedProducerInvoice.getId()).get());
+    return producerInvoiceMapper.fromEntity(
+        invoiceRepository.findById(savedProducerInvoice.getId()).get());
   }
 
   private String getNextInvoiceNumber() {
@@ -126,7 +129,9 @@ public class ProducerInvoiceService {
   }
 
   private void createLineItem(
-          ProducerInvoice producerInvoice, ProducerSubscriptionResponse subscription, int lineItemNumber) {
+      ProducerInvoice producerInvoice,
+      ProducerSubscriptionResponse subscription,
+      int lineItemNumber) {
     producerInvoice.addLineItem(
         ProducerInvoiceLineItem.builder()
             .producerId(producerInvoice.getProducerId())
@@ -185,15 +190,20 @@ public class ProducerInvoiceService {
         endDate,
         (descending ? "descending" : "ascending"));
 
-    Sort createDateSort = Sort.by(descending ? Sort.Direction.DESC : Sort.Direction.ASC, "createDate");
+    Sort createDateSort =
+        Sort.by(descending ? Sort.Direction.DESC : Sort.Direction.ASC, "createDate");
 
     return invoiceRepository
-        .findByProducerIdAndCreateDateBetween(producerId,
-                                    startDate.atStartOfDay().atOffset(ZoneOffset.UTC),
-                                    endDate.atTime(23, 59, 59).atOffset(ZoneOffset.UTC),
-                                    createDateSort)
-            .stream()
-            .map( invoice -> producerInvoiceMapper.fromEntity(invoice, subscriptionContract.findSubscription(invoice.getSubscriptionId())))
-            .toList();
-    }
+        .findByProducerIdAndCreateDateBetween(
+            producerId,
+            startDate.atStartOfDay().atOffset(ZoneOffset.UTC),
+            endDate.atTime(23, 59, 59).atOffset(ZoneOffset.UTC),
+            createDateSort)
+        .stream()
+        .map(
+            invoice ->
+                producerInvoiceMapper.fromEntity(
+                    invoice, subscriptionContract.findSubscription(invoice.getSubscriptionId())))
+        .toList();
+  }
 }

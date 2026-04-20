@@ -5,12 +5,11 @@ import com.green.yp.api.apitype.invoice.ProducerInvoiceResponse;
 import com.green.yp.producer.invoice.data.model.ProducerInvoice;
 import com.green.yp.producer.invoice.data.model.ProducerInvoiceLineItem;
 import com.green.yp.reference.dto.SubscriptionDto;
+import java.util.List;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
-
-import java.util.List;
 
 @Mapper(
     componentModel = "spring",
@@ -27,8 +26,8 @@ public interface ProducerInvoiceMapper {
   @Mapping(source = "id", target = "lineItemId")
   ProducerInvoiceLineItemResponse fromEntity(ProducerInvoiceLineItem lineItem);
 
-  @Mapping( target = "subscriptionName", source = "subscription.displayName")
+  @Mapping(target = "subscriptionName", source = "subscription.displayName")
   @Mapping(target = "createDate", source = "invoice.createDate")
-  @Mapping( target= "subscriptionId", source="invoice.subscriptionId")
+  @Mapping(target = "subscriptionId", source = "invoice.subscriptionId")
   ProducerInvoiceResponse fromEntity(ProducerInvoice invoice, SubscriptionDto subscription);
 }

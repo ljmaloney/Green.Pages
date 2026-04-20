@@ -36,7 +36,7 @@ public interface ProducerMapper {
   @Mapping(source = "savedProducer.lastBillPaidDate", target = "lastBillPaidDate")
   @Mapping(source = "savedProducer.lastBillDate", target = "lastBillDate")
   @Mapping(source = "savedProducer.websiteUrl", target = "websiteUrl")
-  @Mapping(source = "savedProducer.cancelDate", target="cancelDate")
+  @Mapping(source = "savedProducer.cancelDate", target = "cancelDate")
   @Mapping(source = "savedProducer.iconLink", target = "iconLink")
   @Mapping(target = "narrative", source = "savedProducer.narrative")
   @Mapping(source = "subscriptions", target = "subscriptions")

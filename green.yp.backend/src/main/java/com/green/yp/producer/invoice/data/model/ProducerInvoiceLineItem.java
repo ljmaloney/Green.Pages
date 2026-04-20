@@ -61,11 +61,29 @@ public class ProducerInvoiceLineItem extends Immutable {
 
     ProducerInvoiceLineItem that = (ProducerInvoiceLineItem) o;
 
-    return new EqualsBuilder().appendSuper(super.equals(o)).append(lineItem, that.lineItem).append(producerId, that.producerId).append(subscriptionId, that.subscriptionId).append(producerInvoiceId, that.producerInvoiceId).append(description, that.description).append(amount, that.amount).append(producerInvoice, that.producerInvoice).isEquals();
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(lineItem, that.lineItem)
+        .append(producerId, that.producerId)
+        .append(subscriptionId, that.subscriptionId)
+        .append(producerInvoiceId, that.producerInvoiceId)
+        .append(description, that.description)
+        .append(amount, that.amount)
+        .append(producerInvoice, that.producerInvoice)
+        .isEquals();
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(lineItem).append(producerId).append(subscriptionId).append(producerInvoiceId).append(description).append(amount).append(producerInvoice).toHashCode();
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(lineItem)
+        .append(producerId)
+        .append(subscriptionId)
+        .append(producerInvoiceId)
+        .append(description)
+        .append(amount)
+        .append(producerInvoice)
+        .toHashCode();
   }
 }

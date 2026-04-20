@@ -22,26 +22,33 @@ import java.util.UUID;
 @Tag(name = "For retrieval of subscriber invoices")
 @RequestMapping("producer/invoice")
 public class ProducerInvoiceController {
-    private final ProducerInvoiceService producerInvoiceService;
+  private final ProducerInvoiceService producerInvoiceService;
 
-    public ProducerInvoiceController(ProducerInvoiceService producerInvoiceService){
-        this.producerInvoiceService = producerInvoiceService;
-    }
+  public ProducerInvoiceController(ProducerInvoiceService producerInvoiceService) {
+    this.producerInvoiceService = producerInvoiceService;
+  }
 
-    @IsAnyAuthenticatedUser
-    @GetMapping(path="{invoiceId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseApi<ProducerInvoiceResponse> findInvoice(@PathVariable("invoiceId") UUID invoiceId){
-        return new ResponseApi<>(producerInvoiceService.findInvoice(invoiceId, RequestUtil.getRequestIP()), null);
-    }
+  @IsAnyAuthenticatedUser
+  @GetMapping(path = "{invoiceId}", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<ProducerInvoiceResponse> findInvoice(
+      @PathVariable("invoiceId") UUID invoiceId) {
+    return new ResponseApi<>(
+        producerInvoiceService.findInvoice(invoiceId, RequestUtil.getRequestIP()), null);
+  }
 
-    @IsAnyAuthenticatedUser
-    @GetMapping(path="/producer/{producerId}/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseApi<List<ProducerInvoiceResponse>> findInvoices(@PathVariable("producerId") UUID producerId,
-                                                                   @RequestParam("startDate") String startDate,
-                                                                   @RequestParam("endDate") String endDate,
-                                                                   @RequestParam(value = "descending", defaultValue = "true") Boolean descending){
-        return new ResponseApi<>(producerInvoiceService.findInvoices(producerId,
-                DateUtils.parseDate(startDate, LocalDate.class),
-                DateUtils.parseDate(endDate, LocalDate.class), descending), null);
-    }
+  @IsAnyAuthenticatedUser
+  @GetMapping(path = "/producer/{producerId}/search", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<List<ProducerInvoiceResponse>> findInvoices(
+      @PathVariable("producerId") UUID producerId,
+      @RequestParam("startDate") String startDate,
+      @RequestParam("endDate") String endDate,
+      @RequestParam(value = "descending", defaultValue = "true") Boolean descending) {
+    return new ResponseApi<>(
+        producerInvoiceService.findInvoices(
+            producerId,
+            DateUtils.parseDate(startDate, LocalDate.class),
+            DateUtils.parseDate(endDate, LocalDate.class),
+            descending),
+        null);
+  }
 }

@@ -65,6 +65,6 @@ public interface ProducerContactRepository extends JpaRepository<ProducerContact
     """)
   void deleteContacts(@NotNull @NonNull @Param("producerIds") List<UUID> producerIds);
 
-  Optional<ProducerContact> findByProducerIdAndEmailAddress(@NotNull @NonNull UUID producerId,
-                                                   @NotNull @NonNull String email);
+  Optional<ProducerContact> findByProducerIdAndEmailAddress(
+      @NotNull @NonNull UUID producerId, @NotNull @NonNull String email);
 }

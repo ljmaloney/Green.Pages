@@ -46,17 +46,18 @@ public class ProducerImageService {
   private final SearchContract searchContract;
 
   public ProducerImageService(
-          ProducerRepository producerRepository,
-          ImageGalleryRepository imageGalleryRepository,
-          ImageGalleryMapper imageGalleryMapper,
-          ImageFileService imageFileService,
-          SubscriptionContract subscriptionContract, SearchContract searchContract) {
+      ProducerRepository producerRepository,
+      ImageGalleryRepository imageGalleryRepository,
+      ImageGalleryMapper imageGalleryMapper,
+      ImageFileService imageFileService,
+      SubscriptionContract subscriptionContract,
+      SearchContract searchContract) {
     this.producerRepository = producerRepository;
     this.imageGalleryRepository = imageGalleryRepository;
     this.imageGalleryMapper = imageGalleryMapper;
     this.imageFileService = imageFileService;
     this.subscriptionContract = subscriptionContract;
-      this.searchContract = searchContract;
+    this.searchContract = searchContract;
   }
 
   public List<ProducerImageResponse> getGalleryImages(@NonNull @NotNull UUID producerId) {
@@ -66,13 +67,13 @@ public class ProducerImageService {
     return imageGalleryMapper.mapToResponse(images);
   }
 
-    @Transactional
+  @Transactional
   public void uploadLogoImage(UUID producerId, String logoFileName, MultipartFile file) {
-      if ( RequestUtil.isInValidFileName(logoFileName)) {
-          log.warn("Attempting to upload an invalid logoFileName {} by {}", logoFileName, producerId);
-          throw new PreconditionFailedException("Invalid filename " + logoFileName);
-      }
-      Producer producer =
+    if (RequestUtil.isInValidFileName(logoFileName)) {
+      log.warn("Attempting to upload an invalid logoFileName {} by {}", logoFileName, producerId);
+      throw new PreconditionFailedException("Invalid filename " + logoFileName);
+    }
+    Producer producer =
         producerRepository
             .findById(producerId)
             .orElseThrow(() -> new NotFoundException("producer", producerId));
@@ -90,14 +91,14 @@ public class ProducerImageService {
     searchContract.upsertIconLink(producer.getId(), urlPath);
   }
 
-    @Transactional
+  @Transactional
   public void uploadGalleryImage(
       UUID producerId, String imageFilename, String description, MultipartFile file) {
-    if ( RequestUtil.isInValidFileName(imageFilename)) {
-        log.warn("Attempting to upload an invalid filename {} by {}", imageFilename, producerId);
-        throw new PreconditionFailedException("Invalid filename " + imageFilename);
+    if (RequestUtil.isInValidFileName(imageFilename)) {
+      log.warn("Attempting to upload an invalid filename {} by {}", imageFilename, producerId);
+      throw new PreconditionFailedException("Invalid filename " + imageFilename);
     }
-      var producer =
+    var producer =
         producerRepository
             .findById(producerId)
             .orElseThrow(() -> new NotFoundException("producer", producerId));
@@ -132,7 +133,7 @@ public class ProducerImageService {
         producer.getIconLink());
   }
 
-    @Transactional
+  @Transactional
   public void deleteLogo(UUID producerId, String requestIP) {
     Producer producer =
         producerRepository
@@ -145,16 +146,17 @@ public class ProducerImageService {
   }
 
   @Transactional
-  public void deleteGalleryImage(@NotNull @NonNull UUID producerId,
-                                 @NotNull @NonNull String imageFilename, String requestIP) {
-      if ( StringUtils.isBlank(imageFilename)){
-          log.warn("No imageFileName specified for deletion for {}", producerId);
-          throw new PreconditionFailedException("No imageFileName specified for deletion");
-      }
-      producerRepository
+  public void deleteGalleryImage(
+      @NotNull @NonNull UUID producerId, @NotNull @NonNull String imageFilename, String requestIP) {
+    if (StringUtils.isBlank(imageFilename)) {
+      log.warn("No imageFileName specified for deletion for {}", producerId);
+      throw new PreconditionFailedException("No imageFileName specified for deletion");
+    }
+    producerRepository
         .findById(producerId)
         .orElseThrow(() -> new NotFoundException("producer", producerId));
-      log.info("Deleting gallery image {} for producer {} from {}", imageFilename,producerId, requestIP);
+    log.info(
+        "Deleting gallery image {} for producer {} from {}", imageFilename, producerId, requestIP);
     imageFileService.deleteImage(producerId, imageFilename);
     imageGalleryRepository.deleteImageGalleryByProducerIdAndImageFilename(
         producerId, imageFilename);
@@ -179,18 +181,26 @@ public class ProducerImageService {
 
     var producerSubscription =
         producer.getSubscriptionList().stream()
-            .filter(sub -> {
-                log.trace("subscription {} startDate {} endDate {}", sub.getSubscriptionId(), sub.getStartDate(), sub.getEndDate());
-                return sub.isSubscriptionActive(today);
-            })
-            .filter(sub -> {
-                log.trace("determine if subscription {} is in set", sub.getSubscriptionId());
-                return subscriptionSet.contains(sub.getSubscriptionId());
-            })
+            .filter(
+                sub -> {
+                  log.trace(
+                      "subscription {} startDate {} endDate {}",
+                      sub.getSubscriptionId(),
+                      sub.getStartDate(),
+                      sub.getEndDate());
+                  return sub.isSubscriptionActive(today);
+                })
+            .filter(
+                sub -> {
+                  log.trace("determine if subscription {} is in set", sub.getSubscriptionId());
+                  return subscriptionSet.contains(sub.getSubscriptionId());
+                })
             .findFirst()
             .orElseThrow(
                 () -> {
-                  log.warn("The producer {} subscription could not be found or is not active", producer.getId());
+                  log.warn(
+                      "The producer {} subscription could not be found or is not active",
+                      producer.getId());
                   return new PreconditionFailedException(SUBSCRIPTION_VALIDATION_WARNING);
                 });
 
@@ -200,7 +210,9 @@ public class ProducerImageService {
         .orElseThrow(
             () -> {
               // note this really should not happen ...
-              log.warn("Subscription {} could not be found or is not active", producerSubscription.getSubscriptionId());
+              log.warn(
+                  "Subscription {} could not be found or is not active",
+                  producerSubscription.getSubscriptionId());
               return new PreconditionFailedException(SUBSCRIPTION_VALIDATION_WARNING);
             });
   }

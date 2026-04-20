@@ -4,9 +4,8 @@ import com.green.yp.api.apitype.producer.CreateProductRequest;
 import com.green.yp.api.apitype.producer.ProducerProductRequest;
 import com.green.yp.api.apitype.producer.ProducerProductResponse;
 import com.green.yp.producer.data.model.ProducerProduct;
-import java.util.List;
-
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.NonNull;
 import org.mapstruct.*;
 
@@ -22,11 +21,12 @@ public interface ProducerProductMapper {
 
   ProducerProduct toEntity(CreateProductRequest productRequest);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createDate", ignore = true)
-    @Mapping(target = "lastUpdateDate", ignore = true)
-    @Mapping(target = "version", ignore = true)
-    void updateEntity(@NotNull @NonNull ProducerProductRequest productRequest,
-                      @MappingTarget ProducerProduct product);
+  @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "createDate", ignore = true)
+  @Mapping(target = "lastUpdateDate", ignore = true)
+  @Mapping(target = "version", ignore = true)
+  void updateEntity(
+      @NotNull @NonNull ProducerProductRequest productRequest,
+      @MappingTarget ProducerProduct product);
 }

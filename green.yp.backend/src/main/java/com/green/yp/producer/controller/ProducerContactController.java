@@ -70,11 +70,15 @@ public class ProducerContactController {
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ProducerContactResponse> createContact(
-          @PathVariable("locationId") UUID locationId,
-          @Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser,
-          @Valid @RequestBody ProducerContactRequest createContactRequest, HttpServletRequest request) throws Exception {
+      @PathVariable("locationId") UUID locationId,
+      @Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser,
+      @Valid @RequestBody ProducerContactRequest createContactRequest,
+      HttpServletRequest request)
+      throws Exception {
     return new ResponseApi<>(
-        contactOrchestrationService.createContact(locationId, createContactRequest, RequestUtil.getRequestIP(request)), null);
+        contactOrchestrationService.createContact(
+            locationId, createContactRequest, RequestUtil.getRequestIP(request)),
+        null);
   }
 
   @IsAnyAuthenticatedUser

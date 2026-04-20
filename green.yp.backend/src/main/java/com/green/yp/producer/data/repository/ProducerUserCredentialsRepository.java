@@ -57,27 +57,32 @@ public interface ProducerUserCredentialsRepository
       @NonNull @NotNull @Param("producerIds") List<UUID> producerIdList);
 
   @Query(
-    """
-        SELECT auth FROM ProducerUserCredentials auth 
+      """
+        SELECT auth FROM ProducerUserCredentials auth
         WHERE auth.userId = :userName OR auth.emailAddress = :emailAddress
     """)
-  Optional<ProducerUserCredentials> findCredentialsByUserName(@NonNull @NotNull @Param("userName") String userName,
-                                                              @NonNull @NotNull @Param("emailAddress")String emailAddress);
+  Optional<ProducerUserCredentials> findCredentialsByUserName(
+      @NonNull @NotNull @Param("userName") String userName,
+      @NonNull @NotNull @Param("emailAddress") String emailAddress);
 
-  Optional<ProducerUserCredentials> findByExternalAuthorizationServiceRef(String externalAuthorizationServiceRef);
+  Optional<ProducerUserCredentials> findByExternalAuthorizationServiceRef(
+      String externalAuthorizationServiceRef);
 
-  @Query("""
+  @Query(
+      """
       SELECT auth FROM ProducerUserCredentials auth
       WHERE auth.producerId = :producerId
         AND (:firstName IS NULL OR auth.firstName=:firstName )
         AND (:lastName IS NULL OR auth.lastName=:lastName )
   """)
-  List<ProducerUserCredentials> findUsers(@NotNull @NonNull
-                                       @Param("producerId") UUID producerId,
-                                       @Param("firstName") String firstName,
-                                       @Param("lastName") String lastName);
+  List<ProducerUserCredentials> findUsers(
+      @NotNull @NonNull @Param("producerId") UUID producerId,
+      @Param("firstName") String firstName,
+      @Param("lastName") String lastName);
+
   @Modifying
-  @Query("""
+  @Query(
+"""
     DELETE FROM ProducerUserCredentials where producerId IN :producerIds
 """)
   Integer deleteByProducerIds(@Param("producerIds") List<UUID> producerIdList);
