@@ -19,6 +19,7 @@ public record ProducerResponse(
     @NotNull @NonNull String businessName,
     OffsetDateTime cancelDate,
     CancelReasonType cancelReason,
+    String cancelReasonText,
     OffsetDateTime lastBillDate,
     OffsetDateTime lastBillPaidDate,
     UUID lineOfBusinessId,

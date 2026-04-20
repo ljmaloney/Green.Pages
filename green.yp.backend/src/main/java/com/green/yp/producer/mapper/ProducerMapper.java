@@ -30,6 +30,8 @@ public interface ProducerMapper {
   @Mapping(source = "savedProducer.name", target = "businessName")
   @Mapping(source = "savedProducer.createDate", target = "createDate")
   @Mapping(source = "savedProducer.lastUpdateDate", target = "lastUpdateDate")
+  @Mapping(source = "savedProducer.cancelReasonType", target = "cancelReason")
+  @Mapping(source = "savedProducer.cancelReason", target = "cancelReasonText")
   @Mapping(source = "primaryLob.lineOfBusinessId", target = "lineOfBusinessId")
   @Mapping(source = "savedProducer.lastBillPaidDate", target = "lastBillPaidDate")
   @Mapping(source = "savedProducer.lastBillDate", target = "lastBillDate")
