@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'groovy'
     id 'org.springframework.boot' version '3.4.5'
-    id 'io.spring.dependency-management' version '1.1.2'
+    id 'io.spring.dependency-management' version '1.1.6'
     id("org.springdoc.openapi-gradle-plugin") version "1.6.0"
     id 'com.google.cloud.tools.jib' version '3.4.5'
 }
@@ -35,14 +35,39 @@ repositories {
 }
 
 ext {
-    awsBomVersion="2.25.24"
+    // Framework versions
     springCloudVersion = "2024.0.1"
     springDocVersion = "2.8.5"
+    awsBomVersion="2.25.24"
     lombokVersion = "1.18.38"
     hikariVersion="6.3.0"
-    squareVersion="45.0.0.20250618"
-    esapiVersion="2.7.0.0"
     resilienceVersion="2.2.0"
+    jacksonVersion="2.17.2"
+    flywayVersion="11.8.2"
+    mysqlConnectorVersion="8.3.0"
+    cache2kVersion="2.6.1.Final"
+    commonsLangVersion="3.18.0"
+    commonsIoVersion="2.16.1"
+    commonsCsvVersion="1.10.0"
+    commonsCollectionsVersion="4.5.0"
+    log4jVersion="2.25.4"
+    openFeignVersion="13.1"
+    fusionAuthVersion="1.57.0"
+    squareVersion="45.0.0.20250618"
+    jtsVersion="1.20.0"
+    libphonenumberVersion="8.12.26"
+    jsoupVersion="1.21.2"
+    commonsDiscoveryVersion="0.5"
+    hibernationUtilsVersion="3.5.1"
+    spockVersion="2.4-groovy-4.0"
+    junitJupiterVersion="5.10.2"
+    junitPlatformVersion="1.10.2"
+    testngVersion="7.7.0"
+    javafakerVersion="1.0.2"
+    awaitilityVersion="4.1.1"
+    wiremockVersion="3.1.1"
+    esapiVersion="2.7.0.0"
+    commonsPathVersion="2.9.0"
 }
 
 dependencies {
@@ -53,16 +78,14 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-freemarker'
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.security:spring-security-core:6.4.10'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-batch'
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-    implementation 'org.springframework.boot:spring-boot-starter-freemarker:3.4.5'
     implementation "com.zaxxer:HikariCP:${hikariVersion}"
-    implementation 'commons-io:commons-io:2.14.0'
+    implementation 'commons-io:commons-io:2.16.1'
     implementation 'io.fusionauth:fusionauth-java-client:1.57.0'
     implementation("org.locationtech.jts:jts-core:1.20.0")
 
@@ -73,38 +96,38 @@ dependencies {
 
     implementation "com.squareup:square:${squareVersion}"
 
-    implementation 'org.cache2k:cache2k-api'
-    implementation 'org.cache2k:cache2k-core'
-    implementation 'org.cache2k:cache2k-spring'
-    implementation 'org.flywaydb:flyway-core:11.8.2'
-    implementation 'org.flywaydb:flyway-mysql:11.8.2'
-    runtimeOnly 'com.mysql:mysql-connector-j:8.3.0'
+    implementation "org.cache2k:cache2k-api:${cache2kVersion}"
+    implementation "org.cache2k:cache2k-core:${cache2kVersion}"
+    implementation "org.cache2k:cache2k-spring:${cache2kVersion}"
+    implementation "org.flywaydb:flyway-core:${flywayVersion}"
+    implementation "org.flywaydb:flyway-mysql:${flywayVersion}"
+    runtimeOnly "com.mysql:mysql-connector-j:${mysqlConnectorVersion}"
 
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocVersion}"
 
     implementation 'org.yaml:snakeyaml'
-    implementation 'com.jayway.jsonpath:json-path:2.9.0'
-    implementation 'org.apache.commons:commons-csv:1.10.0'
-    implementation 'org.apache.logging.log4j:log4j-1.2-api'
-    implementation 'org.apache.commons:commons-collections4:4.5.0'
-    implementation 'com.googlecode.libphonenumber:libphonenumber:8.12.26'
-    implementation "org.apache.commons:commons-lang3"
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv'
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
-    implementation 'commons-discovery:commons-discovery:0.5'
-    implementation 'org.jsoup:jsoup:1.21.2'
+    implementation "com.jayway.jsonpath:json-path:${commonsPathVersion}"
+    implementation "org.apache.commons:commons-csv:${commonsCsvVersion}"
+    implementation "org.apache.logging.log4j:log4j-1.2-api:${log4jVersion}"
+    implementation "org.apache.commons:commons-collections4:${commonsCollectionsVersion}"
+    implementation "com.googlecode.libphonenumber:libphonenumber:${libphonenumberVersion}"
+    implementation "org.apache.commons:commons-lang3:${commonsLangVersion}"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-csv:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
+    implementation "commons-discovery:commons-discovery:${commonsDiscoveryVersion}"
+    implementation "org.jsoup:jsoup:${jsoupVersion}"
 
-    implementation 'org.apache.logging.log4j:log4j-core:2.25.1'
+    implementation "org.apache.logging.log4j:log4j-core:${log4jVersion}"
     implementation 'org.mapstruct:mapstruct:1.6.3'
     implementation 'org.mapstruct:mapstruct-processor:1.6.3'
 
 //    implementation 'org.apache.httpcomponents:httpclient'
-    implementation 'io.github.openfeign:feign-httpclient'
-    implementation "io.github.openfeign:feign-jackson"
-    implementation 'io.github.openfeign:feign-micrometer'
-    implementation 'io.hypersistence:hypersistence-utils-hibernate-62:3.5.1'
-    implementation 'org.testng:testng:7.7.0'
+    implementation "io.github.openfeign:feign-httpclient:${openFeignVersion}"
+    implementation "io.github.openfeign:feign-jackson:${openFeignVersion}"
+    implementation "io.github.openfeign:feign-micrometer:${openFeignVersion}"
+    implementation "io.hypersistence:hypersistence-utils-hibernate-62:${hibernationUtilsVersion}"
+    implementation "org.testng:testng:${testngVersion}"
 
     implementation platform("software.amazon.awssdk:bom:${awsBomVersion}") // Use the latest stable version
     implementation 'software.amazon.awssdk:s3'
@@ -118,9 +141,9 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     testImplementation 'org.apache.groovy:groovy-all:4.0.26'
-    testImplementation 'org.spockframework:spock-core:2.4-M6-groovy-4.0'
+    testImplementation "org.spockframework:spock-core:${spockVersion}"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation('com.github.javafaker:javafaker:1.0.2') {
+    testImplementation("com.github.javafaker:javafaker:${javafakerVersion}") {
         exclude(module: 'snakeyaml')
     }
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
@@ -128,14 +151,14 @@ dependencies {
     }
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.springframework.batch:spring-batch-test'
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    testImplementation 'org.junit.platform:junit-platform-launcher'
-    testImplementation("org.springframework.cloud:spring-cloud-contract-wiremock:3.1.1") {
+    testImplementation "org.junit.jupiter:junit-jupiter:${junitJupiterVersion}"
+    testImplementation "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}"
+    testImplementation("org.springframework.cloud:spring-cloud-contract-wiremock:${wiremockVersion}") {
         exclude(module: "wiremock-jre8-standalone")
     }
-    testImplementation 'org.awaitility:awaitility'
+    testImplementation "org.awaitility:awaitility:${awaitilityVersion}"
 
-    implementation('org.owasp.esapi:esapi:2.7.0.0') {
+    implementation("org.owasp.esapi:esapi:${esapiVersion}") {
         exclude(module: 'slf4j-simple')
         exclude(module: 'xml-apis')
     }
