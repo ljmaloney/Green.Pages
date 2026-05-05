@@ -264,12 +264,12 @@ public class SquarePaymentService implements PaymentService {
         .build();
   }
     private String normalizePhone(String phoneNumber){
-        String phone =phoneNumber.replaceAll("\\D", "");
-        if ( phone.length() == 11 || phone.length() > 11 ) {
-            return String.join("+", "",phone);
-        } else if ( phone.length() == 10 ) {
-            return String.join("+1", "",phone);
+        String phone = phoneNumber.replaceAll("\\D", "");
+        if (phone.length() == 11 && phone.startsWith("1")) {
+            return "+" + phone;
+        } else if (phone.length() == 10) {
+            return "+1" + phone;
         }
-        return phone;
+        return "+" + phone;
     }
 }

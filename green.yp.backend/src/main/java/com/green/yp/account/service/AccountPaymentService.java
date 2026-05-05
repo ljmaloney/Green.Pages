@@ -437,29 +437,17 @@ public class AccountPaymentService {
               Collections.singletonList(primaryContact.emailAddress()),
               EmailTemplateType.PRODUCER_PAYMENT_CONFIRMATION.getSubjectFormat(),
               () -> {
-                Map<String, Object> map =
-                        new HashMap<>(
-                                Map.of(
-                                        "invoice",
-                                        invoice,
-                                        "invoiceNumber",
-                                        invoice.invoiceNumber(),
-                                        "invoiceDescription",
-                                        invoice.description(),
-                                        "producerId",
-                                        producerResponse.producerId(),
-                                        "lastName",
-                                        primaryContact.lastName(),
-                                        "firstName",
-                                        primaryContact.firstName(),
-                                        "transactionRef",
-                                        completedPayment.paymentRef(),
-                                        "receiptUrl",
-                                        completedPayment.receiptUrl(),
-                                        "timestamp",
-                                        OffsetDateTime.now(),
-                                        "ipAddress",
-                                        StringUtils.isNotBlank(requestIP) ? requestIP : SYSTEM_USER_ID));
+                Map<String, Object> map = new HashMap<>();
+                map.put("invoice", invoice);
+                map.put("invoiceNumber", invoice.invoiceNumber());
+                map.put("invoiceDescription", invoice.description());
+                map.put("producerId", producerResponse.producerId());
+                map.put("lastName", primaryContact.lastName());
+                map.put("firstName", primaryContact.firstName());
+                map.put("transactionRef", completedPayment.paymentRef());
+                map.put("receiptUrl", completedPayment.receiptUrl());
+                map.put("timestamp", OffsetDateTime.now());
+                map.put("ipAddress", StringUtils.isNotBlank(requestIP) ? requestIP : SYSTEM_USER_ID);
                 map.put("invoiceLineItems", invoice.lineItems());
                 map.put("invoiceTotal", invoice.invoiceTotal());
                 return map;
@@ -480,27 +468,16 @@ public class AccountPaymentService {
               Collections.singletonList(primaryContact.emailAddress()),
               EmailTemplateType.PRODUCER_PAYMENT_FAILED.getSubjectFormat(),
               () -> {
-                Map<String, Object> map =
-                        new HashMap<>(
-                                Map.of(
-                                        "invoice",
-                                        invoice,
-                                        "invoiceNumber",
-                                        invoice.invoiceNumber(),
-                                        "invoiceDescription",
-                                        invoice.description(),
-                                        "producerId",
-                                        producerResponse.producerId(),
-                                        "lastName",
-                                        primaryContact.lastName(),
-                                        "firstName",
-                                        primaryContact.firstName(),
-                                        "transactionRef",
-                                        completedPayment.paymentRef(),
-                                        "receiptUrl",
-                                        completedPayment.receiptUrl(),
-                                        "timestamp",
-                                        OffsetDateTime.now()));
+                Map<String, Object> map = new HashMap<>();
+                map.put("invoice", invoice);
+                map.put("invoiceNumber", invoice.invoiceNumber());
+                map.put("invoiceDescription", invoice.description());
+                map.put("producerId", producerResponse.producerId());
+                map.put("lastName", primaryContact.lastName());
+                map.put("firstName", primaryContact.firstName());
+                map.put("transactionRef", completedPayment.paymentRef());
+                map.put("receiptUrl", completedPayment.receiptUrl());
+                map.put("timestamp", OffsetDateTime.now());
                 map.put("errorCode", completedPayment.errorStatusCode());
                 map.put("errorDetail", completedPayment.errorDetail());
                 map.put("invoiceLineItems", invoice.lineItems());
