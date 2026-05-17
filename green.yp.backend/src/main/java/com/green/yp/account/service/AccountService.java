@@ -15,14 +15,12 @@ import com.green.yp.api.contract.*;
 import com.green.yp.email.service.EmailService;
 import com.green.yp.exception.*;
 import jakarta.validation.constraints.NotNull;
-import java.lang.Thread;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
-
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
