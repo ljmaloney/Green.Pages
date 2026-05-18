@@ -1,6 +1,7 @@
 package com.green.yp.search.service;
 
 import com.green.yp.api.apitype.PageableResponse;
+import com.green.yp.api.apitype.common.GeocodeLocation;
 import com.green.yp.api.apitype.enumeration.SearchRecordType;
 import com.green.yp.api.apitype.search.SearchLocationUpdateRequest;
 import com.green.yp.api.apitype.search.SearchMasterRequest;
@@ -49,36 +50,50 @@ public class SearchV2Service {
     log.info("Searching for producers near zipCode: {}, within {} miles", zipCode, distance);
 
     var coordinates = geocodingService.getCoordinates(zipCode);
-    var wktPoint = String.format("POINT(%f %f)", coordinates.latitude(), coordinates.longitude());
 
-    BigDecimal distanceMeters =
-        BigDecimal.valueOf(distance).multiply(BigDecimal.valueOf(MILES_IN_METERS));
+    return executeSearch(coordinates, distance, categoryRefId, keywords, pageable);
+  }
 
-    var searchLocations =
-        searchRepository.executeSearch(
-            wktPoint,
-            distanceMeters,
-            categoryRefId,
-            StringUtils.isBlank(keywords) ? null : keywords,
-            pageable);
+    public PageableResponse<SearchResponse> search(BigDecimal latitude,
+                                                   BigDecimal longitude,
+                                                   Integer distance,
+                                                   UUID categoryRefId, String keywords, Pageable pageable) {
+      log.info("Searching for producers near lat: {}, long: {}, within {} miles", latitude, longitude, distance);
 
-    List<UUID> searchIds = searchLocations.get().map(SearchDistanceProjection::getId).toList();
+      return executeSearch(new GeocodeLocation(latitude, longitude), distance, categoryRefId, keywords, pageable);
+  }
 
-    var searchResults =
-        searchRepository.loadSearchResults(
-            searchIds, coordinates.latitude().doubleValue(), coordinates.longitude().doubleValue());
+  protected PageableResponse<SearchResponse>  executeSearch(GeocodeLocation coordinates, Integer distance, UUID categoryRefId, String keywords, Pageable pageable){
+      var wktPoint = String.format("POINT(%f %f)", coordinates.latitude(), coordinates.longitude());
 
-    log.info(
-        "Found {} producers near zipCode: {}, within {} miles",
-        searchResults.size(),
-        zipCode,
-        distance);
+      BigDecimal distanceMeters =
+              BigDecimal.valueOf(distance).multiply(BigDecimal.valueOf(MILES_IN_METERS));
 
-    return new PageableResponse<>(
-        searchMapper.toResponse(searchResults),
-        (int) searchLocations.getTotalElements(),
-        searchLocations.getNumber(),
-        searchLocations.getTotalPages());
+      var searchLocations =
+              searchRepository.executeSearch(
+                      wktPoint,
+                      distanceMeters,
+                      categoryRefId,
+                      StringUtils.isBlank(keywords) ? null : keywords,
+                      pageable);
+
+      List<UUID> searchIds = searchLocations.get().map(SearchDistanceProjection::getId).toList();
+
+      var searchResults =
+              searchRepository.loadSearchResults(
+                      searchIds, coordinates.latitude().doubleValue(), coordinates.longitude().doubleValue());
+
+      log.info(
+              "Found {} producers within {} miles of coordinates: {}",
+              searchResults.size(),
+              distance,
+              coordinates);
+
+      return new PageableResponse<>(
+              searchMapper.toResponse(searchResults),
+              (int) searchLocations.getTotalElements(),
+              searchLocations.getNumber(),
+              searchLocations.getTotalPages());
   }
 
   public UUID createSearchMaster(@NotNull SearchMasterRequest request) {
@@ -183,6 +198,4 @@ public class SearchV2Service {
             })
         .get();
     }
-
-
 }

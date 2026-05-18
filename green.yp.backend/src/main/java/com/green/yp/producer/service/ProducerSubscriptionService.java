@@ -176,6 +176,7 @@ public class ProducerSubscriptionService {
         .findById(producerId)
         .ifPresentOrElse(
             producer -> {
+              producer.setSubscriptionType(ProducerSubscriptionType.LIVE_DISABLED_NONPAYMENT);
               producer.setCancelDate(cancelDate);
               producer.setCancelReason(cancelReason);
               producer.setCancelReasonType(cancelReasonType);

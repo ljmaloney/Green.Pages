@@ -27,6 +27,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -37,9 +38,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AccountPaymentService {
 
-    public static final String PAYMENT_COMPLETED = "COMPLETED";
-    public static final String SYSTEM_USER_ID = "system";
-    private final EmailService emailService;
+  public static final String PAYMENT_COMPLETED = "COMPLETED";
+  public static final String SYSTEM_USER_ID = "system";
+
+  @Value("${green.yp.failed-payment.grace.months:1}")
+  private Long failedPaymentGracePeriod;
+
+  private final EmailService emailService;
 
   private final InvoiceContract invoiceContract;
   private final ProducerInvoiceContract producerInvoiceContract;
@@ -54,19 +59,20 @@ public class AccountPaymentService {
   private final PaymentContract paymentContract;
 
   private final AccountPaymentMapper paymentMapper;
-    private final SearchContract searchContract;
+  private final SearchContract searchContract;
 
-    public AccountPaymentService(
-            EmailService emailService,
-            InvoiceContract invoiceContract,
-            ProducerInvoiceContract producerInvoiceContract,
-            ProducerContract producerContract,
-            EmailContract emailContract,
-            ProducerPaymentContract producerPaymentContract,
-            ProducerContactContract contactContract,
-            ProducerLocationContract locationContract,
-            PaymentContract paymentContract,
-            AccountPaymentMapper paymentMapper, SearchContract searchContract) {
+  public AccountPaymentService(
+      EmailService emailService,
+      InvoiceContract invoiceContract,
+      ProducerInvoiceContract producerInvoiceContract,
+      ProducerContract producerContract,
+      EmailContract emailContract,
+      ProducerPaymentContract producerPaymentContract,
+      ProducerContactContract contactContract,
+      ProducerLocationContract locationContract,
+      PaymentContract paymentContract,
+      AccountPaymentMapper paymentMapper,
+      SearchContract searchContract) {
     this.emailService = emailService;
     this.invoiceContract = invoiceContract;
     this.producerInvoiceContract = producerInvoiceContract;
@@ -77,8 +83,8 @@ public class AccountPaymentService {
     this.locationContract = locationContract;
     this.paymentContract = paymentContract;
     this.paymentMapper = paymentMapper;
-        this.searchContract = searchContract;
-    }
+    this.searchContract = searchContract;
+  }
 
   /**
    * Applies the first subscription payment and makes the account go "live".
@@ -125,15 +131,18 @@ public class AccountPaymentService {
             Optional.of(savedCustomerCard.externCustRef()),
             true);
 
-      if ( !PAYMENT_COMPLETED.equals(completedPayment.status()) ) {
-          log.warn("Initial subscription payment failed for {} due to {} - {}",
-                  paymentRequest.referenceId(),
-                  completedPayment.errorStatusCode(),
-                  completedPayment.errorDetail());
+    if (!PAYMENT_COMPLETED.equals(completedPayment.status())) {
+      log.warn(
+          "Initial subscription payment failed for {} due to {} - {}",
+          paymentRequest.referenceId(),
+          completedPayment.errorStatusCode(),
+          completedPayment.errorDetail());
 
-          sendPaymentFailed( getPrimaryContact(producerResponse), invoice, producerResponse,  completedPayment);
-          throw new PaymentFailedException(completedPayment.errorStatusCode(), completedPayment.errorDetail());
-      }
+      sendPaymentFailed(
+          getPrimaryContact(producerResponse), invoice, producerResponse, completedPayment);
+      throw new PaymentFailedException(
+          completedPayment.errorStatusCode(), completedPayment.errorDetail());
+    }
 
     invoiceContract.updatePayment(invoice.invoiceId(), completedPayment);
 
@@ -141,15 +150,16 @@ public class AccountPaymentService {
         paymentRequest.referenceId(),
         completedPayment.createDate(),
         completedPayment.createDate(),
-            SYSTEM_USER_ID,
+        SYSTEM_USER_ID,
         requestIP);
 
-    sendPaymentCompleted( requestIP, primaryContact, invoice, producerResponse, completedPayment);
+    sendPaymentCompleted(requestIP, primaryContact, invoice, producerResponse, completedPayment);
 
     return new ApiPaymentResponse(
-        true, producerResponse.producerId(),
-            completedPayment.receiptNumber(),
-            completedPayment.receiptUrl());
+        true,
+        producerResponse.producerId(),
+        completedPayment.receiptNumber(),
+        completedPayment.receiptUrl());
   }
 
   public ApiPaymentResponse applyPayment(
@@ -171,21 +181,25 @@ public class AccountPaymentService {
         producerPaymentContract.applyPayment(paymentRequest, userId, requestIP);
 
     return new ApiPaymentResponse(
-        true, paymentRequest.producerId(),
-            producerPaymentResponse.responseCode(),
-            producerPaymentResponse.responseText());
+        true,
+        paymentRequest.producerId(),
+        producerPaymentResponse.responseCode(),
+        producerPaymentResponse.responseText());
   }
 
   public void processSubscriptionPayment(ProducerResponse producer) {
     log.info("Processing monthly subscription payment for {}", producer.producerId());
 
-    if ( producer.cancelDate() != null){
-      log.warn("Cannot update payment method for non-active (cancelled) producer {} cancelDate {}",
-              producer.producerId(), producer.cancelDate());
+    if (producer.cancelDate() != null) {
+      log.warn(
+          "Cannot update payment method for non-active (cancelled) producer {} cancelDate {}",
+          producer.producerId(),
+          producer.cancelDate());
       return;
     }
 
-    var paymentMethod = paymentContract
+    var paymentMethod =
+        paymentContract
             .getPaymentMethod(producer.producerId(), null, RequestUtil.getRequestIP())
             .filter(pm -> pm.statusType() == PaymentMethodStatusType.CCOF_CREATED)
             .orElse(null);
@@ -197,36 +211,44 @@ public class AccountPaymentService {
     var invoice = createInvoiceForPayment(producer);
 
     var completedPayment =
-            paymentContract.applyPayment(
-                    paymentMapper.toPaymentRequest(producer, paymentMethod, invoice),
-                    Optional.of(paymentMethod.externCustRef()),
-                    true);
+        paymentContract.applyPayment(
+            paymentMapper.toPaymentRequest(producer, paymentMethod, invoice),
+            Optional.of(paymentMethod.externCustRef()),
+            true);
 
-    if ( !PAYMENT_COMPLETED.equals(completedPayment.status()) ) {
-      log.warn("Subscription payment failed for {} due to {} - {}",
-              producer.producerId(),
-              completedPayment.errorStatusCode(),
-              completedPayment.errorDetail());
+    if (!PAYMENT_COMPLETED.equals(completedPayment.status())) {
+      log.warn(
+          "Subscription payment failed for {} due to {} - {}",
+          producer.producerId(),
+          completedPayment.errorStatusCode(),
+          completedPayment.errorDetail());
       producerContract.updateProcessStatus(
-              producer.producerId(), ProducerSubProcessType.PAYMENT_FAILED);
+          producer.producerId(), ProducerSubProcessType.PAYMENT_FAILED);
 
-      producerContract.cancelSubscription(producer.producerId(), CancelReasonType.PAYMENT_FAILED,
-              OffsetDateTime.now().plusMonths(1L), completedPayment.errorDetail());
+      producerContract.cancelSubscription(
+          producer.producerId(),
+          CancelReasonType.PAYMENT_FAILED,
+          OffsetDateTime.now().plusMonths(failedPaymentGracePeriod),
+          completedPayment.errorDetail());
 
-      sendPaymentFailed( getPrimaryContact(producer), invoice, producer,  completedPayment);
+      sendPaymentFailed(getPrimaryContact(producer), invoice, producer, completedPayment);
       return;
     }
 
     invoiceContract.updatePayment(invoice.invoiceId(), completedPayment);
 
-    producerContract.updatePaidDates(producer.producerId(),
-            invoice.createDate(), completedPayment.createDate(), SYSTEM_USER_ID, SYSTEM_USER_ID);
+    producerContract.updatePaidDates(
+        producer.producerId(),
+        invoice.createDate(),
+        completedPayment.createDate(),
+        SYSTEM_USER_ID,
+        SYSTEM_USER_ID);
 
     producerContract.updateProcessStatus(
         producer.producerId(), ProducerSubProcessType.PAYMENT_SUCCESS);
 
     var primaryContact = getPrimaryContact(producer);
-    sendPaymentCompleted(SYSTEM_USER_ID,primaryContact,invoice, producer, completedPayment);
+    sendPaymentCompleted(SYSTEM_USER_ID, primaryContact, invoice, producer, completedPayment);
   }
 
   public PaymentMethodResponse replacePayment(
@@ -236,9 +258,11 @@ public class AccountPaymentService {
 
     var producer = producerContract.findProducer(paymentRequest.referenceId());
 
-    if ( producer.cancelDate() != null){
-      log.info("Cannot update payment method for non-active (cancelled) producer {} cancelDate {}",
-              producer.producerId(), producer.cancelDate());
+    if (producer.cancelDate() != null && producer.cancelDate().isBefore(OffsetDateTime.now())) {
+      log.info(
+          "Cannot update payment method for non-active (cancelled) producer {} cancelDate {}",
+          producer.producerId(),
+          producer.cancelDate());
       throw new PreconditionFailedException(
           "Cannot update payment method for non-active (cancelled) producer");
     }
@@ -248,31 +272,39 @@ public class AccountPaymentService {
             .getPaymentMethod(paymentRequest.referenceId(), authenticatedUser.userId(), requestIP)
             .isEmpty();
 
-    var methodResponse = paymentContract.replaceCardOnFile(
-        paymentRequest, authenticatedUser, createNew, requestIP);
+    var methodResponse =
+        paymentContract.replaceCardOnFile(paymentRequest, authenticatedUser, createNew, requestIP);
 
-    if ( producer.lastBillPaidDate() == null || paymentReinstate(producer)) {
-      var unpaidInvoice = invoiceContract.findUnpaidInvoice(paymentRequest.referenceId(), authenticatedUser, requestIP)
-              .orElseGet( () -> createInvoiceForPayment(producer));
+    if (producer.lastBillPaidDate() == null || paymentReinstate(producer)) {
+      var unpaidInvoice =
+          invoiceContract
+              .findUnpaidInvoice(paymentRequest.referenceId(), authenticatedUser, requestIP)
+              .orElseGet(() -> createInvoiceForPayment(producer));
 
       var completedPayment =
-              paymentContract.applyPayment(
-                      paymentMapper.toPaymentRequest(paymentRequest, methodResponse, unpaidInvoice),
-                      Optional.of(methodResponse.externCustRef()),
-                      true);
+          paymentContract.applyPayment(
+              paymentMapper.toPaymentRequest(paymentRequest, methodResponse, unpaidInvoice),
+              Optional.of(methodResponse.externCustRef()),
+              true);
 
-      if ( !PAYMENT_COMPLETED.equals(completedPayment.status()) ) {
-        log.warn("Payment method saved for {} but outstanding invoice could not be paid due to {} - {}",
-                paymentRequest.referenceId(),
-                completedPayment.errorStatusCode(),
-                completedPayment.errorDetail());
-        throw new PaymentFailedException(completedPayment.errorStatusCode(), completedPayment.errorDetail());
+      if (!PAYMENT_COMPLETED.equals(completedPayment.status())) {
+        log.warn(
+            "Payment method saved for {} but outstanding invoice could not be paid due to {} - {}",
+            paymentRequest.referenceId(),
+            completedPayment.errorStatusCode(),
+            completedPayment.errorDetail());
+        throw new PaymentFailedException(
+            completedPayment.errorStatusCode(), completedPayment.errorDetail());
       }
 
       invoiceContract.updatePayment(unpaidInvoice.invoiceId(), completedPayment);
 
-      producerContract.updatePaidDates(paymentRequest.referenceId(),
-              completedPayment.createDate(), completedPayment.createDate(), authenticatedUser.userId(), requestIP);
+      producerContract.updatePaidDates(
+          paymentRequest.referenceId(),
+          completedPayment.createDate(),
+          completedPayment.createDate(),
+          authenticatedUser.userId(),
+          requestIP);
 
       var primaryContact = getPrimaryContact(producer);
 
@@ -282,15 +314,17 @@ public class AccountPaymentService {
     return methodResponse;
   }
 
-    @Async
-  public void cleanAbandonedAccounts(int daysOld){
+  @Async
+  public void cleanAbandonedAccounts(int daysOld) {
     log.info("Removing unpaid (abandoned signup) account records and credentials");
 
-    List<ProducerResponse> producers = producerContract.findLastModified(daysOld, ProducerSubscriptionType.LIVE_UNPAID, 5);
-    while( CollectionUtils.isNotEmpty(producers)) {
+    List<ProducerResponse> producers =
+        producerContract.findLastModified(daysOld, ProducerSubscriptionType.LIVE_UNPAID, 5);
+    while (CollectionUtils.isNotEmpty(producers)) {
       List<UUID> producerIds = producers.stream().map(ProducerResponse::producerId).toList();
       cleanupAbandonedProducers(RequestUtil.getRequestIP(), producerIds);
-      producers = producerContract.findLastModified(daysOld, ProducerSubscriptionType.LIVE_UNPAID, 5);
+      producers =
+          producerContract.findLastModified(daysOld, ProducerSubscriptionType.LIVE_UNPAID, 5);
     }
     log.info("Removed unpaid (abandoned signup) account records and credentials");
   }
@@ -369,8 +403,7 @@ public class AccountPaymentService {
             .invoiceType(InvoiceType.SUBSCRIPTION)
             .description(
                 String.format(
-                    "%s : %s",
-                    producerResponse.businessName(), primarySubscription.displayName()))
+                    "%s : %s", producerResponse.businessName(), primarySubscription.displayName()))
             .lineItems(lineItems)
             .invoiceTotal(
                 lineItems.stream()
@@ -380,9 +413,7 @@ public class AccountPaymentService {
   }
 
   private InvoiceLineItemRequest createLineItem(
-      UUID producerId,
-      ProducerSubscriptionResponse subscription,
-      int lineItemNumber) {
+      UUID producerId, ProducerSubscriptionResponse subscription, int lineItemNumber) {
     return InvoiceLineItemRequest.builder()
         .externalRef1(producerId.toString())
         .externalRef2(subscription.subscriptionId().toString())
@@ -398,13 +429,11 @@ public class AccountPaymentService {
       case DATA_IMPORT_NO_DISPLAY, TOP_LEVEL, LINE_OF_BUSINESS ->
           String.format(
               "%s - %s",
-              subscription.invoiceCycleType().getCycleDescription(),
-              subscription.displayName());
+              subscription.invoiceCycleType().getCycleDescription(), subscription.displayName());
       case ADD_ON, LINE_OF_BUSINESS_ADD_ON ->
           String.format(
               "%s - Additional Services - %s",
-              subscription.invoiceCycleType().getCycleDescription(),
-              subscription.displayName());
+              subscription.invoiceCycleType().getCycleDescription(), subscription.displayName());
     };
   }
 
@@ -420,9 +449,10 @@ public class AccountPaymentService {
             });
   }
 
-    private boolean paymentReinstate(ProducerResponse producer) {
-       return producer.cancelDate() != null && producer.cancelReason() == CancelReasonType.PAYMENT_FAILED;
-    }
+  private boolean paymentReinstate(ProducerResponse producer) {
+    return producer.cancelDate() != null
+        && producer.cancelReason() == CancelReasonType.PAYMENT_FAILED;
+  }
 
   private void sendPaymentCompleted(
       @NotNull String requestIP,
@@ -433,61 +463,60 @@ public class AccountPaymentService {
     try {
       log.debug("Sending payment completed email for {}", producerResponse.producerId());
       emailService.sendEmailAsync(
-              EmailTemplateType.PRODUCER_PAYMENT_CONFIRMATION,
-              Collections.singletonList(primaryContact.emailAddress()),
-              EmailTemplateType.PRODUCER_PAYMENT_CONFIRMATION.getSubjectFormat(),
-              () -> {
-                Map<String, Object> map = new HashMap<>();
-                map.put("invoice", invoice);
-                map.put("invoiceNumber", invoice.invoiceNumber());
-                map.put("invoiceDescription", invoice.description());
-                map.put("producerId", producerResponse.producerId());
-                map.put("lastName", primaryContact.lastName());
-                map.put("firstName", primaryContact.firstName());
-                map.put("transactionRef", completedPayment.paymentRef());
-                map.put("receiptUrl", completedPayment.receiptUrl());
-                map.put("timestamp", OffsetDateTime.now());
-                map.put("ipAddress", StringUtils.isNotBlank(requestIP) ? requestIP : SYSTEM_USER_ID);
-                map.put("invoiceLineItems", invoice.lineItems());
-                map.put("invoiceTotal", invoice.invoiceTotal());
-                return map;
-              });
+          EmailTemplateType.PRODUCER_PAYMENT_CONFIRMATION,
+          Collections.singletonList(primaryContact.emailAddress()),
+          EmailTemplateType.PRODUCER_PAYMENT_CONFIRMATION.getSubjectFormat(),
+          () -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("invoice", invoice);
+            map.put("invoiceNumber", invoice.invoiceNumber());
+            map.put("invoiceDescription", invoice.description());
+            map.put("producerId", producerResponse.producerId());
+            map.put("lastName", primaryContact.lastName());
+            map.put("firstName", primaryContact.firstName());
+            map.put("transactionRef", completedPayment.paymentRef());
+            map.put("receiptUrl", completedPayment.receiptUrl());
+            map.put("timestamp", OffsetDateTime.now());
+            map.put("ipAddress", StringUtils.isNotBlank(requestIP) ? requestIP : SYSTEM_USER_ID);
+            map.put("invoiceLineItems", invoice.lineItems());
+            map.put("invoiceTotal", invoice.invoiceTotal());
+            return map;
+          });
     } catch (Exception e) {
       log.error(
-              "Unexpected error sending confirmation email to {} ", producerResponse.producerId(), e);
-    }
-  }
-  private void sendPaymentFailed(
-          @NotNull ProducerContactResponse primaryContact,
-          @NotNull InvoiceResponse invoice,
-          @NotNull ProducerResponse producerResponse,
-          @NotNull PaymentTransactionResponse completedPayment) {
-    try {
-      emailService.sendEmailAsync(
-              EmailTemplateType.PRODUCER_PAYMENT_FAILED,
-              Collections.singletonList(primaryContact.emailAddress()),
-              EmailTemplateType.PRODUCER_PAYMENT_FAILED.getSubjectFormat(),
-              () -> {
-                Map<String, Object> map = new HashMap<>();
-                map.put("invoice", invoice);
-                map.put("invoiceNumber", invoice.invoiceNumber());
-                map.put("invoiceDescription", invoice.description());
-                map.put("producerId", producerResponse.producerId());
-                map.put("lastName", primaryContact.lastName());
-                map.put("firstName", primaryContact.firstName());
-                map.put("transactionRef", completedPayment.paymentRef());
-                map.put("receiptUrl", completedPayment.receiptUrl());
-                map.put("timestamp", OffsetDateTime.now());
-                map.put("errorCode", completedPayment.errorStatusCode());
-                map.put("errorDetail", completedPayment.errorDetail());
-                map.put("invoiceLineItems", invoice.lineItems());
-                map.put("invoiceTotal", invoice.invoiceTotal());
-                return map;
-              });
-    } catch (Exception e) {
-      log.error(
-              "Unexpected error sending confirmation email to {} ", producerResponse.producerId(), e);
+          "Unexpected error sending confirmation email to {} ", producerResponse.producerId(), e);
     }
   }
 
+  private void sendPaymentFailed(
+      @NotNull ProducerContactResponse primaryContact,
+      @NotNull InvoiceResponse invoice,
+      @NotNull ProducerResponse producerResponse,
+      @NotNull PaymentTransactionResponse failedPayment) {
+    try {
+      emailService.sendEmailAsync(
+          EmailTemplateType.PRODUCER_PAYMENT_FAILED,
+          Collections.singletonList(primaryContact.emailAddress()),
+          EmailTemplateType.PRODUCER_PAYMENT_FAILED.getSubjectFormat(),
+          () -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("invoice", invoice);
+            map.put("invoiceNumber", invoice.invoiceNumber());
+            map.put("invoiceDescription", invoice.description());
+            map.put("producerId", producerResponse.producerId());
+            map.put("lastName", primaryContact.lastName());
+            map.put("firstName", primaryContact.firstName());
+            map.put("transactionRef", failedPayment.transactionId());
+            map.put("timestamp", OffsetDateTime.now());
+            map.put("errorCode", failedPayment.errorStatusCode());
+            map.put("errorDetail", failedPayment.errorDetail());
+            map.put("invoiceLineItems", invoice.lineItems());
+            map.put("invoiceTotal", invoice.invoiceTotal());
+            return map;
+          });
+    } catch (Exception e) {
+      log.error(
+          "Unexpected error sending confirmation email to {} ", producerResponse.producerId(), e);
+    }
+  }
 }

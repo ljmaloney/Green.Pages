@@ -422,7 +422,8 @@ public class ProducerOrchestrationService {
   }
 
   public void updateProcessStatus(
-      @NonNull @NotNull UUID producerId, ProducerSubProcessType producerSubscriptionType) {
+          @NonNull @NotNull UUID producerId,
+          ProducerSubProcessType producerSubscriptionType) {
     subProcessRepository
         .findByProducerId(producerId)
         .ifPresent(

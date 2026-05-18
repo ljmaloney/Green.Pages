@@ -172,7 +172,8 @@ public class ProducerContract {
     return producerService.getProducersToProcess(maxNumberToProcess);
   }
 
-  public void updateProcessStatus(@NonNull @NotNull UUID producerId, ProducerSubProcessType producerSubscriptionType) {
+  public void updateProcessStatus(@NonNull @NotNull UUID producerId,
+                                  ProducerSubProcessType producerSubscriptionType) {
     producerService.updateProcessStatus(producerId, producerSubscriptionType);
   }
 }

@@ -81,10 +81,6 @@
                                 <td style="text-align: right; width: 20%">Transaction Ref :</td>
                                 <td style="text-align: left">${transactionRef}</td>
                             </tr>
-                            <tr>
-                                <td style="text-align: right; width: 20%">Receipt Link :</td>
-                                <td style="text-align: left"><a href="${receiptUrl}">${receiptUrl}</a></td>
-                            </tr>
                         </table>
                         <p style="font-size: 14px; color: #6b7280; line-height: 1.4;">
                             The subscription payment was attempted at ${timestamp}.
