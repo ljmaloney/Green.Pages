@@ -37,6 +37,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, UUID> {
                 invoice.invoiceType = :invoiceType
                 AND (:referenceId IS NULL OR invoice.externalRef = :referenceId)
                 AND invoice.paidDate BETWEEN :startDate AND :endDate
+            ORDER BY invoice.lastUpdateDate desc
         """)
   List<Invoice> findInvoices(
       @Param("invoiceType") InvoiceType invoiceType,
@@ -48,7 +49,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, UUID> {
         SELECT invoice
         FROM Invoice invoice
         WHERE invoice.externalRef = :externalRef AND invoice.paidDate IS NULL
-        ORDER BY invoice.lastUpdateDate
+        ORDER BY invoice.lastUpdateDate desc
 """)
   List<Invoice> findUnpaidInvoices(@NotNull @NonNull @Param("externalRef") String externalRef);
 }
