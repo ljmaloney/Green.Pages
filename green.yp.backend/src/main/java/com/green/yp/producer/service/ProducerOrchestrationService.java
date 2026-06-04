@@ -435,7 +435,7 @@ public class ProducerOrchestrationService {
   }
 
   public List<ProducerResponse> findCancelled() {
-    return producerRepository.findByCancelledDateIsNotNullAndSubscriptionTypeIn(ProducerSubscriptionType.LIVE_ACTIVE,
+    return producerRepository.findByCanceledDateIsNotNullAndSubscriptionTypeIn(ProducerSubscriptionType.LIVE_ACTIVE,
             ProducerSubscriptionType.LIVE_DISABLED_NONPAYMENT)
             .stream()
             .map(producerMapper::fromEntity)
