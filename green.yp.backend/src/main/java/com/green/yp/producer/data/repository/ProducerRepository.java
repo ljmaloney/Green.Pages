@@ -51,7 +51,7 @@ public interface ProducerRepository extends JpaRepository<Producer, UUID> {
 
   List<Producer> findBySubscriptionTypeAndCancelDateIsNotNull(ProducerSubscriptionType producerSubscriptionType);
 
-  List<Producer> findByCanceledDateIsNotNullAndSubscriptionTypeIn(ProducerSubscriptionType...producerSubscriptionType);
+  List<Producer> findByCancelDateIsNotNullAndSubscriptionTypeIn(ProducerSubscriptionType...producerSubscriptionType);
 
   @Modifying
   @Query(
