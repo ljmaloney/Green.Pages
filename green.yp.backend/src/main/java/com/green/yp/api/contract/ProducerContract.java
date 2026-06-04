@@ -56,10 +56,13 @@ public class ProducerContract {
     subscriptionService.cancelSubscription(accountId, userId, ipAddress);
   }
 
-  public void cancelSubscription(@NonNull @NotNull UUID producerId,
-                                 @NonNull @NotNull CancelReasonType cancelReasonType,
-                                 @NonNull @NotNull OffsetDateTime cancelDate, String cancelReason) {
-    subscriptionService.paymentFailedCancellation(producerId, cancelReasonType, cancelDate, cancelReason);
+  public void cancelSubscription(
+      @NonNull @NotNull UUID producerId,
+      @NonNull @NotNull CancelReasonType cancelReasonType,
+      @NonNull @NotNull OffsetDateTime cancelDate,
+      String cancelReason) {
+    subscriptionService.paymentFailedCancellation(
+        producerId, cancelReasonType, cancelDate, cancelReason);
   }
 
   public ProducerResponse createProducer(CreateProducerRequest producer, String ipAddress) {
@@ -84,10 +87,8 @@ public class ProducerContract {
   public ProducerCredentialsResponse createMasterUserCredentials(
       @NonNull @NotNull UserCredentialsRequest createUserCredentialsRequest,
       String emailAddress,
-      @NonNull @NotNull
-      UUID producerId,
-      @NonNull @NotNull
-      UUID contactId,
+      @NonNull @NotNull UUID producerId,
+      @NonNull @NotNull UUID contactId,
       String ipAddress)
       throws NoSuchAlgorithmException {
     return producerUserService.createMasterUserCredentials(
@@ -132,7 +133,7 @@ public class ProducerContract {
   }
 
   public List<ProducerResponse> findLastModified(
-          Integer daysOld, ProducerSubscriptionType producerSubscriptionType, int maxRecords) {
+      Integer daysOld, ProducerSubscriptionType producerSubscriptionType, int maxRecords) {
     return producerService.findLastModified(daysOld, producerSubscriptionType, maxRecords);
   }
 
@@ -144,24 +145,29 @@ public class ProducerContract {
     producerService.deleteUnpaidProducers(producerIds, ipAddress);
   }
 
-  public Optional<ProducerCredentialsResponse> findCredential(@NotNull @NonNull
-                                                          @NotBlank(message = "Your user name must be between 8 and 150 characters")
-                               @Size(min = 8, max = 150, message = "Your user name must be between 8 and 150 characters")
-                               String userName,
-                               @NonNull @NotBlank String emailAddress) {
+  public Optional<ProducerCredentialsResponse> findCredential(
+      @NotNull
+          @NonNull
+          @NotBlank(message = "Your user name must be between 8 and 150 characters")
+          @Size(min = 8, max = 150, message = "Your user name must be between 8 and 150 characters")
+          String userName,
+      @NonNull @NotBlank String emailAddress) {
     return producerUserService.findCredentials(userName, emailAddress);
   }
 
-  public Optional<ProducerCredentialsResponse> findCredentialByRef(String externalUserRef, String ipAddress) {
+  public Optional<ProducerCredentialsResponse> findCredentialByRef(
+      String externalUserRef, String ipAddress) {
     return producerUserService.findCredentialByRef(externalUserRef, ipAddress);
   }
 
-  public ProducerResponse updatePaidDates(UUID accountId,
-                              OffsetDateTime lastInvoiceDate,
-                              OffsetDateTime subscriptionPaidDate,
-                              String userId,
-                              String ipAddress) {
-    return producerService.updateBillPaidDate(accountId, lastInvoiceDate, subscriptionPaidDate, userId, ipAddress);
+  public ProducerResponse updatePaidDates(
+      UUID accountId,
+      OffsetDateTime lastInvoiceDate,
+      OffsetDateTime subscriptionPaidDate,
+      String userId,
+      String ipAddress) {
+    return producerService.updateBillPaidDate(
+        accountId, lastInvoiceDate, subscriptionPaidDate, userId, ipAddress);
   }
 
   public void initializePaymentProcessQueue() {
@@ -172,8 +178,8 @@ public class ProducerContract {
     return producerService.getProducersToProcess(maxNumberToProcess);
   }
 
-  public void updateProcessStatus(@NonNull @NotNull UUID producerId,
-                                  ProducerSubProcessType producerSubscriptionType) {
+  public void updateProcessStatus(
+      @NonNull @NotNull UUID producerId, ProducerSubProcessType producerSubscriptionType) {
     producerService.updateProcessStatus(producerId, producerSubscriptionType);
   }
 

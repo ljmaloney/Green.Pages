@@ -44,10 +44,14 @@ public class AmazonImageFileServiceImpl extends AbstractImageFileService
   @Override
   protected String saveImageFile(MultipartFile multipartFile, String pathString, String fileName) {
     String key = createKey(pathString, fileName);
-    log.info("Uploading file {} to bucket {} as {}", multipartFile.getOriginalFilename(), s3BucketName, key);
+    log.info(
+        "Uploading file {} to bucket {} as {}",
+        multipartFile.getOriginalFilename(),
+        s3BucketName,
+        key);
     try {
       s3Client.putObject(
-              createObject(key, multipartFile.getContentType()),
+          createObject(key, multipartFile.getContentType()),
           RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));
       return createUrl(imageHostname, pathString, fileName);
     } catch (IOException | S3Exception e) {
@@ -69,19 +73,19 @@ public class AmazonImageFileServiceImpl extends AbstractImageFileService
   }
 
   private PutObjectRequest createObject(String key, String contentType) {
-      if ( "noacl".equals(awsBucketAcl)) {
-          return PutObjectRequest.builder()
-                  .bucket(s3BucketName)
-                  .key(key)
-                  .contentType(contentType)
-                  .build();
-      }
+    if ("noacl".equals(awsBucketAcl)) {
       return PutObjectRequest.builder()
-              .bucket(s3BucketName)
-              .key(key)
-              .acl("public-read") // Required if using S3 public objects
-              .contentType(contentType)
-              .build();
+          .bucket(s3BucketName)
+          .key(key)
+          .contentType(contentType)
+          .build();
+    }
+    return PutObjectRequest.builder()
+        .bucket(s3BucketName)
+        .key(key)
+        .acl("public-read") // Required if using S3 public objects
+        .contentType(contentType)
+        .build();
   }
 
   private String createKey(String path, String fileName) {

@@ -5,5 +5,5 @@ import java.time.LocalDate;
 import java.util.UUID;
 import lombok.NonNull;
 
-public record ProducerServiceDeleteRequest(@NotNull @NonNull UUID serviceId,
-                                           LocalDate discontinueDate) {}
+public record ProducerServiceDeleteRequest(
+    @NotNull @NonNull UUID serviceId, LocalDate discontinueDate) {}

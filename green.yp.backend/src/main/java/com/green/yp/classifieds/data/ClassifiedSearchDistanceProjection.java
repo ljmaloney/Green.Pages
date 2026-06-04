@@ -4,9 +4,9 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public interface ClassifiedSearchDistanceProjection {
-        UUID getClassifiedId();
+  UUID getClassifiedId();
 
-        String getTitle();
+  String getTitle();
 
-        BigDecimal getDistance();
+  BigDecimal getDistance();
 }

@@ -71,11 +71,14 @@ public interface ProducerMapper {
     };
   }
 
-  @Mapping(source = "producer.id", target = "producerId")
-  @Mapping(source = "producer.name", target = "businessName")
-  @Mapping(source = "producer.createDate", target = "createDate")
-  @Mapping(source = "producer.lastUpdateDate", target = "lastUpdateDate")
+  @Mapping(source = "id", target = "producerId")
+  @Mapping(source = "name", target = "businessName")
+  @Mapping(source = "createDate", target = "createDate")
+  @Mapping(source = "lastUpdateDate", target = "lastUpdateDate")
+  @Mapping(source = "cancelReasonType", target = "cancelReason")
+  @Mapping(source = "cancelReason", target = "cancelReasonText")
   ProducerResponse fromEntity(Producer producer);
+
 
   List<ProducerResponse> fromEntity(List<Producer> producers);
 }

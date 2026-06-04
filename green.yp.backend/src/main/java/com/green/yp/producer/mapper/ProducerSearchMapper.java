@@ -56,7 +56,7 @@ public interface ProducerSearchMapper {
   @Mapping(target = "phone", source = "contact.phoneNumber")
   @Mapping(target = "city", source = "location.city")
   @Mapping(target = "state", source = "location.state")
-  @Mapping(target = "postalCode", source="location.postalCode")
+  @Mapping(target = "postalCode", source = "location.postalCode")
   @Mapping(target = "iconLink", source = "producer.iconLink")
   TruncatedProducerResponse limitedOutputResponse(ProducerSearchRecord searchRecord);
 
@@ -84,12 +84,12 @@ public interface ProducerSearchMapper {
   @Mapping(target = "state", source = "location.state")
   @Mapping(target = "postalCode", source = "location.postalCode")
   @Mapping(target = "iconLink", source = "producer.iconLink")
-  @Mapping(target = "subscriptionIds", source ="producer.subscriptionList")
+  @Mapping(target = "subscriptionIds", source = "producer.subscriptionList")
   @Mapping(target = "keywords", source = "producer.keywords")
   ProducerProfileResponse toProfileResponse(ProducerSearchRecord searchRecord);
 
-  default List<UUID> toSubscriptionIds(List<ProducerSubscription> producerSubscriptions){
-    if ( CollectionUtils.isEmpty(producerSubscriptions)) {
+  default List<UUID> toSubscriptionIds(List<ProducerSubscription> producerSubscriptions) {
+    if (CollectionUtils.isEmpty(producerSubscriptions)) {
       return List.of();
     }
     return producerSubscriptions.stream().map(ProducerSubscription::getSubscriptionId).toList();
@@ -133,86 +133,88 @@ public interface ProducerSearchMapper {
       LineOfBusinessDto lob,
       String profileKeywords);
 
-    @Mapping(target = "externId", source = "service.producerServiceId")
-    @Mapping(target = "producerId", source = "service.producerId")
-    @Mapping(target = "locationId", source = "service.producerLocationId")
-    @Mapping(target = "categoryRef", source = "lob.lineOfBusinessId")
-    @Mapping(target = "categoryName", source = "lob.lineOfBusinessName")
-    @Mapping(target = "recordType", constant = "GREEN_PRO_SERVICE")
-    @Mapping(target = "lastActiveDate", ignore = true)
-    @Mapping(target = "keywords", source = "keywords")
-    @Mapping(target = "title", source = "service.shortDescription")
-    @Mapping(target = "businessName", source = "producer.name")
-    @Mapping(target = "businessUrl", source = "location.websiteUrl")
-    @Mapping(target = "businessIconUrl", source = "producer.iconLink")
-    @Mapping(target = "imageUrl", ignore = true)
-    @Mapping(target = "addressLine1", source = "location.addressLine1")
-    @Mapping(target = "addressLine2", source = "location.addressLine2")
-    @Mapping(target = "city", source = "location.city")
-    @Mapping(target = "state", source = "location.state")
-    @Mapping(target = "postalCode", source = "location.postalCode")
-    @Mapping(target = "emailAddress", source = "contact.emailAddress")
-    @Mapping(target = "phoneNumber", source = "contact.phoneNumber")
-    @Mapping(target = "minPrice", source = "service.minServicePrice")
-    @Mapping(target = "maxPrice", source = "service.maxServicePrice")
-    @Mapping(target = "priceUnitsType",source = "service.priceUnitsType")
-    @Mapping(target = "longitude", source = "location.longitude")
-    @Mapping(target = "latitude", source = "location.latitude")
-    @Mapping(target = "description", source = "service.description")
-    @Mapping(target = "customerRef", ignore = true)
-    SearchMasterRequest toSearchMaster(ProducerServiceResponse service,
-                          Producer producer,
-                          ProducerLocation location,
-                          ProducerContact contact,
-                          LineOfBusinessDto lob,
-                          String keywords);
+  @Mapping(target = "externId", source = "service.producerServiceId")
+  @Mapping(target = "producerId", source = "service.producerId")
+  @Mapping(target = "locationId", source = "service.producerLocationId")
+  @Mapping(target = "categoryRef", source = "lob.lineOfBusinessId")
+  @Mapping(target = "categoryName", source = "lob.lineOfBusinessName")
+  @Mapping(target = "recordType", constant = "GREEN_PRO_SERVICE")
+  @Mapping(target = "lastActiveDate", ignore = true)
+  @Mapping(target = "keywords", source = "keywords")
+  @Mapping(target = "title", source = "service.shortDescription")
+  @Mapping(target = "businessName", source = "producer.name")
+  @Mapping(target = "businessUrl", source = "location.websiteUrl")
+  @Mapping(target = "businessIconUrl", source = "producer.iconLink")
+  @Mapping(target = "imageUrl", ignore = true)
+  @Mapping(target = "addressLine1", source = "location.addressLine1")
+  @Mapping(target = "addressLine2", source = "location.addressLine2")
+  @Mapping(target = "city", source = "location.city")
+  @Mapping(target = "state", source = "location.state")
+  @Mapping(target = "postalCode", source = "location.postalCode")
+  @Mapping(target = "emailAddress", source = "contact.emailAddress")
+  @Mapping(target = "phoneNumber", source = "contact.phoneNumber")
+  @Mapping(target = "minPrice", source = "service.minServicePrice")
+  @Mapping(target = "maxPrice", source = "service.maxServicePrice")
+  @Mapping(target = "priceUnitsType", source = "service.priceUnitsType")
+  @Mapping(target = "longitude", source = "location.longitude")
+  @Mapping(target = "latitude", source = "location.latitude")
+  @Mapping(target = "description", source = "service.description")
+  @Mapping(target = "customerRef", ignore = true)
+  SearchMasterRequest toSearchMaster(
+      ProducerServiceResponse service,
+      Producer producer,
+      ProducerLocation location,
+      ProducerContact contact,
+      LineOfBusinessDto lob,
+      String keywords);
 
-    @Mapping(target = "externId", source = "product.productId")
-    @Mapping(target = "producerId", source = "product.producerId")
-    @Mapping(target = "locationId", source = "product.producerLocationId")
-    @Mapping(target = "categoryRef", source = "lob.lineOfBusinessId")
-    @Mapping(target = "categoryName", source = "lob.lineOfBusinessName")
-    @Mapping(target = "recordType", constant = "GREEN_PRO_PRODUCT")
-    @Mapping(target = "lastActiveDate", source = "product.discontinueDate")
-    @Mapping(target = "keywords", source = "keywords")
-    @Mapping(target = "title", source = "product.name")
-    @Mapping(target = "businessName", source = "producer.name")
-    @Mapping(target = "businessUrl", source = "location.websiteUrl")
-    @Mapping(target = "businessIconUrl", source = "producer.iconLink")
-    @Mapping(target = "imageUrl", ignore = true)
-    @Mapping(target = "addressLine1", source = "location.addressLine1")
-    @Mapping(target = "addressLine2", source = "location.addressLine2")
-    @Mapping(target = "city", source = "location.city")
-    @Mapping(target = "state", source = "location.state")
-    @Mapping(target = "postalCode", source = "location.postalCode")
-    @Mapping(target = "emailAddress", source = "contact.emailAddress")
-    @Mapping(target = "phoneNumber", source = "contact.phoneNumber")
-    @Mapping(target = "minPrice", source = "product.price")
-    @Mapping(target = "maxPrice", ignore = true)
-    @Mapping(target = "priceUnitsType", source = "product.pricePerType")
-    @Mapping(target = "longitude", source = "location.longitude")
-    @Mapping(target = "latitude", source = "location.latitude")
-    @Mapping(target = "description", source = "product.description")
-    @Mapping(target = "customerRef", ignore = true)
-    SearchMasterRequest toSearchMaster(ProducerProductResponse product,
-                                       Producer producer,
-                                       ProducerLocation location,
-                                       ProducerContact contact,
-                                       LineOfBusinessDto lob,
-                                       String keywords);
+  @Mapping(target = "externId", source = "product.productId")
+  @Mapping(target = "producerId", source = "product.producerId")
+  @Mapping(target = "locationId", source = "product.producerLocationId")
+  @Mapping(target = "categoryRef", source = "lob.lineOfBusinessId")
+  @Mapping(target = "categoryName", source = "lob.lineOfBusinessName")
+  @Mapping(target = "recordType", constant = "GREEN_PRO_PRODUCT")
+  @Mapping(target = "lastActiveDate", source = "product.discontinueDate")
+  @Mapping(target = "keywords", source = "keywords")
+  @Mapping(target = "title", source = "product.name")
+  @Mapping(target = "businessName", source = "producer.name")
+  @Mapping(target = "businessUrl", source = "location.websiteUrl")
+  @Mapping(target = "businessIconUrl", source = "producer.iconLink")
+  @Mapping(target = "imageUrl", ignore = true)
+  @Mapping(target = "addressLine1", source = "location.addressLine1")
+  @Mapping(target = "addressLine2", source = "location.addressLine2")
+  @Mapping(target = "city", source = "location.city")
+  @Mapping(target = "state", source = "location.state")
+  @Mapping(target = "postalCode", source = "location.postalCode")
+  @Mapping(target = "emailAddress", source = "contact.emailAddress")
+  @Mapping(target = "phoneNumber", source = "contact.phoneNumber")
+  @Mapping(target = "minPrice", source = "product.price")
+  @Mapping(target = "maxPrice", ignore = true)
+  @Mapping(target = "priceUnitsType", source = "product.pricePerType")
+  @Mapping(target = "longitude", source = "location.longitude")
+  @Mapping(target = "latitude", source = "location.latitude")
+  @Mapping(target = "description", source = "product.description")
+  @Mapping(target = "customerRef", ignore = true)
+  SearchMasterRequest toSearchMaster(
+      ProducerProductResponse product,
+      Producer producer,
+      ProducerLocation location,
+      ProducerContact contact,
+      LineOfBusinessDto lob,
+      String keywords);
 
-
-    @Mapping(target = "externId", source = "locationId")
-    @Mapping(target = "producerId", source = "producerId")
-    @Mapping(target = "locationId", source = "locationId")
-    @Mapping(target = "title", source = "locationName")
-    @Mapping(target = "businessUrl", source = "websiteUrl")
-    @Mapping(target = "addressLine1", source = "addressLine1")
-    @Mapping(target = "addressLine2", source = "addressLine2")
-    @Mapping(target = "city", source = "city")
-    @Mapping(target = "state", source = "state")
-    @Mapping(target = "postalCode", source = "postalCode")
-    @Mapping(target = "longitude", source = "longitude")
-    @Mapping(target = "latitude", source = "latitude")
-    SearchLocationUpdateRequest toSearchLocationUpdate(@NotNull @NonNull ProducerLocationResponse location);
+  @Mapping(target = "externId", source = "locationId")
+  @Mapping(target = "producerId", source = "producerId")
+  @Mapping(target = "locationId", source = "locationId")
+  @Mapping(target = "title", source = "locationName")
+  @Mapping(target = "businessUrl", source = "websiteUrl")
+  @Mapping(target = "addressLine1", source = "addressLine1")
+  @Mapping(target = "addressLine2", source = "addressLine2")
+  @Mapping(target = "city", source = "city")
+  @Mapping(target = "state", source = "state")
+  @Mapping(target = "postalCode", source = "postalCode")
+  @Mapping(target = "longitude", source = "longitude")
+  @Mapping(target = "latitude", source = "latitude")
+  SearchLocationUpdateRequest toSearchLocationUpdate(
+      @NotNull @NonNull ProducerLocationResponse location);
 }

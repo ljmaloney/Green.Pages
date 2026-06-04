@@ -33,5 +33,4 @@ public record ProducerProfileResponse(
     String websiteUrl,
     String businessNarrative,
     String iconLink,
-    List<LocationHoursResponse> locationHours) {
-}
+    List<LocationHoursResponse> locationHours) {}

@@ -2,10 +2,9 @@ package com.green.yp.api.apitype.producer;
 
 import com.green.yp.api.apitype.enumeration.ServicePriceUnitsType;
 import jakarta.validation.constraints.NotNull;
-import lombok.NonNull;
-
 import java.math.BigDecimal;
 import java.util.UUID;
+import lombok.NonNull;
 
 public record ProducerServiceUpdateRequest(
     @NotNull @NonNull UUID serviceId,

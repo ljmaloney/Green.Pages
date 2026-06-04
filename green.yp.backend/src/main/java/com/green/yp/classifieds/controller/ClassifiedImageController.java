@@ -41,7 +41,8 @@ public class ClassifiedImageController {
   public void uploadGalleryImage(
       @PathVariable("classifiedId") UUID classifiedId,
       @RequestParam(value = "imageFilename", required = true) String imageFilename,
-      @RequestParam(value = "imageDescription", defaultValue = "No Description") String imageDescription,
+      @RequestParam(value = "imageDescription", defaultValue = "No Description")
+          String imageDescription,
       @RequestParam("file") MultipartFile file) {
     log.info("Uploading gallery image for : {}", classifiedId);
     imageService.uploadGalleryImage(classifiedId, imageFilename, imageDescription, file);

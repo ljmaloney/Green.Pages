@@ -267,7 +267,8 @@ public class AccountPaymentService {
           "Cannot update payment method for non-active (cancelled) producer {} cancelDate {}",
           producer.producerId(),
           producer.cancelDate());
-      throw new PreconditionFailedException(ErrorCodeType.CANCELLED_ACCOUNT,
+      throw new PreconditionFailedException(
+          ErrorCodeType.CANCELLED_ACCOUNT,
           "Cannot update payment method for non-active (cancelled) producer");
     }
 
@@ -357,16 +358,16 @@ public class AccountPaymentService {
         "Removed %s unpaid account subscriptions over %s days old", producerIds.size(), daysOld);
   }
 
-  @Scheduled(fixedRateString="${green.yp.pro.subscription.cancelled.interval:120}",
-          timeUnit = TimeUnit.MINUTES)
+  @Scheduled(
+      fixedRateString = "${green.yp.pro.subscription.cancelled.interval:120}",
+      timeUnit = TimeUnit.MINUTES)
   @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
   public String cleanCancelledAccounts() {
     log.info("Removing cancelled account records and credentials");
 
     List<ProducerResponse> producers = producerContract.findCancelled();
-    producers = producers.stream()
-        .filter(p -> p.cancelDate().isBefore(OffsetDateTime.now()))
-        .toList();
+    producers =
+        producers.stream().filter(p -> p.cancelDate().isBefore(OffsetDateTime.now())).toList();
 
     if (CollectionUtils.isEmpty(producers)) {
       return "No cancelled subscribers found to remove";
@@ -384,8 +385,7 @@ public class AccountPaymentService {
 
     log.info("Removed / deleted producer records for {}", producerIds);
 
-    return String.format(
-            "Removed %s cancelled account subscriptions", producerIds.size());
+    return String.format("Removed %s cancelled account subscriptions", producerIds.size());
   }
 
   private void cleanupAbandonedProducers(String ipAddress, List<UUID> producerIds) {

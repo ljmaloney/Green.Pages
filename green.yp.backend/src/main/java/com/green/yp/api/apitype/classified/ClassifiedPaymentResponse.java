@@ -6,12 +6,12 @@ import java.util.UUID;
 import lombok.Builder;
 
 @Builder
-public record ClassifiedPaymentResponse(UUID classifiedId,
-                                     @Size(max = 200) @NotNull String classifiedTitle,
-                                     String paymentStatus,
-                                     String paymentRef,
-                                        String orderRef,
-                                        String receiptNumber,
-                                        String errorStatusCode,
-                                        String errorDetail) {
-}
+public record ClassifiedPaymentResponse(
+    UUID classifiedId,
+    @Size(max = 200) @NotNull String classifiedTitle,
+    String paymentStatus,
+    String paymentRef,
+    String orderRef,
+    String receiptNumber,
+    String errorStatusCode,
+    String errorDetail) {}

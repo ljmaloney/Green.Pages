@@ -1,7 +1,6 @@
 package com.green.yp.payment.controller;
 
 import com.green.yp.api.apitype.payment.ApiPaymentRequest;
-import com.green.yp.api.apitype.payment.PaymentMethodRequest;
 import com.green.yp.api.apitype.payment.PaymentMethodResponse;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.config.security.AuthUser;

@@ -24,18 +24,21 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "REST endpoint to process payment")
 public class ClassifiedPaymentController {
 
-    private final ClassifiedPaymentService paymentService;
+  private final ClassifiedPaymentService paymentService;
 
-    public ClassifiedPaymentController(ClassifiedPaymentService paymentService){
-        this.paymentService = paymentService;
-    }
+  public ClassifiedPaymentController(ClassifiedPaymentService paymentService) {
+    this.paymentService = paymentService;
+  }
 
-    @Operation(summary = "Proceses payment for a classified ad")
-    @PostMapping(path = "payment", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseApi<ClassifiedPaymentResponse> processPayment(@RequestBody @Valid ApiPaymentRequest paymentRequest,
-                                                                 HttpServletRequest httpServletRequest){
-        return new ResponseApi<>(paymentService.processPayment(paymentRequest,
-                RequestUtil.getRequestIP(httpServletRequest)), null);
-    }
-
+  @Operation(summary = "Proceses payment for a classified ad")
+  @PostMapping(
+      path = "payment",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<ClassifiedPaymentResponse> processPayment(
+      @RequestBody @Valid ApiPaymentRequest paymentRequest, HttpServletRequest httpServletRequest) {
+    return new ResponseApi<>(
+        paymentService.processPayment(paymentRequest, RequestUtil.getRequestIP(httpServletRequest)),
+        null);
+  }
 }

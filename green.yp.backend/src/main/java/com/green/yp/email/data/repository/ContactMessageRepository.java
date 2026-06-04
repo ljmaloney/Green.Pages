@@ -4,14 +4,13 @@ import com.green.yp.api.apitype.contact.ContactMessageRequestType;
 import com.green.yp.api.apitype.contact.ContactMessageResponse;
 import com.green.yp.email.data.model.ContactMessage;
 import jakarta.validation.constraints.NotNull;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.UUID;
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.UUID;
 
 public interface ContactMessageRepository extends JpaRepository<ContactMessage, UUID> {
   @Query(

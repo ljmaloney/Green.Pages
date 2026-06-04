@@ -15,8 +15,7 @@ import org.owasp.esapi.Encoder;
 
 /**
  * Provides a Buffered ServletInputStream for the purpose of sanitization of JSON documents.
- * Considerations: This class buffers the JSON body while performing sanitization of
- * JSON Payload.
+ * Considerations: This class buffers the JSON body while performing sanitization of JSON Payload.
  *
  * @author luther.maloney
  */
@@ -71,12 +70,12 @@ public class BufferedXssJsonInputStream extends ServletInputStream {
         continue;
       }
       if (foundString) { // test for outside delimiter
-          if ( '\\' == (char)prevCh && 'n' == (char)ch){
-              stringToSanitize.setLength(stringToSanitize.length()-1);
-              stringToSanitize.append("<br/>");
-          }else{
-              stringToSanitize.append((char) ch);
-          }
+        if ('\\' == (char) prevCh && 'n' == (char) ch) {
+          stringToSanitize.setLength(stringToSanitize.length() - 1);
+          stringToSanitize.append("<br/>");
+        } else {
+          stringToSanitize.append((char) ch);
+        }
       } else {
         stringBuilder.append((char) ch);
       }

@@ -4,7 +4,6 @@ import com.green.yp.reference.data.enumeration.SubscriptionType;
 import com.green.yp.reference.dto.SubscriptionDto;
 import com.green.yp.reference.service.SubscriptionService;
 import jakarta.validation.constraints.NotNull;
-
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;

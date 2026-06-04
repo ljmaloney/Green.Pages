@@ -30,7 +30,7 @@ public class ClassifiedInvoicePayment extends Immutable {
   private UUID classifiedCustomerId;
 
   @NotNull
-  @Column(name="ip_address", nullable = false)
+  @Column(name = "ip_address", nullable = false)
   private String ipAddress;
 
   @Size(max = 20)
@@ -49,7 +49,7 @@ public class ClassifiedInvoicePayment extends Immutable {
   private String paymentRef;
 
   @NotNull
-  @Column(name="payment_amount", nullable = false)
+  @Column(name = "payment_amount", nullable = false)
   private BigDecimal paymentAmount;
 
   @Override

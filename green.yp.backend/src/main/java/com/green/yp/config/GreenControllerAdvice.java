@@ -29,11 +29,12 @@ public class GreenControllerAdvice {
   @ResponseStatus(HttpStatus.PRECONDITION_FAILED)
   public ResponseApi<Void> handleError(UserCredentialsException e) {
     log.warn("User credentials error: {}", e.getMessage());
-    return new ResponseApi<>(null,
-            new ErrorMessageApi(
-                    e.getErrorCode(),
-                    "A user already exists for the username / email address",
-                    e.getMessage()));
+    return new ResponseApi<>(
+        null,
+        new ErrorMessageApi(
+            e.getErrorCode(),
+            "A user already exists for the username / email address",
+            e.getMessage()));
   }
 
   @ExceptionHandler(ConstraintViolationException.class)
@@ -50,14 +51,12 @@ public class GreenControllerAdvice {
 
   @ExceptionHandler(PaymentFailedException.class)
   @ResponseStatus(HttpStatus.PRECONDITION_FAILED)
-  public ResponseApi<Void> handlePaymentException(PaymentFailedException e){
+  public ResponseApi<Void> handlePaymentException(PaymentFailedException e) {
     log.warn("A validation constraint on a payload was violated - {}", e.getMessage(), e);
     return new ResponseApi<>(
-            null,
-            new ErrorMessageApi(
-                    e.getErrorCode(),
-                    "Error processing your payment request.",
-                    e.getMessage()));
+        null,
+        new ErrorMessageApi(
+            e.getErrorCode(), "Error processing your payment request.", e.getMessage()));
   }
 
   @ExceptionHandler(NoResourceFoundException.class)

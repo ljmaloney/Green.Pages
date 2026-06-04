@@ -25,7 +25,7 @@ public interface PaymentMapper {
   @Mapping(source = "id", target = "paymentMethodId")
   ProducerPaymentMethodResponse fromEntity(ProducerPaymentMethod producerPaymentMethod);
 
-  @Mapping(target = "referenceId", source="referenceId")
+  @Mapping(target = "referenceId", source = "referenceId")
   @Mapping(target = "payorAddress1", source = "addressLine1")
   @Mapping(target = "payorAddress2", source = "addressLine2")
   @Mapping(target = "payorCity", source = "city")
