@@ -20,7 +20,7 @@ public class LineOfBusiness extends Mutable {
   @Column(name = "line_of_business", unique = true, nullable = false, length = 50)
   private String lineOfBusinessName;
 
-  @Column(name="url_lob", unique = true, nullable = false, length = 50)
+  @Column(name = "url_lob", unique = true, nullable = false, length = 50)
   private String urlLob;
 
   @Column(name = "created_by_type")

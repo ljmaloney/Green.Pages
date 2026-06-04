@@ -4,7 +4,6 @@ import com.green.yp.api.apitype.PageableResponse;
 import com.green.yp.api.apitype.search.SearchResponse;
 import com.green.yp.search.service.SearchV2Service;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import java.math.BigDecimal;
 import java.util.UUID;
 import org.springframework.data.domain.PageRequest;

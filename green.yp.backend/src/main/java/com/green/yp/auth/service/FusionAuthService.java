@@ -20,7 +20,6 @@ import io.fusionauth.domain.api.user.SearchRequest;
 import io.fusionauth.domain.api.user.SearchResponse;
 import io.fusionauth.domain.search.UserSearchCriteria;
 import jakarta.validation.constraints.NotNull;
-
 import java.net.UnknownHostException;
 import java.util.Optional;
 import java.util.UUID;
@@ -153,7 +152,7 @@ public class FusionAuthService implements AuthenticationService {
       // Handle errors
       log.error(
               "Error occurred while searching for username {} emailAddress {}, error : {}",
-              userName, emailAddress, response.errorResponse.toString());
+              userName, emailAddress, response.errorResponse);
       throw new UserCredentialsException(
               "Error when retrieving fusion auth credentials", response.exception);
     } else {

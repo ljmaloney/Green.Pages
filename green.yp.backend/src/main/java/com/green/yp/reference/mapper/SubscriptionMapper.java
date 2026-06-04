@@ -5,9 +5,8 @@ import com.green.yp.api.apitype.CreateSubscriptionRequest;
 import com.green.yp.reference.data.model.Subscription;
 import com.green.yp.reference.data.model.SubscriptionFeature;
 import com.green.yp.reference.dto.SubscriptionDto;
-import java.util.List;
-
 import com.green.yp.reference.dto.SubscriptionFeatureDto;
+import java.util.List;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -29,41 +29,53 @@ import java.util.List;
 @Tag(name = "Endpoint for retrieval of invoices")
 @RequestMapping("invoice")
 public class InvoiceController {
-    private final InvoiceService invoiceService;
+  private final InvoiceService invoiceService;
 
-    public InvoiceController(InvoiceService invoiceService) {
-        this.invoiceService = invoiceService;
-    }
+  public InvoiceController(InvoiceService invoiceService) {
+    this.invoiceService = invoiceService;
+  }
 
-    @Operation(summary = "Returns the list of invoices for a given date range")
-    @ApiResponse(responseCode = "200", description = "Producer/Subscriber contact")
-    @ApiResponse(responseCode = "404", description = "Contact not found")
-    @IsSubscriberAdminOrAdmin
-    @GetMapping(path = "producer/{producerId}/search", produces= MediaType.APPLICATION_JSON_VALUE)
-    public ResponseApi<List<InvoiceResponse>> findProducerInvoices(@PathVariable("producerId") String producerId,
-                                                                   @RequestParam("startDate") String startDate,
-                                                                   @RequestParam("endDate") String endDate,
-                                                                   @Parameter(hidden = true)
-                                                                   @AuthUser AuthenticatedUser authenticatedUser,
-                                                                   HttpServletRequest request) throws Exception {
-        return new ResponseApi<>(invoiceService.findInvoices(InvoiceType.SUBSCRIPTION, producerId,
-                DateUtils.parseDate(startDate, LocalDate.class),
-                DateUtils.parseDate(endDate, LocalDate.class), authenticatedUser, RequestUtil.getRequestIP(request)), null);
-    }
+  @Operation(summary = "Returns the list of invoices for a given date range")
+  @ApiResponse(responseCode = "200", description = "Producer/Subscriber contact")
+  @ApiResponse(responseCode = "404", description = "Contact not found")
+  @IsSubscriberAdminOrAdmin
+  @GetMapping(path = "producer/{producerId}/search", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<List<InvoiceResponse>> findProducerInvoices(
+      @PathVariable("producerId") String producerId,
+      @RequestParam("startDate") String startDate,
+      @RequestParam("endDate") String endDate,
+      @Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser,
+      HttpServletRequest request)
+      throws Exception {
+    return new ResponseApi<>(
+        invoiceService.findInvoices(
+            InvoiceType.SUBSCRIPTION,
+            producerId,
+            DateUtils.parseDate(startDate, LocalDate.class),
+            DateUtils.parseDate(endDate, LocalDate.class),
+            authenticatedUser,
+            RequestUtil.getRequestIP(request)),
+        null);
+  }
 
-    @Operation(summary = "Returns the list of invoices for classifieds")
-    @ApiResponse(responseCode = "200", description = "Producer/Subscriber contact")
-    @ApiResponse(responseCode = "404", description = "Contact not found")
-    @IsAdmin
-    @GetMapping(path = "classifieds/search", produces= MediaType.APPLICATION_JSON_VALUE)
-    public ResponseApi<List<InvoiceResponse>> findClassifiedInvoices(@RequestParam("startDate") String startDate,
-                                                                        @RequestParam("endDate") String endDate,
-                                                                      @Parameter(hidden = true)
-                                                                      @AuthUser AuthenticatedUser authenticatedUser,
-                                                                      HttpServletRequest request) {
-        return new ResponseApi<>(invoiceService.findInvoices(InvoiceType.CLASSIFIED, null,
-                DateUtils.parseDate(startDate, LocalDate.class),
-                DateUtils.parseDate(endDate, LocalDate.class),
-                authenticatedUser, RequestUtil.getRequestIP(request)), null);
-    }
+  @Operation(summary = "Returns the list of invoices for classifieds")
+  @ApiResponse(responseCode = "200", description = "Producer/Subscriber contact")
+  @ApiResponse(responseCode = "404", description = "Contact not found")
+  @IsAdmin
+  @GetMapping(path = "classifieds/search", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<List<InvoiceResponse>> findClassifiedInvoices(
+      @RequestParam("startDate") String startDate,
+      @RequestParam("endDate") String endDate,
+      @Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser,
+      HttpServletRequest request) {
+    return new ResponseApi<>(
+        invoiceService.findInvoices(
+            InvoiceType.CLASSIFIED,
+            null,
+            DateUtils.parseDate(startDate, LocalDate.class),
+            DateUtils.parseDate(endDate, LocalDate.class),
+            authenticatedUser,
+            RequestUtil.getRequestIP(request)),
+        null);
+  }
 }

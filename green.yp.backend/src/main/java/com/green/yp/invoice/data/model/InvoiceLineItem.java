@@ -51,11 +51,29 @@ public class InvoiceLineItem extends Immutable {
 
     InvoiceLineItem that = (InvoiceLineItem) o;
 
-    return new EqualsBuilder().appendSuper(super.equals(o)).append(invoice, that.invoice).append(externalRef1, that.externalRef1).append(externalRef2, that.externalRef2).append(lineNumber, that.lineNumber).append(quantity, that.quantity).append(description, that.description).append(amount, that.amount).isEquals();
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(invoice, that.invoice)
+        .append(externalRef1, that.externalRef1)
+        .append(externalRef2, that.externalRef2)
+        .append(lineNumber, that.lineNumber)
+        .append(quantity, that.quantity)
+        .append(description, that.description)
+        .append(amount, that.amount)
+        .isEquals();
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(invoice).append(externalRef1).append(externalRef2).append(lineNumber).append(quantity).append(description).append(amount).toHashCode();
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(invoice)
+        .append(externalRef1)
+        .append(externalRef2)
+        .append(lineNumber)
+        .append(quantity)
+        .append(description)
+        .append(amount)
+        .toHashCode();
   }
 }

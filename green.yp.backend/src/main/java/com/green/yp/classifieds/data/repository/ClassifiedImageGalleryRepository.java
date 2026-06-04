@@ -20,10 +20,12 @@ public interface ClassifiedImageGalleryRepository
 
   Optional<ClassifiedImageGallery> findFirstByClassifiedId(UUID classifiedId);
 
-  @Query("""
+  @Query(
+      """
             SELECT image
             FROM ClassifiedImageGallery image
             WHERE image.classifiedId IN :classifiedIds
         """)
-  List<ClassifiedImageGallery> findImagesByClassifiedIds(@Param("classifiedIds") List<UUID> classifiedIds);
+  List<ClassifiedImageGallery> findImagesByClassifiedIds(
+      @Param("classifiedIds") List<UUID> classifiedIds);
 }

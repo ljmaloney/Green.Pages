@@ -49,7 +49,7 @@ public class Classified extends Mutable {
   @Column(name = "per_unit_type", nullable = false, length = 50)
   private String perUnitType;
 
-  @Column(name="id_token")
+  @Column(name = "id_token")
   private String idToken;
 
   @Size(max = 200)
@@ -103,11 +103,51 @@ public class Classified extends Mutable {
 
     Classified that = (Classified) o;
 
-    return new EqualsBuilder().appendSuper(super.equals(o)).append(activeDate, that.activeDate).append(lastActiveDate, that.lastActiveDate).append(adTypeId, that.adTypeId).append(categoryId, that.categoryId).append(classifiedCustomerId, that.classifiedCustomerId).append(renewalCount, that.renewalCount).append(price, that.price).append(perUnitType, that.perUnitType).append(idToken, that.idToken).append(title, that.title).append(description, that.description).append(city, that.city).append(state, that.state).append(postalCode, that.postalCode).append(emailAddress, that.emailAddress).append(phoneNumber, that.phoneNumber).append(longitude, that.longitude).append(latitude, that.latitude).isEquals();
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(activeDate, that.activeDate)
+        .append(lastActiveDate, that.lastActiveDate)
+        .append(adTypeId, that.adTypeId)
+        .append(categoryId, that.categoryId)
+        .append(classifiedCustomerId, that.classifiedCustomerId)
+        .append(renewalCount, that.renewalCount)
+        .append(price, that.price)
+        .append(perUnitType, that.perUnitType)
+        .append(idToken, that.idToken)
+        .append(title, that.title)
+        .append(description, that.description)
+        .append(city, that.city)
+        .append(state, that.state)
+        .append(postalCode, that.postalCode)
+        .append(emailAddress, that.emailAddress)
+        .append(phoneNumber, that.phoneNumber)
+        .append(longitude, that.longitude)
+        .append(latitude, that.latitude)
+        .isEquals();
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(activeDate).append(lastActiveDate).append(adTypeId).append(categoryId).append(classifiedCustomerId).append(renewalCount).append(price).append(perUnitType).append(idToken).append(title).append(description).append(city).append(state).append(postalCode).append(emailAddress).append(phoneNumber).append(longitude).append(latitude).toHashCode();
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(activeDate)
+        .append(lastActiveDate)
+        .append(adTypeId)
+        .append(categoryId)
+        .append(classifiedCustomerId)
+        .append(renewalCount)
+        .append(price)
+        .append(perUnitType)
+        .append(idToken)
+        .append(title)
+        .append(description)
+        .append(city)
+        .append(state)
+        .append(postalCode)
+        .append(emailAddress)
+        .append(phoneNumber)
+        .append(longitude)
+        .append(latitude)
+        .toHashCode();
   }
 }

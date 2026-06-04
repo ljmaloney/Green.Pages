@@ -22,11 +22,12 @@ public class AuthenticationContract {
   }
 
   public AuthServiceResponse<RegistrationResponse> registerUser(
-          @NotNull @NonNull UUID producerId,
-          @NonNull @NotNull UUID contactId,
-          Boolean subscriberAdmin,
-          @NotNull @NonNull UserCredentialsRequest credentialsRequest) {
-    return authenticationService.registerUser(producerId, contactId, subscriberAdmin, credentialsRequest);
+      @NotNull @NonNull UUID producerId,
+      @NonNull @NotNull UUID contactId,
+      Boolean subscriberAdmin,
+      @NotNull @NonNull UserCredentialsRequest credentialsRequest) {
+    return authenticationService.registerUser(
+        producerId, contactId, subscriberAdmin, credentialsRequest);
   }
 
   public void disableUser(String externalAuthorizationServiceRef) {
@@ -46,8 +47,8 @@ public class AuthenticationContract {
     authenticationService.removeUser(externalAuthorizationServiceRef);
   }
 
-  public Optional<AuthenticatedUserCredentialsResponse> findUser(@NotNull @NonNull String userName,
-                                                                 @NotNull @NonNull String emailAddress) {
+  public Optional<AuthenticatedUserCredentialsResponse> findUser(
+      @NotNull @NonNull String userName, @NotNull @NonNull String emailAddress) {
 
     return authenticationService.findUser(userName, emailAddress);
   }

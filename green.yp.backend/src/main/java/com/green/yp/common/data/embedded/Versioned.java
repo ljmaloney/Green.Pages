@@ -20,7 +20,7 @@ public class Versioned {
   @Version @ReadOnlyProperty private Long version;
 
   @Temporal(TemporalType.TIMESTAMP)
-  @Column(name="create_date", insertable = true, updatable = false)
+  @Column(name = "create_date", insertable = true, updatable = false)
   private OffsetDateTime createDate =
       OffsetDateTime.now().truncatedTo(ChronoUnit.MICROS); // To match column definition datetime(6)
 

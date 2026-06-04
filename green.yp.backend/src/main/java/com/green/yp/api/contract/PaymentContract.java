@@ -20,16 +20,18 @@ public class PaymentContract {
   private final PaymentMethodService paymentMethodService;
 
   public PaymentContract(
-          PaymentOrchestrationService orchestrationService, PaymentMethodService paymentMethodService) {
+      PaymentOrchestrationService orchestrationService, PaymentMethodService paymentMethodService) {
     this.orchestrationService = orchestrationService;
-      this.paymentMethodService = paymentMethodService;
+    this.paymentMethodService = paymentMethodService;
   }
 
-  public PaymentTransactionResponse applyPayment(PaymentRequest paymentRequest, Optional<String> customerRef, boolean cardOnFile) {
+  public PaymentTransactionResponse applyPayment(
+      PaymentRequest paymentRequest, Optional<String> customerRef, boolean cardOnFile) {
     return orchestrationService.applyPayment(paymentRequest, customerRef, cardOnFile);
   }
 
-  public PaymentMethodResponse createPaymentMethod(PaymentMethodRequest methodRequest, String requestIp){
+  public PaymentMethodResponse createPaymentMethod(
+      PaymentMethodRequest methodRequest, String requestIp) {
     return orchestrationService.createPaymentMethod(methodRequest, requestIp);
   }
 
@@ -37,7 +39,7 @@ public class PaymentContract {
     orchestrationService.cancelCardOnFile(referenceId);
   }
 
-  public PaymentMethodResponse replaceCardOnFile(PaymentMethodRequest methodRequest){
+  public PaymentMethodResponse replaceCardOnFile(PaymentMethodRequest methodRequest) {
     return orchestrationService.replaceCardOnFile(methodRequest);
   }
 
@@ -45,19 +47,21 @@ public class PaymentContract {
     producerIds.forEach(orchestrationService::disablePaymentMethods);
   }
 
-  public PaymentMethodResponse replaceCardOnFile(@NotNull @NonNull @Valid ApiPaymentRequest paymentRequest,
-                                              @NotNull @NonNull AuthenticatedUser authenticatedUser,
-                                              boolean createNew,
-                                              @NotNull @NonNull String requestIP) {
-      return orchestrationService.replaceCardOnFile(paymentRequest, authenticatedUser, createNew, requestIP);
+  public PaymentMethodResponse replaceCardOnFile(
+      @NotNull @NonNull @Valid ApiPaymentRequest paymentRequest,
+      @NotNull @NonNull AuthenticatedUser authenticatedUser,
+      boolean createNew,
+      @NotNull @NonNull String requestIP) {
+    return orchestrationService.replaceCardOnFile(
+        paymentRequest, authenticatedUser, createNew, requestIP);
   }
 
-  public Optional<PaymentMethodResponse> getPaymentMethod(@NotNull @NonNull UUID referenceId,
-                                           String authenticatedUser,
-                                           String requestIP) {
-    try{
-      return Optional.of(paymentMethodService.findMethod(referenceId.toString(), authenticatedUser, requestIP));
-    } catch (NotFoundException nfe){
+  public Optional<PaymentMethodResponse> getPaymentMethod(
+      @NotNull @NonNull UUID referenceId, String authenticatedUser, String requestIP) {
+    try {
+      return Optional.of(
+          paymentMethodService.findMethod(referenceId.toString(), authenticatedUser, requestIP));
+    } catch (NotFoundException nfe) {
       return Optional.empty();
     }
   }

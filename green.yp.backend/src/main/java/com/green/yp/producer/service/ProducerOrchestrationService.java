@@ -330,6 +330,8 @@ public class ProducerOrchestrationService {
             .orElseThrow(() -> new NotFoundException(PRODUCER_ID, producerId));
 
     producer.setCancelDate(null);
+    producer.setCancelReason(null);
+    producer.setCancelReasonType(null);
     producer.setSubscriptionType(ProducerSubscriptionType.LIVE_ACTIVE);
     producer.setLastBillDate(lastInvoiceDate);
     producer.setLastBillPaidDate(subscriptionPaidDate);
@@ -369,6 +371,7 @@ public class ProducerOrchestrationService {
           producer.getId(),
           producer.getCancelDate());
       throw new PreconditionFailedException(
+          ErrorCodeType.CANCELLED_ACCOUNT,
           String.format(
               "Subscription for %s cancelled as of %s",
               producer.getId(), producer.getCancelDate()));
@@ -422,8 +425,7 @@ public class ProducerOrchestrationService {
   }
 
   public void updateProcessStatus(
-          @NonNull @NotNull UUID producerId,
-          ProducerSubProcessType producerSubscriptionType) {
+      @NonNull @NotNull UUID producerId, ProducerSubProcessType producerSubscriptionType) {
     subProcessRepository
         .findByProducerId(producerId)
         .ifPresent(
@@ -431,5 +433,18 @@ public class ProducerOrchestrationService {
               s.setProcessStep(producerSubscriptionType);
               subProcessRepository.saveAndFlush(s);
             });
+  }
+
+  public List<ProducerResponse> findCancelled() {
+    return producerRepository
+        .findByCancelDateIsNotNullAndSubscriptionTypeIn(
+            ProducerSubscriptionType.LIVE_ACTIVE, ProducerSubscriptionType.LIVE_DISABLED_NONPAYMENT)
+        .stream()
+        .map(producerMapper::fromEntity)
+        .toList();
+  }
+
+  public void disableProducer(List<UUID> producerIds, String ipAddress) {
+    producerRepository.updateStatus(producerIds, ProducerSubscriptionType.LIVE_CANCELED);
   }
 }

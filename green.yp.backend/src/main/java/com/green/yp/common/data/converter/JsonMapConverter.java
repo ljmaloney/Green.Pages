@@ -13,24 +13,25 @@ import java.util.Map;
 @Converter
 public class JsonMapConverter implements AttributeConverter<Map<String, Object>, String> {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    @Override
-    public String convertToDatabaseColumn(Map<String, Object> attribute) {
-        try {
-            return attribute != null ? objectMapper.writeValueAsString(attribute) : null;
-        } catch (Exception e) {
-            log.error("Unexpected error converting map to JSON string", e);
-            throw new SystemException("Error converting map to JSON", e);
-        }
-    }
+  private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Override
-    public Map<String, Object> convertToEntityAttribute(String dbData) {
-        try {
-            return dbData != null ? objectMapper.readValue(dbData, Map.class) : null;
-        } catch (Exception e) {
-            log.error("Unexpected error converting JSON string to map", e);
-            throw new SystemException("Error converting JSON to map", e);
-        }
+  @Override
+  public String convertToDatabaseColumn(Map<String, Object> attribute) {
+    try {
+      return attribute != null ? objectMapper.writeValueAsString(attribute) : null;
+    } catch (Exception e) {
+      log.error("Unexpected error converting map to JSON string", e);
+      throw new SystemException("Error converting map to JSON", e);
     }
+  }
+
+  @Override
+  public Map<String, Object> convertToEntityAttribute(String dbData) {
+    try {
+      return dbData != null ? objectMapper.readValue(dbData, Map.class) : null;
+    } catch (Exception e) {
+      log.error("Unexpected error converting JSON string to map", e);
+      throw new SystemException("Error converting JSON to map", e);
+    }
+  }
 }

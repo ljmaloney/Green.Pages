@@ -37,24 +37,29 @@ public class ContactController {
 
   public ContactController(MessageService service, MessageDataService dataService) {
     this.service = service;
-      this.dataService = dataService;
+    this.dataService = dataService;
   }
 
   @Operation(summary = "Returns the list of contact messages")
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @IsAdmin
-  public ResponseApi<List<ContactMessageResponse>> getContactMessages(@RequestParam("startDate") String startDate,
-                                                                      @RequestParam("endDate") String endDate,
-                                                                      @RequestParam("requestType") ContactMessageRequestType requestType,
-                                                                      @Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser) {
-      return new ResponseApi<>(dataService.getMessages(DateUtils.parseDate(startDate, LocalDate.class),
-              DateUtils.parseDate(endDate, LocalDate.class), requestType), null);
+  public ResponseApi<List<ContactMessageResponse>> getContactMessages(
+      @RequestParam("startDate") String startDate,
+      @RequestParam("endDate") String endDate,
+      @RequestParam("requestType") ContactMessageRequestType requestType,
+      @Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser) {
+    return new ResponseApi<>(
+        dataService.getMessages(
+            DateUtils.parseDate(startDate, LocalDate.class),
+            DateUtils.parseDate(endDate, LocalDate.class),
+            requestType),
+        null);
   }
 
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public void processContactRequest(@RequestBody @Valid ContactMessageRequest contactMessageRequest,
-                                    HttpServletRequest request) {
+  public void processContactRequest(
+      @RequestBody @Valid ContactMessageRequest contactMessageRequest, HttpServletRequest request) {
     service.sendMessage(contactMessageRequest, RequestUtil.getRequestIP(request));
   }
 }

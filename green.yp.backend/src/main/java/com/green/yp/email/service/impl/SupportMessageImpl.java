@@ -16,20 +16,19 @@ public class SupportMessageImpl implements MessageSendService {
   @Value("${greenyp.support.email:noemail}")
   private String supportEmail;
 
-    private final MessageDataService messageDataService;
+  private final MessageDataService messageDataService;
 
-    public SupportMessageImpl(MessageDataService messageDataService) {
-        this.messageDataService = messageDataService;
-    }
+  public SupportMessageImpl(MessageDataService messageDataService) {
+    this.messageDataService = messageDataService;
+  }
 
-    @Override
-    public ContactMessageResponse createContactMessage(ContactMessageRequest contactMessageRequest, String requestIP) {
-        log.info("Create support message request: {}", contactMessageRequest);
-        return messageDataService.createContactMessage(contactMessageRequest, supportEmail, requestIP);
-    }
+  @Override
+  public ContactMessageResponse createContactMessage(
+      ContactMessageRequest contactMessageRequest, String requestIP) {
+    log.info("Create support message request: {}", contactMessageRequest);
+    return messageDataService.createContactMessage(contactMessageRequest, supportEmail, requestIP);
+  }
 
-    @Override
-    public void sendMessage(UUID contactMessageId) {
-
-    }
+  @Override
+  public void sendMessage(UUID contactMessageId) {}
 }

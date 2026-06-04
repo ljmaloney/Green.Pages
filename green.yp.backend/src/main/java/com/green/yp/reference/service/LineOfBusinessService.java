@@ -17,7 +17,6 @@ import com.green.yp.reference.dto.LineOfBusinessDto;
 import com.green.yp.reference.mapper.LineOfBusinessMapper;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

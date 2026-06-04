@@ -7,5 +7,5 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ClassifiedCategoryRepository extends JpaRepository<ClassifiedCategory, UUID> {
-    Optional<ClassifiedCategory> findByUrlName(String categoryName);
+  Optional<ClassifiedCategory> findByUrlName(String categoryName);
 }

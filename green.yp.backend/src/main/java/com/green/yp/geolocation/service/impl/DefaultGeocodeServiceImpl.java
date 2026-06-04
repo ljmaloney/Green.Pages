@@ -15,10 +15,10 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 @ConditionalOnProperty(
-        name = "greenyp.geocoder.live.enabled",
-        havingValue = "false",
-        matchIfMissing = true // default is OFF
-)
+    name = "greenyp.geocoder.live.enabled",
+    havingValue = "false",
+    matchIfMissing = true // default is OFF
+    )
 public class DefaultGeocodeServiceImpl implements GeocodingService {
 
   private final PostalCodeGeocodeRepository repository;

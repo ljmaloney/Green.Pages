@@ -14,6 +14,7 @@ import com.green.yp.api.apitype.producer.enumeration.ProducerSubscriptionType;
 import com.green.yp.api.contract.*;
 import com.green.yp.config.security.AuthenticatedUser;
 import com.green.yp.email.service.EmailService;
+import com.green.yp.exception.ErrorCodeType;
 import com.green.yp.exception.PaymentFailedException;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.payment.data.enumeration.PaymentMethodStatusType;
@@ -23,12 +24,15 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -264,6 +268,7 @@ public class AccountPaymentService {
           producer.producerId(),
           producer.cancelDate());
       throw new PreconditionFailedException(
+          ErrorCodeType.CANCELLED_ACCOUNT,
           "Cannot update payment method for non-active (cancelled) producer");
     }
 
@@ -351,6 +356,36 @@ public class AccountPaymentService {
 
     return String.format(
         "Removed %s unpaid account subscriptions over %s days old", producerIds.size(), daysOld);
+  }
+
+  @Scheduled(
+      fixedRateString = "${green.yp.pro.subscription.cancelled.interval:120}",
+      timeUnit = TimeUnit.MINUTES)
+  @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+  public String cleanCancelledAccounts() {
+    log.info("Removing cancelled account records and credentials");
+
+    List<ProducerResponse> producers = producerContract.findCancelled();
+    producers =
+        producers.stream().filter(p -> p.cancelDate().isBefore(OffsetDateTime.now())).toList();
+
+    if (CollectionUtils.isEmpty(producers)) {
+      return "No cancelled subscribers found to remove";
+    }
+    List<UUID> producerIds = producers.stream().map(ProducerResponse::producerId).toList();
+
+    paymentContract.disablePaymentMethod(producerIds);
+
+    producerContract.deleteCredentials(producerIds);
+    log.info("Removed / deleted credentials for {}", producerIds);
+
+    searchContract.deleteSearchMaster(producerIds, "127.0.0.1");
+
+    producerContract.disableProducer(producerIds, "127.0.0.1");
+
+    log.info("Removed / deleted producer records for {}", producerIds);
+
+    return String.format("Removed %s cancelled account subscriptions", producerIds.size());
   }
 
   private void cleanupAbandonedProducers(String ipAddress, List<UUID> producerIds) {

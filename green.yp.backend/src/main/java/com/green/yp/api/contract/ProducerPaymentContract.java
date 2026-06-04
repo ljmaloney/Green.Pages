@@ -19,9 +19,9 @@ public class ProducerPaymentContract {
   private final ProducerPaymentMethodService methodService;
 
   public ProducerPaymentContract(
-          ProducerPaymentOrchestrationService paymentService,
-          PaymentOrchestrationService transactionService,
-          ProducerPaymentMethodService methodService) {
+      ProducerPaymentOrchestrationService paymentService,
+      PaymentOrchestrationService transactionService,
+      ProducerPaymentMethodService methodService) {
     this.paymentService = paymentService;
     this.transactionService = transactionService;
     this.methodService = methodService;
@@ -44,8 +44,8 @@ public class ProducerPaymentContract {
     return paymentService.applyPayment(paymentRequest, userId, requestIP);
   }
 
-    public PaymentTransactionResponse applyPayment(PaymentRequest paymentRequest, Optional<String> customerRef, boolean cardOnFile) {
-      return transactionService.applyPayment(paymentRequest, customerRef, cardOnFile);
-    }
-
+  public PaymentTransactionResponse applyPayment(
+      PaymentRequest paymentRequest, Optional<String> customerRef, boolean cardOnFile) {
+    return transactionService.applyPayment(paymentRequest, customerRef, cardOnFile);
+  }
 }

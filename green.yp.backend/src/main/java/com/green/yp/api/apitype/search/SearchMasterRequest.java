@@ -2,11 +2,10 @@ package com.green.yp.api.apitype.search;
 
 import com.green.yp.api.apitype.enumeration.SearchRecordType;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
+import lombok.Builder;
 
 @Builder
 public record SearchMasterRequest(

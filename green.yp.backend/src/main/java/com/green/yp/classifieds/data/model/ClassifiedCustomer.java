@@ -61,11 +61,11 @@ public class ClassifiedCustomer extends Mutable {
   private String emailAddress;
 
   @Size(max = 25)
-  @Column(name="email_validation_token", nullable = false, length = 25)
+  @Column(name = "email_validation_token", nullable = false, length = 25)
   private String emailAddressValidationToken;
 
   @Temporal(TemporalType.TIMESTAMP)
-  @Column(name="email_validation_date")
+  @Column(name = "email_validation_date")
   private OffsetDateTime emailValidationDate;
 
   @Override
@@ -104,7 +104,7 @@ public class ClassifiedCustomer extends Mutable {
         .toHashCode();
   }
 
-    public boolean isValidToken(String emailToken) {
-      return emailToken.equals(this.getEmailAddressValidationToken());
-    }
+  public boolean isValidToken(String emailToken) {
+    return emailToken.equals(this.getEmailAddressValidationToken());
+  }
 }

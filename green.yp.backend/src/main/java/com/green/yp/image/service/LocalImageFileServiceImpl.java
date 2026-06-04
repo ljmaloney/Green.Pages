@@ -44,11 +44,12 @@ public class LocalImageFileServiceImpl extends AbstractImageFileService
 
   protected void deleteFile(String pathKey, String fileName) {
     try {
-      Path path = StringUtils.isEmpty(fileName)
+      Path path =
+          StringUtils.isEmpty(fileName)
               ? FileSystems.getDefault().getPath(fileSystemPath, pathKey)
               : FileSystems.getDefault().getPath(fileSystemPath, pathKey, fileName);
       Files.deleteIfExists(path);
-    } catch ( Exception e) {
+    } catch (Exception e) {
       log.error("Unexpected error deleting / removing producer image", e);
       throw new SystemException("Unexpected error deleting / removing producer image", e);
     }

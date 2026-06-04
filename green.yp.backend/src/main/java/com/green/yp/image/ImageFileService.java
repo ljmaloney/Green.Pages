@@ -7,20 +7,23 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface ImageFileService {
   void deleteLogo(UUID producerId);
+
   default void deleteImage(UUID producerId, String imageFilename) {
     deleteImage(producerId, null, imageFilename);
   }
+
   void deleteImage(UUID producerId, String overrideBase, String imageFilename);
 
   String saveLogo(UUID producerId, String logoFilename, MultipartFile logoFile);
 
-  default String saveImage(UUID producerId, String imageFilename, MultipartFile imageFile){
+  default String saveImage(UUID producerId, String imageFilename, MultipartFile imageFile) {
     return saveImage(producerId, null, imageFilename, imageFile);
   }
 
-  String saveImage(UUID producerId, String overrideBase, String imageFilename, MultipartFile imageFile);
+  String saveImage(
+      UUID producerId, String overrideBase, String imageFilename, MultipartFile imageFile);
 
-  default String getBasePath(String basePath, String override){
+  default String getBasePath(String basePath, String override) {
     return StringUtils.isBlank(override) ? basePath : override;
   }
 

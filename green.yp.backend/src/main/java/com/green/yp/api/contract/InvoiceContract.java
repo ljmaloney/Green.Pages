@@ -13,23 +13,24 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class InvoiceContract {
-    private final InvoiceService invoiceService;
+  private final InvoiceService invoiceService;
 
-    public InvoiceContract(InvoiceService invoiceService) {
-        this.invoiceService = invoiceService;
-    }
+  public InvoiceContract(InvoiceService invoiceService) {
+    this.invoiceService = invoiceService;
+  }
 
-    public InvoiceResponse createInvoice(InvoiceRequest invoiceRequest){
-        return invoiceService.createInvoice(invoiceRequest);
-    }
+  public InvoiceResponse createInvoice(InvoiceRequest invoiceRequest) {
+    return invoiceService.createInvoice(invoiceRequest);
+  }
 
-    public void updatePayment(UUID invoiceId, PaymentTransactionResponse completedPayment) {
-        invoiceService.updatePayment(invoiceId, completedPayment);
-    }
+  public void updatePayment(UUID invoiceId, PaymentTransactionResponse completedPayment) {
+    invoiceService.updatePayment(invoiceId, completedPayment);
+  }
 
-    public Optional<InvoiceResponse> findUnpaidInvoice(@NotNull @NonNull UUID referenceId,
-                                                       @NotNull @NonNull AuthenticatedUser authenticatedUser,
-                                                       @NotNull @NonNull String requestIP) {
-        return invoiceService.findUnpaidInvoice(referenceId, authenticatedUser, requestIP);
-    }
+  public Optional<InvoiceResponse> findUnpaidInvoice(
+      @NotNull @NonNull UUID referenceId,
+      @NotNull @NonNull AuthenticatedUser authenticatedUser,
+      @NotNull @NonNull String requestIP) {
+    return invoiceService.findUnpaidInvoice(referenceId, authenticatedUser, requestIP);
+  }
 }

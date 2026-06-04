@@ -20,24 +20,30 @@ public class EmailContract {
 
   public EmailContract(EmailService emailService, EmailValidationService emailValidationService) {
     this.emailService = emailService;
-      this.emailValidationService = emailValidationService;
+    this.emailValidationService = emailValidationService;
   }
 
   public void sendEmail(
-          EmailTemplateType emailTemplateType, ProducerContact contact, String emailAddress)  {
+      EmailTemplateType emailTemplateType, ProducerContact contact, String emailAddress) {
     emailService.sendEmail(emailTemplateType, contact, emailAddress);
   }
 
-  public void sendEmail(EmailTemplateType emailTemplateType, ContactMessageRequest contactMessageRequest, String emailAddress) {
+  public void sendEmail(
+      EmailTemplateType emailTemplateType,
+      ContactMessageRequest contactMessageRequest,
+      String emailAddress) {
     emailService.sendEmail(emailTemplateType, contactMessageRequest, emailAddress);
   }
 
-  public void sendEmail(EmailTemplateType emailTemplateType, List<String> emailsAddress,
-                        String subject, @NotNull Supplier<Map<String, Object>> mappingSupplier){
+  public void sendEmail(
+      EmailTemplateType emailTemplateType,
+      List<String> emailsAddress,
+      String subject,
+      @NotNull Supplier<Map<String, Object>> mappingSupplier) {
     emailService.sendEmailAsync(emailTemplateType, emailsAddress, subject, mappingSupplier);
   }
 
-  public EmailValidationResponse validateEmail(String externRef, String emailAddress){
+  public EmailValidationResponse validateEmail(String externRef, String emailAddress) {
     return emailValidationService.findValidatedEmail(externRef, emailAddress);
   }
 

@@ -20,51 +20,63 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service("classifiedMessage")
 public class ClassifiedMessageImpl implements MessageSendService {
-    @Value("${greenyp.classified.baseUrl}")
-      private String classifiedUrl;
+  @Value("${greenyp.classified.baseUrl}")
+  private String classifiedUrl;
 
-    private final ContactMessageRepository repository;
-    private final ContactMapper mapper;
-    private final ClassifiedContract classifiedContract;
-    private final EmailService emailService;
+  private final ContactMessageRepository repository;
+  private final ContactMapper mapper;
+  private final ClassifiedContract classifiedContract;
+  private final EmailService emailService;
 
-    public ClassifiedMessageImpl(ContactMessageRepository repository,
-                                 ContactMapper mapper,
-                                 ClassifiedContract classifiedContract, EmailService emailService) {
-        this.repository = repository;
-        this.mapper = mapper;
-        this.classifiedContract = classifiedContract;
-        this.emailService = emailService;
-    }
+  public ClassifiedMessageImpl(
+      ContactMessageRepository repository,
+      ContactMapper mapper,
+      ClassifiedContract classifiedContract,
+      EmailService emailService) {
+    this.repository = repository;
+    this.mapper = mapper;
+    this.classifiedContract = classifiedContract;
+    this.emailService = emailService;
+  }
 
-    @Override
-    public ContactMessageResponse createContactMessage(ContactMessageRequest request, String requestIP) {
-        log.info("Creating new classified ad -> customer contact message for classified id {}",
-                request.classifiedRequest().classifiedId());
+  @Override
+  public ContactMessageResponse createContactMessage(
+      ContactMessageRequest request, String requestIP) {
+    log.info(
+        "Creating new classified ad -> customer contact message for classified id {}",
+        request.classifiedRequest().classifiedId());
 
-        var classified = classifiedContract.findClassifiedAd(request.classifiedRequest().classifiedId());
+    var classified =
+        classifiedContract.findClassifiedAd(request.classifiedRequest().classifiedId());
 
-        var contactMessage = mapper.toEntity(request, classified, requestIP);
-        contactMessage.setAddresseeName(String.join(" ", classified.customer().firstName(),classified.customer().lastName()));
-        contactMessage.setSmsEmailType("email");
-        return mapper.toDto(repository.saveAndFlush(contactMessage));
-    }
+    var contactMessage = mapper.toEntity(request, classified, requestIP);
+    contactMessage.setAddresseeName(
+        String.join(" ", classified.customer().firstName(), classified.customer().lastName()));
+    contactMessage.setSmsEmailType("email");
+    return mapper.toDto(repository.saveAndFlush(contactMessage));
+  }
 
-    @Override
-    public void sendMessage(UUID contactMessageId) {
-        log.info("Sending email for classified ad : contactMessageId {}", contactMessageId);
+  @Override
+  public void sendMessage(UUID contactMessageId) {
+    log.info("Sending email for classified ad : contactMessageId {}", contactMessageId);
 
-        var message = repository.findById(contactMessageId)
-                .orElseThrow(() -> {
-                    log.error("No contact message found for id {}", contactMessageId);
-                    return new IllegalStateException("No classified ad with id: " + contactMessageId);
+    var message =
+        repository
+            .findById(contactMessageId)
+            .orElseThrow(
+                () -> {
+                  log.error("No contact message found for id {}", contactMessageId);
+                  return new IllegalStateException("No classified ad with id: " + contactMessageId);
                 });
 
-        var classified = classifiedContract.findClassifiedAd(message.getClassifiedId());
+    var classified = classifiedContract.findClassifiedAd(message.getClassifiedId());
 
-        var directLink = String.format("%s/classifieds/%s", classifiedUrl, classified.classified().classifiedId());
+    var directLink =
+        String.format("%s/classifieds/%s", classifiedUrl, classified.classified().classifiedId());
 
-        var params = new HashMap<String,Object>(Map.of(
+    var params =
+        new HashMap<String, Object>(
+            Map.of(
                 "firstName", classified.customer().firstName(),
                 "lastName", classified.customer().lastName(),
                 "link", directLink,
@@ -75,14 +87,15 @@ public class ClassifiedMessageImpl implements MessageSendService {
                 "contactEmail", message.getFromEmail(),
                 "contactPhone", message.getFromPhone(),
                 "ipAddress", message.getSourceIpAddress()));
-        params.put("timestamp", OffsetDateTime.now());
+    params.put("timestamp", OffsetDateTime.now());
 
-        emailService.sendEmailAsync(EmailTemplateType.CLASSIFIED_CONTACT_INFO,
-                Collections.singletonList(message.getDestination()),
-                EmailTemplateType.CLASSIFIED_CONTACT_INFO.formatSubject(classified.classified().title()),
-                () -> params);
+    emailService.sendEmailAsync(
+        EmailTemplateType.CLASSIFIED_CONTACT_INFO,
+        Collections.singletonList(message.getDestination()),
+        EmailTemplateType.CLASSIFIED_CONTACT_INFO.formatSubject(classified.classified().title()),
+        () -> params);
 
-        message.setMessageSentDate(OffsetDateTime.now());
-        repository.saveAndFlush(message);
-    }
+    message.setMessageSentDate(OffsetDateTime.now());
+    repository.saveAndFlush(message);
+  }
 }

@@ -8,8 +8,11 @@ public class UserCredentialsException extends BusinessException {
   }
 
   public UserCredentialsException(String userName, String emailAddress) {
-    super("User credentials exist for userName %s and email address %s",
-            HttpStatus.PRECONDITION_FAILED,
-            ErrorCodeType.BUSINESS_VALIDATION_ERROR, userName, emailAddress);
+    super(
+        "User credentials exist for userName %s and email address %s",
+        HttpStatus.PRECONDITION_FAILED,
+        ErrorCodeType.BUSINESS_VALIDATION_ERROR,
+        userName,
+        emailAddress);
   }
 }

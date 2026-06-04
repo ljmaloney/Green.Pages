@@ -11,19 +11,16 @@ import com.green.yp.search.data.entity.SearchDistanceProjection;
 import com.green.yp.search.data.entity.SearchMaster;
 import com.green.yp.search.data.repository.SearchRepository;
 import com.green.yp.search.mapper.SearchMapper;
-
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
-
-import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
