@@ -45,4 +45,18 @@ public interface ProducerRepository extends JpaRepository<Producer, UUID> {
 
   List<Producer> findByLastUpdateDateBeforeAndSubscriptionType(
       OffsetDateTime offsetDateTime, ProducerSubscriptionType producerSubscriptionType, Limit of);
+
+
+  List<Producer> findBySubscriptionType(ProducerSubscriptionType producerSubscriptionType);
+
+  List<Producer> findBySubscriptionTypeAndCancelDateIsNotNull(ProducerSubscriptionType producerSubscriptionType);
+
+  List<Producer> findByCancelledDateIsNotNullAndSubscriptionTypeIn(ProducerSubscriptionType...producerSubscriptionType);
+
+  @Modifying
+  @Query(
+          """
+            UPDATE Producer p SET p.subscriptionType=:producerSubscriptionType WHERE p.id in (:producerIds)
+        """)
+  void updateStatus(List<UUID> producerIds, ProducerSubscriptionType producerSubscriptionType);
 }

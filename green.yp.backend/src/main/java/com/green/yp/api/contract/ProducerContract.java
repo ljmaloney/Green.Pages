@@ -176,4 +176,12 @@ public class ProducerContract {
                                   ProducerSubProcessType producerSubscriptionType) {
     producerService.updateProcessStatus(producerId, producerSubscriptionType);
   }
+
+  public List<ProducerResponse> findCancelled() {
+    return producerService.findCancelled();
+  }
+
+  public void disableProducer(List<UUID> producerIds, String ipAddress) {
+    producerService.disableProducer(producerIds, ipAddress);
+  }
 }

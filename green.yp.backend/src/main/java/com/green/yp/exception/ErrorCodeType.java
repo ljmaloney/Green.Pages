@@ -14,6 +14,7 @@ public enum ErrorCodeType {
   PRODUCER_NOT_FOUND("The requested producer %s was not found", HttpStatus.NOT_FOUND.value()),
   SYSTEM_ERROR("Unexpected internal error occurred", HttpStatus.INTERNAL_SERVER_ERROR.value()),
   UNEXPECTED_PAYMENT_ERROR("Unexpected payment error", HttpStatus.INTERNAL_SERVER_ERROR.value()),
+  CANCELLED_ACCOUNT("Producer account is cancelled" ,HttpStatus.PRECONDITION_FAILED.value()),
   MAX_LOGIN_ATTEMPTS(
       "Max login attempts exceeded, contact account is locked for {} minutes",
       HttpStatus.LOCKED.value()),
