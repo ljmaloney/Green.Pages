@@ -35,10 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 /**
- * Account Orchestration service used to
- * 1. Create the account
- * 2. Cancel the account
- * 3. Apply initial payment to make the account "live"
+ * Account Orchestration service used to 1. Create the account 2. Cancel the account 3. Apply
+ * initial payment to make the account "live"
  */
 public class AccountService {
 
@@ -59,20 +57,21 @@ public class AccountService {
   private int renewalThreads;
 
   public AccountService(
-          EmailService emailService,
-          ProducerContract producerContract,
-          PaymentContract paymentContract,
-          ProducerContactContract contactContract,
-          ProducerLocationContract locationContract, AccountPaymentService paymentService,
-          AccountMapper accountMapper,
-          ProducerContactContract producerContactContract) {
+      EmailService emailService,
+      ProducerContract producerContract,
+      PaymentContract paymentContract,
+      ProducerContactContract contactContract,
+      ProducerLocationContract locationContract,
+      AccountPaymentService paymentService,
+      AccountMapper accountMapper,
+      ProducerContactContract producerContactContract) {
     this.emailService = emailService;
     this.producerContract = producerContract;
     this.paymentContract = paymentContract;
     this.contactContract = contactContract;
     this.locationContract = locationContract;
-      this.paymentService = paymentService;
-      this.accountMapper = accountMapper;
+    this.paymentService = paymentService;
+    this.accountMapper = accountMapper;
     this.producerContactContract = producerContactContract;
   }
 
@@ -238,30 +237,36 @@ public class AccountService {
     }
   }
 
-  @Scheduled(fixedDelayString="${green.yp.pro.subscription.renewal.fixedDelay:180}",
-          timeUnit = TimeUnit.MINUTES)
-  public void processMonthlyPayment(){
+  @Scheduled(
+      fixedDelayString = "${green.yp.pro.subscription.renewal.fixedDelay:180}",
+      timeUnit = TimeUnit.MINUTES)
+  public void processMonthlyPayment() {
     log.info("Begin processing monthly producer / pro subscriptions");
 
     producerContract.initializePaymentProcessQueue();
-      try (var threadPool = new ForkJoinPool(renewalThreads)) {
-        List<ProducerResponse> producersToProcess = producerContract.getProducersToProcess(renewalThreads);
-        while(CollectionUtils.isNotEmpty(producersToProcess)){
-          processPayment(producersToProcess, threadPool);
-          producersToProcess = producerContract.getProducersToProcess(renewalThreads);
-        }
-      }catch (Exception e) {
-        log.error("Unexpected error while processing pro subscription renewal payments", e);
+    try (var threadPool = new ForkJoinPool(renewalThreads)) {
+      List<ProducerResponse> producersToProcess =
+          producerContract.getProducersToProcess(renewalThreads);
+      while (CollectionUtils.isNotEmpty(producersToProcess)) {
+        processPayment(producersToProcess, threadPool);
+        producersToProcess = producerContract.getProducersToProcess(renewalThreads);
       }
+    } catch (Exception e) {
+      log.error("Unexpected error while processing pro subscription renewal payments", e);
+    }
     log.info("Completed processing monthly producer / pro subscriptions");
   }
 
   private void processPayment(List<ProducerResponse> producersToProcess, ForkJoinPool threadPool) {
-    var futureComplete = threadPool.submit( () -> producersToProcess.parallelStream().forEach(paymentService::processSubscriptionPayment));
+    var futureComplete =
+        threadPool.submit(
+            () ->
+                producersToProcess.parallelStream()
+                    .forEach(paymentService::processSubscriptionPayment));
     while (!futureComplete.isDone()) {
-      try{
+      try {
         Thread.sleep(500);
-      }catch (InterruptedException ie){
+      } catch (InterruptedException ie) {
         log.warn("Interrupted while waiting for subscription payment");
       }
     }
@@ -298,7 +303,8 @@ public class AccountService {
                       null,
                       request.businessPhone(),
                       request.cellPhone(),
-                      request.emailAddress(), false),
+                      request.emailAddress(),
+                      false),
                   producerResponse.producerId(),
                   contactResponse.producerLocationId(),
                   ipAddress);
@@ -377,25 +383,23 @@ public class AccountService {
     } catch (NotFoundException pfe) {
       log.info("No Primary location found for {}", producerId);
     }
-      LocationRequest request = account.primaryLocation();
-      if (locationResponse != null) {
-        if (request.locationId() != null
-            && !request.locationId().equals(locationResponse.locationId())) {
-          throw new BusinessException(
-              "Attempting to update primary location with another location");
-        }
-        request = accountMapper.copyRequest(request, locationResponse.locationId());
+    LocationRequest request = account.primaryLocation();
+    if (locationResponse != null) {
+      if (request.locationId() != null
+          && !request.locationId().equals(locationResponse.locationId())) {
+        throw new BusinessException("Attempting to update primary location with another location");
       }
-      locationResponse = locationContract.updatePrimaryLocation(producerId, request, ipAddress);
-      return locationResponse;
+      request = accountMapper.copyRequest(request, locationResponse.locationId());
+    }
+    locationResponse = locationContract.updatePrimaryLocation(producerId, request, ipAddress);
+    return locationResponse;
   }
 
   private void isValidPrimaryContact(CreateAccountRequest account) {
-      if (!account.primaryContact().producerContactType().isAccountCreation()) {
-        log.info(
-            "Attempt to create account with invalid contact, contact must be ADMIN or PRIMARY");
-        throw new PreconditionFailedException("ContactType must be one of ADMIN or PRIMARY");
-      }
+    if (!account.primaryContact().producerContactType().isAccountCreation()) {
+      log.info("Attempt to create account with invalid contact, contact must be ADMIN or PRIMARY");
+      throw new PreconditionFailedException("ContactType must be one of ADMIN or PRIMARY");
+    }
   }
 
   private boolean isModifyingExistingCredentials(

@@ -5,11 +5,9 @@ import com.green.yp.api.apitype.search.SearchMasterRequest;
 import com.green.yp.api.apitype.search.SearchResponse;
 import com.green.yp.search.data.entity.SearchMaster;
 import com.green.yp.search.data.entity.SearchRecord;
-
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
-
-import jakarta.validation.constraints.NotNull;
 import org.mapstruct.*;
 
 @Mapper(

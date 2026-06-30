@@ -19,18 +19,19 @@ import org.springframework.data.repository.query.Param;
 
 public interface InvoiceRepository extends JpaRepository<Invoice, UUID> {
 
-    @Query(
-            nativeQuery = true,
-            value =
-                    """
+  @Query(
+      nativeQuery = true,
+      value =
+          """
                                SELECT count(*)
                                FROM invoice
                                WHERE create_date between :startDate and :endDate
                             """)
-    Integer getCountByDate(
-            @Param("startDate") OffsetDateTime startDate, @Param("endDate") OffsetDateTime endDate);
+  Integer getCountByDate(
+      @Param("startDate") OffsetDateTime startDate, @Param("endDate") OffsetDateTime endDate);
 
-  @Query("""
+  @Query(
+      """
             SELECT invoice
             FROM Invoice invoice
             WHERE
@@ -45,7 +46,8 @@ public interface InvoiceRepository extends JpaRepository<Invoice, UUID> {
       @Param("startDate") OffsetDateTime startDate,
       @Param("endDate") OffsetDateTime endDate);
 
-  @Query("""
+  @Query(
+"""
         SELECT invoice
         FROM Invoice invoice
         WHERE invoice.externalRef = :externalRef AND invoice.paidDate IS NULL

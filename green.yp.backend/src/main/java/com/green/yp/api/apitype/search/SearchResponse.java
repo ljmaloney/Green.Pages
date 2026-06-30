@@ -1,7 +1,6 @@
 package com.green.yp.api.apitype.search;
 
 import com.green.yp.api.apitype.enumeration.SearchRecordType;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 

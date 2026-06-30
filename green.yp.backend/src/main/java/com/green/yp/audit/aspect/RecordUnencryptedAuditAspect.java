@@ -41,13 +41,14 @@ public class RecordUnencryptedAuditAspect {
   @Around(value = "methodAnnotatedWithAuditRequest()")
   public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
     long startTime = System.currentTimeMillis();
-    try{
-        return joinPoint.proceed();
-    }  finally {
-        log.info("Elapsed time for {} - {} is : {}",
-                joinPoint.getSignature().getDeclaringTypeName(),
-                joinPoint.getSignature().getName(),
-                (System.currentTimeMillis() - startTime));
+    try {
+      return joinPoint.proceed();
+    } finally {
+      log.info(
+          "Elapsed time for {} - {} is : {}",
+          joinPoint.getSignature().getDeclaringTypeName(),
+          joinPoint.getSignature().getName(),
+          (System.currentTimeMillis() - startTime));
     }
   }
 

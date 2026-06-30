@@ -19,7 +19,7 @@ public class ContactMessage extends Mutable {
   @Column(name = "message_sent_date")
   private OffsetDateTime messageSentDate;
 
-  @Column(name="source_ip_address")
+  @Column(name = "source_ip_address")
   private String sourceIpAddress;
 
   @Size(max = 50)
@@ -30,7 +30,7 @@ public class ContactMessage extends Mutable {
   @Column(name = "contact_request_type", nullable = false, length = 50)
   private ContactMessageRequestType contactRequestType;
 
-  @Column (name = "producer_id")
+  @Column(name = "producer_id")
   private UUID producerId;
 
   @Column(name = "location_id")
@@ -42,10 +42,10 @@ public class ContactMessage extends Mutable {
   @Column(name = "product_service_ref", length = 16)
   private UUID productServiceRef;
 
-  @Column(name="requestor_name", length = 150)
+  @Column(name = "requestor_name", length = 150)
   private String requestorName;
 
-  @Column(name="addressee_name")
+  @Column(name = "addressee_name")
   private String addresseeName;
 
   @Size(max = 150)

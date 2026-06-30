@@ -164,12 +164,12 @@ public class SubscriptionService {
         patchRequest,
         subscription,
         (name, value) ->
-          switch (name) {
-            case "monthlyAutopayAmount", "quarterlyAutopayAmount", "annualBillAmount" ->
-                BigDecimal.valueOf((double) value);
-            case "startDate", "endDate" -> DateUtils.parseDate(value.toString(), Date.class);
-            default -> value;
-          });
+            switch (name) {
+              case "monthlyAutopayAmount", "quarterlyAutopayAmount", "annualBillAmount" ->
+                  BigDecimal.valueOf((double) value);
+              case "startDate", "endDate" -> DateUtils.parseDate(value.toString(), Date.class);
+              default -> value;
+            });
     return subscriptionMapper.mapToDto(subscriptionRepository.saveAndFlush(subscription));
   }
 }

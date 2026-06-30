@@ -6,7 +6,8 @@ public class PreconditionFailedException extends BusinessException {
   public PreconditionFailedException(String message) {
     super(message, HttpStatus.PRECONDITION_FAILED, ErrorCodeType.BUSINESS_VALIDATION_ERROR);
   }
-  public PreconditionFailedException(ErrorCodeType errorCodeType, String message){
+
+  public PreconditionFailedException(ErrorCodeType errorCodeType, String message) {
     super(message, HttpStatus.PRECONDITION_FAILED, errorCodeType);
   }
 

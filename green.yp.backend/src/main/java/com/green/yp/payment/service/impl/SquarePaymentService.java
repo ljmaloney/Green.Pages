@@ -23,8 +23,9 @@ import org.springframework.stereotype.Service;
     havingValue = "square",
     matchIfMissing = true)
 public class SquarePaymentService implements PaymentService {
-    public static final String ERROR_CREATING_NEW_SUBSCRIBER_CUSTOMER = "Error creating new subscriber customer";
-    private final SquareResponseMapper squareResponseMapper;
+  public static final String ERROR_CREATING_NEW_SUBSCRIBER_CUSTOMER =
+      "Error creating new subscriber customer";
+  private final SquareResponseMapper squareResponseMapper;
 
   private final SquareClient squareClient;
   private final SquareResponseMapper responseMapper;
@@ -54,18 +55,21 @@ public class SquarePaymentService implements PaymentService {
             .idempotencyKey(paymentTransactionId.toString())
             .autocomplete(true)
             .referenceId(paymentRequest.referenceId())
-//            .verificationToken(Optional.ofNullable(paymentRequest.verificationToken()))
+            //
+            // .verificationToken(Optional.ofNullable(paymentRequest.verificationToken()))
             .verificationToken(
-                cardOnFile ? Optional.empty() : Optional.ofNullable(paymentRequest.verificationToken()))
+                cardOnFile
+                    ? Optional.empty()
+                    : Optional.ofNullable(paymentRequest.verificationToken()))
             .note(paymentRequest.note())
             .statementDescriptionIdentifier(
                 StringUtils.truncate(paymentRequest.statementDescription(), 20))
             .buyerEmailAddress(paymentRequest.emailAddress())
-                .buyerPhoneNumber(normalizePhone(paymentRequest.phoneNumber()))
+            .buyerPhoneNumber(normalizePhone(paymentRequest.phoneNumber()))
             .amountMoney(createMoney(paymentRequest.paymentAmount()))
             .appFeeMoney(createMoney(BigDecimal.ZERO))
             .tipMoney(createMoney(BigDecimal.ZERO))
-             .customerDetails(CustomerDetails.builder().sellerKeyedIn(false).build())
+            .customerDetails(CustomerDetails.builder().sellerKeyedIn(false).build())
             .billingAddress(
                 Address.builder()
                     .addressLine1(paymentRequest.address())
@@ -115,7 +119,10 @@ public class SquarePaymentService implements PaymentService {
             .referenceId(methodRequest.referenceId())
             .build();
 
-    log.debug("Calling square to crate new customer {} for paymentMethodId {}", squareCustomer, paymentMethodId);
+    log.debug(
+        "Calling square to crate new customer {} for paymentMethodId {}",
+        squareCustomer,
+        paymentMethodId);
 
     var custResponse = squareClient.customers().create(squareCustomer);
 
@@ -127,7 +134,7 @@ public class SquarePaymentService implements PaymentService {
               log.warn(
                   "There was an error creating customer for paymentMethodId {}", paymentMethodId);
               return new SystemException(
-                      ERROR_CREATING_NEW_SUBSCRIBER_CUSTOMER,
+                  ERROR_CREATING_NEW_SUBSCRIBER_CUSTOMER,
                   HttpStatus.INTERNAL_SERVER_ERROR,
                   ErrorCodeType.PAYMENT_CUSTOMER_ERROR);
             });
@@ -141,7 +148,8 @@ public class SquarePaymentService implements PaymentService {
         externCustId,
         methodRequest.referenceId());
 
-    var updateRequest = UpdateCustomerRequest.builder()
+    var updateRequest =
+        UpdateCustomerRequest.builder()
             .customerId(externCustId)
             .referenceId(methodRequest.referenceId())
             .companyName(methodRequest.companyName())
@@ -152,12 +160,9 @@ public class SquarePaymentService implements PaymentService {
             .address(createAddress(methodRequest))
             .build();
 
-      log.debug("Calling square to update existing cutomer - {}", updateRequest);
+    log.debug("Calling square to update existing cutomer - {}", updateRequest);
 
-    var custResponse =
-        squareClient
-            .customers()
-            .update(updateRequest);
+    var custResponse = squareClient.customers().update(updateRequest);
 
     return custResponse
         .getCustomer()
@@ -167,7 +172,7 @@ public class SquarePaymentService implements PaymentService {
               log.warn(
                   "There was an error updating customer for paymentMethodId {}", paymentMethodId);
               return new SystemException(
-                      ERROR_CREATING_NEW_SUBSCRIBER_CUSTOMER,
+                  ERROR_CREATING_NEW_SUBSCRIBER_CUSTOMER,
                   HttpStatus.INTERNAL_SERVER_ERROR,
                   ErrorCodeType.PAYMENT_CUSTOMER_ERROR);
             });
@@ -232,9 +237,10 @@ public class SquarePaymentService implements PaymentService {
         .orElseThrow(
             () -> {
               log.warn(
-                  "There was an error creating card on file for customer for paymentMethodId {}", paymentMethodId);
+                  "There was an error creating card on file for customer for paymentMethodId {}",
+                  paymentMethodId);
               return new SystemException(
-                      ERROR_CREATING_NEW_SUBSCRIBER_CUSTOMER,
+                  ERROR_CREATING_NEW_SUBSCRIBER_CUSTOMER,
                   HttpStatus.INTERNAL_SERVER_ERROR,
                   ErrorCodeType.PAYMENT_CUSTOMER_ERROR);
             });
@@ -263,13 +269,14 @@ public class SquarePaymentService implements PaymentService {
         .country(Country.US)
         .build();
   }
-    private String normalizePhone(String phoneNumber){
-        String phone = phoneNumber.replaceAll("\\D", "");
-        if (phone.length() == 11 && phone.startsWith("1")) {
-            return "+" + phone;
-        } else if (phone.length() == 10) {
-            return "+1" + phone;
-        }
-        return "+" + phone;
+
+  private String normalizePhone(String phoneNumber) {
+    String phone = phoneNumber.replaceAll("\\D", "");
+    if (phone.length() == 11 && phone.startsWith("1")) {
+      return "+" + phone;
+    } else if (phone.length() == 10) {
+      return "+1" + phone;
     }
+    return "+" + phone;
+  }
 }

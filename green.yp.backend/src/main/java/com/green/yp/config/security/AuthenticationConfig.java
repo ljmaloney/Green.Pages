@@ -32,16 +32,19 @@ public class AuthenticationConfig {
       HttpSecurity http, Converter<Jwt, AbstractAuthenticationToken> authenticationConverter)
       throws Exception {
     http.cors(Customizer.withDefaults())
-            .csrf(AbstractHttpConfigurer::disable)
+        .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers(HttpMethod.POST, "/account",
-                                "/account/applyInitialPayment",
-                                "/account/*/validate",
-                                "/contact",
-                                "/email/validate",
-                                "/email/contact",
-                                "/classified/create-ad").permitAll()
+                auth.requestMatchers(
+                        HttpMethod.POST,
+                        "/account",
+                        "/account/applyInitialPayment",
+                        "/account/*/validate",
+                        "/contact",
+                        "/email/validate",
+                        "/email/contact",
+                        "/classified/create-ad")
+                    .permitAll()
                     .requestMatchers(
                         "/",
                         "/classified/create-ad",
@@ -71,7 +74,7 @@ public class AuthenticationConfig {
                         "/producer/location/product/**",
                         "/subscriber/**",
                         "/search",
-                            "/v2/search","/v2/search/nearme")
+                        "/v2/search","/v2/search/nearme")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
@@ -94,7 +97,8 @@ public class AuthenticationConfig {
             "https://*.lovable.app"));
     configuration.setAllowedMethods(
         Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "cache-control", "Cache-Control"));
+    configuration.setAllowedHeaders(
+        Arrays.asList("Authorization", "Content-Type", "cache-control", "Cache-Control"));
     configuration.setExposedHeaders(List.of("Authorization"));
     configuration.setAllowCredentials(true);
 

@@ -1,10 +1,9 @@
 package com.green.yp.api.apitype.search;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.NonNull;
-
 import java.math.BigDecimal;
 import java.util.UUID;
+import lombok.NonNull;
 
 public record SearchLocationUpdateRequest(@NotNull @NonNull UUID externId,
                                           @NotNull @NonNull UUID producerId,

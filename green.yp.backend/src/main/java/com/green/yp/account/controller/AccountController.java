@@ -138,12 +138,13 @@ public class AccountController {
 
   @IsAnyAuthenticatedUser
   @Operation(summary = "Update the subscriber / producer account business profile")
-  @PutMapping(path = "/{accountId}",
+  @PutMapping(
+      path = "/{accountId}",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public ResponseApi<AccountResponse> updateAccount(
-         @PathVariable(name="accountId") UUID accountId,
+      @PathVariable(name = "accountId") UUID accountId,
       @Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser,
       @RequestBody @Valid UpdateAccountRequest account) {
     try {
@@ -171,7 +172,7 @@ public class AccountController {
   }
 
   @Scheduled(cron = "0 0 0,12 * * *")
-  public void cleanAbandonedAccounts(){
+  public void cleanAbandonedAccounts() {
     paymentService.cleanAbandonedAccounts(5);
   }
 

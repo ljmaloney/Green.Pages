@@ -82,57 +82,63 @@ public interface SearchRepository extends JpaRepository<SearchMaster, UUID> {
   void deleteSearchMasterByExternId(@NotNull UUID externRefId);
 
   @Modifying
-  @Query("""
+  @Query(
+      """
           UPDATE SearchMaster sm SET sm.lastActiveDate =:lastActiveDate, sm.lastUpdateDate = :updateDate
           WHERE sm.producerId =:producerId
     """)
-  int disableSearch(@NotNull @Param("producerId}")UUID producerId,
-                    @Param("lastActiveDate") LocalDate lastActiveDate,
-                    @Param("updateDate")OffsetDateTime updateDate);
+  int disableSearch(
+      @NotNull @Param("producerId}") UUID producerId,
+      @Param("lastActiveDate") LocalDate lastActiveDate,
+      @Param("updateDate") OffsetDateTime updateDate);
 
-  @Query(""" 
+  @Query(
+      """
      SELECT sm FROM SearchMaster sm WHERE sm.externId=:externId AND sm.customerRef=:customerRef
    """)
-  Optional<SearchMaster> findSearchMaster(@NotNull @NotNull @Param("externId") UUID externId,
-                                          @NotNull @NotNull @Param("customerRef") String customerRef);
+  Optional<SearchMaster> findSearchMaster(
+      @NotNull @NotNull @Param("externId") UUID externId,
+      @NotNull @NotNull @Param("customerRef") String customerRef);
 
-  @Query("""
+  @Query(
+      """
             SELECT sm
             FROM SearchMaster sm
             WHERE sm.externId=:externId AND sm.producerId=:producerId
                   AND sm.locationId=:locationId AND sm.categoryRef=:categoryRef
         """)
-  Optional<SearchMaster> findSearchMaster(@NotNull @NotNull @Param("externId") UUID externId,
-                        @NotNull @NotNull @Param("producerId") UUID producerId,
-                        @NotNull @NotNull @Param("locationId") UUID locationId,
-                        @NotNull @NotNull @Param("categoryRef") UUID categoryRef);
+  Optional<SearchMaster> findSearchMaster(
+      @NotNull @NotNull @Param("externId") UUID externId,
+      @NotNull @NotNull @Param("producerId") UUID producerId,
+      @NotNull @NotNull @Param("locationId") UUID locationId,
+      @NotNull @NotNull @Param("categoryRef") UUID categoryRef);
 
-    @Query("""
+  @Query(
+      """
             SELECT sm
             FROM SearchMaster sm
             WHERE sm.producerId=:producerId
               AND sm.locationId=:locationId
               AND sm.recordType IN (:recordTypes)
         """)
-    List<SearchMaster> findSearchMaster(@NotNull @NotNull @Param("externId") UUID externId,
-                                            @NotNull @NotNull @Param("producerId") UUID producerId,
-                                            @NotNull @NotNull @Param("locationId") UUID locationId,
-            @NotNull @NotNull @Param("recordTypes") SearchRecordType...recordTypes);
+  List<SearchMaster> findSearchMaster(
+      @NotNull @NotNull @Param("externId") UUID externId,
+      @NotNull @NotNull @Param("producerId") UUID producerId,
+      @NotNull @NotNull @Param("locationId") UUID locationId,
+      @NotNull @NotNull @Param("recordTypes") SearchRecordType... recordTypes);
 
-    @Modifying
-    @Query("DELETE FROM SearchMaster sm WHERE sm.producerId IN :producerIds")
-    void deleteSearchMasterByProducerIds(@Param("producerIds") List<UUID> producerIds);
+  @Modifying
+  @Query("DELETE FROM SearchMaster sm WHERE sm.producerId IN :producerIds")
+  void deleteSearchMasterByProducerIds(@Param("producerIds") List<UUID> producerIds);
 
-    void deleteSearchMasterByExternIdAndRecordType(UUID externId, SearchRecordType recordType);
+  void deleteSearchMasterByExternIdAndRecordType(UUID externId, SearchRecordType recordType);
 
   @Modifying
   @Query("UPDATE SearchMaster sm SET sm.businessIconUrl=:urlPath WHERE sm.producerId=:producerId")
   void updateBusinessIconUrl(
       @Param("producerId") UUID producerId, @Param("urlPath") String urlPath);
 
-    @Modifying
-    @Query("UPDATE SearchMaster sm SET sm.businessIconUrl=NULL WHERE sm.producerId=:producerId")
-    void deleteBusinessIconUrl(@Param("producerIds") UUID producerId);
-
-
+  @Modifying
+  @Query("UPDATE SearchMaster sm SET sm.businessIconUrl=NULL WHERE sm.producerId=:producerId")
+  void deleteBusinessIconUrl(@Param("producerIds") UUID producerId);
 }

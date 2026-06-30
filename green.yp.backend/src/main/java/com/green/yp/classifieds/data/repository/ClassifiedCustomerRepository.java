@@ -4,15 +4,10 @@ import com.green.yp.classifieds.data.model.ClassifiedCustomer;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-
-import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 public interface ClassifiedCustomerRepository extends JpaRepository<ClassifiedCustomer, UUID> {
   Optional<ClassifiedCustomer> findClassifiedCustomerByEmailAddress(@Email String emailAddress);

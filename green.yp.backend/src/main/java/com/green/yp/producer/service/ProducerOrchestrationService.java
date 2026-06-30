@@ -370,7 +370,8 @@ public class ProducerOrchestrationService {
           "Producer {} subscription cancelled as of {}",
           producer.getId(),
           producer.getCancelDate());
-      throw new PreconditionFailedException(ErrorCodeType.CANCELLED_ACCOUNT,
+      throw new PreconditionFailedException(
+          ErrorCodeType.CANCELLED_ACCOUNT,
           String.format(
               "Subscription for %s cancelled as of %s",
               producer.getId(), producer.getCancelDate()));
@@ -435,15 +436,15 @@ public class ProducerOrchestrationService {
   }
 
   public List<ProducerResponse> findCancelled() {
-    return producerRepository.findByCancelDateIsNotNullAndSubscriptionTypeIn(ProducerSubscriptionType.LIVE_ACTIVE,
-            ProducerSubscriptionType.LIVE_DISABLED_NONPAYMENT)
-            .stream()
-            .map(producerMapper::fromEntity)
-            .toList();
+    return producerRepository
+        .findByCancelDateIsNotNullAndSubscriptionTypeIn(
+            ProducerSubscriptionType.LIVE_ACTIVE, ProducerSubscriptionType.LIVE_DISABLED_NONPAYMENT)
+        .stream()
+        .map(producerMapper::fromEntity)
+        .toList();
   }
 
-    public void disableProducer(List<UUID> producerIds, String ipAddress) {
-        producerRepository.updateStatus(producerIds, ProducerSubscriptionType.LIVE_CANCELED);
-    }
+  public void disableProducer(List<UUID> producerIds, String ipAddress) {
+    producerRepository.updateStatus(producerIds, ProducerSubscriptionType.LIVE_CANCELED);
+  }
 }
-  

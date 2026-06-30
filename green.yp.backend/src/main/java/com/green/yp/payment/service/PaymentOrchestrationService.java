@@ -29,13 +29,14 @@ public class PaymentOrchestrationService {
   private final PaymentMapper paymentMapper;
 
   public PaymentOrchestrationService(
-          PaymentTransactionService transactionService,
-          PaymentService paymentService,
-          PaymentMethodService methodService, PaymentMapper paymentMapper) {
+      PaymentTransactionService transactionService,
+      PaymentService paymentService,
+      PaymentMethodService methodService,
+      PaymentMapper paymentMapper) {
     this.transactionService = transactionService;
     this.paymentService = paymentService;
     this.methodService = methodService;
-      this.paymentMapper = paymentMapper;
+    this.paymentMapper = paymentMapper;
   }
 
   @AuditRequest(
@@ -73,11 +74,16 @@ public class PaymentOrchestrationService {
   }
 
   @Transactional
-  public PaymentMethodResponse replaceCardOnFile(ApiPaymentRequest methodRequest,
-                                                 AuthenticatedUser authenticatedUser,
-                                                 boolean createNew, String ipAddress) {
-    if ( createNew ){
-      log.info("Create payment method for subscriber {} from ip {}", authenticatedUser.userId(), ipAddress );
+  public PaymentMethodResponse replaceCardOnFile(
+      ApiPaymentRequest methodRequest,
+      AuthenticatedUser authenticatedUser,
+      boolean createNew,
+      String ipAddress) {
+    if (createNew) {
+      log.info(
+          "Create payment method for subscriber {} from ip {}",
+          authenticatedUser.userId(),
+          ipAddress);
       return createPaymentMethod(paymentMapper.toPaymentMethodRequest(methodRequest), ipAddress);
     }
     return replaceCardOnFile(paymentMapper.toPaymentMethodRequest(methodRequest));

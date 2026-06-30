@@ -7,12 +7,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ClassifiedContract {
-    private final ClassifiedService classifiedService;
-    public ClassifiedContract(ClassifiedService service){
-        this.classifiedService = service;
-    }
+  private final ClassifiedService classifiedService;
 
-    public ClassifiedAdCustomerResponse findClassifiedAd(UUID classifiedId) {
-        return classifiedService.findClassifiedAndCustomer(classifiedId);
-    }
+  public ClassifiedContract(ClassifiedService service) {
+    this.classifiedService = service;
+  }
+
+  public ClassifiedAdCustomerResponse findClassifiedAd(UUID classifiedId) {
+    return classifiedService.findClassifiedAndCustomer(classifiedId);
+  }
 }

@@ -26,7 +26,7 @@ public interface AccountPaymentMapper {
 
   @Mapping(target = "referenceId", source = "paymentRequest.referenceId")
   @Mapping(target = "paymentToken", source = "savedCard.cardRef")
-  @Mapping(target = "paymentNonce", source="paymentRequest.paymentToken")
+  @Mapping(target = "paymentNonce", source = "paymentRequest.paymentToken")
   @Mapping(target = "paymentAmount", source = "invoice.invoiceTotal")
   @Mapping(target = "totalAmount", source = "invoice.invoiceTotal")
   @Mapping(target = "note", source = "invoice.invoiceNumber")
@@ -46,7 +46,7 @@ public interface AccountPaymentMapper {
   @Mapping(target = "paymentAmount", source = "invoice.invoiceTotal")
   @Mapping(target = "totalAmount", source = "invoice.invoiceTotal")
   @Mapping(target = "note", source = "invoice.invoiceNumber")
-  @Mapping(target = "firstName", source="savedCard.givenName")
+  @Mapping(target = "firstName", source = "savedCard.givenName")
   @Mapping(target = "lastName", source = "savedCard.familyName")
   @Mapping(target = "address", source = "savedCard.payorAddress1")
   @Mapping(target = "city", source = "savedCard.payorCity")
@@ -55,9 +55,9 @@ public interface AccountPaymentMapper {
   @Mapping(target = "phoneNumber", source = "savedCard.phoneNumber")
   @Mapping(target = "emailAddress", source = "savedCard.emailAddress")
   PaymentRequest toPaymentRequest(
-          @NotNull @NonNull ProducerResponse producer,
-          PaymentMethodResponse savedCard,
-          InvoiceResponse invoice);
+      @NotNull @NonNull ProducerResponse producer,
+      PaymentMethodResponse savedCard,
+      InvoiceResponse invoice);
 
   ApiPaymentResponse toApiResponse(PaymentMethodResponse paymentMethodResponse);
 }

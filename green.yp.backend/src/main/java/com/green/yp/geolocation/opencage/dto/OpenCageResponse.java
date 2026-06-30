@@ -5,14 +5,12 @@ import lombok.Data;
 
 @Data
 public class OpenCageResponse {
-    private List<OpenCageResult> results;
-    private OpenCageStatus status;
+  private List<OpenCageResult> results;
+  private OpenCageStatus status;
 
-    @Data
-    public class OpenCageStatus {
-        private int code;
-        private String message;
-    }
-
+  @Data
+  public class OpenCageStatus {
+    private int code;
+    private String message;
+  }
 }
-

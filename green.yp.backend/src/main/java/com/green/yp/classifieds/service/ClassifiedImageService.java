@@ -67,7 +67,11 @@ public class ClassifiedImageService {
   }
 
   public void deleteGallaryImage(UUID classifiedId, String imageFilename, String requestIP) {
-    log.info("Deleting gallery image {} for classifiedId: {} - {}",imageFilename, classifiedId, requestIP);
+    log.info(
+        "Deleting gallery image {} for classifiedId: {} - {}",
+        imageFilename,
+        classifiedId,
+        requestIP);
     classifedRepository
         .findById(classifiedId)
         .orElseThrow(() -> new NotFoundException("producer", classifiedId));
