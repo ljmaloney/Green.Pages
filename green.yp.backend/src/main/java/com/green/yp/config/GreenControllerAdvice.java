@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MissingRequestValueException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -23,6 +25,16 @@ public class GreenControllerAdvice {
         null,
         new ErrorMessageApi(
             ErrorCodeType.SYSTEM_ERROR, "Unexpected error has occurred", e.getMessage()));
+  }
+
+  @ExceptionHandler(MissingRequestValueException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseApi<Void> handleError(MissingRequestValueException e) {
+    log.warn("Missing request value: {}", e.getMessage());
+    return new ResponseApi<>(
+        null,
+        new ErrorMessageApi(
+            ErrorCodeType.PAYLOAD_VALIDATION, "Missing or malformed request parameter", e.getMessage()));
   }
 
   @ExceptionHandler(UserCredentialsException.class)
