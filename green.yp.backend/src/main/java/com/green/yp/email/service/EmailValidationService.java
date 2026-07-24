@@ -6,6 +6,7 @@ import com.green.yp.api.apitype.email.EmailValidationStatusType;
 import com.green.yp.email.data.model.EmailValidation;
 import com.green.yp.email.data.repository.EmailValidationRepository;
 import com.green.yp.email.mapper.EmailMapper;
+import com.green.yp.exception.ErrorCodeType;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.util.TokenUtils;
 import jakarta.validation.Valid;
@@ -44,10 +45,12 @@ public class EmailValidationService {
                     "Email address {} validation tokens do not match from ipAddress {} ",
                     validationRequest.emailAddress(),
                     requestIP);
-                throw new PreconditionFailedException("Email address validation failed");
+                throw new PreconditionFailedException(ErrorCodeType.EMAIL_VALIDATION_TOKEN,
+                        "Email address validation failed");
               }
               emailValidation.setEmailValidationDate(OffsetDateTime.now());
               emailValidation.setIpAddress(requestIP);
+
               emailValidation.setValidationStatus(EmailValidationStatusType.VALIDATED);
               repository.saveAndFlush(emailValidation);
             },

@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestValueException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -35,6 +36,18 @@ public class GreenControllerAdvice {
         null,
         new ErrorMessageApi(
             ErrorCodeType.PAYLOAD_VALIDATION, "Missing or malformed request parameter", e.getMessage()));
+  }
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseApi<Void> handleInvalidArguement(MethodArgumentNotValidException ex){
+    log.warn("Missing request value: {}", ex.getMessage());
+    return new ResponseApi<>(
+            null,
+            new ErrorMessageApi(
+                    ErrorCodeType.PAYLOAD_VALIDATION,
+                    "Missing or malformed request parameter",
+                    ex.getMessage()));
   }
 
   @ExceptionHandler(UserCredentialsException.class)

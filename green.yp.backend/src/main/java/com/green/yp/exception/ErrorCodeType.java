@@ -20,7 +20,8 @@ public enum ErrorCodeType {
       "Max login attempts exceeded, contact account is locked for {} minutes",
       HttpStatus.LOCKED.value()),
   PAYMENT_CUSTOMER_ERROR(
-      "Error creating customer for payment method", HttpStatus.INTERNAL_SERVER_ERROR.value());
+      "Error creating customer for payment method", HttpStatus.INTERNAL_SERVER_ERROR.value()),
+  EMAIL_VALIDATION_TOKEN("The validation token for the email address was not valid", HttpStatus.PRECONDITION_FAILED.value());
   private final int errorCode;
   private final String messageFormat;
 
