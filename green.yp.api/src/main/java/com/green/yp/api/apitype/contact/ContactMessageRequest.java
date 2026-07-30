@@ -21,10 +21,13 @@ public record ContactMessageRequest(ContactMessageRequestType requestType,
                              @Pattern(regexp = "^((?!  ).)*$", message = "Name should not contain consecutive spaces")
                              @Pattern(regexp = "^[^a-z].*$", message = "Name should not start with a lower case character")
                              String name,
-                                    @Size(max = 16, message = "The maximum length of a cell phone number is 12 characters")
-                             @Pattern(regexp = "^(?:\\+1)?\\s?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}$")
+                             @Size(max = 16, message = "The maximum length of a cell phone number is 12 characters")
+                             @Pattern(regexp = "^(?:\\+1)?\\s?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}$",
+                                     message="Invalid phone number format")
                              String phoneNumber,
-                                    @Pattern(regexp = "^[A-Za-z\\s\\-.']+$", message = "Subject should contain only alphabets, spaces, or hyphens")
+                             @Pattern(regexp = "^[A-Za-z\\s\\-:.']+$",
+                                            message = "Subject should contain only alphabets, spaces, colons, or hyphens")
                              String subject,
-                                    @Pattern(regexp = "^[A-Za-z\\s\\-.']+$", message = "Message should contain only alphabets, spaces, or hyphens")
+                             @Pattern(regexp = "^[A-Za-z\\s\\-.']+$",
+                                            message = "Message should contain only alphabets, spaces, or hyphens")
                              String message) {}
