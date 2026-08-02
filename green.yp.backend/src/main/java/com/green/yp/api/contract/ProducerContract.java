@@ -4,10 +4,7 @@ import com.green.yp.api.apitype.enumeration.CancelReasonType;
 import com.green.yp.api.apitype.enumeration.ProducerSubProcessType;
 import com.green.yp.api.apitype.producer.*;
 import com.green.yp.api.apitype.producer.enumeration.ProducerSubscriptionType;
-import com.green.yp.producer.service.ProducerLocationService;
-import com.green.yp.producer.service.ProducerOrchestrationService;
-import com.green.yp.producer.service.ProducerSubscriptionService;
-import com.green.yp.producer.service.ProducerUserService;
+import com.green.yp.producer.service.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -28,16 +25,18 @@ public class ProducerContract {
   private final ProducerUserService producerUserService;
 
   private final ProducerSubscriptionService subscriptionService;
+  private final ProducerProfileService profileService;
 
   public ProducerContract(
-      ProducerOrchestrationService producerService,
-      ProducerLocationService producerLocationService,
-      ProducerUserService producerUserService,
-      ProducerSubscriptionService subscriptionService) {
+          ProducerOrchestrationService producerService,
+          ProducerLocationService producerLocationService,
+          ProducerUserService producerUserService,
+          ProducerSubscriptionService subscriptionService, ProducerProfileService profileService) {
     this.producerService = producerService;
     this.producerLocationService = producerLocationService;
     this.producerUserService = producerUserService;
     this.subscriptionService = subscriptionService;
+      this.profileService = profileService;
   }
 
   public ProducerResponse findProducer(@NonNull @NotNull UUID producerId) {
@@ -97,6 +96,10 @@ public class ProducerContract {
 
   public ProducerLocationResponse findPrimaryLocation(UUID accountId) {
     return producerLocationService.findPrimaryLocation(accountId);
+  }
+
+  public ProducerProfileResponse getProducerProfile(UUID producerLocationId){
+    return profileService.getProducerProfile(producerLocationId);
   }
 
   public ProducerResponse updateProducer(ProducerRequest producer) {

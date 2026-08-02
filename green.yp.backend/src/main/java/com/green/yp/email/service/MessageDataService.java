@@ -36,23 +36,23 @@ public class MessageDataService {
         return repository.findMessages(startDate, endDate);
     }
 
-    public ContactMessageResponse createContactMessage(ContactMessageRequest request,
-                                                       ProducerResponse producer,
-                                                       ProducerLocationResponse location,
-                                                       ProducerContactResponse contact,
-                                                       String requestIP) {
-        log.info("Creating new subscriber -> customer contact message - {} for {} at {} - IP {}",
-                request.subject(), producer.producerId(), location.locationId(), requestIP);
-        var contactMessage = mapper.toEntity(request, producer, location, contact, requestIP);
-        contactMessage.setSourceIpAddress(requestIP);
-        contactMessage.setSmsEmailType("email");
-        contactMessage.setAddresseeName(getContactName(contact));
-        contactMessage.setDestination(contact.emailAddress());
-        if ( request.leadContactRequest().productServiceRef() != null ) {
-            contactMessage.setProductServiceRef(request.leadContactRequest().productServiceRef());
-        }
-        return mapper.toDto(repository.saveAndFlush(contactMessage));
-    }
+//    public ContactMessageResponse createContactMessage(ContactMessageRequest request,
+//                                                       ProducerResponse producer,
+//                                                       ProducerLocationResponse location,
+//                                                       ProducerContactResponse contact,
+//                                                       String requestIP) {
+//        log.info("Creating new subscriber -> customer contact message - {} for {} at {} - IP {}",
+//                request.subject(), producer.producerId(), location.locationId(), requestIP);
+//        var contactMessage = mapper.toEntity(request, producer, location, contact, requestIP);
+//        contactMessage.setSourceIpAddress(requestIP);
+//        contactMessage.setSmsEmailType("email");
+//        contactMessage.setAddresseeName(getContactName(contact));
+//        contactMessage.setDestination(contact.emailAddress());
+//        if ( request.leadContactRequest().productServiceRef() != null ) {
+//            contactMessage.setProductServiceRef(request.leadContactRequest().productServiceRef());
+//        }
+//        return mapper.toDto(repository.saveAndFlush(contactMessage));
+//    }
 
     public ContactMessageResponse createContactMessage(ContactMessageRequest request,
                                                        ClassifiedAdCustomerResponse classified,

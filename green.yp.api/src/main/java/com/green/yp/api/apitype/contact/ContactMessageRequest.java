@@ -28,6 +28,6 @@ public record ContactMessageRequest(ContactMessageRequestType requestType,
                              @Pattern(regexp = "^[A-Za-z\\s\\-:.']+$",
                                             message = "Subject should contain only alphabets, spaces, colons, or hyphens")
                              String subject,
-                             @Pattern(regexp = "^[A-Za-z\\s\\-.']+$",
+                             @Pattern(regexp = "^[A-Za-z0-9\\s\\-.: ']+$",
                                             message = "Message should contain only alphabets, spaces, or hyphens")
                              String message) {}
