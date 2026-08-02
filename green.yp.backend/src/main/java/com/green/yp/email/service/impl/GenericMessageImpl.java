@@ -5,12 +5,10 @@ import com.green.yp.api.apitype.contact.ContactMessageResponse;
 import com.green.yp.api.apitype.producer.enumeration.ProducerContactType;
 import com.green.yp.api.contract.ProducerContactContract;
 import com.green.yp.api.contract.ProducerContract;
-import com.green.yp.api.contract.ProducerLocationContract;
 import com.green.yp.email.data.repository.ContactMessageRepository;
 import com.green.yp.email.mapper.ContactMapper;
 import com.green.yp.email.service.MessageSendService;
 import java.util.UUID;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -24,25 +22,27 @@ public class GenericMessageImpl implements MessageSendService {
   private final ContactMapper mapper;
   private final ContactMessageRepository repository;
 
-    public GenericMessageImpl(ProducerContract producerContract,
-                              ProducerContactContract producerContactContract,
-                              ContactMapper mapper,
-                              ContactMessageRepository repository) {
-        this.producerContract = producerContract;
-        this.contactContract = producerContactContract;
-        this.mapper = mapper;
-        this.repository = repository;
-    }
+  public GenericMessageImpl(
+      ProducerContract producerContract,
+      ProducerContactContract producerContactContract,
+      ContactMapper mapper,
+      ContactMessageRepository repository) {
+    this.producerContract = producerContract;
+    this.contactContract = producerContactContract;
+    this.mapper = mapper;
+    this.repository = repository;
+  }
 
-    @Override
+  @Override
   public ContactMessageResponse createContactMessage(
       ContactMessageRequest request, String requestIP) {
     log.info(
-            "Creating new pro -> customer contact message for producer id {} locationId {}",
-            request.leadContactRequest().producerId(),
-            request.leadContactRequest().locationId());
+        "Creating new pro -> customer contact message for producer id {} locationId {}",
+        request.leadContactRequest().producerId(),
+        request.leadContactRequest().locationId());
 
-    var producerProfile = producerContract.getProducerProfile(request.leadContactRequest().locationId());
+    var producerProfile =
+        producerContract.getProducerProfile(request.leadContactRequest().locationId());
 
     var message = mapper.toEntity(request, producerProfile, requestIP);
 
@@ -56,7 +56,7 @@ public class GenericMessageImpl implements MessageSendService {
             c -> {
               if (StringUtils.isNotBlank(c.firstName()) && StringUtils.isNotBlank(c.lastName())) {
                 message.setAddresseeName(String.join(" ", c.firstName(), c.lastName()));
-              } else if ( StringUtils.isNotBlank(c.genericContactName())){
+              } else if (StringUtils.isNotBlank(c.genericContactName())) {
                 message.setAddresseeName(c.genericContactName());
               }
             });

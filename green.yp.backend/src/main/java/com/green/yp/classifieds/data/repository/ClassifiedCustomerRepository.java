@@ -12,17 +12,21 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ClassifiedCustomerRepository extends JpaRepository<ClassifiedCustomer, UUID> {
   Optional<ClassifiedCustomer> findClassifiedCustomerByEmailAddress(@Email String emailAddress);
 
-  Optional<ClassifiedCustomer> findClassifiedCustomerByEmailAddressOrPhoneNumber(@Email String emailAddress,
-                                                                                 @NotBlank(message = "Enter your phone number")
-                                                                                 @Pattern(regexp = "^(?:\\+1)?\\s?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}$")
-                                                                                 String phoneNumber);
+  Optional<ClassifiedCustomer> findClassifiedCustomerByEmailAddressOrPhoneNumber(
+      @Email String emailAddress,
+      @NotBlank(message = "Enter your phone number")
+          @Pattern(regexp = "^(?:\\+1)?\\s?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}$")
+          String phoneNumber);
 
-    @NotNull Optional<ClassifiedCustomer> findClassifiedCustomerByPhoneNumber(@NotBlank(message = "Enter your phone number")
-                                                                              @Pattern(regexp = "^(?:\\+1)?\\s?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}$")
-                                                                              String phoneNumber);
+  @NotNull
+  Optional<ClassifiedCustomer> findClassifiedCustomerByPhoneNumber(
+      @NotBlank(message = "Enter your phone number")
+          @Pattern(regexp = "^(?:\\+1)?\\s?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}$")
+          String phoneNumber);
 
-    Optional<ClassifiedCustomer> findClassifiedCustomerByEmailAddressAndPhoneNumber(@Email String emailAddress,
-                                                                        @NotBlank(message = "Enter your phone number")
-                                                                        @Pattern(regexp = "^(?:\\+1)?\\s?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}$")
-                                                                        String phoneNumber);
+  Optional<ClassifiedCustomer> findClassifiedCustomerByEmailAddressAndPhoneNumber(
+      @Email String emailAddress,
+      @NotBlank(message = "Enter your phone number")
+          @Pattern(regexp = "^(?:\\+1)?\\s?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}$")
+          String phoneNumber);
 }

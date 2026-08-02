@@ -34,7 +34,8 @@ public interface LineOfBusinessMapper {
 
   List<LineOfBusinessDto> toApi(List<LineOfBusinessDto> allLineOfBusiness);
 
-  default LineOfBusiness fromDtoToEntity(@Valid @NotNull LineOfBusinessDto lineOfBusinessDto, LineOfBusiness lineOfBusiness){
+  default LineOfBusiness fromDtoToEntity(
+      @Valid @NotNull LineOfBusinessDto lineOfBusinessDto, LineOfBusiness lineOfBusiness) {
     lineOfBusiness.setId(lineOfBusinessDto.lineOfBusinessId());
     lineOfBusiness.setLineOfBusinessName(lineOfBusinessDto.lineOfBusinessName());
     lineOfBusiness.setCreateType(lineOfBusinessDto.createType());

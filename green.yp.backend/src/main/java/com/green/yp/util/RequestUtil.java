@@ -24,10 +24,11 @@ public class RequestUtil {
     "REMOTE_ADDR"
   };
 
-    // Allow alphanumeric, dash, underscore, and dot
-    private static final Pattern SAFE_FILENAME = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9._-]{0,254}$");
+  // Allow alphanumeric, dash, underscore, and dot
+  private static final Pattern SAFE_FILENAME =
+      Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9._-]{0,254}$");
 
-    private RequestUtil() {}
+  private RequestUtil() {}
 
   public static String getRequestIP() {
     return getRequestIP(null);
@@ -60,12 +61,14 @@ public class RequestUtil {
     return request.getRemoteAddr();
   }
 
-    public static boolean isInValidFileName(String filename) {
-        if (filename == null || filename.contains("..") || filename.contains("/") || filename.contains("\\")) {
-            return true;
-        }
-        // Must match safe characters
-        return !SAFE_FILENAME.matcher(filename).matches();
+  public static boolean isInValidFileName(String filename) {
+    if (filename == null
+        || filename.contains("..")
+        || filename.contains("/")
+        || filename.contains("\\")) {
+      return true;
     }
-
+    // Must match safe characters
+    return !SAFE_FILENAME.matcher(filename).matches();
+  }
 }

@@ -39,13 +39,13 @@ public class SearchV2Controller {
 
   @GetMapping("/nearme")
   public PageableResponse<SearchResponse> search(
-          @RequestParam BigDecimal latitude,
-          @RequestParam BigDecimal longitude,
-          @RequestParam(required = false) String keywords,
-          @RequestParam(required = false) UUID categoryRefId,
-          @RequestParam(defaultValue = "25") Integer distance,
-          @RequestParam(defaultValue = "0") Integer page,
-          @RequestParam(defaultValue = "15") Integer limit) {
+      @RequestParam BigDecimal latitude,
+      @RequestParam BigDecimal longitude,
+      @RequestParam(required = false) String keywords,
+      @RequestParam(required = false) UUID categoryRefId,
+      @RequestParam(defaultValue = "25") Integer distance,
+      @RequestParam(defaultValue = "0") Integer page,
+      @RequestParam(defaultValue = "15") Integer limit) {
 
     Pageable pageable = PageRequest.of(page, limit);
     return searchService.search(latitude, longitude, distance, categoryRefId, keywords, pageable);

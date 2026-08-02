@@ -72,7 +72,8 @@ public class FusionAuthService implements AuthenticationService {
 
     if (response.wasSuccessful()) {
       log.info("Created new user credentials for producer : {}", producerId);
-      return new AuthServiceResponse<>(response.getSuccessResponse().registrationVerificationId, response.successResponse);
+      return new AuthServiceResponse<>(
+          response.getSuccessResponse().registrationVerificationId, response.successResponse);
     } else {
       // Handle errors
       log.error(
@@ -111,14 +112,21 @@ public class FusionAuthService implements AuthenticationService {
       log.debug("Found fusionAuth credentials : {}", externalAuthorizationServiceRef);
       return new AuthServiceResponse<>("", response.successResponse);
     } else {
-      if ( response.getException() instanceof UnknownHostException) {
-          log.error("Could not contact fusionAuth service - {}", response.getException().getMessage());
-          throw new SystemException("Could not contact fusionAuth service", HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodeType.SYSTEM_ERROR);
+      if (response.getException() instanceof UnknownHostException) {
+        log.error(
+            "Could not contact fusionAuth service - {}", response.getException().getMessage());
+        throw new SystemException(
+            "Could not contact fusionAuth service",
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            ErrorCodeType.SYSTEM_ERROR);
       }
-        // Handle errors
+      // Handle errors
       log.error(
           "Error occurred when retrieving credentials for {} : {}",
-          externalAuthorizationServiceRef, response.getErrorResponse() != null ? response.getErrorResponse() : response.getException());
+          externalAuthorizationServiceRef,
+          response.getErrorResponse() != null
+              ? response.getErrorResponse()
+              : response.getException());
 
       throw new UserCredentialsException(
           "Error when retrieving fusion auth credentials", response.exception);
@@ -126,8 +134,8 @@ public class FusionAuthService implements AuthenticationService {
   }
 
   @Override
-  public Optional<AuthenticatedUserCredentialsResponse> findUser(@NonNull String userName,
-                                                                 @NonNull String emailAddress) {
+  public Optional<AuthenticatedUserCredentialsResponse> findUser(
+      @NonNull String userName, @NonNull String emailAddress) {
 
     UserSearchCriteria criteria = new UserSearchCriteria();
     criteria.queryString = String.format("email:\"%s\" OR username:\"%s\"", emailAddress, userName);
@@ -136,31 +144,38 @@ public class FusionAuthService implements AuthenticationService {
     SearchRequest request = new SearchRequest(criteria);
 
     ClientResponse<SearchResponse, Errors> response = fusionAuthClient.searchUsersByQuery(request);
-    if ( response.wasSuccessful()){
-      log.warn("Found {} credentials for {} {}", response.successResponse.total, userName, emailAddress);
+    if (response.wasSuccessful()) {
+      log.warn(
+          "Found {} credentials for {} {}", response.successResponse.total, userName, emailAddress);
       return response.getSuccessResponse().users.stream()
-              .filter( user -> user.username.equals(userName))
-              .findFirst()
-              .map(user -> AuthenticatedUserCredentialsResponse.builder()
+          .filter(user -> user.username.equals(userName))
+          .findFirst()
+          .map(
+              user ->
+                  AuthenticatedUserCredentialsResponse.builder()
                       .externalAuthorizationServiceRef(user.id.toString())
                       .userName(user.username)
                       .lastName(user.lastName)
                       .firstName(user.firstName)
                       .emailAddress(user.email)
                       .build());
-    } else if ( response.errorResponse != null ) {
+    } else if (response.errorResponse != null) {
       // Handle errors
       log.error(
-              "Error occurred while searching for username {} emailAddress {}, error : {}",
-              userName, emailAddress, response.errorResponse);
+          "Error occurred while searching for username {} emailAddress {}, error : {}",
+          userName,
+          emailAddress,
+          response.errorResponse);
       throw new UserCredentialsException(
-              "Error when retrieving fusion auth credentials", response.exception);
+          "Error when retrieving fusion auth credentials", response.exception);
     } else {
-        log.error(
-                "Error occurred while searching for username {} emailAddress {}, response : {}",
-                userName, emailAddress, response);
-        throw new UserCredentialsException(
-                "Error when retrieving fusion auth credentials", response.exception);
+      log.error(
+          "Error occurred while searching for username {} emailAddress {}, response : {}",
+          userName,
+          emailAddress,
+          response);
+      throw new UserCredentialsException(
+          "Error when retrieving fusion auth credentials", response.exception);
     }
   }
 
@@ -210,30 +225,34 @@ public class FusionAuthService implements AuthenticationService {
     }
   }
 
-  private User createFusionAuthUser(UUID producerId, UUID contactId, UserCredentialsRequest userCredentialsRequest) {
+  private User createFusionAuthUser(
+      UUID producerId, UUID contactId, UserCredentialsRequest userCredentialsRequest) {
 
     String username =
         StringUtils.isNotBlank(userCredentialsRequest.userName())
             ? userCredentialsRequest.userName()
             : userCredentialsRequest.emailAddress();
 
-    var user = new User()
-        .with(u -> u.email = userCredentialsRequest.emailAddress())
-        .with(u -> u.tenantId = UUID.fromString(applicationId))
-        .with(u -> u.firstName = userCredentialsRequest.firstName())
-        .with(u -> u.lastName = userCredentialsRequest.lastName())
-        .with(
-            u ->
-                u.fullName =
-                    userCredentialsRequest.firstName() + " " + userCredentialsRequest.lastName())
-        .with(u -> u.mobilePhone = userCredentialsRequest.cellPhone())
-        .with(u -> u.username = username)
-        .with(u -> u.password = userCredentialsRequest.credentials());
-    if ( producerId != null ){
+    var user =
+        new User()
+            .with(u -> u.email = userCredentialsRequest.emailAddress())
+            .with(u -> u.tenantId = UUID.fromString(applicationId))
+            .with(u -> u.firstName = userCredentialsRequest.firstName())
+            .with(u -> u.lastName = userCredentialsRequest.lastName())
+            .with(
+                u ->
+                    u.fullName =
+                        userCredentialsRequest.firstName()
+                            + " "
+                            + userCredentialsRequest.lastName())
+            .with(u -> u.mobilePhone = userCredentialsRequest.cellPhone())
+            .with(u -> u.username = username)
+            .with(u -> u.password = userCredentialsRequest.credentials());
+    if (producerId != null) {
       user = user.with(u -> u.data.put("producerId", producerId));
     }
-    if ( contactId != null ){
-      user = user.with( u -> u.data.put("contactId", contactId));
+    if (contactId != null) {
+      user = user.with(u -> u.data.put("contactId", contactId));
     }
     return user;
   }

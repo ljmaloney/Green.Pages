@@ -30,7 +30,8 @@ public interface ClassifiedRepository extends JpaRepository<Classified, UUID> {
   Optional<ClassifiedCustomerProjection> findClassifiedAndCustomer(
       @NotNull @Param("classifiedId") UUID classifiedId);
 
-  @Query("""
+  @Query(
+"""
     SELECT new com.green.yp.classifieds.data.model.ClassifiedSearchProjection(classified, adType, category, null)
     FROM Classified AS classified
         INNER JOIN ClassifiedAdType AS adType on adType.id = classified.adTypeId
@@ -41,11 +42,13 @@ public interface ClassifiedRepository extends JpaRepository<Classified, UUID> {
        AND :currentDate BETWEEN classified.activeDate AND classified.lastActiveDate
      ORDER BY classified.createDate
 """)
-  List<ClassifiedSearchProjection> getMostRecent(@NotNull @Param("currentDate") LocalDate currentDate,
-                                                 @Param("categoryId") UUID categoryId, Limit limit);
+  List<ClassifiedSearchProjection> getMostRecent(
+      @NotNull @Param("currentDate") LocalDate currentDate,
+      @Param("categoryId") UUID categoryId,
+      Limit limit);
 
-
-  @Query("""
+  @Query(
+      """
         SELECT classified
         FROM Classified classified
         WHERE classified.activeDate IS NULL AND classified.lastActiveDate IS NULL
@@ -53,7 +56,9 @@ public interface ClassifiedRepository extends JpaRepository<Classified, UUID> {
     """)
   List<Classified> findUnpaidAds(@Param("olderThan") OffsetDateTime olderThan);
 
-  @Query( value = """
+  @Query(
+      value =
+          """
             SELECT
                 bin_to_uuid(c.id) as classifiedId,
                 c.title,
@@ -66,7 +71,8 @@ public interface ClassifiedRepository extends JpaRepository<Classified, UUID> {
               AND (?2 IS NULL OR ST_Distance_Sphere(c.location_geo_point, ST_GeomFromText(?1, 4326)) <= ?2)
             ORDER BY distance ASC
         """,
-      countQuery = """
+      countQuery =
+          """
             SELECT COUNT(*)
             FROM classified c
             WHERE
@@ -74,17 +80,18 @@ public interface ClassifiedRepository extends JpaRepository<Classified, UUID> {
               AND (?4 IS NULL OR c.classified_category_id = ?4)
               AND (?5 IS NULL OR MATCH(title) AGAINST(?5 IN NATURAL LANGUAGE MODE))
               AND (?2 IS NULL OR ST_Distance_Sphere(c.location_geo_point, ST_GeomFromText(?1, 4326)) <= ?2)
-            """, nativeQuery = true)
+            """,
+      nativeQuery = true)
   Page<ClassifiedSearchDistanceProjection> searchClassifieds(
-          @Param("wktPoint")  String wktPoint,
-          @Param("distanceMeters") BigDecimal distanceMeters,
-          @Param("currentDate")  LocalDate currentDate,
-          @Param("classifiedCategoryId") UUID classifiedCategoryId,
-          @Param("keywords") String keywords,
-          Pageable pageable);
+      @Param("wktPoint") String wktPoint,
+      @Param("distanceMeters") BigDecimal distanceMeters,
+      @Param("currentDate") LocalDate currentDate,
+      @Param("classifiedCategoryId") UUID classifiedCategoryId,
+      @Param("keywords") String keywords,
+      Pageable pageable);
 
   @Query(
-          """
+      """
             SELECT new com.green.yp.classifieds.data.model.ClassifiedSearchProjection(
                 classified, adType, category,
                 CAST(ROUND((3959.0 * acos(cos(radians(:latitude)) * cos(radians(classified.latitude)) *
@@ -101,7 +108,8 @@ public interface ClassifiedRepository extends JpaRepository<Classified, UUID> {
             sin(radians(:latitude)) * sin(radians(classified.latitude)))) ASC,
             classified.title ASC
         """)
-  List<ClassifiedSearchProjection> getSearchRsults(@Param("classifiedIds") List<UUID> classifiedIds,
-                                                   @Param("latitude") Double latitude,
-                                                   @Param("longitude") Double longitude);
+  List<ClassifiedSearchProjection> getSearchRsults(
+      @Param("classifiedIds") List<UUID> classifiedIds,
+      @Param("latitude") Double latitude,
+      @Param("longitude") Double longitude);
 }

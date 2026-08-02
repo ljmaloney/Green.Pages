@@ -74,7 +74,8 @@ public class AuthenticationConfig {
                         "/producer/location/product/**",
                         "/subscriber/**",
                         "/search",
-                        "/v2/search","/v2/search/nearme")
+                        "/v2/search",
+                        "/v2/search/nearme")
                     .permitAll()
                     .anyRequest()
                     .authenticated())

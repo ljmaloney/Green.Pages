@@ -59,10 +59,11 @@ public class LineOfBusinessService {
   }
 
   @Cacheable("lineOfBusiness")
-  public LineOfBusinessDto getLineOfBusiness(String urlString){
-    return repository.findLineOfBusinessByUrlLob(urlString)
-            .map(lineOfBusinessMapper::toDto)
-            .orElseThrow(() -> new NotFoundException(LINE_OF_BUSINESS, urlString));
+  public LineOfBusinessDto getLineOfBusiness(String urlString) {
+    return repository
+        .findLineOfBusinessByUrlLob(urlString)
+        .map(lineOfBusinessMapper::toDto)
+        .orElseThrow(() -> new NotFoundException(LINE_OF_BUSINESS, urlString));
   }
 
   @Cacheable("allLineOfBusiness")
@@ -127,19 +128,25 @@ public class LineOfBusinessService {
   }
 
   @AuditRequest(
-          requestParameter = "lobDto",
-          objectType = AuditObjectType.LINE_OF_BUSINESS,
-          actionType = AuditActionType.UPDATE)
+      requestParameter = "lobDto",
+      objectType = AuditObjectType.LINE_OF_BUSINESS,
+      actionType = AuditActionType.UPDATE)
   @CacheEvict(
-          value = {"allLineOfBusiness", LINE_OF_BUSINESS},
-          allEntries = true)
-  public LineOfBusinessDto updateLineOfBusiness(@Valid @NotNull LineOfBusinessDto lineOfBusinessDto, String userId, @NotNull String ipAddress) {
-    var lineOfBusiness = repository.findById(lineOfBusinessDto.lineOfBusinessId()).orElseThrow(
-            () -> new NotFoundException("LineOfBusiness", lineOfBusinessDto.lineOfBusinessId()));
+      value = {"allLineOfBusiness", LINE_OF_BUSINESS},
+      allEntries = true)
+  public LineOfBusinessDto updateLineOfBusiness(
+      @Valid @NotNull LineOfBusinessDto lineOfBusinessDto,
+      String userId,
+      @NotNull String ipAddress) {
+    var lineOfBusiness =
+        repository
+            .findById(lineOfBusinessDto.lineOfBusinessId())
+            .orElseThrow(
+                () ->
+                    new NotFoundException("LineOfBusiness", lineOfBusinessDto.lineOfBusinessId()));
 
     return lineOfBusinessMapper.toDto(
-            repository.save(lineOfBusinessMapper
-                    .fromDtoToEntity(lineOfBusinessDto, lineOfBusiness)));
+        repository.save(lineOfBusinessMapper.fromDtoToEntity(lineOfBusinessDto, lineOfBusiness)));
   }
 
   public List<LOBServiceDto> findServices(UUID lineOfBusinessId) {

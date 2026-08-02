@@ -33,8 +33,8 @@ public class ClassifiedService {
   @Value("${green.yp.classified.token.timeout:15}")
   private Integer tokenTimeoutMinutes;
 
-    @Value("${green.yp.classified.unpaid.timeout:30}")
-    private Integer unpaidTimeoutMinutes;
+  @Value("${green.yp.classified.unpaid.timeout:30}")
+  private Integer unpaidTimeoutMinutes;
 
   private final ClassifiedRepository repository;
   private final ClassifedTokenRepository tokenRepository;
@@ -48,15 +48,16 @@ public class ClassifiedService {
   private final ClassifiedMapper mapper;
 
   public ClassifiedService(
-          ClassifiedRepository repository,
-          ClassifedTokenRepository tokenRepository,
-          ClassifiedCustomerRepository customerRepository,
-          ClassifiedAdTypeService adTypeService,
-          ClassifiedCategoryService categoryService,
-          ClassifiedGeocodeService geocodeService,
-          EmailContract emailContract, ClassifiedImageService imageService,
-          ClassifiedMapper mapper,
-          ClassifiedCustomerService customerService) {
+      ClassifiedRepository repository,
+      ClassifedTokenRepository tokenRepository,
+      ClassifiedCustomerRepository customerRepository,
+      ClassifiedAdTypeService adTypeService,
+      ClassifiedCategoryService categoryService,
+      ClassifiedGeocodeService geocodeService,
+      EmailContract emailContract,
+      ClassifiedImageService imageService,
+      ClassifiedMapper mapper,
+      ClassifiedCustomerService customerService) {
     this.repository = repository;
     this.tokenRepository = tokenRepository;
     this.customerRepository = customerRepository;
@@ -64,9 +65,9 @@ public class ClassifiedService {
     this.categoryService = categoryService;
     this.geocodeService = geocodeService;
     this.emailContract = emailContract;
-      this.imageService = imageService;
-      this.mapper = mapper;
-      this.customerService = customerService;
+    this.imageService = imageService;
+    this.mapper = mapper;
+    this.customerService = customerService;
   }
 
   public ClassifiedAdCustomerResponse findClassifiedAndCustomer(UUID classifiedId) {
@@ -123,34 +124,35 @@ public class ClassifiedService {
 
     var classifiedResponse = mapper.fromEntity(repository.saveAndFlush(classified));
 
-    var emailValidation = emailContract.validateEmail(classified.getId().toString(), customer.getEmailAddress());
+    var emailValidation =
+        emailContract.validateEmail(classified.getId().toString(), customer.getEmailAddress());
 
     // send confirmation email
-    if(emailValidation.validationStatus() == EmailValidationStatusType.NOT_VALIDATED
-       || emailValidation.validationStatus() == EmailValidationStatusType.VALIDATED ){
-        emailContract.sendEmail(
-                  EmailTemplateType.CLASSIFIED_EMAIL_VALIDATION,
-                  Collections.singletonList(classified.getEmailAddress()),
-                  EmailTemplateType.CLASSIFIED_EMAIL_VALIDATION.getSubjectFormat(),
-                  () -> {
-                      Map<String, Object> templateData = new HashMap<>();
-                      templateData.put("lastName", request.lastName());
-                      templateData.put("firstName", request.firstName());
-                      templateData.put("classifiedTitle", request.title());
-                      templateData.put("categoryName", category.name());
-                      templateData.put("emailValidationToken", emailValidation.token());
-                      templateData.put("adTypeName", adType.adTypeName());
-                      templateData.put("paymentAmount", adType.monthlyPrice());
-                      templateData.put("ipAddress", requestIP);
-                      templateData.put("timestamp", classified.getCreateDate());
-                      return templateData;
-                  });
-      }
+    if (emailValidation.validationStatus() == EmailValidationStatusType.NOT_VALIDATED
+        || emailValidation.validationStatus() == EmailValidationStatusType.VALIDATED) {
+      emailContract.sendEmail(
+          EmailTemplateType.CLASSIFIED_EMAIL_VALIDATION,
+          Collections.singletonList(classified.getEmailAddress()),
+          EmailTemplateType.CLASSIFIED_EMAIL_VALIDATION.getSubjectFormat(),
+          () -> {
+            Map<String, Object> templateData = new HashMap<>();
+            templateData.put("lastName", request.lastName());
+            templateData.put("firstName", request.firstName());
+            templateData.put("classifiedTitle", request.title());
+            templateData.put("categoryName", category.name());
+            templateData.put("emailValidationToken", emailValidation.token());
+            templateData.put("adTypeName", adType.adTypeName());
+            templateData.put("paymentAmount", adType.monthlyPrice());
+            templateData.put("ipAddress", requestIP);
+            templateData.put("timestamp", classified.getCreateDate());
+            return templateData;
+          });
+    }
 
     return classifiedResponse;
   }
 
-    public ClassifiedResponse updateClassified(
+  public ClassifiedResponse updateClassified(
       @Valid ClassifiedUpdateRequest classifiedRequest, String requestIP) {
     return null;
   }
@@ -203,32 +205,41 @@ public class ClassifiedService {
                 OffsetDateTime.now()));
   }
 
-    public void cleanUnpaid() {
-      var deleteDate = OffsetDateTime.now().minusMinutes(unpaidTimeoutMinutes.longValue());
-      List<Classified> classifieds = repository.findUnpaidAds(deleteDate);
-      classifieds.forEach(classified -> {
+  public void cleanUnpaid() {
+    var deleteDate = OffsetDateTime.now().minusMinutes(unpaidTimeoutMinutes.longValue());
+    List<Classified> classifieds = repository.findUnpaidAds(deleteDate);
+    classifieds.forEach(
+        classified -> {
           imageService.deleteGalleryImages(classified.getId());
           repository.delete(classified);
           log.info("Deleted unpaid classified: {} - {}", classified.getId(), classified.getTitle());
-      });
-    }
+        });
+  }
 
-    public void validateEmail(UUID classifiedId, String emailAddress, String emailToken, String requestIP) {
-      log.info("Validating email address {} for classifiedId: {} from {}", emailAddress, classifiedId, requestIP);
-      repository.findClassifiedAndCustomer(classifiedId).ifPresentOrElse( projection -> {
-                var customer = projection.customer();
-                if ( customer.getEmailAddress().equals(emailAddress) && customer.isValidToken(emailToken)){
-                    customer.setEmailValidationDate(OffsetDateTime.now());
-                    customerRepository.save(customer);
-                }else {
-                    log.warn("Invalid email or email token for classifiedId {}", classifiedId);
-                    throw new PreconditionFailedException("Invalid email or email token");
-                }
-              },
-              () -> {
-                  log.warn("No classified found for {}", classifiedId);
-                  throw new NotFoundException("classified", classifiedId);
+  public void validateEmail(
+      UUID classifiedId, String emailAddress, String emailToken, String requestIP) {
+    log.info(
+        "Validating email address {} for classifiedId: {} from {}",
+        emailAddress,
+        classifiedId,
+        requestIP);
+    repository
+        .findClassifiedAndCustomer(classifiedId)
+        .ifPresentOrElse(
+            projection -> {
+              var customer = projection.customer();
+              if (customer.getEmailAddress().equals(emailAddress)
+                  && customer.isValidToken(emailToken)) {
+                customer.setEmailValidationDate(OffsetDateTime.now());
+                customerRepository.save(customer);
+              } else {
+                log.warn("Invalid email or email token for classifiedId {}", classifiedId);
+                throw new PreconditionFailedException("Invalid email or email token");
               }
-      );
-    }
+            },
+            () -> {
+              log.warn("No classified found for {}", classifiedId);
+              throw new NotFoundException("classified", classifiedId);
+            });
+  }
 }

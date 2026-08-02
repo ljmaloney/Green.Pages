@@ -28,15 +28,16 @@ public class ProducerContract {
   private final ProducerProfileService profileService;
 
   public ProducerContract(
-          ProducerOrchestrationService producerService,
-          ProducerLocationService producerLocationService,
-          ProducerUserService producerUserService,
-          ProducerSubscriptionService subscriptionService, ProducerProfileService profileService) {
+      ProducerOrchestrationService producerService,
+      ProducerLocationService producerLocationService,
+      ProducerUserService producerUserService,
+      ProducerSubscriptionService subscriptionService,
+      ProducerProfileService profileService) {
     this.producerService = producerService;
     this.producerLocationService = producerLocationService;
     this.producerUserService = producerUserService;
     this.subscriptionService = subscriptionService;
-      this.profileService = profileService;
+    this.profileService = profileService;
   }
 
   public ProducerResponse findProducer(@NonNull @NotNull UUID producerId) {
@@ -98,7 +99,7 @@ public class ProducerContract {
     return producerLocationService.findPrimaryLocation(accountId);
   }
 
-  public ProducerProfileResponse getProducerProfile(UUID producerLocationId){
+  public ProducerProfileResponse getProducerProfile(UUID producerLocationId) {
     return profileService.getProducerProfile(producerLocationId);
   }
 

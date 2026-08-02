@@ -26,34 +26,40 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ClassifiedSearchController {
 
-    private final ClassifiedSearchService searchService;
+  private final ClassifiedSearchService searchService;
 
-    public ClassifiedSearchController(ClassifiedSearchService searchService){
-        this.searchService = searchService;
-    }
+  public ClassifiedSearchController(ClassifiedSearchService searchService) {
+    this.searchService = searchService;
+  }
 
-    @GetMapping(path="search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericPageableResponse<ClassifiedSearchResponse> search(@RequestParam(value = "postalCode") String postalCode,
-                                                                    @RequestParam(value = "distance", defaultValue = "50") Integer distanceMiles,
-                                                                    @RequestParam(value ="category", required = false) UUID categoryId,
-                                                                    @RequestParam(value="keywords", required = false) String keywords,
-                                                                    @RequestParam(defaultValue = "0") Integer page,
-                                                                    @RequestParam(defaultValue = "15") Integer limit,
-                                                                    HttpServletRequest httpRequest ) {
-        Pageable pageable = PageRequest.of(page, limit);
-        return searchService.searchClassifieds(pageable,
-                postalCode,
-                distanceMiles,
-                categoryId,
-                keywords,
-                RequestUtil.getRequestIP(httpRequest));
-    }
+  @GetMapping(path = "search", produces = MediaType.APPLICATION_JSON_VALUE)
+  public GenericPageableResponse<ClassifiedSearchResponse> search(
+      @RequestParam(value = "postalCode") String postalCode,
+      @RequestParam(value = "distance", defaultValue = "50") Integer distanceMiles,
+      @RequestParam(value = "category", required = false) UUID categoryId,
+      @RequestParam(value = "keywords", required = false) String keywords,
+      @RequestParam(defaultValue = "0") Integer page,
+      @RequestParam(defaultValue = "15") Integer limit,
+      HttpServletRequest httpRequest) {
+    Pageable pageable = PageRequest.of(page, limit);
+    return searchService.searchClassifieds(
+        pageable,
+        postalCode,
+        distanceMiles,
+        categoryId,
+        keywords,
+        RequestUtil.getRequestIP(httpRequest));
+  }
 
-    @GetMapping(path="mostRecent", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseApi<List<ClassifiedSearchResponse>> mostRecent(@RequestParam(value = "number", defaultValue = "9") Integer maxCount,
-                                                                  @RequestParam(value = "categoryId", required = false) UUID categoryId,
-                                                                  @RequestParam(value = "categoryName", required = false) String categoryName,
-                                                                  HttpServletRequest httpRequest){
-    return new ResponseApi<>(searchService.mostRecent(maxCount, categoryId, categoryName, RequestUtil.getRequestIP(httpRequest)), null);
-    }
+  @GetMapping(path = "mostRecent", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<List<ClassifiedSearchResponse>> mostRecent(
+      @RequestParam(value = "number", defaultValue = "9") Integer maxCount,
+      @RequestParam(value = "categoryId", required = false) UUID categoryId,
+      @RequestParam(value = "categoryName", required = false) String categoryName,
+      HttpServletRequest httpRequest) {
+    return new ResponseApi<>(
+        searchService.mostRecent(
+            maxCount, categoryId, categoryName, RequestUtil.getRequestIP(httpRequest)),
+        null);
+  }
 }

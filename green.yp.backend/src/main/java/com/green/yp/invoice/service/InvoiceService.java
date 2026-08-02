@@ -25,78 +25,94 @@ import org.springframework.stereotype.Service;
 @Service
 public class InvoiceService {
 
-    public static final String LINE_NUMBER = "lineNumber";
-    private final InvoiceRepository invoiceRepository;
-    private final InvoiceMapper mapper;
+  public static final String LINE_NUMBER = "lineNumber";
+  private final InvoiceRepository invoiceRepository;
+  private final InvoiceMapper mapper;
 
-    public InvoiceService(InvoiceRepository invoiceRepository, InvoiceMapper mapper){
-        this.invoiceRepository = invoiceRepository;
-        this.mapper = mapper;
-    }
+  public InvoiceService(InvoiceRepository invoiceRepository, InvoiceMapper mapper) {
+    this.invoiceRepository = invoiceRepository;
+    this.mapper = mapper;
+  }
 
-    public InvoiceResponse createInvoice(InvoiceRequest invoiceRequest) {
-        log.info("Creating new invoice for {}", invoiceRequest.externalRef());
-        Invoice invoice = mapper.toEntity(invoiceRequest);
+  public InvoiceResponse createInvoice(InvoiceRequest invoiceRequest) {
+    log.info("Creating new invoice for {}", invoiceRequest.externalRef());
+    Invoice invoice = mapper.toEntity(invoiceRequest);
 
-        var nextInvoiceNumber = getNextInvoiceNumber();
-        invoice.setInvoiceNumber(nextInvoiceNumber);
-        //this is a little hack to get around functional requiring final objects.
-        Map<String, Integer> lineMap = new HashMap<>();
-        lineMap.put(LINE_NUMBER, 1);
-        invoice.getLineItems().forEach(line -> {
-            line.setInvoice(invoice);
-            line.setLineNumber(lineMap.get(LINE_NUMBER));
-            lineMap.put(LINE_NUMBER, lineMap.get(LINE_NUMBER) + 1);
-        });
+    var nextInvoiceNumber = getNextInvoiceNumber();
+    invoice.setInvoiceNumber(nextInvoiceNumber);
+    // this is a little hack to get around functional requiring final objects.
+    Map<String, Integer> lineMap = new HashMap<>();
+    lineMap.put(LINE_NUMBER, 1);
+    invoice
+        .getLineItems()
+        .forEach(
+            line -> {
+              line.setInvoice(invoice);
+              line.setLineNumber(lineMap.get(LINE_NUMBER));
+              lineMap.put(LINE_NUMBER, lineMap.get(LINE_NUMBER) + 1);
+            });
 
-        return mapper.fromEntity(invoiceRepository.saveAndFlush(invoice));
-    }
+    return mapper.fromEntity(invoiceRepository.saveAndFlush(invoice));
+  }
 
-    public void updatePayment(UUID invoiceId, PaymentTransactionResponse completedPayment) {
-        log.debug("Updating payment for {} with receipt {}", invoiceId, completedPayment.receiptNumber());
-        invoiceRepository.findById(invoiceId).ifPresent(invoice -> {
-           invoice.setPaidDate(OffsetDateTime.now());
-           invoice.setPaymentTransactionId(completedPayment.transactionId());
-           invoice.setPaymentReceiptNumber(completedPayment.receiptNumber());
-           invoice.setPaymentReceiptUrl(completedPayment.receiptUrl());
-           invoiceRepository.save(invoice);
-        });
-    }
+  public void updatePayment(UUID invoiceId, PaymentTransactionResponse completedPayment) {
+    log.debug(
+        "Updating payment for {} with receipt {}", invoiceId, completedPayment.receiptNumber());
+    invoiceRepository
+        .findById(invoiceId)
+        .ifPresent(
+            invoice -> {
+              invoice.setPaidDate(OffsetDateTime.now());
+              invoice.setPaymentTransactionId(completedPayment.transactionId());
+              invoice.setPaymentReceiptNumber(completedPayment.receiptNumber());
+              invoice.setPaymentReceiptUrl(completedPayment.receiptUrl());
+              invoiceRepository.save(invoice);
+            });
+  }
 
-    private String getNextInvoiceNumber() {
-        OffsetDateTime startDate = OffsetDateTime.now().truncatedTo(ChronoUnit.DAYS);
-        OffsetDateTime endDate = startDate.plusDays(1).minusSeconds(1);
+  private String getNextInvoiceNumber() {
+    OffsetDateTime startDate = OffsetDateTime.now().truncatedTo(ChronoUnit.DAYS);
+    OffsetDateTime endDate = startDate.plusDays(1).minusSeconds(1);
 
-        Integer counter = invoiceRepository.getCountByDate(startDate, endDate);
+    Integer counter = invoiceRepository.getCountByDate(startDate, endDate);
 
-        String prefix = new SimpleDateFormat("yyyyMMdd").format(Date.from(startDate.toInstant()));
-        return String.format(
-                "%s-%s", prefix, new DecimalFormat("000000").format(counter.doubleValue() + 1));
-    }
+    String prefix = new SimpleDateFormat("yyyyMMdd").format(Date.from(startDate.toInstant()));
+    return String.format(
+        "%s-%s", prefix, new DecimalFormat("000000").format(counter.doubleValue() + 1));
+  }
 
-    public List<InvoiceResponse> findInvoices(InvoiceType invoiceType,
-                                              String referenceId,
-                                              LocalDate startDate,
-                                              LocalDate endDate,
-                                              AuthenticatedUser authenticatedUser,
-                                              String requestIP) {
-        log.info("Finding {} invoices for {} between {} and {} from requestIP {}",
-                invoiceType, referenceId, startDate, endDate, requestIP);
-        return invoiceRepository.findInvoices(invoiceType, referenceId,
-                OffsetDateTime.of(startDate.atTime(0,0,0), ZoneOffset.UTC),
-                OffsetDateTime.of(endDate.atTime(23,59,59), ZoneOffset.UTC))
-                .stream()
-                .map(mapper::fromEntity)
-                .toList();
-    }
+  public List<InvoiceResponse> findInvoices(
+      InvoiceType invoiceType,
+      String referenceId,
+      LocalDate startDate,
+      LocalDate endDate,
+      AuthenticatedUser authenticatedUser,
+      String requestIP) {
+    log.info(
+        "Finding {} invoices for {} between {} and {} from requestIP {}",
+        invoiceType,
+        referenceId,
+        startDate,
+        endDate,
+        requestIP);
+    return invoiceRepository
+        .findInvoices(
+            invoiceType,
+            referenceId,
+            OffsetDateTime.of(startDate.atTime(0, 0, 0), ZoneOffset.UTC),
+            OffsetDateTime.of(endDate.atTime(23, 59, 59), ZoneOffset.UTC))
+        .stream()
+        .map(mapper::fromEntity)
+        .toList();
+  }
 
-    public Optional<InvoiceResponse> findUnpaidInvoice(@NotNull @NonNull UUID referenceId,
-                                                       @NotNull @NonNull AuthenticatedUser authenticatedUser,
-                                                       @NotNull @NonNull String requestIP) {
-        log.info("Finding most recent unpaid invoice for {} from requestIp {}", referenceId, requestIP);
-        return invoiceRepository.findUnpaidInvoices(String.valueOf(referenceId))
-                .stream()
-                .findFirst()
-                .map(mapper::fromEntity);
-    }
+  public Optional<InvoiceResponse> findUnpaidInvoice(
+      @NotNull @NonNull UUID referenceId,
+      @NotNull @NonNull AuthenticatedUser authenticatedUser,
+      @NotNull @NonNull String requestIP) {
+    log.info("Finding most recent unpaid invoice for {} from requestIp {}", referenceId, requestIP);
+    return invoiceRepository.findUnpaidInvoices(String.valueOf(referenceId)).stream()
+        .findFirst()
+        .map(mapper::fromEntity);
+  }
 }

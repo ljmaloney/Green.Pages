@@ -12,38 +12,41 @@ import org.springframework.stereotype.Service;
 @Service
 public class ClassifiedCustomerService {
 
-    private final ClassifiedCustomerRepository repository;
-    private final ClassifiedMapper mapper;
+  private final ClassifiedCustomerRepository repository;
+  private final ClassifiedMapper mapper;
 
-    public ClassifiedCustomerService(ClassifiedCustomerRepository repository,
-                                     ClassifiedMapper mapper) {
-        this.repository = repository;
-        this.mapper = mapper;
-    }
-    /*
+  public ClassifiedCustomerService(
+      ClassifiedCustomerRepository repository, ClassifiedMapper mapper) {
+    this.repository = repository;
+    this.mapper = mapper;
+  }
 
-     */
-    public ClassifiedCustomer upsertCustomer(ClassifiedRequest request){
-        return repository
-                .findClassifiedCustomerByEmailAddressAndPhoneNumber(request.emailAddress(), request.phoneNumber())
-                .map(cust -> {
-                    upsertCustomerData(request, cust);
-                    return repository.save(cust);
-                 })
-                .orElseGet(
-                                () -> {
-                                    var newCustomer = mapper.customterFromClassified(request);
-                                    newCustomer.setEmailAddressValidationToken(TokenUtils.generateCode(8));
-                                    return repository.saveAndFlush(newCustomer);
-                });
-    }
+  /*
 
-    private static void upsertCustomerData(ClassifiedRequest request, ClassifiedCustomer cust) {
-        cust.setFirstName(request.firstName());
-        cust.setLastName(request.lastName());
-        cust.setAddress(request.address());
-        cust.setCity(request.city());
-        cust.setState(request.state());
-        cust.setPostalCode(request.postalCode());
-    }
+  */
+  public ClassifiedCustomer upsertCustomer(ClassifiedRequest request) {
+    return repository
+        .findClassifiedCustomerByEmailAddressAndPhoneNumber(
+            request.emailAddress(), request.phoneNumber())
+        .map(
+            cust -> {
+              upsertCustomerData(request, cust);
+              return repository.save(cust);
+            })
+        .orElseGet(
+            () -> {
+              var newCustomer = mapper.customterFromClassified(request);
+              newCustomer.setEmailAddressValidationToken(TokenUtils.generateCode(8));
+              return repository.saveAndFlush(newCustomer);
+            });
+  }
+
+  private static void upsertCustomerData(ClassifiedRequest request, ClassifiedCustomer cust) {
+    cust.setFirstName(request.firstName());
+    cust.setLastName(request.lastName());
+    cust.setAddress(request.address());
+    cust.setCity(request.city());
+    cust.setState(request.state());
+    cust.setPostalCode(request.postalCode());
+  }
 }

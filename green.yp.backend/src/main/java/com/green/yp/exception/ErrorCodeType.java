@@ -21,7 +21,9 @@ public enum ErrorCodeType {
       HttpStatus.LOCKED.value()),
   PAYMENT_CUSTOMER_ERROR(
       "Error creating customer for payment method", HttpStatus.INTERNAL_SERVER_ERROR.value()),
-  EMAIL_VALIDATION_TOKEN("The validation token for the email address was not valid", HttpStatus.PRECONDITION_FAILED.value());
+  EMAIL_VALIDATION_TOKEN(
+      "The validation token for the email address was not valid",
+      HttpStatus.PRECONDITION_FAILED.value());
   private final int errorCode;
   private final String messageFormat;
 

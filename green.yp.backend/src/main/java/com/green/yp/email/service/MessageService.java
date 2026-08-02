@@ -33,5 +33,4 @@ public class MessageService {
 
     sender.sendMessage(contactMessageResponse.emailMessageId());
   }
-
 }
