@@ -41,50 +41,63 @@ public class ClassifiedController {
         service.findClassified(classifiedId, RequestUtil.getRequestIP(request)), null);
   }
 
-  @PostMapping(path="{classifiedId}/validate")
+  @PostMapping(path = "{classifiedId}/validate")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void validateEmailToken(@PathVariable("classifiedId") UUID classifiedId,
-                                 @RequestParam("emailAddress") String emailAddress,
-                                 @RequestParam("token") String emailToken,
-                                 HttpServletRequest request){
-    service.validateEmail(classifiedId, emailAddress, emailToken, RequestUtil.getRequestIP(request));
+  public void validateEmailToken(
+      @PathVariable("classifiedId") UUID classifiedId,
+      @RequestParam("emailAddress") String emailAddress,
+      @RequestParam("token") String emailToken,
+      HttpServletRequest request) {
+    service.validateEmail(
+        classifiedId, emailAddress, emailToken, RequestUtil.getRequestIP(request));
   }
 
-  @Operation(summary = "Requests sending authenticate messsage so classified customer can edit the ad")
-  @GetMapping(path="{classifiedId}/requestAuthCode")
-  public void requestAuthCode(@PathVariable("classifiedId") UUID classifiedId,
-                              @RequestParam(name="tokenDestination")  String tokenDestination,
-                              @RequestParam(name="tokenType") ClassifiedTokenType tokenType,
-                              HttpServletRequest request) throws NoSuchAlgorithmException {
-    service.requestAuthCode(classifiedId, tokenDestination, tokenType, RequestUtil.getRequestIP(request));
+  @Operation(
+      summary = "Requests sending authenticate messsage so classified customer can edit the ad")
+  @GetMapping(path = "{classifiedId}/requestAuthCode")
+  public void requestAuthCode(
+      @PathVariable("classifiedId") UUID classifiedId,
+      @RequestParam(name = "tokenDestination") String tokenDestination,
+      @RequestParam(name = "tokenType") ClassifiedTokenType tokenType,
+      HttpServletRequest request)
+      throws NoSuchAlgorithmException {
+    service.requestAuthCode(
+        classifiedId, tokenDestination, tokenType, RequestUtil.getRequestIP(request));
   }
 
   @Operation(summary = "Retrieves classified and customer data together")
-  @GetMapping(path="{classifiedId}/customer")
-  public ResponseApi<ClassifiedAdCustomerResponse> findClassifiedAndCustomer(@PathVariable("classifiedId") UUID classifiedId) {
+  @GetMapping(path = "{classifiedId}/customer")
+  public ResponseApi<ClassifiedAdCustomerResponse> findClassifiedAndCustomer(
+      @PathVariable("classifiedId") UUID classifiedId) {
     return new ResponseApi<>(service.findClassifiedAndCustomer(classifiedId), null);
   }
 
   @Operation(summary = "Creates the initial classified ad record")
-  @PostMapping( path="create-ad",
+  @PostMapping(
+      path = "create-ad",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseApi<ClassifiedResponse> createClassified(
-          @RequestBody @Valid ClassifiedRequest classifiedRequest,
-          HttpServletRequest httpRequest) {
-    return new ResponseApi<>(service.createClassified(classifiedRequest, RequestUtil.getRequestIP(httpRequest)), null);
+      @RequestBody @Valid ClassifiedRequest classifiedRequest, HttpServletRequest httpRequest) {
+    return new ResponseApi<>(
+        service.createClassified(classifiedRequest, RequestUtil.getRequestIP(httpRequest)), null);
   }
 
   @Operation(summary = "Updates a classified ad")
-  @PutMapping( consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseApi<ClassifiedResponse> updateClassified(@RequestBody @Valid ClassifiedUpdateRequest classifiedRequest,
-                                                          HttpServletRequest httpRequest) {
-    return new ResponseApi<>(service.updateClassified(classifiedRequest, RequestUtil.getRequestIP(httpRequest)), null);
+  @PutMapping(
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<ClassifiedResponse> updateClassified(
+      @RequestBody @Valid ClassifiedUpdateRequest classifiedRequest,
+      HttpServletRequest httpRequest) {
+    return new ResponseApi<>(
+        service.updateClassified(classifiedRequest, RequestUtil.getRequestIP(httpRequest)), null);
   }
 
-  @Scheduled(fixedDelayString="${greenyp.classified.unpaid.clean.fixedDelay:180}",
-          timeUnit = TimeUnit.MINUTES)
-  public void cleanupUnpaidClassifieds(){
+  @Scheduled(
+      fixedDelayString = "${greenyp.classified.unpaid.clean.fixedDelay:180}",
+      timeUnit = TimeUnit.MINUTES)
+  public void cleanupUnpaidClassifieds() {
     log.info("Starting process to clean up unpaid classifieds");
     service.cleanUnpaid();
     log.info("Finished process to clean up unpaid classifieds");

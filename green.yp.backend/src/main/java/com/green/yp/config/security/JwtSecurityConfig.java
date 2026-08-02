@@ -21,7 +21,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 public class JwtSecurityConfig {
 
   @Bean
-  public JwtDecoder jwtDecoder( @Value("${greenyp.jwt.decoderUrl}") String wellKnownJwtDecoderUrl) {
+  public JwtDecoder jwtDecoder(@Value("${greenyp.jwt.decoderUrl}") String wellKnownJwtDecoderUrl) {
     return NimbusJwtDecoder.withJwkSetUri(wellKnownJwtDecoderUrl).build();
   }
 

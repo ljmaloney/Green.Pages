@@ -47,7 +47,8 @@ public class ClassifiedPaymentService {
   private final SearchContract searchContract;
   private final EmailContract emailService;
 
-  private static final String PAYMENT_NOTE_FORMAT = """
+  private static final String PAYMENT_NOTE_FORMAT =
+      """
                        Classified Ad Package: %s
                        Classified Category : %s
                        Classified Title : %s
@@ -59,27 +60,30 @@ public class ClassifiedPaymentService {
   private String classifiedUrl;
 
   public ClassifiedPaymentService(
-          ProducerPaymentContract producerPaymentContract, ClassifiedMapper classifiedMapper,
-          ClassifiedRepository classifiedRepository,
-          ClassifiedAdTypeService adTypeService,
-          ClassifiedCategoryService classifiedCategoryService,
-          EmailContract emailService,
-          InvoiceContract invoiceContract,
-          ClassifiedPaymentMapper paymentMapper, ClassifiedImageGalleryRepository imageGalleryRepository, SearchContract searchContract) {
+      ProducerPaymentContract producerPaymentContract,
+      ClassifiedMapper classifiedMapper,
+      ClassifiedRepository classifiedRepository,
+      ClassifiedAdTypeService adTypeService,
+      ClassifiedCategoryService classifiedCategoryService,
+      EmailContract emailService,
+      InvoiceContract invoiceContract,
+      ClassifiedPaymentMapper paymentMapper,
+      ClassifiedImageGalleryRepository imageGalleryRepository,
+      SearchContract searchContract) {
     this.producerPaymentContract = producerPaymentContract;
-      this.classifiedMapper = classifiedMapper;
-      this.paymentMapper = paymentMapper;
+    this.classifiedMapper = classifiedMapper;
+    this.paymentMapper = paymentMapper;
     this.adTypeService = adTypeService;
     this.classifiedCategoryService = classifiedCategoryService;
     this.classifiedRepository = classifiedRepository;
     this.emailService = emailService;
     this.invoiceContract = invoiceContract;
-      this.imageGalleryRepository = imageGalleryRepository;
-      this.searchContract = searchContract;
+    this.imageGalleryRepository = imageGalleryRepository;
+    this.searchContract = searchContract;
   }
 
   public ClassifiedPaymentResponse processPayment(
-          @Valid ApiPaymentRequest paymentRequest, String requestIP) {
+      @Valid ApiPaymentRequest paymentRequest, String requestIP) {
 
     var classified =
         classifiedRepository
@@ -91,38 +95,55 @@ public class ClassifiedPaymentService {
                   return new NotFoundException("Classified", paymentRequest.referenceId());
                 });
 
-    if ( invalidEmailToken(classified.classified()) ){
-       log.warn("Attempt to create an ad using an invalid email token for customer {}", classified.customer().getId());
-      throw new PreconditionFailedException("Invalid email address token %s",paymentRequest.emailValidationToken());
+    if (invalidEmailToken(classified.classified())) {
+      log.warn(
+          "Attempt to create an ad using an invalid email token for customer {}",
+          classified.customer().getId());
+      throw new PreconditionFailedException(
+          "Invalid email address token %s", paymentRequest.emailValidationToken());
     }
 
     var adType = adTypeService.findAdType(classified.classified().getAdTypeId());
 
     var category = classifiedCategoryService.findCategory(classified.classified().getCategoryId());
 
-    var note = StringUtils.trim(String.format(PAYMENT_NOTE_FORMAT, adType.adTypeName(),
-            category.name(),
-            classified.classified().getTitle(),
-            StringUtils.truncate(classified.classified().getDescription(), 100),
-            adType.monthlyPrice()));
+    var note =
+        StringUtils.trim(
+            String.format(
+                PAYMENT_NOTE_FORMAT,
+                adType.adTypeName(),
+                category.name(),
+                classified.classified().getTitle(),
+                StringUtils.truncate(classified.classified().getDescription(), 100),
+                adType.monthlyPrice()));
 
     var paymentResponse =
         producerPaymentContract.applyPayment(
-            paymentMapper.toPaymentRequest(paymentRequest, "GrnPgs-Classifieds", adType.monthlyPrice(), adType.monthlyPrice(), note, requestIP),
-            Optional.empty(), false);
+            paymentMapper.toPaymentRequest(
+                paymentRequest,
+                "GrnPgs-Classifieds",
+                adType.monthlyPrice(),
+                adType.monthlyPrice(),
+                note,
+                requestIP),
+            Optional.empty(),
+            false);
 
-    if ( !"COMPLETED".equals(paymentResponse.status()) ) {
-      log.warn("Attempted to process payment of classified ad {} failed - {} detail {}",
-              classified.classified().getId(),
-              paymentResponse.errorStatusCode(),
-              paymentResponse.errorDetail());
-      throw new PaymentFailedException("Classified Payment Failed",paymentResponse.errorDetail());
+    if (!"COMPLETED".equals(paymentResponse.status())) {
+      log.warn(
+          "Attempted to process payment of classified ad {} failed - {} detail {}",
+          classified.classified().getId(),
+          paymentResponse.errorStatusCode(),
+          paymentResponse.errorDetail());
+      throw new PaymentFailedException("Classified Payment Failed", paymentResponse.errorDetail());
     }
 
     var token = TokenUtils.generateCode(10);
     classified.classified().setIdToken(token);
 
-    var directLink = String.format("%s/classifieds/%s?secret=%s", classifiedUrl, classified.classified().getId(), token);
+    var directLink =
+        String.format(
+            "%s/classifieds/%s?secret=%s", classifiedUrl, classified.classified().getId(), token);
 
     // create invoice record for classified ad
     createInvoice(classified, adType, paymentResponse);
@@ -136,58 +157,92 @@ public class ClassifiedPaymentService {
 
     createSearchMaster(classified, category);
 
-    return new ClassifiedPaymentResponse(classified.classified().getId(),
-            classified.classified().getTitle(),
-            paymentResponse.status(),
-            paymentResponse.paymentRef(),
-            paymentResponse.orderRef(), paymentResponse.receiptNumber(), null, null);
+    return new ClassifiedPaymentResponse(
+        classified.classified().getId(),
+        classified.classified().getTitle(),
+        paymentResponse.status(),
+        paymentResponse.paymentRef(),
+        paymentResponse.orderRef(),
+        paymentResponse.receiptNumber(),
+        null,
+        null);
   }
 
-    private void createSearchMaster(ClassifiedCustomerProjection classified, ClassifiedCategoryResponse category) {
-      log.info("Creating search master for classified {}", classified.classified().getId());
+  private void createSearchMaster(
+      ClassifiedCustomerProjection classified, ClassifiedCategoryResponse category) {
+    log.info("Creating search master for classified {}", classified.classified().getId());
 
-        var image = imageGalleryRepository.findFirstByClassifiedId(classified.classified().getId())
-                .map(ClassifiedImageGallery::getUrl)
-                .orElse(null);
+    var image =
+        imageGalleryRepository
+            .findFirstByClassifiedId(classified.classified().getId())
+            .map(ClassifiedImageGallery::getUrl)
+            .orElse(null);
 
-      var searchRequest = classifiedMapper.toSearchRequest(classified.classified(),
-              classified.customer(),
-              category,
-              image,
-              createKeywords(classified, category));
+    var searchRequest =
+        classifiedMapper.toSearchRequest(
+            classified.classified(),
+            classified.customer(),
+            category,
+            image,
+            createKeywords(classified, category));
 
-      searchContract.upsertSearchMaster(List.of(searchRequest), classified.classified().getId());
-
+    searchContract.upsertSearchMaster(List.of(searchRequest), classified.classified().getId());
   }
 
-    private String createKeywords(ClassifiedCustomerProjection classified, ClassifiedCategoryResponse category) {
-      return String.join(" ", category.name(),
-              category.shortDescription(),
-              classified.classified().getTitle(),
-              classified.classified().getDescription());
-    }
+  private String createKeywords(
+      ClassifiedCustomerProjection classified, ClassifiedCategoryResponse category) {
+    return String.join(
+        " ",
+        category.name(),
+        category.shortDescription(),
+        classified.classified().getTitle(),
+        classified.classified().getDescription());
+  }
 
-    private void sendConfirmationEmail(String requestIP, ClassifiedAdTypeResponse adType, ClassifiedCustomerProjection classified, ClassifiedCategoryResponse category, String directLink, PaymentTransactionResponse paymentResponse) {
+  private void sendConfirmationEmail(
+      String requestIP,
+      ClassifiedAdTypeResponse adType,
+      ClassifiedCustomerProjection classified,
+      ClassifiedCategoryResponse category,
+      String directLink,
+      PaymentTransactionResponse paymentResponse) {
     String subject = String.format("Greenyp - %s classified ad confirmation", adType.adTypeName());
-    emailService.sendEmail(EmailTemplateType.CLASSIFIED_CONFIRMATION,
-            Collections.singletonList(classified.classified().getEmailAddress()),
-            subject,
-            () -> Map.of("customer", classified.customer(),
-                    "categoryName", category.name(),
-                    "classifiedTitle", classified.classified().getTitle(),
-                    "link", directLink,
-                    "adTypeName", adType.adTypeName(),
-                    "paymentAmount", adType.monthlyPrice(),
-                    "ipAddress", requestIP,
-                    "classifiedId", classified.classified().getId().toString(),
-                    "transactionRef", paymentResponse.paymentRef(),
-                    "timestamp", classified.classified().getCreateDate()));
+    emailService.sendEmail(
+        EmailTemplateType.CLASSIFIED_CONFIRMATION,
+        Collections.singletonList(classified.classified().getEmailAddress()),
+        subject,
+        () ->
+            Map.of(
+                "customer",
+                classified.customer(),
+                "categoryName",
+                category.name(),
+                "classifiedTitle",
+                classified.classified().getTitle(),
+                "link",
+                directLink,
+                "adTypeName",
+                adType.adTypeName(),
+                "paymentAmount",
+                adType.monthlyPrice(),
+                "ipAddress",
+                requestIP,
+                "classifiedId",
+                classified.classified().getId().toString(),
+                "transactionRef",
+                paymentResponse.paymentRef(),
+                "timestamp",
+                classified.classified().getCreateDate()));
   }
 
-  private void createInvoice(ClassifiedCustomerProjection classified,
-                             ClassifiedAdTypeResponse adType, PaymentTransactionResponse paymentResponse) {
+  private void createInvoice(
+      ClassifiedCustomerProjection classified,
+      ClassifiedAdTypeResponse adType,
+      PaymentTransactionResponse paymentResponse) {
 
-    invoiceContract.createInvoice(new InvoiceRequest(classified.classified().getId().toString(),
+    invoiceContract.createInvoice(
+        new InvoiceRequest(
+            classified.classified().getId().toString(),
             paymentResponse.transactionId(),
             InvoiceType.CLASSIFIED,
             String.format("%s Classified Ad", adType.adTypeName()),
@@ -195,16 +250,21 @@ public class ClassifiedPaymentService {
             paymentResponse.receiptNumber(),
             paymentResponse.receiptUrl(),
             paymentResponse.totalAmount(),
-            List.of(new InvoiceLineItemRequest(1,
+            List.of(
+                new InvoiceLineItemRequest(
+                    1,
                     classified.classified().getId().toString(),
                     null,
-                    String.format("%s : Ad Package %s", classified.classified().getTitle(), adType.adTypeName()),
+                    String.format(
+                        "%s : Ad Package %s",
+                        classified.classified().getTitle(), adType.adTypeName()),
                     1,
                     paymentResponse.totalAmount()))));
   }
+
   private boolean invalidEmailToken(Classified classified) {
     var response =
         emailService.validateEmail(classified.getId().toString(), classified.getEmailAddress());
     return !(response.validationStatus() == EmailValidationStatusType.VALIDATED);
-   }
+  }
 }

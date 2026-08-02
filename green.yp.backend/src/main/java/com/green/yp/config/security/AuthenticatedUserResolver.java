@@ -28,7 +28,7 @@ public class AuthenticatedUserResolver implements HandlerMethodArgumentResolver 
       ModelAndViewContainer mavContainer,
       NativeWebRequest webRequest,
       WebDataBinderFactory binderFactory) {
-   log.info("AuthenticatedUserResolver invoked");
+    log.info("AuthenticatedUserResolver invoked");
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     if (authentication != null && authentication.getPrincipal() instanceof Jwt jwt) {
       String userId = jwt.getSubject();

@@ -45,8 +45,8 @@ public class EmailValidationService {
                     "Email address {} validation tokens do not match from ipAddress {} ",
                     validationRequest.emailAddress(),
                     requestIP);
-                throw new PreconditionFailedException(ErrorCodeType.EMAIL_VALIDATION_TOKEN,
-                        "Email address validation failed");
+                throw new PreconditionFailedException(
+                    ErrorCodeType.EMAIL_VALIDATION_TOKEN, "Email address validation failed");
               }
               emailValidation.setEmailValidationDate(OffsetDateTime.now());
               emailValidation.setIpAddress(requestIP);

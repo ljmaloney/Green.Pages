@@ -24,6 +24,7 @@ public interface SubscriptionMapper {
   SubscriptionDto mapToDto(Subscription subscription);
 
   List<SubscriptionFeatureDto> mapToDtoList(List<SubscriptionFeature> features);
+
   SubscriptionFeatureDto mapToDto(SubscriptionFeature feature);
 
   List<String> toFeatureStringList(List<SubscriptionFeature> features);
@@ -33,7 +34,9 @@ public interface SubscriptionMapper {
   }
 
   Subscription mapToEntity(CreateSubscriptionRequest createRequest);
+
   SubscriptionFeature mapToEntity(CreateSubscriptionFeatureRequest createRequest);
+
   List<SubscriptionFeature> mapToEntityList(List<CreateSubscriptionFeatureRequest> features);
 
   default List<SubscriptionFeature> mapToEntity(List<String> features) {

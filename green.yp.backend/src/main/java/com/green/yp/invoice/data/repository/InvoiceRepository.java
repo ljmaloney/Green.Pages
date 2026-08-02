@@ -1,18 +1,12 @@
 package com.green.yp.invoice.data.repository;
 
-import com.green.yp.api.apitype.invoice.InvoiceResponse;
 import com.green.yp.api.apitype.invoice.InvoiceType;
 import com.green.yp.invoice.data.model.Invoice;
-
-import java.time.LocalDate;
+import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-
-import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
-import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

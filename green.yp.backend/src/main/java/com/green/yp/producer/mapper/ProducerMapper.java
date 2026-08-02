@@ -79,6 +79,5 @@ public interface ProducerMapper {
   @Mapping(source = "cancelReason", target = "cancelReasonText")
   ProducerResponse fromEntity(Producer producer);
 
-
   List<ProducerResponse> fromEntity(List<Producer> producers);
 }

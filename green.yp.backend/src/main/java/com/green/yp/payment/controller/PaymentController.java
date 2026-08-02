@@ -49,9 +49,14 @@ public class PaymentController {
       path = "replace",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseApi<PaymentMethodResponse> replacePaymentMethod(@Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser,
-                                                                 @RequestParam(name = "createNew", defaultValue = "false") boolean createNew,
-                                                                 @RequestBody ApiPaymentRequest methodRequest, HttpServletRequest request) {
-    return new ResponseApi<>(orchestrationService.replaceCardOnFile(methodRequest,  authenticatedUser, createNew, RequestUtil.getRequestIP(request)), null);
+  public ResponseApi<PaymentMethodResponse> replacePaymentMethod(
+      @Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser,
+      @RequestParam(name = "createNew", defaultValue = "false") boolean createNew,
+      @RequestBody ApiPaymentRequest methodRequest,
+      HttpServletRequest request) {
+    return new ResponseApi<>(
+        orchestrationService.replaceCardOnFile(
+            methodRequest, authenticatedUser, createNew, RequestUtil.getRequestIP(request)),
+        null);
   }
 }

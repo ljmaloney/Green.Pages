@@ -6,6 +6,4 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @PreAuthorize("hasAnyRole('GREENPAGES-SUBSCRIBER','GREENPAGES-SUBSCRIBERADMIN')")
-public @interface IsSubscriberOrAdmin {
-}
-
+public @interface IsSubscriberOrAdmin {}

@@ -23,6 +23,7 @@ public class MessageService {
         contactRequest.requestType(),
         contactRequest.subject(),
         requestIP);
+
     MessageSendService sender = senders.get(contactRequest.requestType().getEmailSender());
     if (sender == null) {
       log.info("No sender registered for {}", contactRequest.requestType());
@@ -32,5 +33,4 @@ public class MessageService {
 
     sender.sendMessage(contactMessageResponse.emailMessageId());
   }
-
 }

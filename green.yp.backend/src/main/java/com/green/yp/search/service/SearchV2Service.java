@@ -51,55 +51,70 @@ public class SearchV2Service {
     return executeSearch(coordinates, distance, categoryRefId, keywords, pageable);
   }
 
-    public PageableResponse<SearchResponse> search(BigDecimal latitude,
-                                                   BigDecimal longitude,
-                                                   Integer distance,
-                                                   UUID categoryRefId, String keywords, Pageable pageable) {
-      log.info("Searching for producers near lat: {}, long: {}, within {} miles", latitude, longitude, distance);
+  public PageableResponse<SearchResponse> search(
+      BigDecimal latitude,
+      BigDecimal longitude,
+      Integer distance,
+      UUID categoryRefId,
+      String keywords,
+      Pageable pageable) {
+    log.info(
+        "Searching for producers near lat: {}, long: {}, within {} miles",
+        latitude,
+        longitude,
+        distance);
 
-      return executeSearch(new GeocodeLocation(latitude, longitude), distance, categoryRefId, keywords, pageable);
+    return executeSearch(
+        new GeocodeLocation(latitude, longitude), distance, categoryRefId, keywords, pageable);
   }
 
-  protected PageableResponse<SearchResponse>  executeSearch(GeocodeLocation coordinates, Integer distance, UUID categoryRefId, String keywords, Pageable pageable){
-      var wktPoint = String.format("POINT(%f %f)", coordinates.latitude(), coordinates.longitude());
+  protected PageableResponse<SearchResponse> executeSearch(
+      GeocodeLocation coordinates,
+      Integer distance,
+      UUID categoryRefId,
+      String keywords,
+      Pageable pageable) {
+    var wktPoint = String.format("POINT(%f %f)", coordinates.latitude(), coordinates.longitude());
 
-      BigDecimal distanceMeters =
-              BigDecimal.valueOf(distance).multiply(BigDecimal.valueOf(MILES_IN_METERS));
+    BigDecimal distanceMeters =
+        BigDecimal.valueOf(distance).multiply(BigDecimal.valueOf(MILES_IN_METERS));
 
-      var searchLocations =
-              searchRepository.executeSearch(
-                      wktPoint,
-                      distanceMeters,
-                      categoryRefId,
-                      StringUtils.isBlank(keywords) ? null : keywords,
-                      pageable);
+    var searchLocations =
+        searchRepository.executeSearch(
+            wktPoint,
+            distanceMeters,
+            categoryRefId,
+            StringUtils.isBlank(keywords) ? null : keywords,
+            pageable);
 
-      List<UUID> searchIds = searchLocations.get().map(SearchDistanceProjection::getId).toList();
+    List<UUID> searchIds = searchLocations.get().map(SearchDistanceProjection::getId).toList();
 
-      var searchResults =
-              searchRepository.loadSearchResults(
-                      searchIds, coordinates.latitude().doubleValue(), coordinates.longitude().doubleValue());
+    var searchResults =
+        searchRepository.loadSearchResults(
+            searchIds, coordinates.latitude().doubleValue(), coordinates.longitude().doubleValue());
 
-      log.info(
-              "Found {} producers within {} miles of coordinates: {}",
-              searchResults.size(),
-              distance,
-              coordinates);
+    log.info(
+        "Found {} producers within {} miles of coordinates: {}",
+        searchResults.size(),
+        distance,
+        coordinates);
 
-      return new PageableResponse<>(
-              searchMapper.toResponse(searchResults),
-              (int) searchLocations.getTotalElements(),
-              searchLocations.getNumber(),
-              searchLocations.getTotalPages());
+    return new PageableResponse<>(
+        searchMapper.toResponse(searchResults),
+        (int) searchLocations.getTotalElements(),
+        searchLocations.getNumber(),
+        searchLocations.getTotalPages());
   }
 
   public UUID createSearchMaster(@NotNull SearchMasterRequest request) {
-      log.info("Creating search master record for externRef {} recordType {}",
-              request.externId(), request.recordType());
+    log.info(
+        "Creating search master record for externRef {} recordType {}",
+        request.externId(),
+        request.recordType());
 
-      var searchMaster = upsertSearchMaster(request);
+    var searchMaster = upsertSearchMaster(request);
 
-      return  searchMaster.getId();
+    return searchMaster.getId();
   }
 
   public void deleteSearchMaster(@NotNull UUID externRefId) {
@@ -108,47 +123,54 @@ public class SearchV2Service {
   }
 
   public void deleteProducerSearchMaster(List<UUID> producerIds) {
-      searchRepository.deleteSearchMasterByProducerIds(producerIds);
+    searchRepository.deleteSearchMasterByProducerIds(producerIds);
   }
 
-    public  void deleteProducerSearchMaster(UUID externId, SearchRecordType recordType) {
-      log.info("Deleting search master record for externRef {} recordType {}", externId, recordType);
-        searchRepository.deleteSearchMasterByExternIdAndRecordType(externId, recordType);
-    }
+  public void deleteProducerSearchMaster(UUID externId, SearchRecordType recordType) {
+    log.info("Deleting search master record for externRef {} recordType {}", externId, recordType);
+    searchRepository.deleteSearchMasterByExternIdAndRecordType(externId, recordType);
+  }
 
   public void disableProducerSearch(@NotNull UUID producerId, LocalDate lastActiveDate) {
-      log.info("Disabling search master for producer with id {} as of lastActiveDate {}", producerId, lastActiveDate);
-      int count = searchRepository.disableSearch(producerId, lastActiveDate, OffsetDateTime.now());
-      log.info("{} GREEN_PRO records disabled for {} as of {}", count, producerId, lastActiveDate);
+    log.info(
+        "Disabling search master for producer with id {} as of lastActiveDate {}",
+        producerId,
+        lastActiveDate);
+    int count = searchRepository.disableSearch(producerId, lastActiveDate, OffsetDateTime.now());
+    log.info("{} GREEN_PRO records disabled for {} as of {}", count, producerId, lastActiveDate);
   }
 
-    public void createSearchMaster(List<SearchMasterRequest> searchList) {
-      searchList.forEach(this::createSearchMaster);
-    }
+  public void createSearchMaster(List<SearchMasterRequest> searchList) {
+    searchList.forEach(this::createSearchMaster);
+  }
 
-    public void upsertSearchMaster(List<SearchMasterRequest> searchRequests, UUID producerId) {
-        log.info("Upserting search master records for customer ref {}", producerId);
-        searchRequests.forEach(this::upsertSearchMaster);
-    }
+  public void upsertSearchMaster(List<SearchMasterRequest> searchRequests, UUID producerId) {
+    log.info("Upserting search master records for customer ref {}", producerId);
+    searchRequests.forEach(this::upsertSearchMaster);
+  }
 
-    public void updateLocation(SearchLocationUpdateRequest searchLocationUpdate) {
-      log.debug("Updating search master for location {}", searchLocationUpdate);
+  public void updateLocation(SearchLocationUpdateRequest searchLocationUpdate) {
+    log.debug("Updating search master for location {}", searchLocationUpdate);
 
-      searchRepository.findSearchMaster(searchLocationUpdate.externId(),
-              searchLocationUpdate.producerId(),
-              searchLocationUpdate.locationId(), SearchRecordType.GREEN_PRO_SERVICE, SearchRecordType.GREEN_PRO_PRODUCT)
-              .forEach( sm -> {
-                  searchMapper.updateLocation(sm, searchLocationUpdate);
-                  searchRepository.saveAndFlush(sm);
-              });
+    searchRepository
+        .findSearchMaster(
+            searchLocationUpdate.externId(),
+            searchLocationUpdate.producerId(),
+            searchLocationUpdate.locationId(),
+            SearchRecordType.GREEN_PRO_SERVICE,
+            SearchRecordType.GREEN_PRO_PRODUCT)
+        .forEach(
+            sm -> {
+              searchMapper.updateLocation(sm, searchLocationUpdate);
+              searchRepository.saveAndFlush(sm);
+            });
+  }
 
-    }
-
-    @Transactional
-    public void upsertProducerIconLink(UUID producerId, String urlPath) {
-        log.info("Upserting producer {} icon link {}", producerId, urlPath);
-        searchRepository.updateBusinessIconUrl(producerId, urlPath);
-    }
+  @Transactional
+  public void upsertProducerIconLink(UUID producerId, String urlPath) {
+    log.info("Upserting producer {} icon link {}", producerId, urlPath);
+    searchRepository.updateBusinessIconUrl(producerId, urlPath);
+  }
 
   private SearchMaster upsertSearchMaster(SearchMasterRequest request) {
     if (request.recordType() == SearchRecordType.CLASSIFIED) {
@@ -194,5 +216,5 @@ public class SearchV2Service {
               return java.util.Optional.of(searchRepository.saveAndFlush(sm));
             })
         .get();
-    }
+  }
 }

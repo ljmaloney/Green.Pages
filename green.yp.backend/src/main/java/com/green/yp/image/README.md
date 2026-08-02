@@ -1,9 +1,9 @@
 # Steps for Deployment on AWS
 
 This document contains the steps required to setup and configure an AWS Simple Storage Service (S3)
-bucket for uploading/saving images uploaded via an a service running on an AWS Elastic
-Container Services Fargate service/task. The bucket will be used to serve images to the public, and should
-have read-only public permissions and read-write permissions for the Fargate service
+bucket for uploading/saving images uploaded via an a service running on an AWS Elastic Container Services Fargate
+service/task. The bucket will be used to serve images to the public, and should have read-only public permissions and
+read-write permissions for the Fargate service
 
 ### 1. Create an AWS - S3 Bucket
 
@@ -14,8 +14,8 @@ have read-only public permissions and read-write permissions for the Fargate ser
 
 ### 2. Setup Bucket Policy for Read Only access
 
-In Bucket -> Permissions -> Bucket policy use something like the following to allow public read
-access to the files in the bucket
+In Bucket -> Permissions -> Bucket policy use something like the following to allow public read access to the files in
+the bucket
 <code>
 {
 "Version": "2012-10-17",

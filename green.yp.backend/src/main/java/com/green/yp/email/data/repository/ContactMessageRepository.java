@@ -19,7 +19,8 @@ public interface ContactMessageRepository extends JpaRepository<ContactMessage, 
       @NotNull @Param("startDate") OffsetDateTime startDate,
       @NotNull @Param("endDate") OffsetDateTime endDate);
 
-  @Query("""
+  @Query(
+      """
         SELECT msg
         FROM ContactMessage msg
         WHERE msg.createDate BETWEEN :startDate AND :endDate
