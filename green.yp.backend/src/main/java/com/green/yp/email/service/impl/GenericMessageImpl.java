@@ -59,6 +59,7 @@ public class GenericMessageImpl implements MessageSendService {
               } else if (StringUtils.isNotBlank(c.genericContactName())) {
                 message.setAddresseeName(c.genericContactName());
               }
+              message.setDestination(c.emailAddress());
             });
     message.setSmsEmailType("email");
     return mapper.toDto(repository.saveAndFlush(message));

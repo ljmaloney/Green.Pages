@@ -3,6 +3,7 @@ package com.green.yp.email.mapper;
 import com.green.yp.api.apitype.classified.ClassifiedAdCustomerResponse;
 import com.green.yp.api.apitype.contact.ContactMessageRequest;
 import com.green.yp.api.apitype.contact.ContactMessageResponse;
+import com.green.yp.api.apitype.producer.ProducerContactResponse;
 import com.green.yp.api.apitype.producer.ProducerProfileResponse;
 import com.green.yp.email.data.model.ContactMessage;
 import org.mapstruct.InjectionStrategy;
@@ -71,5 +72,7 @@ public interface ContactMapper {
   @Mapping(target = "sourceIpAddress", source = "ipAddress")
   @Mapping(target = "contactRequestType", source = "request.requestType")
   ContactMessage toEntity(
-      ContactMessageRequest request, ProducerProfileResponse profile, String ipAddress);
+      ContactMessageRequest request,
+      ProducerProfileResponse profile,
+      String ipAddress);
 }
