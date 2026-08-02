@@ -38,8 +38,9 @@ public class GenericMessageImpl implements MessageSendService {
   public ContactMessageResponse createContactMessage(
       ContactMessageRequest request, String requestIP) {
     log.info(
-            "Creating new classified ad -> customer contact message for classified id {}",
-            request.classifiedRequest().classifiedId());
+            "Creating new pro -> customer contact message for producer id {} locationId {}",
+            request.leadContactRequest().producerId(),
+            request.leadContactRequest().locationId());
 
     var producerProfile = producerContract.getProducerProfile(request.leadContactRequest().locationId());
 
