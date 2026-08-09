@@ -1,4 +1,4 @@
-package com.green.yp.email.service;
+package com.green.yp.message.service;
 
 import com.green.yp.api.apitype.enumeration.EmailTemplateType;
 import com.green.yp.exception.SystemException;
@@ -51,7 +51,7 @@ public class EmailService {
       helper.setSubject(subject);
       helper.setFrom(defaultFromEmail);
 
-      var model = new HashMap<String, Object>(mappingSupplier.get());
+      var model = new HashMap<>(mappingSupplier.get());
       model.put(
           "subject", StringUtils.isBlank(subject) ? emailTemplate.getSubjectFormat() : subject);
 

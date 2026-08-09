@@ -12,7 +12,7 @@ import com.green.yp.api.apitype.producer.*;
 import com.green.yp.api.apitype.producer.enumeration.ProducerContactType;
 import com.green.yp.api.apitype.producer.enumeration.ProducerDisplayContactType;
 import com.green.yp.api.contract.*;
-import com.green.yp.email.service.EmailService;
+import com.green.yp.message.service.EmailService;
 import com.green.yp.exception.*;
 import jakarta.validation.constraints.NotNull;
 import java.security.NoSuchAlgorithmException;

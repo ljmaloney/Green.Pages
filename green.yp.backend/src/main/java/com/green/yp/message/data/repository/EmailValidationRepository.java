@@ -1,6 +1,6 @@
-package com.green.yp.email.data.repository;
+package com.green.yp.message.data.repository;
 
-import com.green.yp.email.data.model.EmailValidation;
+import com.green.yp.message.data.model.EmailValidation;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;

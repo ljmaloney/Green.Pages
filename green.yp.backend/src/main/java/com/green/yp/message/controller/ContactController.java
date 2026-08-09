@@ -1,4 +1,4 @@
-package com.green.yp.email.controller;
+package com.green.yp.message.controller;
 
 import com.green.yp.api.apitype.contact.ContactMessageRequest;
 import com.green.yp.api.apitype.contact.ContactMessageRequestType;
@@ -6,8 +6,8 @@ import com.green.yp.api.apitype.contact.ContactMessageResponse;
 import com.green.yp.common.dto.ResponseApi;
 import com.green.yp.config.security.AuthUser;
 import com.green.yp.config.security.AuthenticatedUser;
-import com.green.yp.email.service.MessageDataService;
-import com.green.yp.email.service.MessageService;
+import com.green.yp.message.service.MessageDataService;
+import com.green.yp.message.service.MessageService;
 import com.green.yp.security.IsAdmin;
 import com.green.yp.util.DateUtils;
 import com.green.yp.util.RequestUtil;

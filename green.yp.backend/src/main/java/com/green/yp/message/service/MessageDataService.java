@@ -1,12 +1,12 @@
-package com.green.yp.email.service;
+package com.green.yp.message.service;
 
 import com.green.yp.api.apitype.classified.ClassifiedAdCustomerResponse;
 import com.green.yp.api.apitype.contact.ContactMessageRequest;
 import com.green.yp.api.apitype.contact.ContactMessageRequestType;
 import com.green.yp.api.apitype.contact.ContactMessageResponse;
 import com.green.yp.api.apitype.producer.ProducerContactResponse;
-import com.green.yp.email.data.repository.ContactMessageRepository;
-import com.green.yp.email.mapper.ContactMapper;
+import com.green.yp.message.data.repository.ContactMessageRepository;
+import com.green.yp.message.mapper.ContactMapper;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalTime;

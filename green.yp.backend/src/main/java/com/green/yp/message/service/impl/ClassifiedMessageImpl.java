@@ -1,13 +1,13 @@
-package com.green.yp.email.service.impl;
+package com.green.yp.message.service.impl;
 
 import com.green.yp.api.apitype.contact.ContactMessageRequest;
 import com.green.yp.api.apitype.contact.ContactMessageResponse;
 import com.green.yp.api.apitype.enumeration.EmailTemplateType;
 import com.green.yp.api.contract.ClassifiedContract;
-import com.green.yp.email.data.repository.ContactMessageRepository;
-import com.green.yp.email.mapper.ContactMapper;
-import com.green.yp.email.service.EmailService;
-import com.green.yp.email.service.MessageSendService;
+import com.green.yp.message.data.repository.ContactMessageRepository;
+import com.green.yp.message.mapper.ContactMapper;
+import com.green.yp.message.service.EmailService;
+import com.green.yp.message.service.MessageSendService;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.HashMap;

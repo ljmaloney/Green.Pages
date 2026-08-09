@@ -1,4 +1,4 @@
-package com.green.yp.email.service;
+package com.green.yp.message.service;
 
 import com.green.yp.api.apitype.contact.ContactMessageRequest;
 import com.green.yp.api.apitype.contact.ContactMessageResponse;

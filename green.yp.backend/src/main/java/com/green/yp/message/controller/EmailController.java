@@ -1,7 +1,7 @@
-package com.green.yp.email.controller;
+package com.green.yp.message.controller;
 
 import com.green.yp.api.apitype.email.EmailValidationRequest;
-import com.green.yp.email.service.EmailValidationService;
+import com.green.yp.message.service.EmailValidationService;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
