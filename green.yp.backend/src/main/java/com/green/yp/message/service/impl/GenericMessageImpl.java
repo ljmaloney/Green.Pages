@@ -5,8 +5,9 @@ import com.green.yp.api.apitype.contact.ContactMessageResponse;
 import com.green.yp.api.apitype.producer.enumeration.ProducerContactType;
 import com.green.yp.api.contract.ProducerContactContract;
 import com.green.yp.api.contract.ProducerContract;
-import com.green.yp.message.data.repository.ContactMessageRepository;
-import com.green.yp.message.mapper.ContactMapper;
+import com.green.yp.message.data.repository.MessageMetaRepository;
+import com.green.yp.message.data.repository.MessageRepository;
+import com.green.yp.message.mapper.MessageMapper;
 import com.green.yp.message.service.MessageSendService;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -19,18 +20,21 @@ public class GenericMessageImpl implements MessageSendService {
 
   private final ProducerContract producerContract;
   private final ProducerContactContract contactContract;
-  private final ContactMapper mapper;
-  private final ContactMessageRepository repository;
+  private final MessageMapper mapper;
+  private final MessageRepository repository;
+  private final MessageMetaRepository metaRepository;
 
   public GenericMessageImpl(
-      ProducerContract producerContract,
-      ProducerContactContract producerContactContract,
-      ContactMapper mapper,
-      ContactMessageRepository repository) {
+          ProducerContract producerContract,
+          ProducerContactContract producerContactContract,
+          MessageMapper mapper,
+          MessageRepository repository,
+          MessageMetaRepository metaRepository) {
     this.producerContract = producerContract;
     this.contactContract = producerContactContract;
     this.mapper = mapper;
     this.repository = repository;
+      this.metaRepository = metaRepository;
   }
 
   @Override
@@ -44,7 +48,10 @@ public class GenericMessageImpl implements MessageSendService {
     var producerProfile =
         producerContract.getProducerProfile(request.leadContactRequest().locationId());
 
-    var message = mapper.toEntity(request, producerProfile, requestIP);
+    var messageMeta = mapper.toEntity(request, producerProfile, requestIP);
+    var message = mapper.toMessageEntity(request, producerProfile, requestIP);
+    message.setMeta(messageMeta);
+    messageMeta.getMessages().add(message);
 
     contactContract
         .findContacts(
@@ -62,7 +69,8 @@ public class GenericMessageImpl implements MessageSendService {
               message.setDestination(c.emailAddress());
             });
     message.setSmsEmailType("email");
-    return mapper.toDto(repository.saveAndFlush(message));
+    var savedMessage = metaRepository.saveAndFlush(messageMeta);
+    return mapper.toResponse(savedMessage, savedMessage.getMessages().getFirst());
   }
 
   @Override

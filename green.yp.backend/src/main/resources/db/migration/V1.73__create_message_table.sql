@@ -16,16 +16,17 @@ BEGIN
         source_ip_address    varchar(16)  not null,
         message_status       varchar(50)  not null,
         sms_email_type       varchar(50)  not null,
-        addressee_name       varchar(150) null,
-        addressee_ref        binary(16)   not null,
-        from_ref             binary(16)   not null,
-        from_email           varchar(150) not null,
-        from_phone           varchar(15)  null,
-        message              text         null,
+        addressee_name       varchar(150),
+        destination          varchar(255),
+        addressee_ref        binary(16),
+        from_ref             binary(16),
+        from_email           varchar(150),
+        from_phone           varchar(15),
+        message              text         not null,
         constraint message_meta_fk
             foreign key (message_meta_id) references greenyp.message_meta (id)
     )ENGINE = InnoDB;
-    create index message_date_idx on greenyp.message (create_date);
+    alter table message add index message_date_idx(create_date);
 END //
 DELIMITER ;
 CALL `?`();

@@ -66,6 +66,6 @@ public class MessageMeta extends Mutable {
     @Column(name="message_descr")
     private String messageDescription;
 
-    @OneToMany(mappedBy = "messageMeta", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "meta", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Message> messages;
 }

@@ -3,6 +3,7 @@ package com.green.yp.message.mapper;
 import com.green.yp.api.apitype.classified.ClassifiedAdCustomerResponse;
 import com.green.yp.api.apitype.contact.ContactMessageRequest;
 import com.green.yp.api.apitype.contact.ContactMessageResponse;
+import com.green.yp.api.apitype.producer.ProducerProfileResponse;
 import com.green.yp.message.data.model.Message;
 import com.green.yp.message.data.model.MessageMeta;
 import org.mapstruct.InjectionStrategy;
@@ -45,4 +46,21 @@ public interface MessageMapper {
     @Mapping(target = "message", source = "message.message")
     ContactMessageResponse toResponse(MessageMeta savedMessage,
                                       Message message);
+
+    @Mapping(target = "contactRequestType", source = "request.requestType")
+    @Mapping(target = "subject", source = "request.subject")
+    @Mapping(target = "sourceRef", source = "producerProfile.locationId")
+    @Mapping(target = "parentSourceRef", source = "producerProfile.producerId")
+    @Mapping(target = "requestorName", source = "request.name")
+    @Mapping(target = "fromEmail", source = "request.emailAddress")
+    @Mapping(target = "fromPhone", source = "request.phoneNumber")
+    @Mapping(target = "companyName", source = "request.companyName")
+    @Mapping(target = "sourceIpAddress", expression = "java(requestIP)")
+    MessageMeta toEntity(ContactMessageRequest request,
+                    ProducerProfileResponse producerProfile,
+                    String requestIP);
+
+     Message toMessageEntity(ContactMessageRequest request,
+                           ProducerProfileResponse producerProfile,
+                           String requestIP);
 }

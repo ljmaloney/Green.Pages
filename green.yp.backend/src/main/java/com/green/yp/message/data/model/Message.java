@@ -40,6 +40,9 @@ public class Message extends Mutable {
     @Column(name="addressee_name")
     private String addresseeName;
 
+    @Column(name="destination")
+    private String destination;
+
     @Column(name="addresseeRef")
     private UUID addresseeRef;
 
