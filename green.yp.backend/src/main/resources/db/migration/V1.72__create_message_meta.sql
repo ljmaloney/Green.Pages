@@ -16,11 +16,13 @@ create table if not exists greenyp.message_meta
     contact_request_type varchar(50)  not null,
     source_ref           binary(16)   not null,
     parent_source_ref    binary(16)   not null,
-    requestor_ref        binary(16)   null,
+    requestor_ref        binary(16),
+    company_name         varchar(100),
     requestor_name       varchar(150) not null,
     requestor_email      varchar(150) not null,
-    requestor_phone      varchar(15)  null,
-    subject              varchar(255) not null
+    requestor_phone      varchar(15),
+    subject              varchar(255) not null,
+    message_descr        varchar(255) not null
 )ENGINE = InnoDB;
 alter table message_meta add index msg_meta_date_idx (create_date);
 alter table message_meta add index msg_meta_requestor_req_idx(requestor_ref);

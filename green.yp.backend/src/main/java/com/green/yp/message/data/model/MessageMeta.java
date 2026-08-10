@@ -5,9 +5,17 @@ import com.green.yp.common.data.embedded.Mutable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.*;
 
+import java.util.List;
 import java.util.UUID;
 
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name="message_meta", schema = "greenyp")
 public class MessageMeta extends Mutable {
 
@@ -35,6 +43,9 @@ public class MessageMeta extends Mutable {
     @Column(name = "requestor_ref")
     private UUID requestor_ref;
 
+    @Column(name="company_name")
+    String companyName;
+
     @Column(name = "requestor_name", length = 150)
     private String requestorName;
 
@@ -51,4 +62,10 @@ public class MessageMeta extends Mutable {
     @NotNull
     @Column(name = "subject", nullable = false)
     private String subject;
+
+    @Column(name="message_descr")
+    private String messageDescription;
+
+    @OneToMany(mappedBy = "messageMeta", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Message> messages;
 }
