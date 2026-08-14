@@ -1,51 +1,57 @@
-package com.green.yp.email.service.impl;
+package com.green.yp.message.service.impl;
 
 import com.green.yp.api.apitype.contact.ContactMessageRequest;
 import com.green.yp.api.apitype.contact.ContactMessageResponse;
 import com.green.yp.api.apitype.producer.enumeration.ProducerContactType;
 import com.green.yp.api.contract.ProducerContactContract;
 import com.green.yp.api.contract.ProducerContract;
-import com.green.yp.email.data.repository.ContactMessageRepository;
-import com.green.yp.email.mapper.ContactMapper;
-import com.green.yp.email.service.MessageSendService;
+import com.green.yp.message.data.repository.MessageMetaRepository;
+import com.green.yp.message.data.repository.MessageRepository;
+import com.green.yp.message.mapper.MessageMapper;
+import com.green.yp.message.service.MessageSendService;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 @Slf4j
-@Service("productMessage")
-public class ProductMessageImpl implements MessageSendService {
+@Service("genericMessage")
+public class GenericMessageImpl implements MessageSendService {
 
   private final ProducerContract producerContract;
   private final ProducerContactContract contactContract;
-  private final ContactMapper mapper;
-  private final ContactMessageRepository repository;
+  private final MessageMapper mapper;
+  private final MessageRepository repository;
+  private final MessageMetaRepository metaRepository;
 
-  public ProductMessageImpl(
-      ProducerContract producerContract,
-      ProducerContactContract contactContract,
-      ContactMapper mapper,
-      ContactMessageRepository repository) {
+  public GenericMessageImpl(
+          ProducerContract producerContract,
+          ProducerContactContract producerContactContract,
+          MessageMapper mapper,
+          MessageRepository repository,
+          MessageMetaRepository metaRepository) {
     this.producerContract = producerContract;
-    this.contactContract = contactContract;
+    this.contactContract = producerContactContract;
     this.mapper = mapper;
     this.repository = repository;
+      this.metaRepository = metaRepository;
   }
 
   @Override
   public ContactMessageResponse createContactMessage(
       ContactMessageRequest request, String requestIP) {
     log.info(
-        "Creating new producer product -> customer contact message for producer id {} locationId {} and productId {}",
+        "Creating new pro -> customer contact message for producer id {} locationId {}",
         request.leadContactRequest().producerId(),
-        request.leadContactRequest().locationId(),
-        request.leadContactRequest().productServiceRef());
+        request.leadContactRequest().locationId());
 
     var producerProfile =
         producerContract.getProducerProfile(request.leadContactRequest().locationId());
 
-    var message = mapper.toEntity(request, producerProfile, requestIP);
+    var messageMeta = mapper.toEntity(request, producerProfile, requestIP);
+    var message = mapper.toMessageEntity(request, producerProfile, requestIP);
+    message.setMeta(messageMeta);
+    messageMeta.getMessages().add(message);
 
     contactContract
         .findContacts(
@@ -63,7 +69,8 @@ public class ProductMessageImpl implements MessageSendService {
               message.setDestination(c.emailAddress());
             });
     message.setSmsEmailType("email");
-    return mapper.toDto(repository.saveAndFlush(message));
+    var savedMessage = metaRepository.saveAndFlush(messageMeta);
+    return mapper.toResponse(savedMessage, savedMessage.getMessages().getFirst());
   }
 
   @Override

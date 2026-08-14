@@ -1,4 +1,4 @@
-package com.green.yp.email.data.model;
+package com.green.yp.message.data.model;
 
 import com.green.yp.api.apitype.email.EmailValidationStatusType;
 import com.green.yp.common.data.embedded.Mutable;

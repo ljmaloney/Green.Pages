@@ -13,7 +13,7 @@ import com.green.yp.api.apitype.producer.enumeration.ProducerContactType;
 import com.green.yp.api.apitype.producer.enumeration.ProducerSubscriptionType;
 import com.green.yp.api.contract.*;
 import com.green.yp.config.security.AuthenticatedUser;
-import com.green.yp.email.service.EmailService;
+import com.green.yp.message.service.EmailService;
 import com.green.yp.exception.ErrorCodeType;
 import com.green.yp.exception.PaymentFailedException;
 import com.green.yp.exception.PreconditionFailedException;

@@ -1,9 +1,9 @@
-package com.green.yp.email.service.impl;
+package com.green.yp.message.service.impl;
 
 import com.green.yp.api.apitype.contact.ContactMessageRequest;
 import com.green.yp.api.apitype.contact.ContactMessageResponse;
-import com.green.yp.email.service.MessageDataService;
-import com.green.yp.email.service.MessageSendService;
+import com.green.yp.message.service.MessageDataService;
+import com.green.yp.message.service.MessageSendService;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

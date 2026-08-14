@@ -1,8 +1,8 @@
-package com.green.yp.email.data.repository;
+package com.green.yp.message.data.repository;
 
 import com.green.yp.api.apitype.contact.ContactMessageRequestType;
 import com.green.yp.api.apitype.contact.ContactMessageResponse;
-import com.green.yp.email.data.model.ContactMessage;
+import com.green.yp.message.data.model.ContactMessage;
 import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.List;

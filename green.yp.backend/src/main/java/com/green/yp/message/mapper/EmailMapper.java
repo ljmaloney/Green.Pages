@@ -1,7 +1,7 @@
-package com.green.yp.email.mapper;
+package com.green.yp.message.mapper;
 
 import com.green.yp.api.apitype.email.EmailValidationResponse;
-import com.green.yp.email.data.model.EmailValidation;
+import com.green.yp.message.data.model.EmailValidation;
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;

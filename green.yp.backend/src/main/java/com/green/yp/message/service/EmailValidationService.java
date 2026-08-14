@@ -1,11 +1,11 @@
-package com.green.yp.email.service;
+package com.green.yp.message.service;
 
 import com.green.yp.api.apitype.email.EmailValidationRequest;
 import com.green.yp.api.apitype.email.EmailValidationResponse;
 import com.green.yp.api.apitype.email.EmailValidationStatusType;
-import com.green.yp.email.data.model.EmailValidation;
-import com.green.yp.email.data.repository.EmailValidationRepository;
-import com.green.yp.email.mapper.EmailMapper;
+import com.green.yp.message.data.model.EmailValidation;
+import com.green.yp.message.data.repository.EmailValidationRepository;
+import com.green.yp.message.mapper.EmailMapper;
 import com.green.yp.exception.ErrorCodeType;
 import com.green.yp.exception.PreconditionFailedException;
 import com.green.yp.util.TokenUtils;
