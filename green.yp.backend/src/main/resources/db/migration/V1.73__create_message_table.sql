@@ -19,6 +19,7 @@ BEGIN
         addressee_name       varchar(150),
         destination          varchar(255),
         addressee_ref        binary(16),
+        addressee_email      varchar(150),
         from_ref             binary(16),
         from_email           varchar(150),
         from_phone           varchar(15),

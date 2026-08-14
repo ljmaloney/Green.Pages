@@ -35,4 +35,6 @@ public class EmailController {
       @RequestBody @Valid EmailValidationRequest validationRequest, HttpServletRequest request) {
     validationService.validateEmail(validationRequest, RequestUtil.getRequestIP(request));
   }
+
+
 }

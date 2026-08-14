@@ -30,6 +30,9 @@ public interface MessageMapper {
 
     @Mapping(target = "message", source = "request.message")
     @Mapping(target = "addresseeRef", source = "classifiedCustomer.classified.classifiedId")
+    @Mapping(target = "addresseeEmail", source = "classifiedCustomer.customer.email")
+    @Mapping(target = "fromEmail", source="request.emailAddress")
+    @Mapping(target = "fromPhone", source="request.phoneNumber")
     Message toMessageEntity(ContactMessageRequest request,
                             ClassifiedAdCustomerResponse classifiedCustomer);
 
