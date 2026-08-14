@@ -12,6 +12,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
+import java.util.List;
+
 @Mapper(
         componentModel = "spring",
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
@@ -68,5 +70,10 @@ public interface MessageMapper {
                            ProducerProfileResponse producerProfile,
                            String requestIP);
 
-    ContactMessageResponse toDto(MessageRecord messageRecord);
+     @Mapping(target = "producerId", source = "messageRecord.parentSourceRef")
+     @Mapping(target = "classifiedId", source = "messageRecord.parentSourceRef")
+     @Mapping(target = "productServiceRef", source = "messageRecord.sourceRef")
+     ContactMessageResponse toDto(MessageRecord messageRecord);
+
+    List<ContactMessageResponse> toDto(List<MessageRecord> messageRecord);
 }
