@@ -46,9 +46,6 @@ public class Message extends Mutable {
     @Column(name="addresseeRef")
     private UUID addresseeRef;
 
-    @Column(name="addressee_email", length = 150)
-    private String addresseeEmail;
-
     @Column(name="from_ref")
     private UUID fromRef;
 

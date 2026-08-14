@@ -6,6 +6,7 @@ import com.green.yp.api.apitype.contact.ContactMessageResponse;
 import com.green.yp.api.apitype.producer.ProducerProfileResponse;
 import com.green.yp.message.data.model.Message;
 import com.green.yp.message.data.model.MessageMeta;
+import com.green.yp.message.data.model.MessageRecord;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -30,7 +31,7 @@ public interface MessageMapper {
 
     @Mapping(target = "message", source = "request.message")
     @Mapping(target = "addresseeRef", source = "classifiedCustomer.classified.classifiedId")
-    @Mapping(target = "addresseeEmail", source = "classifiedCustomer.customer.emailAddress")
+    @Mapping(target = "destination", source = "classifiedCustomer.customer.emailAddress")
     @Mapping(target = "fromEmail", source="request.emailAddress")
     @Mapping(target = "fromPhone", source="request.phoneNumber")
     Message toMessageEntity(ContactMessageRequest request,
@@ -66,4 +67,6 @@ public interface MessageMapper {
      Message toMessageEntity(ContactMessageRequest request,
                            ProducerProfileResponse producerProfile,
                            String requestIP);
+
+    ContactMessageResponse toDto(MessageRecord messageRecord);
 }

@@ -9,6 +9,8 @@ import com.green.yp.config.security.AuthenticatedUser;
 import com.green.yp.message.service.MessageDataService;
 import com.green.yp.message.service.MessageService;
 import com.green.yp.security.IsAdmin;
+import com.green.yp.security.IsSubscriber;
+import com.green.yp.security.IsSubscriberAdmin;
 import com.green.yp.util.DateUtils;
 import com.green.yp.util.RequestUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,7 +53,20 @@ public class ContactController {
         dataService.getMessages(
             DateUtils.parseDate(startDate, LocalDate.class),
             DateUtils.parseDate(endDate, LocalDate.class),
-            requestType),
+            requestType, authenticatedUser),
+        null);
+  }
+
+  @GetMapping(path="/producer", produces = MediaType.APPLICATION_JSON_VALUE)
+  @IsSubscriber
+  @IsSubscriberAdmin
+  public ResponseApi<List<ContactMessageResponse>> getProducerMessages(
+          @RequestParam("startDate") String startDate,
+          @RequestParam("endDate") String endDate,
+          @RequestParam("requestType") ContactMessageRequestType requestType,
+          @Parameter(hidden = true) @AuthUser AuthenticatedUser authenticatedUser) {
+    return new ResponseApi<>(
+        dataService.getSubscriberMessages(startDate, endDate, requestType,authenticatedUser),
         null);
   }
 
