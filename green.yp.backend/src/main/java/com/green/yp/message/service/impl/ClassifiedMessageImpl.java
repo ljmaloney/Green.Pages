@@ -59,7 +59,10 @@ public class ClassifiedMessageImpl implements MessageSendService {
 
     MessageMeta meta = mapper.toEntity(request, classified);
     String messageDescription = String.join(" || ", classified.classified().title(), classified.classified().description());
-    meta.setMessageDescription(messageDescription.substring(0,255));
+    if ( messageDescription.length() > 255)
+      meta.setMessageDescription(messageDescription.substring(0,255));
+    else
+      meta.setMessageDescription(messageDescription);
 
     Message message = mapper.toMessageEntity(request, classified);
     meta.getMessages().add(message);
