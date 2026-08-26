@@ -3,17 +3,28 @@ package com.green.yp.message.service;
 import com.green.yp.api.apitype.contact.ContactMessageRequest;
 import com.green.yp.api.apitype.contact.ContactMessageResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import com.green.yp.api.message.MessageMetaResponse;
+import com.green.yp.api.message.MessageResponse;
 import com.green.yp.exception.BusinessException;
 import com.green.yp.exception.ErrorCodeType;
+import com.green.yp.message.data.model.AppMessageRecord;
+import com.green.yp.message.data.model.Message;
+import com.green.yp.message.data.model.MessageStatus;
 import com.green.yp.message.data.repository.MessageRepository;
 import com.green.yp.message.mapper.MessageMapper;
+import jakarta.validation.constraints.NotNull;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -45,12 +56,50 @@ public class MessageService {
     sender.sendMessage(contactMessageResponse.emailMessageId());
   }
 
-  public List<ContactMessageResponse> getContactMessages(String emailAddress, String messageRef) {
-    if (StringUtils.isBlank(emailAddress) && StringUtils.isBlank(messageRef)){
+  public List<MessageMetaResponse> getContactMessages(@NonNull String emailAddress, UUID messageRef) {
+    if (StringUtils.isBlank(emailAddress) && messageRef == null){
       log.info("No email address or message ref provided");
       throw new BusinessException("No email address or reference provided",
               HttpStatus.BAD_REQUEST, ErrorCodeType.BUSINESS_VALIDATION_ERROR);
     }
-    return mapper.toDto(messageRepository.findMessages(emailAddress, messageRef));
+    List<AppMessageRecord> messages = messageRepository.findMessages(emailAddress,messageRef);
+    return mapper.toMetaResponse(messages);
+  }
+
+  public List<MessageResponse> getMessages(@NotNull @NonNull UUID messageMetaId,
+                                           String emailAddress,
+                                           UUID messageRef) {
+    if (StringUtils.isBlank(emailAddress) && messageRef == null){
+      log.info("No email address or message ref provided");
+      throw new BusinessException("No email address or reference provided",
+              HttpStatus.BAD_REQUEST, ErrorCodeType.BUSINESS_VALIDATION_ERROR);
+    }
+    log.info("Getting messages for {}", messageMetaId);
+    List<Message> messages = messageRepository.findMessages(messageMetaId, emailAddress, messageRef);
+    if ( CollectionUtils.isEmpty(messages)){
+      log.warn("No messages found for {}", messageMetaId);
+      return new ArrayList<MessageResponse>();
+    }
+    return mapper.toResponse(messages);
+  }
+
+  @Transactional
+  void markMessageRead(UUID messageId, String emailAddress, UUID messageRef){
+//    if (StringUtils.isBlank(emailAddress) && messageRef == null){
+//      log.info("No email address or message ref provided");
+//      throw new BusinessException("No email address or reference provided",
+//              HttpStatus.BAD_REQUEST, ErrorCodeType.BUSINESS_VALIDATION_ERROR);
+//    }
+//    messageRepository.
+  }
+
+  @Transactional
+  public void archiveMessage(UUID messageId, String emailAddress, UUID messageRef) {
+    if (StringUtils.isBlank(emailAddress) && messageRef == null){
+      log.info("No email address or message ref provided");
+      throw new BusinessException("No email address or reference provided",
+              HttpStatus.BAD_REQUEST, ErrorCodeType.BUSINESS_VALIDATION_ERROR);
+    }
+    messageRepository.archiveMessage(messageId, emailAddress, messageRef, MessageStatus.ARCHIVED);
   }
 }

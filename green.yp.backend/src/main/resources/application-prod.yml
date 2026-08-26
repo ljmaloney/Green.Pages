@@ -105,7 +105,7 @@ greenyp:
   image:
     service:
       impl: aws
-      host: https://greenyp-public-images.s3.amazonaws.com
+      host: https://images.greenyp.com
       bucket: greenyp-public-images
   jwt:
     decoderUrl: https://auth.greenyp.com/.well-known/jwks.json
