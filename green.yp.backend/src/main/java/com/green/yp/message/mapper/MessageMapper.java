@@ -78,10 +78,9 @@ public interface MessageMapper {
      @Mapping(target = "productServiceRef", source = "messageRecord.sourceRef")
      ContactMessageResponse toDto(MessageRecord messageRecord);
 
-    List<ContactMessageResponse> toDto(List<AppMessageRecord> appMessages);
-
     List<MessageMetaResponse> toMetaResponse(List<AppMessageRecord> metas);
-  @Mapping(target = "metaId", source = "meta.id")
+
+    @Mapping(target = "metaId", source = "meta.id")
   @Mapping(target = "subject", source="meta.subject")
   @Mapping(target="messageDescription", source="meta.messageDescription")
   @Mapping(target = "unreadMessageCount", source = "unreadCount")
