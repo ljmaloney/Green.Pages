@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,4 +69,12 @@ public class MessageMeta extends Mutable {
 
     @OneToMany(mappedBy = "meta", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Message> messages;
+
+    public void addMessage(Message message) {
+        if ( messages == null) {
+            messages = new ArrayList<>();
+        }
+        messages.add(message);
+        message.setMeta(this);
+    }
 }

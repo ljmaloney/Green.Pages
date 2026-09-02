@@ -51,7 +51,7 @@ public class GenericMessageImpl implements MessageSendService {
     var messageMeta = mapper.toEntity(request, producerProfile, requestIP);
     var message = mapper.toMessageEntity(request, producerProfile, requestIP);
     message.setMeta(messageMeta);
-    messageMeta.getMessages().add(message);
+    messageMeta.addMessage(message);
     messageMeta.setMessageDescription(producerProfile.businessName());
 
     contactContract

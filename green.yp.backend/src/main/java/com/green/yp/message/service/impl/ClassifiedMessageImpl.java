@@ -65,10 +65,9 @@ public class ClassifiedMessageImpl implements MessageSendService {
       meta.setMessageDescription(messageDescription);
 
     Message message = mapper.toMessageEntity(request, classified);
-    meta.getMessages().add(message);
-    message.setMeta(meta);
-    message.setSourceIpAddress(requestIP);
+    meta.addMessage(message);
 
+    message.setSourceIpAddress(requestIP);
     var savedMessage = metaRepository.saveAndFlush(meta);
     return mapper.toResponse(savedMessage, savedMessage.getMessages().getFirst());
   }
