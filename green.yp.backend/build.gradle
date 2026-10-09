@@ -59,7 +59,6 @@ ext {
     libphonenumberVersion="8.13.55"
     jsoupVersion="1.19.1"
     commonsDiscoveryVersion="0.5"
-    hibernationUtilsVersion="3.9.2"
     testngVersion="7.11.0"
     javafakerVersion="1.0.2"
     awaitilityVersion="4.3.0"
@@ -124,7 +123,6 @@ dependencies {
     implementation "io.github.openfeign:feign-httpclient:${openFeignVersion}"
     implementation "io.github.openfeign:feign-jackson:${openFeignVersion}"
     implementation "io.github.openfeign:feign-micrometer:${openFeignVersion}"
-    implementation "io.hypersistence:hypersistence-utils-hibernate-63:${hibernationUtilsVersion}"
     implementation "org.testng:testng:${testngVersion}"
 
     implementation platform("software.amazon.awssdk:bom:${awsBomVersion}") // Use the latest stable version
