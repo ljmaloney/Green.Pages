@@ -1,8 +1,7 @@
 plugins {
     id 'java'
-    id 'groovy'
-    id 'org.springframework.boot' version '3.4.5'
-    id 'io.spring.dependency-management' version '1.1.6'
+    id 'org.springframework.boot' version '4.0.8'
+    id 'io.spring.dependency-management' version '1.1.7'
     id("org.springdoc.openapi-gradle-plugin") version "1.6.0"
     id 'com.google.cloud.tools.jib' version '3.4.5'
 }
@@ -15,7 +14,9 @@ versionProps.load(new FileInputStream(versionFile))
 version = versionProps['version']
 
 java {
-    sourceCompatibility = '21'
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
 }
 
 configurations {
@@ -36,35 +37,31 @@ repositories {
 
 ext {
     // Framework versions
-    springCloudVersion = "2024.0.1"
+    springCloudVersion = "2025.1.2"
     springDocVersion = "2.8.5"
-    awsBomVersion="2.25.24"
+    awsBomVersion="2.31.7"
     lombokVersion = "1.18.38"
     hikariVersion="6.3.0"
-    resilienceVersion="2.2.0"
-    jacksonVersion="2.17.2"
+    resilienceVersion="2.3.0"
+    jacksonVersion="2.18.3"
     flywayVersion="11.8.2"
-    mysqlConnectorVersion="8.3.0"
+    mysqlConnectorVersion="9.2.0"
     cache2kVersion="2.6.1.Final"
     commonsLangVersion="3.18.0"
-    commonsIoVersion="2.16.1"
-    commonsCsvVersion="1.10.0"
-    commonsCollectionsVersion="4.5.0"
-    log4jVersion="2.25.4"
-    openFeignVersion="13.1"
+    commonsIoVersion="2.18.0"
+    commonsCsvVersion="1.13.0"
+    commonsCollectionsVersion="4.5.0-M3"
+    log4jVersion="2.24.3"
+    openFeignVersion="13.5"
     fusionAuthVersion="1.57.0"
     squareVersion="45.0.0.20250618"
     jtsVersion="1.20.0"
-    libphonenumberVersion="8.12.26"
-    jsoupVersion="1.21.2"
+    libphonenumberVersion="8.13.55"
+    jsoupVersion="1.19.1"
     commonsDiscoveryVersion="0.5"
-    hibernationUtilsVersion="3.5.1"
-    spockVersion="2.4-groovy-4.0"
-    junitJupiterVersion="5.10.2"
-    junitPlatformVersion="1.10.2"
-    testngVersion="7.7.0"
+    testngVersion="7.11.0"
     javafakerVersion="1.0.2"
-    awaitilityVersion="4.1.1"
+    awaitilityVersion="4.3.0"
     wiremockVersion="3.1.1"
     esapiVersion="2.7.0.0"
     commonsPathVersion="2.9.0"
@@ -85,9 +82,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-batch'
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     implementation "com.zaxxer:HikariCP:${hikariVersion}"
-    implementation 'commons-io:commons-io:2.16.1'
-    implementation 'io.fusionauth:fusionauth-java-client:1.57.0'
-    implementation("org.locationtech.jts:jts-core:1.20.0")
+    implementation "commons-io:commons-io:${commonsIoVersion}"
+    implementation "io.fusionauth:fusionauth-java-client:${fusionAuthVersion}"
+    implementation "org.locationtech.jts:jts-core:${jtsVersion}"
 
     implementation("io.github.resilience4j:resilience4j-spring-boot3:${resilienceVersion}")
     implementation("io.github.resilience4j:resilience4j-circuitbreaker:${resilienceVersion}")
@@ -126,33 +123,30 @@ dependencies {
     implementation "io.github.openfeign:feign-httpclient:${openFeignVersion}"
     implementation "io.github.openfeign:feign-jackson:${openFeignVersion}"
     implementation "io.github.openfeign:feign-micrometer:${openFeignVersion}"
-    implementation "io.hypersistence:hypersistence-utils-hibernate-62:${hibernationUtilsVersion}"
     implementation "org.testng:testng:${testngVersion}"
 
     implementation platform("software.amazon.awssdk:bom:${awsBomVersion}") // Use the latest stable version
     implementation 'software.amazon.awssdk:s3'
     implementation 'software.amazon.awssdk:auth'
     implementation 'software.amazon.awssdk:regions'
-    implementation 'software.amazon.awssdk:location:2.25.15'
+    implementation 'software.amazon.awssdk:location'
 
     testImplementation 'io.github.openfeign:feign-mock'
     testImplementation "org.projectlombok:lombok:${lombokVersion}"
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-    testImplementation 'org.apache.groovy:groovy-all:4.0.26'
-    testImplementation "org.spockframework:spock-core:${spockVersion}"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.mockito:mockito-core:5.16.0'
+    testImplementation 'net.bytebuddy:byte-buddy:1.17.2'
+    testImplementation 'net.bytebuddy:byte-buddy-agent:1.17.2'
     testImplementation("com.github.javafaker:javafaker:${javafakerVersion}") {
         exclude(module: 'snakeyaml')
     }
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude(module: 'android-json')
-    }
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.springframework.batch:spring-batch-test'
-    testImplementation "org.junit.jupiter:junit-jupiter:${junitJupiterVersion}"
-    testImplementation "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}"
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.junit.platform:junit-platform-launcher'
     testImplementation("org.springframework.cloud:spring-cloud-contract-wiremock:${wiremockVersion}") {
         exclude(module: "wiremock-jre8-standalone")
     }
@@ -198,7 +192,7 @@ jib {
         tags = ["latest", "${version}"]
     }
     from {
-        image = 'eclipse-temurin:21-alpine'
+        image = 'eclipse-temurin:25-alpine'
     }
     container {
         mainClass = 'com.green.yp.GreenYPBackendApplication'
