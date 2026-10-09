@@ -1,6 +1,5 @@
 plugins {
     id 'java'
-    id 'groovy'
     id 'org.springframework.boot' version '3.4.5'
     id 'io.spring.dependency-management' version '1.1.6'
     id("org.springdoc.openapi-gradle-plugin") version "1.6.0"
@@ -15,7 +14,9 @@ versionProps.load(new FileInputStream(versionFile))
 version = versionProps['version']
 
 java {
-    sourceCompatibility = '21'
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
 }
 
 configurations {
@@ -59,7 +60,6 @@ ext {
     jsoupVersion="1.21.2"
     commonsDiscoveryVersion="0.5"
     hibernationUtilsVersion="3.5.1"
-    spockVersion="2.4-groovy-4.0"
     junitJupiterVersion="5.10.2"
     junitPlatformVersion="1.10.2"
     testngVersion="7.7.0"
@@ -140,9 +140,10 @@ dependencies {
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-    testImplementation 'org.apache.groovy:groovy-all:4.0.26'
-    testImplementation "org.spockframework:spock-core:${spockVersion}"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.mockito:mockito-core:5.16.0'
+    testImplementation 'net.bytebuddy:byte-buddy:1.17.2'
+    testImplementation 'net.bytebuddy:byte-buddy-agent:1.17.2'
     testImplementation("com.github.javafaker:javafaker:${javafakerVersion}") {
         exclude(module: 'snakeyaml')
     }
@@ -198,7 +199,7 @@ jib {
         tags = ["latest", "${version}"]
     }
     from {
-        image = 'eclipse-temurin:21-alpine'
+        image = 'eclipse-temurin:25-alpine'
     }
     container {
         mainClass = 'com.green.yp.GreenYPBackendApplication'
