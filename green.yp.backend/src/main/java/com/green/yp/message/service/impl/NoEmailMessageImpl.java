@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
+
 @Slf4j
 @Service("noEmail")
 public class NoEmailMessageImpl implements MessageSendService {
@@ -28,7 +30,7 @@ public class NoEmailMessageImpl implements MessageSendService {
   public Optional<ContactMessageResponse> createContactMessage(
       ContactMessageRequest contactMessageRequest, String requestIP) {
     log.info("Create support message request: {}", contactMessageRequest);
-    return Optional.ofNullable(messageDataService.createContactMessage(contactMessageRequest, supportEmail, requestIP));
+    return Optional.empty();
   }
 
   @Override

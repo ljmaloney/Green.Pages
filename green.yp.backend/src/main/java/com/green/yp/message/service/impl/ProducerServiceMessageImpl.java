@@ -2,7 +2,6 @@ package com.green.yp.message.service.impl;
 
 import com.green.yp.api.apitype.contact.ContactMessageRequest;
 import com.green.yp.api.apitype.contact.ContactMessageResponse;
-import com.green.yp.api.apitype.producer.enumeration.ProducerContactType;
 import com.green.yp.api.contract.ProducerContactContract;
 import com.green.yp.api.contract.ProducerContract;
 import com.green.yp.message.data.repository.ContactMessageRepository;
@@ -12,19 +11,18 @@ import com.green.yp.message.service.MessageSendService;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service("serviceMessage")
-public class ServiceMessageImpl implements MessageSendService {
+public class ProducerServiceMessageImpl implements MessageSendService {
 
   private final ProducerContract producerContract;
   private final ProducerContactContract contactContract;
   private final ContactMapper mapper;
   private final ContactMessageRepository repository;
 
-  public ServiceMessageImpl(
+  public ProducerServiceMessageImpl(
       ProducerContract producerContract,
       ProducerContactContract producerContactContract,
       ContactMapper mapper,

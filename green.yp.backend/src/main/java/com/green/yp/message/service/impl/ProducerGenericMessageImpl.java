@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service("genericMessage")
-public class GenericMessageImpl implements MessageSendService {
+public class ProducerGenericMessageImpl implements MessageSendService {
 
   private final ProducerContract producerContract;
   private final ProducerContactContract contactContract;
@@ -26,7 +26,7 @@ public class GenericMessageImpl implements MessageSendService {
   private final MessageRepository repository;
   private final MessageMetaRepository metaRepository;
 
-  public GenericMessageImpl(
+  public ProducerGenericMessageImpl(
           ProducerContract producerContract,
           ProducerContactContract producerContactContract,
           MessageMapper mapper,

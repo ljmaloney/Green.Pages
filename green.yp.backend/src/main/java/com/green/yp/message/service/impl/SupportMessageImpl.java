@@ -28,7 +28,7 @@ public class SupportMessageImpl implements MessageSendService {
   public Optional<ContactMessageResponse> createContactMessage(
       ContactMessageRequest contactMessageRequest, String requestIP) {
     log.info("Create support message request: {}", contactMessageRequest);
-    return Optional.ofNullable(messageDataService.createContactMessage(contactMessageRequest, supportEmail, requestIP));
+    return Optional.empty();
   }
 
   @Override

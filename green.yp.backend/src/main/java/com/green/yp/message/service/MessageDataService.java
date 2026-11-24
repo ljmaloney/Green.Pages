@@ -36,17 +36,17 @@ public class MessageDataService {
       this.messageMapper = messageMapper;
   }
 
-  public ContactMessageResponse createContactMessage(
-      ContactMessageRequest request, String emailAddress, String requestIP) {
-    log.info("Creating new generic contact message for {}", emailAddress);
-    var contactMessage = mapper.toEntity(request, requestIP);
-    contactMessage.setAddresseeName(emailAddress);
-    contactMessage.setSourceIpAddress(requestIP);
-    contactMessage.setSmsEmailType("email");
-    contactMessage.setDestination(emailAddress);
-
-    return mapper.toDto(repository.saveAndFlush(contactMessage));
-  }
+//  public ContactMessageResponse createContactMessage(
+//      ContactMessageRequest request, String emailAddress, String requestIP) {
+//    log.info("Creating new generic contact message for {}", emailAddress);
+//    var contactMessage = mapper.toEntity(request, requestIP);
+//    contactMessage.setAddresseeName(emailAddress);
+//    contactMessage.setSourceIpAddress(requestIP);
+//    contactMessage.setSmsEmailType("email");
+//    contactMessage.setDestination(emailAddress);
+//
+//    return mapper.toDto(repository.saveAndFlush(contactMessage));
+//  }
 
   public List<ContactMessageResponse> getMessages(
           @NotNull @NonNull LocalDate startDate,
