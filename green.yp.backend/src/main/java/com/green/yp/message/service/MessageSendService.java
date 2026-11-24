@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface MessageSendService {
-  Optional<ContactMessageResponse> createContactMessage(
+   Optional<ContactMessageResponse> createContactMessage(
       ContactMessageRequest contactMessageRequest, String requestIP);
 
   void sendMessage(UUID contactMessageId);

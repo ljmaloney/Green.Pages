@@ -1,79 +1,43 @@
 package com.green.yp.message.service.impl;
 
 import com.green.yp.api.apitype.contact.ContactMessageRequest;
-import com.green.yp.api.apitype.contact.ContactMessageResponse;
-import com.green.yp.api.apitype.producer.enumeration.ProducerContactType;
+import com.green.yp.api.apitype.producer.ProducerProfileResponse;
+
 import com.green.yp.api.contract.ProducerContactContract;
 import com.green.yp.api.contract.ProducerContract;
+import com.green.yp.message.data.model.MessageMeta;
 import com.green.yp.message.data.repository.MessageMetaRepository;
-import com.green.yp.message.data.repository.MessageRepository;
 import com.green.yp.message.mapper.MessageMapper;
 import com.green.yp.message.service.MessageSendService;
 
-import java.util.Optional;
+
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service("genericMessage")
-public class ProducerGenericMessageImpl implements MessageSendService {
+public class ProducerGenericMessageImpl extends AbstractProducerMessage implements MessageSendService {
 
-  private final ProducerContract producerContract;
-  private final ProducerContactContract contactContract;
-  private final MessageMapper mapper;
-  private final MessageRepository repository;
-  private final MessageMetaRepository metaRepository;
+  private MessageMapper mapper;
 
   public ProducerGenericMessageImpl(
           ProducerContract producerContract,
           ProducerContactContract producerContactContract,
           MessageMapper mapper,
-          MessageRepository repository,
           MessageMetaRepository metaRepository) {
-    this.producerContract = producerContract;
-    this.contactContract = producerContactContract;
+    super(producerContract, producerContactContract, mapper, metaRepository);
     this.mapper = mapper;
-    this.repository = repository;
-      this.metaRepository = metaRepository;
   }
 
   @Override
-  public Optional<ContactMessageResponse> createContactMessage(
-      ContactMessageRequest request, String requestIP) {
-    log.info(
-        "Creating new pro -> customer contact message for producer id {} locationId {}",
-        request.leadContactRequest().producerId(),
-        request.leadContactRequest().locationId());
-
-    var producerProfile =
-        producerContract.getProducerProfile(request.leadContactRequest().locationId());
-
-    var messageMeta = mapper.toEntity(request, producerProfile, requestIP);
-    var message = mapper.toMessageEntity(request, producerProfile, requestIP);
+  MessageMeta createMessage(ContactMessageRequest contactMessageRequest, ProducerProfileResponse producerProfile, String requestIP) {
+    var messageMeta = mapper.toEntity(contactMessageRequest, producerProfile, requestIP);
+    var message = mapper.toMessageEntity(contactMessageRequest, producerProfile, requestIP);
     message.setMeta(messageMeta);
     messageMeta.addMessage(message);
     messageMeta.setMessageDescription(producerProfile.businessName());
-
-    contactContract
-        .findContacts(
-            request.leadContactRequest().producerId(), request.leadContactRequest().locationId())
-        .stream()
-        .filter(c -> c.producerContactType() == ProducerContactType.PRIMARY)
-        .findFirst()
-        .ifPresent(
-            c -> {
-              if (StringUtils.isNotBlank(c.firstName()) && StringUtils.isNotBlank(c.lastName())) {
-                message.setAddresseeName(String.join(" ", c.firstName(), c.lastName()));
-              } else if (StringUtils.isNotBlank(c.genericContactName())) {
-                message.setAddresseeName(c.genericContactName());
-              }
-              message.setDestination(c.emailAddress());
-            });
-    message.setSmsEmailType("email");
-    var savedMessage = metaRepository.saveAndFlush(messageMeta);
-    return Optional.of(mapper.toResponse(savedMessage, savedMessage.getMessages().getFirst()));
+    return messageMeta;
   }
 
   @Override
