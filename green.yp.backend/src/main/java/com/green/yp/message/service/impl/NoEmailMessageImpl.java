@@ -4,6 +4,8 @@ import com.green.yp.api.apitype.contact.ContactMessageRequest;
 import com.green.yp.api.apitype.contact.ContactMessageResponse;
 import com.green.yp.message.service.MessageDataService;
 import com.green.yp.message.service.MessageSendService;
+
+import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,10 +25,10 @@ public class NoEmailMessageImpl implements MessageSendService {
   }
 
   @Override
-  public ContactMessageResponse createContactMessage(
+  public Optional<ContactMessageResponse> createContactMessage(
       ContactMessageRequest contactMessageRequest, String requestIP) {
     log.info("Create support message request: {}", contactMessageRequest);
-    return messageDataService.createContactMessage(contactMessageRequest, supportEmail, requestIP);
+    return Optional.ofNullable(messageDataService.createContactMessage(contactMessageRequest, supportEmail, requestIP));
   }
 
   @Override

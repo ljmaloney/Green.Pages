@@ -72,8 +72,8 @@ public class ContactController {
 
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public void processContactRequest(
-      @RequestBody @Valid ContactMessageRequest contactMessageRequest, HttpServletRequest request) {
+  public void processContactRequest(@RequestBody @Valid ContactMessageRequest contactMessageRequest,
+      HttpServletRequest request) {
     service.sendMessage(contactMessageRequest, RequestUtil.getRequestIP(request));
   }
 }

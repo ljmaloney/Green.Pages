@@ -9,6 +9,8 @@ import com.green.yp.message.data.repository.MessageMetaRepository;
 import com.green.yp.message.data.repository.MessageRepository;
 import com.green.yp.message.mapper.MessageMapper;
 import com.green.yp.message.service.MessageSendService;
+
+import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -38,7 +40,7 @@ public class GenericMessageImpl implements MessageSendService {
   }
 
   @Override
-  public ContactMessageResponse createContactMessage(
+  public Optional<ContactMessageResponse> createContactMessage(
       ContactMessageRequest request, String requestIP) {
     log.info(
         "Creating new pro -> customer contact message for producer id {} locationId {}",
@@ -71,7 +73,7 @@ public class GenericMessageImpl implements MessageSendService {
             });
     message.setSmsEmailType("email");
     var savedMessage = metaRepository.saveAndFlush(messageMeta);
-    return mapper.toResponse(savedMessage, savedMessage.getMessages().getFirst());
+    return Optional.of(mapper.toResponse(savedMessage, savedMessage.getMessages().getFirst()));
   }
 
   @Override

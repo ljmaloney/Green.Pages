@@ -50,10 +50,11 @@ public class MessageService {
     if (sender == null) {
       log.info("No sender registered for {}", contactRequest.requestType());
     }
-    ContactMessageResponse contactMessageResponse =
-        sender.createContactMessage(contactRequest, requestIP);
 
-    sender.sendMessage(contactMessageResponse.emailMessageId());
+    sender.createContactMessage(contactRequest, requestIP)
+            .ifPresent(contactMessageResponse -> {
+      sender.sendMessage(contactMessageResponse.emailMessageId());
+    });
   }
 
   public List<MessageMetaResponse> getContactMessages(@NonNull String emailAddress, UUID messageRef) {

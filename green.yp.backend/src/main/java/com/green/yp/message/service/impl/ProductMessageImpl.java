@@ -8,6 +8,8 @@ import com.green.yp.api.contract.ProducerContract;
 import com.green.yp.message.data.repository.ContactMessageRepository;
 import com.green.yp.message.mapper.ContactMapper;
 import com.green.yp.message.service.MessageSendService;
+
+import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -34,7 +36,7 @@ public class ProductMessageImpl implements MessageSendService {
   }
 
   @Override
-  public ContactMessageResponse createContactMessage(
+  public Optional<ContactMessageResponse> createContactMessage(
       ContactMessageRequest request, String requestIP) {
     log.info(
         "Creating new producer product -> customer contact message for producer id {} locationId {} and productId {}",
@@ -42,28 +44,30 @@ public class ProductMessageImpl implements MessageSendService {
         request.leadContactRequest().locationId(),
         request.leadContactRequest().productServiceRef());
 
-    var producerProfile =
-        producerContract.getProducerProfile(request.leadContactRequest().locationId());
+    return Optional.empty();
 
-    var message = mapper.toEntity(request, producerProfile, requestIP);
-
-    contactContract
-        .findContacts(
-            request.leadContactRequest().producerId(), request.leadContactRequest().locationId())
-        .stream()
-        .filter(c -> c.producerContactType() == ProducerContactType.PRIMARY)
-        .findFirst()
-        .ifPresent(
-            c -> {
-              if (StringUtils.isNotBlank(c.firstName()) && StringUtils.isNotBlank(c.lastName())) {
-                message.setAddresseeName(String.join(" ", c.firstName(), c.lastName()));
-              } else if (StringUtils.isNotBlank(c.genericContactName())) {
-                message.setAddresseeName(c.genericContactName());
-              }
-              message.setDestination(c.emailAddress());
-            });
-    message.setSmsEmailType("email");
-    return mapper.toDto(repository.saveAndFlush(message));
+//    var producerProfile =
+//        producerContract.getProducerProfile(request.leadContactRequest().locationId());
+//
+//    var message = mapper.toEntity(request, producerProfile, requestIP);
+//
+//    contactContract
+//        .findContacts(
+//            request.leadContactRequest().producerId(), request.leadContactRequest().locationId())
+//        .stream()
+//        .filter(c -> c.producerContactType() == ProducerContactType.PRIMARY)
+//        .findFirst()
+//        .ifPresent(
+//            c -> {
+//              if (StringUtils.isNotBlank(c.firstName()) && StringUtils.isNotBlank(c.lastName())) {
+//                message.setAddresseeName(String.join(" ", c.firstName(), c.lastName()));
+//              } else if (StringUtils.isNotBlank(c.genericContactName())) {
+//                message.setAddresseeName(c.genericContactName());
+//              }
+//              message.setDestination(c.emailAddress());
+//            });
+//    message.setSmsEmailType("email");
+//    return mapper.toDto(repository.saveAndFlush(message));
   }
 
   @Override

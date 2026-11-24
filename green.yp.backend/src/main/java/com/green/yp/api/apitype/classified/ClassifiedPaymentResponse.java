@@ -9,6 +9,7 @@ import lombok.Builder;
 public record ClassifiedPaymentResponse(
     UUID classifiedId,
     @Size(max = 200) @NotNull String classifiedTitle,
+    String idToken,
     String paymentStatus,
     String paymentRef,
     String orderRef,

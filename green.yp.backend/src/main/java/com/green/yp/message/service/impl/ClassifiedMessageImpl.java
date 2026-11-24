@@ -13,10 +13,8 @@ import com.green.yp.message.mapper.MessageMapper;
 import com.green.yp.message.service.EmailService;
 import com.green.yp.message.service.MessageSendService;
 import java.time.OffsetDateTime;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,7 +46,7 @@ public class ClassifiedMessageImpl implements MessageSendService {
   }
 
   @Override
-  public ContactMessageResponse createContactMessage(
+  public Optional<ContactMessageResponse> createContactMessage(
       ContactMessageRequest request, String requestIP) {
     log.info(
             "Creating new classified ad -> customer contact message for classified id {}",
@@ -69,7 +67,7 @@ public class ClassifiedMessageImpl implements MessageSendService {
 
     message.setSourceIpAddress(requestIP);
     var savedMessage = metaRepository.saveAndFlush(meta);
-    return mapper.toResponse(savedMessage, savedMessage.getMessages().getFirst());
+    return Optional.of(mapper.toResponse(savedMessage, savedMessage.getMessages().getFirst()));
   }
 
   @Override

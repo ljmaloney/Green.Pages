@@ -160,6 +160,7 @@ public class ClassifiedPaymentService {
     return new ClassifiedPaymentResponse(
         classified.classified().getId(),
         classified.classified().getTitle(),
+        classified.classified().getIdToken(),
         paymentResponse.status(),
         paymentResponse.paymentRef(),
         paymentResponse.orderRef(),
