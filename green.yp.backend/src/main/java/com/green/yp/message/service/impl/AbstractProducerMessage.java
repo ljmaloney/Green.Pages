@@ -8,7 +8,6 @@ import com.green.yp.api.contract.ProducerContactContract;
 import com.green.yp.api.contract.ProducerContract;
 import com.green.yp.message.data.model.MessageMeta;
 import com.green.yp.message.data.repository.MessageMetaRepository;
-import com.green.yp.message.data.repository.MessageRepository;
 import com.green.yp.message.mapper.MessageMapper;
 import com.green.yp.message.service.MessageSendService;
 import lombok.extern.slf4j.Slf4j;
