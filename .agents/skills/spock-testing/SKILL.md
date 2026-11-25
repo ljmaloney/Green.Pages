@@ -13,7 +13,7 @@ description: Write Groovy - Spock specifications (not Junit) for testing Spring 
 - Creating integration tests with Testcontainers or WireMock
 
 ## Baseline conventions
-- Spring Boot 4, Java 25 (`ms-spring-boot-parent` 2.x)
+- Spring Boot 4, Java 25
 - Spock 2.4+ on Groovy 4.0.x (verify against the Boot 4 BOM), managed via BOMs
 - Descriptive quoted-string test names
 - Constructor injection for SUT; `@Subject` annotation
@@ -39,17 +39,24 @@ description: Write Groovy - Spock specifications (not Junit) for testing Spring 
 - Seed via Spring Data repositories from `src/test/resources/data/*.json`
 - Clean in `setup()` or `cleanup()`
 
+## MySQL integration tests
+- Use a Spring-managed `MySQLContainer` bean with `@ServiceConnection` and an available, application-compatible MySQL image
+- Create the schema using application migrations or a test schema
+- Seed and clean an isolated test database with `@Sql` scripts in `src/test/resources/data/` before and after each feature
+- Include Spring Boot Testcontainers integration, the Testcontainers MySQL module, a MySQL JDBC driver, and Spring JDBC; Docker must be running
+- See [the MySQL seed-data example](assets/EXAMPLES.md#mysql-integration-spec-with-seed-data)
+
 ## WireMock integration tests
 - `@Shared static WireMockServer` with dynamic port
 - Override base URL with `@DynamicPropertySource`
 - Fixture naming: `servicename/endpoint-token_httpstatus.json`
 
-## POM inspection
-Before generating Spock tests, verify Maven has:
-- `spock-bom` in `<dependencyManagement>`
-- `spock-core` and `spock-spring` with `<scope>test</scope>`
+## Gradle inspection
+Before generating Spock tests, verify the Gradle build has:
+- `spock-bom` imported as a test dependency platform
+- `spock-core` and `spock-spring` in `testImplementation`
 - `wiremock` if mocking HTTP; `testcontainers:mongodb` + `testcontainers:spock` for container tests
-- Groovy test compiler plugin if not already configured
+- The Groovy plugin and `useJUnitPlatform()` for the test task
 
 If any are missing, tell the user which ones and ask before adding them.
 
@@ -60,7 +67,7 @@ If any are missing, tell the user which ones and ask before adding them.
 - Concurrency-sensitive paths
 - Pagination/sorting boundaries
 
-See [assets/EXAMPLES.md](assets/EXAMPLES.md) for core unit test template, data tables, Spring Boot integration spec, JSON fixture helper, WireMock patterns (inline, fixture files, parameterized), MongoDB integration specs, interaction testing, and Maven dependencies.
+See [assets/EXAMPLES.md](assets/EXAMPLES.md) for core unit test template, data tables, Spring Boot integration spec, JSON fixture helper, WireMock patterns (inline, fixture files, parameterized), MongoDB integration specs, interaction testing, and Gradle dependencies.
 
 ## Definition of done
 - [ ] Spec follows `{ClassName}Spec.groovy` naming

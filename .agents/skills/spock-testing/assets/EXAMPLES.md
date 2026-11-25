@@ -267,6 +267,59 @@ src/test/resources/
       pricing-txn-123_404.json
 ```
 
+## MySQL integration spec with seed data
+
+Use a Spring-managed container so its lifecycle and connection details are available to the application context. The example assumes an existing `users` table with `id` and `name` columns; use the application's migrations or test schema to create it. The SQL scripts run before and after each feature to keep the seed data isolated.
+
+```groovy
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Import
+import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.test.context.jdbc.Sql
+import org.springframework.test.context.jdbc.Sql.ExecutionPhase
+import org.testcontainers.containers.MySQLContainer
+import spock.lang.Specification
+
+@SpringBootTest
+@Import(MySqlTestContainers)
+@Sql(scripts = '/data/users-seed.sql', executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = '/data/users-cleanup.sql', executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+class UserRepositorySpec extends Specification {
+
+    @Autowired JdbcTemplate jdbcTemplate
+
+    def "finds a seeded user in MySQL"() {
+        expect:
+        jdbcTemplate.queryForObject('select name from users where id = ?', String, 1001L) == 'Ada'
+    }
+}
+
+@TestConfiguration(proxyBeanMethods = false)
+class MySqlTestContainers {
+    @Bean
+    @ServiceConnection
+    MySQLContainer<?> mysql() {
+        new MySQLContainer<>('mysql:9.7.4')
+    }
+}
+```
+
+`src/test/resources/data/users-seed.sql`:
+```sql
+INSERT INTO users (id, name) VALUES (1001, 'Ada');
+```
+
+`src/test/resources/data/users-cleanup.sql`:
+```sql
+DELETE FROM users WHERE id = 1001;
+```
+
+Choose an available MySQL image tag compatible with the application, and use an isolated test database. Add Spring Boot's Testcontainers integration, the Testcontainers MySQL module, a MySQL JDBC driver, and Spring JDBC to the Gradle test runtime, using versions compatible with the project's Spring Boot and Testcontainers dependency management. Docker must be running. Unlike JUnit Jupiter's `@Testcontainers` and `@Container` annotations, the Spring-managed bean also starts and stops the container for a Spock specification.
+
 ## Interaction testing patterns
 ```groovy
 then:
@@ -279,39 +332,32 @@ then:
 1 * client.call(_ as Request) >> new Response(code: 200)
 ```
 
-## Suggested dependencies (Maven)
-```xml
-<dependencyManagement>
-  <dependencies>
-    <dependency>
-      <groupId>org.spockframework</groupId>
-      <artifactId>spock-bom</artifactId>
-      <version><!-- 2.4-M6+ --></version>
-      <type>pom</type>
-      <scope>import</scope>
-    </dependency>
-  </dependencies>
-</dependencyManagement>
+## Suggested dependencies (Gradle)
+```groovy
+// build.gradle
+plugins {
+    id 'groovy'
+}
 
-<dependency>
-  <groupId>org.spockframework</groupId>
-  <artifactId>spock-core</artifactId>
-  <scope>test</scope>
-</dependency>
-<dependency>
-  <groupId>org.spockframework</groupId>
-  <artifactId>spock-spring</artifactId>
-  <scope>test</scope>
-</dependency>
-<dependency>
-  <groupId>org.wiremock</groupId>
-  <artifactId>wiremock</artifactId>
-  <scope>test</scope>
-</dependency>
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.spockframework:spock-bom:2.4-groovy-4.0')
+    testImplementation 'org.spockframework:spock-core'
+    testImplementation 'org.spockframework:spock-spring'
+    testImplementation 'org.wiremock:wiremock:3.13.1'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.13.4'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
 ```
 
 ## Version check checklist
 - [ ] Java 25
 - [ ] Spring Boot 4
 - [ ] Spock from `spock-bom` at `2.4-M6+` with Groovy `4.0.x`
-- [ ] No duplicate version pins outside dependency management
+- [ ] No duplicate version pins outside Gradle dependency management
