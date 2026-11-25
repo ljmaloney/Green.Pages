@@ -269,7 +269,7 @@ src/test/resources/
 
 ## MySQL integration spec with seed data
 
-Use a Spring-managed container so its lifecycle and connection details are available to the application context. The example assumes an existing `users` table with `id` and `name` columns; use the application's migrations or test schema to create it. The SQL scripts run before and after each feature to keep the seed data isolated.
+Use a Spring-managed container so its lifecycle and connection details are available to the application context. The example assumes an existing `users` table with `id` and `name` columns; use the application's migrations or test schema to create it. Place the classpath scripts in the test-case directory shown below; Spring runs them before and after each feature to keep the seed data isolated. The same arrangement works for controller specifications.
 
 ```groovy
 import org.springframework.beans.factory.annotation.Autowired
@@ -286,8 +286,8 @@ import spock.lang.Specification
 
 @SpringBootTest
 @Import(MySqlTestContainers)
-@Sql(scripts = '/data/users-seed.sql', executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
-@Sql(scripts = '/data/users-cleanup.sql', executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(scripts = '/data/controller/user-repository/seed.sql', executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = '/data/controller/user-repository/cleanup.sql', executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class UserRepositorySpec extends Specification {
 
     @Autowired JdbcTemplate jdbcTemplate
@@ -308,12 +308,12 @@ class MySqlTestContainers {
 }
 ```
 
-`src/test/resources/data/users-seed.sql`:
+`green.yp.backend/src/test/resources/data/controller/user-repository/seed.sql`:
 ```sql
 INSERT INTO users (id, name) VALUES (1001, 'Ada');
 ```
 
-`src/test/resources/data/users-cleanup.sql`:
+`green.yp.backend/src/test/resources/data/controller/user-repository/cleanup.sql`:
 ```sql
 DELETE FROM users WHERE id = 1001;
 ```

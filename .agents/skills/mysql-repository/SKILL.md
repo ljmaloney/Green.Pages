@@ -55,7 +55,8 @@ MySQL DDL commonly causes implicit commits and cannot generally be rolled back t
 - Let Flyway own schema evolution. Check the effective `spring.jpa.hibernate.ddl-auto` setting and avoid using Hibernate schema creation or updates to manage persistent environments; use validation where compatible with the project's mappings.
 
 ## Flyway integration
-- Check the configured migration locations and schema history; this project normally stores SQL migrations in `green.yp.backend/src/main/resources/db/migration` using names such as `V1.1__greenyp_initial_schema.sql`.
+- Flyway SQL scripts are typically located in `green.yp.backend/src/main/resources/db/migration/`, for example `V1.1__greenyp_initial_schema.sql`.
+- Check the configured migration locations and schema history for the active environment.
 - Inspect all existing versions and Flyway history before choosing a unique, correctly ordered `V<version>__<description>.sql` filename. Investigate duplicate versions or malformed filenames rather than assuming the next version is safe.
 - Never edit a migration already applied to a shared environment; add a forward migration. Review MySQL-specific syntax, existing data, locks, implicit commits, and compatibility with deployed application versions.
 - Validate and apply migrations to an isolated MySQL instance first, including upgrade from a representative prior schema and, where practical, a fresh database. Check `flyway_schema_history` and investigate failures; do not blindly repair checksums, baseline, or clean a database.

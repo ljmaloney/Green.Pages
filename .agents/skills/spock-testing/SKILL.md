@@ -23,9 +23,10 @@ description: Write Groovy - Spock specifications (not Junit) for testing Spring 
 ## Directory and naming
 - Place specs under `src/test/groovy/...` mirroring production packages
 - Name files `{ClassName}Spec.groovy`
-- JSON fixtures under `src/test/resources/[testclassname]/`
+- Controller test data under `green.yp.backend/src/test/resources/data/controller/[testcase]/`, grouped by spec or test case with descriptive filenames
+- Store readable JSON fixtures there and load them from the test classpath in Spock; use SQL scripts in the same directory for relational database seed and cleanup data
 - WireMock fixtures under `src/test/resources/[testclassname]/servicename/[endpoint_httpstatus].json`
-- MongoDB seed data under `src/test/resources/data/`
+- Place other database seed data under `src/test/resources/data/`, grouped by test case
 
 ## Feature method structure
 - **given:** setup input state, stubs, preconditions
@@ -36,13 +37,13 @@ description: Write Groovy - Spock specifications (not Junit) for testing Spring 
 ## MongoDB integration tests
 - Declare `@Shared static MongoDBContainer mongo = new MongoDBContainer("mongo:8")`
 - Wire with `@DynamicPropertySource`
-- Seed via Spring Data repositories from `src/test/resources/data/*.json`
+- Seed via Spring Data repositories from classpath JSON fixtures under `src/test/resources/data/`
 - Clean in `setup()` or `cleanup()`
 
 ## MySQL integration tests
 - Use a Spring-managed `MySQLContainer` bean with `@ServiceConnection` and an available, application-compatible MySQL image
 - Create the schema using application migrations or a test schema
-- Seed and clean an isolated test database with `@Sql` scripts in `src/test/resources/data/` before and after each feature
+- Seed and clean an isolated test database with classpath `@Sql` scripts in the relevant test-case directory before and after each feature; for controller tests use `data/controller/[testcase]/`
 - Include Spring Boot Testcontainers integration, the Testcontainers MySQL module, a MySQL JDBC driver, and Spring JDBC; Docker must be running
 - See [the MySQL seed-data example](assets/EXAMPLES.md#mysql-integration-spec-with-seed-data)
 
